@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 10:17 -->
+<!-- 2026-03-14 Sat 12:59 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple Diagrams</title>
@@ -19,7 +19,7 @@ body { font-family: sans-serif;
        background-color: #383634; }
 a:link { color: #C0BFBC; }
 a:visited { color: #77767B; }
-code, pre { background: #434139;
+code, pre { background: #000;
             padding: 2px;
             font-family: monospace; }
 </style>
@@ -153,7 +153,7 @@ Here's the diagram:
 </p>
 
 
-<div id="org155cbff" class="figure">
+<div id="org6c831a2" class="figure">
 <p><img src="../assets/Classes_ER.svg" alt="Classes_ER.svg" class="org-svg" />
 </p>
 </div>
@@ -178,7 +178,7 @@ implied. Otherwise, everything is the same:
 </p>
 
 
-<div id="org1c64a53" class="figure">
+<div id="org2d02a0d" class="figure">
 <p><img src="../assets/Classes_ER_conceptual.svg" alt="Classes_ER_conceptual.svg" class="org-svg" />
 </p>
 </div>
@@ -223,15 +223,22 @@ another one can be different, it can be represented as <code>A | B</code> or
 </p>
 
 
-<div id="orge2d8bf0" class="figure">
+<div id="org4cc236d" class="figure">
 <p><img src="../assets/Classes_ER_variations1.svg" alt="Classes_ER_variations1.svg" class="org-svg" />
 </p>
 </div>
 
 <p>
 The brackets show that this relation name is used as the default
-relation (where there is no name at all).
+relation (where there is no name at all). It can be read as:
 </p>
+
+<ul class="org-ul">
+<li>"Scrollbar knows its Window"</li>
+<li>"Window owns Scrollbar"</li>
+<li>"Close button knows its Window"</li>
+<li>"Window owns Close button"</li>
+</ul>
 
 <p>
 Another situation: some term/notion has some attribute sharing its
@@ -246,7 +253,7 @@ And instances also have their own, individual values-attributes
 </p>
 
 
-<div id="orgb9e3af7" class="figure">
+<div id="org0d63bbf" class="figure">
 <p><img src="../assets/Classes_ER_variations2.svg" alt="Classes_ER_variations2.svg" class="org-svg" />
 </p>
 </div>
@@ -269,7 +276,7 @@ the class but not close to an arrow.
 </p>
 
 
-<div id="org6f74f9f" class="figure">
+<div id="org43a76f7" class="figure">
 <p><img src="../assets/Classes_ER_variations3.svg" alt="Classes_ER_variations3.svg" class="org-svg" />
 </p>
 </div>
@@ -302,8 +309,8 @@ a salary.
 <h2 id="org8d29b5e">Algorithmic diagrams</h2>
 <div class="outline-text-2" id="text-org8d29b5e">
 
-<div id="org4f908a0" class="figure">
-<p><img src="../assets/Algo_Diag1.svg" alt="Algo_Diag1.svg" class="org-svg" />
+<div id="orgb416edc" class="figure">
+<p><img src="../assets/Algo1.svg" alt="Algo1.svg" class="org-svg" />
 </p>
 </div>
 
@@ -373,8 +380,8 @@ take a look at this algorithm:
 </p>
 
 
-<div id="org61b6a83" class="figure">
-<p><img src="../assets/Algo_Diag2.svg" alt="Algo_Diag2.svg" class="org-svg" />
+<div id="org5f56198" class="figure">
+<p><img src="../assets/Algo2.svg" alt="Algo2.svg" class="org-svg" />
 </p>
 </div>
 
@@ -427,7 +434,58 @@ to learn them - compare it with UML!
 <h2 id="org3cd59d9">Grafcet-like diagrams</h2>
 <div class="outline-text-2" id="text-org3cd59d9">
 <p>
-TODO
+These algorithmic diagrams can be used also in <a href="https://fr.wikipedia.org/wiki/Grafcet">Grafcet</a> style:
+</p>
+
+
+<div id="org0474f8b" class="figure">
+<p><img src="../assets/Algo_as_Grafcet1.svg" alt="Algo_as_Grafcet1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+we even can try to add tokens&#x2026; In this diagram serving of coffee
+happens only if everything required was provided - so we have the
+<b>condition</b> "Wait for all" (like traffic sign!). We drew it separately
+from "serve coffee to all" because we have another route to it: "cup
+of coffee" ready for consumption. Else - we can write the text "Wait
+for all" (or similar) directly inside the rectangle "serve coffee to
+all".
+</p>
+
+<p>
+So, when all inputs will be ready - serving starts. "Wait for all"
+also reminds us some route/road/map related objects, for ex, <b>bus
+stop</b>: it's a place where people gather, it can work as "if more than
+10 persons came, we start". In Grafcet it's <b>Convergence in AND</b> element
+of diagrams.
+</p>
+
+<p>
+Then "serve coffee to all" serves coffee to 2 tables: simultaneously.
+And this is the same as <b>Divergence in AND</b> in Grafcet diagrams.
+</p>
+
+<p>
+We can draw <b>Divergence in OR</b> element too:
+</p>
+
+
+<div id="org9cb121e" class="figure">
+<p><img src="../assets/Algo_as_Grafcet2.svg" alt="Algo_as_Grafcet2.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+where only one of 2 tables will be served. Kind of optimization of
+waiters work :) The rectangle "Just one of" can be more complex
+"traffic sign", for ex, it can explicitly declares the condition
+of choice.
+</p>
+
+<p>
+I think, it's easy to extend it more, including add of tokens for
+Petri nets.
 </p>
 </div>
 </div>
