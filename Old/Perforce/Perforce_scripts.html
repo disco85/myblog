@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Perforce scripts</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="perforce, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Perforce scripts</h1>
+<div id="outline-container-orga457ece" class="outline-2">
+<h2 id="orga457ece">Perforce scripts</h2>
+<div class="outline-text-2" id="text-orga457ece">
+<p>
+This is useful Perforce old my scripts-helpers.
+</p>
+
+<p>
+Common utils:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #575757;"># </span><span style="color: #575757;">Returns number of changelists, prints list of changelists</span>
+<span style="color: #ff4500;">find_p4cl</span>() {
+        p4 changes -u $<span style="color: #ffffff;">USER</span> -s pending|awk <span style="color: #696969;">'</span>
+<span style="color: #696969;">                BEGIN { found=0 }</span>
+<span style="color: #696969;">                /^Change / {</span>
+<span style="color: #696969;">                        p4cl[found, 0] = $2</span>
+<span style="color: #696969;">                        p4cl[found, 1] = $4</span>
+<span style="color: #696969;">                        w = match($0, /\*pending\* /)</span>
+<span style="color: #696969;">                        if (w) d = substr($0, w + length("*pending* "))</span>
+<span style="color: #696969;">                        else d = ""</span>
+<span style="color: #696969;">                        p4cl[found, 2] = d</span>
+<span style="color: #696969;">                        found++</span>
+<span style="color: #696969;">                }</span>
+<span style="color: #696969;">                END {</span>
+<span style="color: #696969;">                        if (found) {</span>
+<span style="color: #696969;">                                print "Available ChangeLists:"</span>
+<span style="color: #696969;">                                print "======================"</span>
+<span style="color: #696969;">                                for (i=0; i&lt;found; i++) {</span>
+<span style="color: #696969;">                                        printf "  %s on %s: %s...\n",</span>
+<span style="color: #696969;">                                                p4cl[i, 0],</span>
+<span style="color: #696969;">                                                p4cl[i, 1],</span>
+<span style="color: #696969;">                                                p4cl[i, 2]</span>
+<span style="color: #696969;">                                }</span>
+<span style="color: #696969;">                        }</span>
+<span style="color: #696969;">                        exit found</span>
+<span style="color: #696969;">                }</span>
+<span style="color: #696969;">        '</span>
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">Input from user changelist (show default value if it one only).</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">If no input, returns default</span>
+<span style="color: #ff4500;">read_p4cl</span>() {
+        <span style="color: #a52a2a;">local</span> changelists _p4cl p4clhint
+        <span style="color: #ffffff;">changelists</span>=<span style="color: #fa8072;">`find_p4cl`</span>
+        <span style="color: #696969;">if</span> [ $<span style="color: #ffffff;">?</span> -eq 1 ]; <span style="color: #696969;">then</span>
+                <span style="color: #ffffff;">_p4cl</span>=<span style="color: #fa8072;">`echo "$changelists"|awk 'NR==3{print $1}'`</span>
+                <span style="color: #ffffff;">p4clhint</span>=<span style="color: #696969;">" [${_p4cl}]"</span>
+        <span style="color: #696969;">else</span>
+                <span style="color: #ffffff;">_p4cl</span>=<span style="color: #696969;">""</span>
+                <span style="color: #ffffff;">p4clhint</span>=<span style="color: #696969;">""</span>
+        <span style="color: #696969;">fi</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"$changelists"</span>
+        <span style="color: #a52a2a;">echo</span>
+        <span style="color: #a52a2a;">echo</span> -n <span style="color: #696969;">"Enter P4 ChangeList number${p4clhint}: "</span>; <span style="color: #a52a2a;">read</span> p4cl; : ${<span style="color: #ffffff;">p4cl</span>:=$<span style="color: #ffffff;">_p4cl</span>}
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">if not Perforce workspace then report it</span>
+<span style="color: #ff4500;">check_p4ws</span>() {
+        <span style="color: #ffffff;">CF</span>=${<span style="color: #ffffff;">P4CONFIG</span>:-.p4config}
+        [ -f <span style="color: #696969;">"$CF"</span> ] || { <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">'Seems not P4 workspace!'</span> &gt;&amp;2; <span style="color: #696969;">return</span> 1; }
+        <span style="color: #696969;">return</span> 0
+}
+</pre>
+</div>
+
+<p>
+List of modified files without switch it to "Edit" mode (devs often forget to do it :)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">List of locally modified files without put them into ChangeList</span>
+
+<span style="color: #a52a2a;">.</span> .p4utils
+check_p4ws || <span style="color: #696969;">exit</span> 1
+p4 reconcile -e -n
+</pre>
+</div>
+
+<p>
+Review sending:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">Send ChangeList review request</span>
+
+<span style="color: #a52a2a;">.</span> .p4utils
+check_p4ws || <span style="color: #696969;">exit</span> 1
+read_p4cl
+<span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"Posting review now. Wait, please..."</span>
+post-review $<span style="color: #ffffff;">p4cl</span>
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+#+title: Haskell Mustache templates
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2020-02-03 Mon 18:27]
+
+* Haskell Mustache templates
+
+This is a small example how to use Mustache template implementation in Haskell.
+Main idea of Mustache is to avoid complex syntax and all semantics is getting
+from variable itself: boolean vairables using as sections allow to hide/show its
+content, lists - to enumerate its content, etc. Example is very simple! You need
+to add ~mustache~ and ~text~ packages into your .cabal file only.
+
+
+#+BEGIN_SRC haskell
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+module Main where
+import qualified Data.Text             as T
+import           Text.Mustache
+import           Text.Mustache.Compile
+
+-- Tutorial: https://www.stackbuilders.com/tutorials/haskell/mustache-templates/
+
+templ :: Template
+templ = [mustache|We are the good Company "{{name}}":
+{{#persons}}
+- my name is {{name}} and I'm {{age}} years old
+{{/persons}}
+|]
+
+data Company = Company {
+  cName :: T.Text
+, cPersons :: [Person]
+                       }
+instance ToMustache Company where
+  toMustache c = object
+    [ "persons" ~> cPersons c
+    , "name" ~> cName c
+    ]
+
+
+data Person = Person {
+  pName :: T.Text
+, pAge  :: Int
+                     }
+instance ToMustache Person where
+  toMustache per = object
+    [ "age" ~> pAge per
+    , "name" ~> pName per
+    ]
+
+main :: IO ()
+main = do
+  let c = Company "MS" [Person "Alex" 20, Person "Jane" 21, Person "John" 25]
+  putStr $ T.unpack $ substitute templ $ c
+#+END_SRC
+
+Output is:
+
+#+BEGIN_SRC console
+We are the good Company "MS":
+- my name is Alex and I'm 20 years old
+- my name is Jane and I'm 21 years old
+- my name is John and I'm 25 years old
+#+END_SRC

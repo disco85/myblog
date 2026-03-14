@@ -1,0 +1,226 @@
+#+title: AB models
+#+description: My Blog
+#+keywords: paradigms, logo
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: paradigms logo
+#+date: [2022-07-07 Thu 17:52]
+
+* AB models
+
+[[https://en.wikipedia.org/wiki/Agent-based_model][ABM - agent-based models]] can be used to model the behavior of some systems, swarms, flocks, epidemics, network communication...
+
+Typical domains are economics, biology, physics, chemistry, psychology, system dynamics.
+
+One of the examples is [[https://ccl.northwestern.edu/netlogo/][NetLogo]] system which allows you to write such models in a [[https://en.wikipedia.org/wiki/Logo_(programming_language)][Logo language]] dialect. It supports:
+
+- Classical programming constructions
+- Different queries on its agents (patches, turtles, links, custom agents)
+- 2D/3D view
+- R, Wolfram, Python, Scala communication
+- Networking
+- Plotting
+- Translating of the model to standalone HTML file
+- Models parameterization with widgets and linked global variables
+- etc...
+
+My model of a network swarm of "workers" and "masters" looks like (its video representation is here - TODO):
+
+#+BEGIN_SRC logo
+; Terms:
+;   SWARM  - an one Swarm node (can be DCC, a Worker)
+;   DCC    - master node giving tasks to Workers
+;   Worker - executes tasks
+
+breed [swarms swarm]
+
+
+globals [cols rows center-col center-row nothing-captured]
+
+
+swarms-own [
+  swarm-ip            ; IP address of the swarm
+  swarm-role          ; "worker" / "dcc"
+  swarm-captured-me   ; DCC captured this Worker
+  swarm-captured      ; list of captured Workers by this DCC
+  swarm-beaten-me     ; list of DCCs beeaten this DCC
+  swarm-col swarm-row ; coords of the swarm
+]
+
+
+to setup-geom
+  let world-cols (max-pxcor - min-pxcor + 1)
+  let world-rows (max-pycor - min-pycor + 1)
+  let world-cells-num world-cols * world-rows
+  if world-cells-num < swarms-num [error "No room for all Swarms"]
+  let recom-size sqrt swarms-num
+  set cols max (list world-cols recom-size)
+  set rows int (swarms-num / cols)
+  set center-col int (world-cols / 2)
+  set center-row int (world-rows / 2)
+end
+
+
+to at-world [col row fn]
+  let world-col col
+  let world-row -1 * row
+  (run fn world-col world-row)
+end
+
+
+to-report gen-dcc-list
+  let dccs-num (swarms-num * %dcc / 100)
+  let swarms-per-dcc (swarms-num / dccs-num)
+  let dcc-list n-values dccs-num [ i -> random swarms-per-dcc ]
+  report dcc-list
+end
+
+
+to setup-swarm [i dcc-list]
+  let swarms-per-dcc (swarms-num / length dcc-list)
+  let dcc (i / swarms-per-dcc)
+  let off round (i mod swarms-per-dcc)
+  let dccp (off = item dcc dcc-list)
+  set swarm-ip i
+  set swarm-captured-me nobody
+  set swarm-captured []
+  set swarm-beaten-me []
+  set swarm-col int (who mod cols)
+  set swarm-row floor (who / cols)
+;  set label who
+  ifelse dccp [
+    set swarm-role "dcc"
+    set shape "square"
+    set label who
+    set color (12 + (10 * int (dcc / 3))) + (3 * int (dcc mod 3))
+    (ifelse
+      0 = int dcc mod 3 [set label-color white]
+      ;1 = int dcc mod 3 [set alcolor 3]
+      [set label-color black]
+    )
+  ] [
+    set swarm-role "worker"
+    set shape "circle"
+    set color white
+    set label-color black
+  ]
+end
+
+
+;to-report swarm-at [col row]
+;  report swarms with [swarm-col = col and swarm-row = row]
+;end
+
+
+to setup
+  clear-all
+  clear-ticks
+  setup-geom
+  let dcc-list gen-dcc-list
+  ask patches [set pcolor 5]
+  create-swarms swarms-num [
+    setup-swarm who dcc-list
+    set size 0.7
+    at-world swarm-col swarm-row [[x y] -> setxy x y]
+  ]
+end
+
+
+to resolve-conflict [me enemy]
+  if (not member? enemy [swarm-beaten-me] of swarm me) and (not member? me [swarm-beaten-me] of swarm enemy)
+  and me != enemy [
+;    show (list me "vs" enemy)
+    let fight shuffle list me enemy ; 0th is winner
+    let winner item 0 fight
+    let loser item 1 fight
+    let swarm-winner swarm winner
+    let swarm-loser swarm loser
+    ask swarm-loser [
+      let loser-workers swarm-captured
+      set swarm-beaten-me lput winner swarm-beaten-me
+      set swarm-captured []
+      ask swarm-winner [
+        let winner-color color
+        let winner-label-color label-color
+        set swarm-captured sentence swarm-captured loser-workers
+        foreach loser-workers [ loser-ex-worker ->
+          ask swarm loser-ex-worker [
+            set swarm-captured-me winner
+            set label winner
+            set label-color winner-label-color
+            set color winner-color
+            set nothing-captured false
+          ]
+        ]
+      ]
+    ]
+  ]
+end
+
+
+to-report workers-percent [perc]
+  let workers-num count swarms with [ swarm-role = "worker" ]
+  report perc * workers-num / 100
+end
+
+
+to-report is-dcc-gets-needed
+  (ifelse capture-way = "winner gets %" [
+    report length swarm-captured >= workers-percent dcc-needs-%workers
+  ] capture-way = "winner gets all" [
+    report length swarm-captured >= workers-percent 100
+  ] [
+    report false
+  ])
+end
+
+
+to dcc-capture
+  set nothing-captured true
+  let me who
+  let my-color color
+  let my-label-color label-color
+  let captured-by-me swarm-captured
+  let me-and-army lput me swarm-captured
+  let conflicted-pairs []
+  foreach me-and-army [ swarm-i ->
+    ask swarm swarm-i [
+      ask (swarms-on [neighbors] of patch-here)
+      with [swarm-role = "worker" and (capture-way = "forever" or swarm-captured-me != me)] [
+        ifelse capture-way = "forever" or swarm-captured-me = nobody [
+          set label me
+          set label-color my-label-color
+          set color my-color
+          set swarm-captured-me me
+          set captured-by-me lput who captured-by-me
+          set nothing-captured false
+        ] [
+          ; remember conflict pairs then resolve conflicts. Resolving is not here BCS
+          ; it modifies items that we iterate over
+          set conflicted-pairs lput (list me swarm-captured-me) conflicted-pairs
+        ]
+        if is-dcc-gets-needed [ stop ]
+      ]
+      if is-dcc-gets-needed [ stop ]
+    ]
+    set swarm-captured captured-by-me
+  ]
+  if member? capture-way ["winner gets all" "winner gets %"] [
+    foreach conflicted-pairs [
+      pair -> resolve-conflict (item 0 pair) (item 1 pair)
+      if is-dcc-gets-needed [ stop ]
+    ]
+  ]
+end
+
+
+to go
+  let all-dcc-completed true
+  ask swarms with [swarm-role = "dcc"] [
+    dcc-capture
+    if not nothing-captured [
+      set all-dcc-completed false
+    ]
+  ]
+  if all-dcc-completed [ stop ]
+end
+#+END_SRC

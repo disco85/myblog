@@ -1,0 +1,15 @@
+#+title: Integer limits in C
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-06 Thu 05:29]
+
+* Integer limits in C
+
+They are in limits.h. But when you need calculated (depends on type), you can use:
+
+#+BEGIN_SRC cpp
+#define SOME_TYPE_MAX (SOME_TYPE)((unsigned long)(1<<sizeof(SOME_TYPE)*8-1)-1)
+#define SOME_TYPE_MIN (~SOME_TYPE_MAX)
+#+END_SRC

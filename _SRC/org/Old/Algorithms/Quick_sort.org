@@ -1,0 +1,71 @@
+#+title: Quick sort
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-04 Tue 18:24]
+
+* Quick sort
+
+This is the implementation of quick sort algorithm in C.
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<class T>
+void qsort(T* a, long len)
+{
+    printf("call\n");
+    long l = 0, r = len, mid = len/2;
+    T temp, p;
+
+    p = a[mid]; // central item
+
+    /* Swap: items less than p will go to left, above - to right,
+       l going from the left, r - from the right, before the item,
+       which denies this rule. After finding of such items we will
+       swap them
+    do {
+        // looking for item from the left which > p
+        while (a[l] < p) l++;
+        // looking for item from the right < p
+        while (a[r] > p) r--;
+
+        // swap them if no wrapping
+        if (l <= r) {
+            SWAP(a[l], a[r], temp);
+            l++; r--; // go to next - without it - hang up!
+        }
+    } while (l<=r); // XXX may be better is l<r ?
+
+
+    /* Recursive calls if there is what to sort.
+    Both cases works, upper makes about 2 times lesser calls!
+    Split by the point where on left side are all < p, on right:
+    all > p. If to choice another point of splitting, result
+    of pre-sorting will be lost - ordering on one of the sides
+    will be denied
+    */
+    if (r > 0) qsort(a, r);
+    if (len > l) qsort(a+l, len-l);
+
+    /*if (len>1) {
+        qsort(a, mid);
+        qsort(a + mid, len - mid);
+    }*/
+}
+
+
+/*****************************************
+                   main
+ ****************************************/
+int main(void)
+{
+    int arr[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
+    PRINTARR(arr, "%d");
+    qsort(arr, sizeofarray(arr));
+    PRINTARR(arr, "%d");
+    return (0);
+}
+#+END_SRC

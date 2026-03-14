@@ -1,0 +1,133 @@
+#+title: Stream integration by Simpson's rule
+#+description: My Blog
+#+keywords: dsp, tcl/tk, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: dsp tcl/tk clang
+#+date: [2020-02-08 Sat 15:53]
+
+* Stream integration by Simpson's rule
+
+About this method of numerical integration you can read here. To do it in streaming manner we should do little formal mathematics.
+
+Composite Simpson's rule:
+
+$$
+\int_a^bf(x)dx\approx \frac h3 \sum_{k=1,2}^{N-1}(f(x_{k-1}) + 4 f(x_k) + f(x_{k+1}))
+$$
+
+where k=1,2 means from 1 step by 2, N is even intervals number.
+
+The sum will be:
+
+$$\frac h3 \sum_{k=1,2}^{N-1}S_k$$
+
+Simpsone's method requires 3 points least so we can integrate not every point (sample) but through one, so neighboring samples are IN-2 and IN. Different between them is:
+
+$$I_N - I_{N-2} = \frac h3(\sum_{k=1,2}^{N-1}S_k - \sum_{k=1,2}^{N-3}S_k) = \frac h3(S_{N-1} + \sum_{k=1,2}^{N-3}S_k - \sum_{k=1,2}^{N-3}S_k)
+$$
+
+no S,,N-2,, member because of the step k=2.
+
+So difference is: $$\frac h3 S_{N-1}$$
+
+For example, $$I_4 - I_2 = \frac h3(y_2 + 4y_3 + y_4)$$, where I,,4,, is 4th interval but 5th sample.
+
+And resulting formula of I,,i,, is:
+
+$$
+0, i\le1 \newline
+\frac h3(y_{i-2} + 4y_{i-1} + y_i) + I_{i-1}, i\ mod\ 2 = 0 \newline
+I_{i-1}, i\ mod\ 2 \ne 0
+$$
+
+where ~i~ is a number of input sample. We can not get values of I on each sample, but through one (skipping odds and 0-th, 1-th). On odds samples, value will repeat previous one.
+
+Example in SWIG (some.h file):
+
+#+BEGIN_SRC cpp
+// Simpsone's rule integrator
+typedef struct CSIntr {
+        double I; // last value of integral
+        double y_1; // y[-1]
+        double y_2; // y[-2]
+        double h; // step of subinterval
+        double h_d; // step of subinterval/3
+        long long i; // iteration
+} CSIntr;
+#+END_SRC
+
+~some.i~ file:
+
+#+BEGIN_SRC cpp
+%include "some.h"
+%extend CSIntr {
+    // FIXME how is more right to do this?
+    void reset() {
+        $self->I = 0.;
+        $self->y_1 = $self->y_2 = 0.;
+        $self->i = 0;
+    }
+
+    void setup(double h) {
+        $self->h = h;
+        $self->h_d = h/3.;
+    }
+
+    CSIntr(double h) {
+        CSIntr *obj;
+
+        if (NULL == (obj=(CSIntr*) malloc(sizeof (CSIntr))))
+            return (NULL);
+        CSIntr_reset(obj);
+        CSIntr_setup(obj, h);
+        return (obj);
+    }
+
+    ~CSIntr() {
+        if ($self) free($self);
+    }
+
+    double calculate(double y) {
+        if ($self->i <= 1)
+            $self->I = 0;
+        else if (0 == $self->i % 2)
+            $self->I += $self->h_d * ($self->y_2 + 4. * $self->y_1 + y);
+
+        $self->y_2 = $self->y_1;
+        $self->y_1 = y;
+        $self->i++;
+        return ($self->I);
+    }
+};
+#+END_SRC
+
+So, if we use Tcl, then we can build and test our class (~Makefile~ fragment):
+
+#+BEGIN_SRC Makefile
+some_wrap.c: some.i some.h some.c
+ swig -tcl -pkgversion 1.0 some.i
+
+some.dll: some_wrap.c
+ gcc -Ic:/tcl/include -I./ -DUSE_TCL_STUBS -c some_wrap.c -o some_wrap.o
+ gcc -shared -o some.dll some/some_wrap.o -L c:/tcl/lib -ltclstub85 -lm
+#+END_SRC
+
+test on linear function with ~yi = {1, 2, 3, 4, 5}~: 
+
+#+BEGIN_SRC tcl
+load some
+% CSIntr cs 1
+_f85f7601_p_CSIntr
+% cs calculate 1
+0.0
+% cs calculate 2
+0.0
+% cs calculate 3
+4.0
+% cs calculate 4
+4.0
+% cs calculate 5
+12.0
+#+END_SRC
+
+and I,,4,, is really 12.0

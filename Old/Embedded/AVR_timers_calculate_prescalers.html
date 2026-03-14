@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AVR timers: calculate prescalers</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">AVR timers: calculate prescalers</h1>
+<div id="outline-container-org43bf0ef" class="outline-2">
+<h2 id="org43bf0ef">AVR timers: calculate prescalers</h2>
+<div class="outline-text-2" id="text-org43bf0ef">
+<p>
+Functions below are only for Atmega128, see "bitness" of timers, prescalers values&#x2026;
+</p>
+
+<p>
+When you use AVR timers, you should setup it's prescalers' values. Often, programmers calculates prescaler on the paper and then hardcodes it into the code. And this is done every time for new delay value. This task can be done automatically by next algorithm. Next is the Python prototype of the algorithm.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #696969;">class</span> <span style="color: #ff4500;">Timer</span>:
+    <span style="color: #ff4500;">freq</span> = 0 # freq. of timer
+    bits = 0 # <span style="color: #696969;">"bitsness"</span> of timer
+
+<span style="color: #a52a2a;"># We</span> have <span style="color: #696969;">for</span> example 4 timers
+_timers = [<span style="color: #7fffd4;">Timer</span>(), <span style="color: #7fffd4;">Timer</span>(), <span style="color: #7fffd4;">Timer</span>(), <span style="color: #7fffd4;">Timer</span>()]
+
+def init_timers():
+<span style="color: #a52a2a;">    # setup</span> bitness of the timers
+    global <span style="color: #ff4500;">_timers</span>
+    <span style="color: #ffffff;">_timers</span>[0].bits = 256
+    _timers[1].bits = 65536
+    _timers[2].bits = 256
+    _timers[3].bits = 65536
+
+<span style="color: #a52a2a;"># for</span> Atmega128
+def _alarm_setup(timer, D):
+    prescales0 = (1, 8, 32, 64, 128, 256, 1024,)
+    prescales = (1, 8, 64, 256, 1024,)
+<span style="color: #a52a2a;">    # base</span> freq of timer, the same <span style="color: #696969;">for</span> all but is possible to specify differents
+    freq = 8000000 # Freq. of MCU
+
+    <span style="color: #696969;">if</span> timer == 0:
+        psc = prescales0
+    <span style="color: #696969;">else</span>:
+        psc = prescales
+
+    _timers[timer].freq = freq
+
+    T = 1000000 * psc[-1] * _timers[timer].bits / freq
+    cycles = D/T
+    <span style="color: #696969;">if</span> cycles:
+        D -= cycles*T
+
+    <span style="color: #696969;">for</span> _psc in psc:
+<span style="color: #a52a2a;">        # T</span> - timer period (step in usec)
+        T = 1000000 * _psc * _timers[timer].bits / freq
+<span style="color: #a52a2a;">        # D_T</span> - how many T (timer periods) are <span style="color: #ff4500;">in</span> <span style="color: #ffffff;">D</span> (delay)
+        D_T = <span style="color: #ff4500;">float</span>(D)/T
+        <span style="color: #696969;">if</span> D_T &lt;= .5:
+<span style="color: #a52a2a;">            # can</span> <span style="color: #696969;">not</span> be rounded even to 1, too <span style="color: #ff4500;">short</span> delay time!
+            <span style="color: #696969;">return</span> None
+        elif D_T &gt; _timers[timer].bits:
+<span style="color: #a52a2a;">            # delay</span> is too <span style="color: #ff4500;">long</span> <span style="color: #696969;">for</span> <span style="color: #696969;">this</span> prescale value
+            <span style="color: #696969;">continue</span>
+        <span style="color: #696969;">else</span>:
+<span style="color: #a52a2a;">            # bingo</span>!
+            cn = _timers[timer].bits - <span style="color: #ff4500;">int</span>(D_T) + 1
+            prescale = _psc
+            <span style="color: #696969;">return</span> (cn, prescale, cycles)
+    <span style="color: #696969;">return</span> None
+
+<span style="color: #a52a2a;"># test</span>
+init_timers()
+<span style="color: #ff4500;">print</span> <span style="color: #ffffff;">_alarm_setup</span>(0, 10000000)
+<span style="color: #ff4500;">print</span> <span style="color: #ffffff;">_alarm_setup</span>(0, 256)
+</pre>
+</div>
+
+<p>
+Function <code>_alarm_setup()</code> returns triplet (start value of timer counter, prescaler value, total cycles of the timer counter). These 3 values defines initial parameters of counter which should count to delay D microseconds. It's possible to define any values of delay time in this manner.
+This Python prototype example is only to show idea of algorithm. But next is the real implementation on C for WinAVR:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #575757;">/* </span><span style="color: #575757;">Calculates prescale (divisor of timer: 1,8,...) and start</span>
+<span style="color: #575757;"> * counter value and total cycles number. Returns 0 on success, -1 on faulire.</span>
+<span style="color: #575757;"> * D is the delay in microseconds.  timer is number of timer.</span>
+<span style="color: #575757;"> * Out values are saved in corresponding timerc_t.</span>
+<span style="color: #575757;"> * Atmega128 implementation!!!</span>
+<span style="color: #575757;"> */</span>
+<span style="color: #ff4500;">int</span>
+<span style="color: #ff4500;">_alarm_setup</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">timer</span>,
+             <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">D</span>)
+{
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>;
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">max_psc</span>; <span style="color: #575757;">// </span><span style="color: #575757;">max. value of prescaler of timer</span>
+        <span style="color: #ff4500;">int</span> *<span style="color: #ffffff;">psc</span>; <span style="color: #575757;">// </span><span style="color: #575757;">prescalers of timer</span>
+        <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">T</span>; <span style="color: #575757;">// </span><span style="color: #575757;">period of tick</span>
+        <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">Tclk</span>; <span style="color: #575757;">// </span><span style="color: #575757;">period of clock</span>
+        <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">Tall</span>; <span style="color: #575757;">// </span><span style="color: #575757;">period of timer cycle (from 0 to bits)</span>
+
+        psc = _timers[timer].prescalers;
+        max_psc = psc[_timers[timer].nprescalers-1];
+
+        <span style="color: #575757;">/* </span><span style="color: #575757;">Base frequency is F_CPU. Real frequency is F_CPU/prescaler.</span>
+<span style="color: #575757;">           One tick occupes 1/freq seconds (freq in MHz). N ticks occupes</span>
+<span style="color: #575757;">           N/freq. N is max ticks number in counter = bits of this counter =</span>
+<span style="color: #575757;">           _timers[timer].bits. So, total time to count all ticks of counter is</span>
+<span style="color: #575757;">           N/freq = N/(F_CPU/prescaler) = N*prescaler/F_CPU. Freq is in MHz, to</span>
+<span style="color: #575757;">           use microseconds instead of seconds, * 1000000.</span>
+
+<span style="color: #575757;">           T is the total time of count all the counter with slowest freq (with</span>
+<span style="color: #575757;">           last prescaler - max_psc). cycles is how many counter cycles are in</span>
+<span style="color: #575757;">           D with slowest prescaler on this timer-counter.</span>
+
+<span style="color: #575757;">           Then D set to D without cycles time.</span>
+<span style="color: #575757;">           */</span>
+
+        <span style="color: #575757;">// </span><span style="color: #575757;">1000000 * max_psc &gt; F_CPU, so T/F_CPU != 0</span>
+        T = (1000000 * max_psc / F_CPU) * _timers[timer].bits;
+        _timers[timer].cycles = D/T;
+
+        <span style="color: #696969;">if</span> (_timers[timer].cycles &gt; 0) {
+                D -= (_timers[timer].cycles) * T;
+                _timers[timer].cycles_prescaler = max_psc;
+        }
+        <span style="color: #696969;">else</span> {
+                <span style="color: #575757;">// </span><span style="color: #575757;">If does not need cycles, cycles_prescaler will be 0</span>
+                <span style="color: #575757;">// </span><span style="color: #575757;">(may be used as flag of this)</span>
+                _timers[timer].cycles_prescaler = 0;
+        }
+
+        D *= 1000; <span style="color: #575757;">// </span><span style="color: #575757;">in nanoseconds</span>
+        Tclk = 1000000000 / F_CPU; <span style="color: #575757;">// </span><span style="color: #575757;">in nanoseconds</span>
+        <span style="color: #696969;">for</span> (i=0; i&lt;_timers[timer].nprescalers; i++) {
+                T = Tclk * psc[i]; <span style="color: #575757;">// </span><span style="color: #575757;">time of one tick</span>
+                Tall = T * _timers[timer].bits; <span style="color: #575757;">// </span><span style="color: #575757;">time to count all ticks of counter</span>
+                <span style="color: #696969;">if</span> (D &gt; Tall) {
+                        <span style="color: #575757;">// </span><span style="color: #575757;">delay D is too long for this Tall</span>
+                        <span style="color: #696969;">continue</span>;
+                }
+                <span style="color: #696969;">else</span> {
+                        _timers[timer].prescaler = psc[i];
+                        <span style="color: #575757;">// </span><span style="color: #575757;">D/T how many ticks in D, cn is ticks from 0</span>
+                        _timers[timer].cn = _timers[timer].bits - D/T;
+                        <span style="color: #696969;">return</span> (0);
+                }
+        }
+        <span style="color: #696969;">return</span> (-1);
+}
+</pre>
+</div>
+
+<p>
+This function uses global array of timers: _timers. This is the array of the timerc<sub>t</sub> structs:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">timerc_t</span> {
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">timer_handler_t</span> <span style="color: #ffffff;">alarm_handler</span>;
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">nover</span>; <span style="color: #575757;">// </span><span style="color: #575757;">number of overflow</span>
+        <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">bits</span>; <span style="color: #575757;">// </span><span style="color: #575757;">number of bits</span>
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">cn</span>; <span style="color: #575757;">// </span><span style="color: #575757;">start from this count value</span>
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">cycles</span>; <span style="color: #575757;">// </span><span style="color: #575757;">cycles number</span>
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">prescaler</span>; <span style="color: #575757;">// </span><span style="color: #575757;">prescaler (1, 8, 32... - depends on arch. and timer)</span>
+        <span style="color: #696969;">volatile</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">cycles_prescaler</span>; <span style="color: #575757;">// </span><span style="color: #575757;">prescaler (usually 1024) for total counter cycles</span>
+        <span style="color: #ff4500;">int</span> *<span style="color: #ffffff;">prescalers</span>; <span style="color: #575757;">// </span><span style="color: #575757;">array of timer-counter prescalers</span>
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">nprescalers</span>; <span style="color: #575757;">// </span><span style="color: #575757;">length of prescalers' array</span>
+} <span style="color: #ff4500;">timerc_t</span>; 
+</pre>
+</div>
+
+<p>
+Full implementation of timers support for AVR (Atmega128 only at the moment) can be found in my Github.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

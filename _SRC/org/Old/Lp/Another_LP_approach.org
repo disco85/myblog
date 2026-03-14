@@ -1,0 +1,31 @@
+#+title: Another LP approach
+#+description: My Blog
+#+keywords: misc, lp
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: misc lp
+#+date: [2020-02-09 Sun 08:51]
+
+* Another LP approach
+
+Another approach is to use reStructuredText document generator system (see docutils). How to? It's easy: instead of embedding into source code the hyper-text formatting, images, links, you can write your program like story (in usual LP style), use RST syntax (like WiKi) for images embedding and various styles - your code is Literate Programming story as before. But now you can embed code fragments where you need with "include" directive of docutils. This directive requires "startd-after" and "end-before" options for this case. These options defines line (string fragment) the code starts after, and line - the code ends before. I use for this lines Vim foldering lines. See:
+
+#+BEGIN_SRC cpp
+// Source code:
+int x;
+// Opening port {{{
+int open_port(int port) {
+...
+}
+// }}}
+#+END_SRC
+
+This is very usuable for folding big source code!
+And in your .rst file (which plays a role of the .w file but for weaving only):
+
+#+BEGIN_SRC
+and we define the function for a port opening:
+
+.. include:: port.c
+    :start-after: // Opening port {{{
+    :end-before: // }}}
+#+END_SRC

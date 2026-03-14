@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tags generation for ASF project</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="misc, embedded" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Tags generation for ASF project</h1>
+<div id="outline-container-orgcb0ea95" class="outline-2">
+<h2 id="orgcb0ea95">Tags generation for ASF project</h2>
+<div class="outline-text-2" id="text-orgcb0ea95">
+<p>
+If you use Atmel Software Framework you can generate tags (with ctags|GNU Global) for your Vim/Emacs environment in such way (in Makefile):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-makefile"><span style="color: #ffffff;">ctags</span> = c:/Program Files/ctags.exe
+<span style="color: #ffffff;">gtags</span> = c:/global/bin/gtags.exe
+<span style="color: #ffffff;">sed</span> = c:/MinGW/msys/1.0/bin/sed.exe
+<span style="color: #ffffff;">find</span> = c:/MinGW/msys/1.0/bin/find.exe
+
+<span style="color: #ffffff;">GTAGS_FILES</span> = GTAGS GPATH GRTAGS
+<span style="color: #575757;"># </span><span style="color: #575757;">Global can not parse out of c:/prj/PRJ1/src</span>
+<span style="color: #ffffff;">TAGS_DIRS</span> = <span style="color: #696969;">'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include'</span> \
+   c:/prj/PRJ1/src/asf-3.0.1 \
+   c:/prj/PRJ1/src/PRJ1
+
+<span style="color: #ff4500;">tags.files</span>: force
+ $(<span style="color: #ffffff;">find</span>) $(<span style="color: #ffffff;">TAGS_DIRS</span>) -type f -name *.S -or -name *.h -or -name *.c|$(<span style="color: #ffffff;">sed</span>) <span style="color: #696969;">'s/c:\/prj\/PRJ1\/src/./g'</span> &gt;tags.files
+
+<span style="color: #ff4500;">$(</span><span style="color: #ff4500;">GTAGS_FILES</span><span style="color: #ff4500;">)</span>: tags.files
+ $(<span style="color: #ffffff;">gtags</span>) -f tags.files
+
+<span style="color: #ff4500;">.PHONY</span>: global_tags
+<span style="color: #ff4500;">global_tags</span>: $(<span style="color: #ffffff;">GTAGS_FILES</span>)
+
+<span style="color: #ff4500;">tags</span>: tags.files
+ $(<span style="color: #ffffff;">ctags</span>) -L tags.files
+
+<span style="color: #ff4500;">.PHONY</span>: all_tags
+<span style="color: #ff4500;">all_tags</span>: tags global_tags
+
+<span style="color: #ff4500;">.PHONY</span>: clean_tags
+<span style="color: #ff4500;">clean_tags</span>:
+ rm -f $(<span style="color: #ffffff;">GTAGS_FILES</span>) tags
+</pre>
+</div>
+
+<p>
+I suppose in this example you use Windows, have MinGW (with find, sed utils). Project is located in c:\prj and has name PRJ1. To generate use targets: <code>tags</code>, <code>global_tags</code> or <code>all_tags</code>. tags file will be about 100 MB, Global tags files will be about 70 MB, but Global can not parse files out of source tree, so <code>avr32/include</code> will be missed - use <code>ctags</code> instead of.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

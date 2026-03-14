@@ -1,0 +1,39 @@
+#+title: Tcl: regsub replacing by proc
+#+description: My Blog
+#+keywords: misc, tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: misc tcl/tk
+#+date: [2020-02-06 Thu 05:15]
+
+* Tcl: regsub replacing by proc
+
+This is the procedure like ~regsub~ but replacement is happens with procedure - not text:
+
+#+BEGIN_SRC tcl
+proc regsub2 {re inStr by {varName ""}} {
+# Simple version of regsub but support substitution by proc:
+# regsub2 $re $str $by, where $by can be {proc \1 \2...}
+    set result $inStr
+    set byCallStr [regsub -all {\\(\d+)} $by {$m\1}]
+    set matchedVarsCount [lindex [regexp -about $re] 0]
+    set matchedVarNames {all}
+    for {set i 1} {$i <= $matchedVarsCount} {incr i} {
+        lappend matchedVarNames "m$i"
+    }
+    set nsubs 0
+    foreach $matchedVarNames [regexp -all -inline $re $result] {
+        set byRes [eval $byCallStr]
+        set result [regsub $re $result $byRes]
+        incr nsubs
+    }
+    if {$varName eq ""} {
+        return $result
+    } else {
+        upvar 1 $varName varName_
+        set varName_ $result
+        return $nsubs
+    }
+}
+#+END_SRC
+
+If you call it with IncrTcl then use ~::itcl::code~ proc.

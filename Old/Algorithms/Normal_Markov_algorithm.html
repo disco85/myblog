@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Normal Markov algorithm</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Normal Markov algorithm</h1>
+<div id="outline-container-org3a91fab" class="outline-2">
+<h2 id="org3a91fab">Normal Markov algorithm</h2>
+<div class="outline-text-2" id="text-org3a91fab">
+<p>
+<a href="https://en.wikipedia.org/wiki/Markov_algorithm">Normal Markov algorithm</a> - is
+the abstract rewriting system or method of algorithms description/writing.
+Here is simple Python implementation. Idea of this A. is in the foundation of
+Refal.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> __future__ <span style="color: #696969;">import</span> print_function
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Rule</span>:
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, f, t, last=0):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">f</span> = f  <span style="color: #575757;"># </span><span style="color: #575757;">from</span>
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">t</span> = t  <span style="color: #575757;"># </span><span style="color: #575757;">to</span>
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">len</span> = <span style="color: #a52a2a;">len</span>(<span style="color: #696969;">self</span>.f)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">last</span> = last  <span style="color: #575757;"># </span><span style="color: #575757;">last rule?</span>
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__str__</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">return</span> <span style="color: #696969;">"&lt;Rule%s %s -&gt; %s&gt;"</span> % (<span style="color: #696969;">'.'</span> <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.last <span style="color: #696969;">else</span> <span style="color: #696969;">''</span>, <span style="color: #696969;">self</span>.f, <span style="color: #696969;">self</span>.t)
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">sub</span>(<span style="color: #696969;">self</span>, text):
+        <span style="color: #696969;">""" Substitution:</span>
+<span style="color: #696969;">        &gt;&gt;&gt; Rule('a', 'b').sub('qweaaannn')</span>
+<span style="color: #696969;">        (1, 'qwebaannn')</span>
+<span style="color: #696969;">        &gt;&gt;&gt; Rule('a', 'b').sub('aaa')</span>
+<span style="color: #696969;">        (1, 'baa')</span>
+<span style="color: #696969;">        &gt;&gt;&gt; Rule('a', '').sub('qweaba')</span>
+<span style="color: #696969;">        (1, 'qweba')</span>
+<span style="color: #696969;">        &gt;&gt;&gt; Rule('', 'xyz').sub('qweaba')</span>
+<span style="color: #696969;">        (1, 'xyzqweaba')</span>
+<span style="color: #696969;">        &gt;&gt;&gt; Rule('', '').sub('qweaba')</span>
+<span style="color: #696969;">        (0, 'qweaba')</span>
+<span style="color: #696969;">        """</span>
+        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> <span style="color: #696969;">self</span>.f <span style="color: #696969;">and</span> <span style="color: #696969;">not</span> <span style="color: #696969;">self</span>.t: <span style="color: #696969;">return</span> (0, text)
+        <span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(0, <span style="color: #a52a2a;">len</span>(text)):
+            <span style="color: #ffffff;">end</span> = i + <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">len</span>
+            <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.f == text[i:end]:
+                <span style="color: #696969;">return</span> (1, text[0:i] + <span style="color: #696969;">self</span>.t + text[end:])
+        <span style="color: #696969;">return</span> (0, text)
+
+
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">NM</span>:
+    <span style="color: #696969;">""" Normal Markov's Algorithm</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm = NM([Rule("ba", "ab"),])</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('aababbbabababbaaa')</span>
+<span style="color: #696969;">    'aaaaaaaaabbbbbbbb'</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm = NM([Rule("c", ""), Rule("bb", "ddd", last=1)])</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('abbcabbca')</span>
+<span style="color: #696969;">    'adddabba'</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('dcacb')</span>
+<span style="color: #696969;">    'dab'</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm = NM([Rule("*a", "", last=1),</span>
+<span style="color: #696969;">    ...          Rule("*b", "", last=1),</span>
+<span style="color: #696969;">    ...          Rule("*", "", last=1),</span>
+<span style="color: #696969;">    ...          Rule("", "*"),</span>
+<span style="color: #696969;">    ... ])</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('bbaba')</span>
+<span style="color: #696969;">    'baba'</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm = NM([Rule("*0", "00*"),</span>
+<span style="color: #696969;">    ...          Rule("*1", "01*"),</span>
+<span style="color: #696969;">    ...          Rule("*2", "10*"),</span>
+<span style="color: #696969;">    ...          Rule("*3", "11*"),</span>
+<span style="color: #696969;">    ...          Rule("*", "", last=1),</span>
+<span style="color: #696969;">    ...          Rule("", "*"),</span>
+<span style="color: #696969;">    ... ])</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('0123')</span>
+<span style="color: #696969;">    '00011011'</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm = NM([Rule("*a", "a*"),</span>
+<span style="color: #696969;">    ...          Rule("*b", "b*"),</span>
+<span style="color: #696969;">    ...          Rule("*", "a", last=1),</span>
+<span style="color: #696969;">    ...          Rule("", "*"),</span>
+<span style="color: #696969;">    ... ])</span>
+<span style="color: #696969;">    &gt;&gt;&gt; nm('bbab')</span>
+<span style="color: #696969;">    'bbaba'</span>
+<span style="color: #696969;">    """</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, rules):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">rules</span> = rules
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">eval</span>(<span style="color: #696969;">self</span>, text):
+        <span style="color: #696969;">while</span> 1:
+            <span style="color: #ffffff;">changed</span> = 0
+            <span style="color: #696969;">for</span> rule <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.rules:
+                <span style="color: #ffffff;">oldtext</span> = text
+                <span style="color: #ffffff;">applied</span>, <span style="color: #ffffff;">text</span> = rule.sub(text)
+                <span style="color: #575757;">#</span><span style="color: #575757;">print("%s -&gt; %s [by %s]" % (oldtext, text, rule))</span>
+                <span style="color: #696969;">if</span> applied:
+                    <span style="color: #ffffff;">changed</span> = 1
+                    <span style="color: #696969;">if</span> rule.last: <span style="color: #696969;">return</span> text
+                    <span style="color: #696969;">else</span>: <span style="color: #696969;">break</span>
+            <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> changed:
+                <span style="color: #696969;">return</span> text
+    <span style="color: #ffffff;">__call__</span> = <span style="color: #a52a2a;">eval</span>
+
+<span style="color: #696969;">import</span> doctest
+doctest.testmod()
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

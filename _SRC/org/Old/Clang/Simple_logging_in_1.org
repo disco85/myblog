@@ -1,0 +1,56 @@
+#+title: Simple logging in C (1)
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-09 Sun 08:09]
+
+* Simple logging in C (1)
+
+This snippet shows way to turning-on/-off different levels of log/debug messaging in C program:
+
+For example, lets create log messages support with 3 levels and possibility to select what levels are enabled:
+
+#+BEGIN_SRC cpp
+#define PRN(...) printf(__VA_ARGS__)
+#define L1 1
+#define L2 2
+#define L3 4
+
+#define PRN_L(L, ...) PRN_##L(__VA_ARGS__)
+
+#if (LEVEL) & (L3)
+#  define PRN_L3(...) PRN(__VA_ARGS__)
+#else
+#  define PRN_L3(...)
+#endif
+
+#if (LEVEL) & (L2)
+#  define PRN_L2(...) PRN(__VA_ARGS__)
+#else
+#  define PRN_L2(...)
+#endif
+
+#if (LEVEL) & (L1)
+#  define PRN_L1(...) PRN(__VA_ARGS__)
+#else
+#  define PRN_L1(...)
+#endif
+#+END_SRC
+
+And somewhere in our program use it:
+
+#+BEGIN_SRC cpp
+// enable only messages of levels 1 and 3 (equals to 1|4==5)
+#define LEVEL (L1|L3)
+#include "logger.h"
+
+void main() {
+    // use general macro or PRN_L1(), PRN_L2(), PRN_L3()
+    PRN_L(L1, "There %d\n", 1);
+    PRN_L(L2, "There %d\n", 2); // no effect!
+    PRN_L(L3, "There %d\n", 3);
+}
+#+END_SRC
+
+What else? With LEVEL definition you can control enabled levels: 0 - disable all levels or use OR-ed combination of L1..3.

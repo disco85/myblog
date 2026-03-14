@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Imperative Haskell quicksort</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Imperative Haskell quicksort</h1>
+<div id="outline-container-orgbe75ca4" class="outline-2">
+<h2 id="orgbe75ca4">Imperative Haskell quicksort</h2>
+<div class="outline-text-2" id="text-orgbe75ca4">
+<p>
+This is the Haskell implementation of quicksort but in imperative style; yes,
+it's terrible and very naive implementation :-)
+</p>
+
+<p>
+Difference between all C/C++/Java implementations from the Web is that all
+indexes are checking on out of bounds.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- exit from array bounds is checking !
+import Data.Array
+import qualified Data.Array.ST as DAS
+import qualified Control.Monad.ST as CMS
+import qualified Data.Array.MArray as DAM
+
+
+findLeft :: (Ix i, Num i, Ord e) =&gt; DAS.STArray s i e -&gt; i -&gt; e -&gt; CMS.ST s i
+findLeft arr l p = do
+  let n = l + 1
+  e &lt;- DAM.readArray arr l
+  b &lt;- DAM.getBounds arr
+  if e &lt; p &amp;&amp; (inRange b n) then findLeft arr n p else return l
+
+
+findRight :: (Ix i, Num i, Ord e) =&gt; DAS.STArray s i e -&gt; i -&gt; e -&gt; CMS.ST s i
+findRight arr r p = do
+  let n = r - 1
+  e &lt;- DAM.readArray arr r
+  b &lt;- DAM.getBounds arr
+  if e &gt; p &amp;&amp; (inRange b n) then findRight arr n p else return r
+
+
+swap :: Ix i =&gt; DAS.STArray s i e -&gt; i -&gt; i -&gt; CMS.ST s ()
+swap arr i j = do
+  vi &lt;- DAM.readArray arr i
+  vj &lt;- DAM.readArray arr j
+  DAM.writeArray arr i vj
+  DAM.writeArray arr j vi
+
+
+swapAll :: (Ix i, Num i, Ord e) =&gt; DAS.STArray s i e -&gt; i -&gt; i -&gt; e -&gt; CMS.ST s (i, i)
+swapAll arr l r p = do
+  l' &lt;- findLeft arr l p
+  r' &lt;- findRight arr r p
+  b &lt;- DAM.getBounds arr
+  let nl = l' + 1
+      nr = r' - 1
+  if l' &lt;= r' &amp;&amp; (inRange b nl) &amp;&amp; (inRange b nr) then do
+    swap arr l' r'
+    swapAll arr (l' + 1) (r' - 1) p
+  else return (l', r')
+
+
+qsortArray :: (Integral i, Ix i, Ord e) =&gt; DAS.STArray s i e -&gt; i -&gt; i -&gt; CMS.ST s ()
+qsortArray arr i0 i1 =
+  let l = i0
+      r = i1
+      mid = (i0 + i1) `div` 2 -- pivot index
+  in do
+    p &lt;- DAM.readArray arr mid -- pivot
+    (l', r') &lt;- swapAll arr l r p
+    if i0 &lt; r' then do
+      qsortArray arr i0 r'
+      else return ()
+    if l' &lt; i1 then do
+      qsortArray arr l' i1
+      else return ()
+
+
+qsort  :: (Num e, Ord e) =&gt; [e] -&gt; [e]
+qsort xs =
+  let len = length xs
+      i1 = len - 1
+  in elems $ DAS.runSTArray $
+    do
+      arr &lt;- DAM.newListArray (0, i1) xs
+      qsortArray arr 0 i1
+      return arr
+
+
+main :: IO()
+main = print $ qsort [0, 0, 9, 10, 4, 3, 98, 100, 99, 2, 6, 1]
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

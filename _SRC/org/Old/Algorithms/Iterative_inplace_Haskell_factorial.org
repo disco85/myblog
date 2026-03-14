@@ -1,0 +1,75 @@
+#+title: Iterative in-place Haskell factorial
+#+description: My Blog
+#+keywords: haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell algorithms
+#+date: [2020-02-04 Tue 18:59]
+
+* Iterative in-place Haskell factorial
+
+This is the implementation of factorial which does not use recursion
+and does not pass result via stack but use 2 "global" vars: counter
+abd factorial value. For example:
+
+#+BEGIN_SRC
+fact 5 = 120
+
+       counter  | fact
+       ---------+-----------
+        5       | 5
+        4       | 20
+        3       | 60
+        2       | 120
+        1       | 120 => end
+#+END_SRC
+
+Instead of pass temporary result of multiplication via stack, we'll
+create 2 states and use them as counter and factorial value. How to
+create 2 states? For one state we can use ~State~ monad, for 2...
+state in the state. Adding state to another monad (possible state too)
+is responsibility of ~StateT~ transformer. Calculation will looks like
+~StateT Integer (State Integer) ()~. This means that we use ~Integer~
+for counter and multiplication result, nothing will be returned as
+result because we use as result the state.
+
+#+BEGIN_SRC haskell
+import Control.Monad
+import Control.Monad.Trans.State
+import Control.Monad.Trans.Class
+
+
+-- | StateT s m a :: * -> (* -> *) -> * -> *
+-- here "external" is in signature, not actually - in call
+fact1 :: StateT Integer (State Integer) ()
+fact1 = do
+  i <- get              -- ^ counter: external state
+  when (i > 1) $ do     -- ^ if counter > 1
+    lift $ modify (i*)  -- ^ mult internal state by counter (initial: 1)
+    modify (-1+)        -- ^ decrement external state
+    fact1               -- ^ to next iteration, changed states
+
+
+fact :: Integer -> Integer
+fact n = execState (execStateT fact1 n) 1
+-- ^ external (internal in signature) state is fact, internal is counter
+
+
+main :: IO ()
+main = do
+  putStrLn "Result: "
+  print $ fact 5
+#+END_SRC
+
+Implementation is simple. First, signature describes only types, not
+actual nesting structure, so in function body "internal" is the internal
+in signature. ~lift~/~get~ are relative for internal/external but in
+termins of signature. Really after transformation you will works with
+stack-like structure, so when you call your function, you should create
+all in reverse order: internal becomes external, so we get counter as
+external state but pass it in call as internal. No collision here: it's
+actually internal, only in signature it's looks like external, because
+signature looks like application of ~StateT~ (externally) to argument
+~State~.
+
+We nothing return because there is a way to return state instead of result.
+This does ~exec*~ functions family (~execState~ is needed in external call).

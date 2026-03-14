@@ -1,0 +1,156 @@
+#+title: Safe database queries
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2020-02-04 Tue 06:38]
+
+* Safe database queries
+
+I recently encountered an error when my SQL queries affect more than one
+row. One of such bug was that query does select and got first row (I know
+that I get one), but truth is that I got more than one, so I select first,
+and, sure, it was not correct row.
+
+I don't use ORMs, there are a lot of reasons why better to avoid them. But
+ORM like a schema can offer only restrictions on relations (usually). So,
+I try to find some solution which will deny situation when query select
+unexpected number of rows (it can be expanding on modify, etc).
+
+I will try to cover 2 cases: statically verified and dynamically (at run-time).
+First is based on idea that I can know expected result and query property, which
+leads to such result. I mean, if I expect that result will contain single row,
+and I can classify queries as returning multiple/single rows then no problem
+to match them at compile time. In the second case, I expect single/multiple
+rows (again, as result or as modified set), but real result can be checked
+only at run-time (first, with result set size, second, with affected rows counter -
+it's available in many databases).
+
+The code is:
+
+#+BEGIN_SRC haskell
+{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE TypeFamilies  #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE GADTs  #-}
+
+
+module Lib () where
+
+import Data.Proxy
+
+data Uniq = Uniq deriving Show
+data NUniq = NUniq deriving Show
+data UUniq = UUniq deriving Show
+
+type family Un u where
+    Un [a] = NUniq
+    Un a = Uniq
+
+class VerDim u where
+  verDim :: [a] -> Either u u
+instance VerDim Uniq where
+  verDim [] = Right Uniq
+  verDim [_] = Right Uniq
+  verDim _ = Left Uniq
+instance VerDim NUniq where
+  verDim [] = Right NUniq
+  verDim [_] = Left NUniq
+  verDim _ = Right NUniq
+
+-- maps value (term) to type (a): IsUniq -> Uniq, IsNotUniq -> NUniq
+data IsUniq a where
+  IsUniq :: IsUniq Uniq
+  IsNotUniq :: IsUniq NUniq
+
+-- emulation
+data SQL a = SQL { sqlStm :: String } deriving (Show, Eq)
+data Con = Con
+class Query r where
+    doQuery :: Con -> String -> IO r
+instance Query Int where
+    doQuery con s = return 123
+instance Query [Int] where
+    doQuery con s = return [5, 6]
+class QueryN r where
+    doQueryN :: Con -> String -> IO [r]
+instance QueryN Int where
+    doQueryN _ _ = return [1,2,3]
+instance QueryN Float where
+    doQueryN _ _ = return [1.0]
+
+
+sql1 :: SQL Uniq
+sql1 = SQL "select * from table where id=999"
+sql2 :: SQL NUniq
+sql2 = SQL "select * from table"
+sql3 :: SQL UUniq
+sql3 = SQL "select * from table where name='x'"
+
+-- n <- exec sql1 Con :: IO Int
+-- n <- exec sql1 Con :: IO [Int] -- DENIED
+-- n <- exec sql2 Con :: IO Int -- DENIED
+-- n <- exec sql2 Con :: IO [Int]
+type IxIO i a = IO a
+exec :: forall a i. (Query a, Un a ~ i) => SQL i -> Con -> IO a
+exec sql con = do
+    res <- doQuery con (sqlStm sql) :: IxIO i a
+    return res
+
+-- n <- dexec (Proxy::Proxy Uniq) sql3 Con :: IO [Float]
+-- n <- dexec (Proxy::Proxy NUniq) sql3 Con :: IO [Float] -- DENIED
+-- n <- dexec (Proxy::Proxy NUniq) sql3 Con :: IO [Int]
+-- n <- dexec (Proxy::Proxy Uniq) sql3 Con :: IO [Int] -- DENIED
+dexec :: forall a u i j. (QueryN a, Show u, VerDim u) => Proxy u -> SQL i -> Con -> IO [a]
+dexec _proxy sql con = do
+  res <- doQueryN con (sqlStm sql) :: IxIO j [a]
+  case (verDim res :: Either u u) of
+    Right u -> return res
+    Left u -> error $ "Expected " ++ show u ++ "!!!"
+
+-- n <- dexec IsUniq sql3 Con :: IO [Float]
+-- n <- dexec IsNotUniq sql3 Con :: IO [Float] -- DENIED
+-- n <- dexec IsNotUniq sql3 Con :: IO [Int]
+-- n <- dexec IsUniq sql3 Con :: IO [Int] -- DENIED
+dexec1 :: forall a u i j. (QueryN a, Show u, VerDim u)
+  => IsUniq u -> SQL i -> Con -> IxIO j [a]
+dexec1 _proxy sql con = do
+  res <- doQueryN con (sqlStm sql) :: IxIO j [a]
+  case (verDim res :: Either u u) of
+    Right u -> return res
+    Left u -> error $ "Expected " ++ show u ++ "!!!"
+#+END_SRC
+
+Terminology is a little bit strange :) Uniq - means only 1 (or 0) rows. NUniq
+means 0 or multiple rows. UUniq - unknown uniqueness. ~exec~ function executes
+SQL statement which is phantom and is marked with property - returning single
+(Uniq) or multiple (NUniq) rows. So, with ~exec~ it's easy to do queries which
+are verified at compile time: ~exec~ is polymorphic, but you can not select
+multiple rows with SQL statement returning only one and vice versa.
+
+~dexec~ is more interesting function, it does dynamic queries and you use Proxy first argument
+to pass expecting result rows size (Uniq/NUniq) but SQL statements can ne any (sql1, sql2, sql3).
+If low level database query function returns multiple rows while you expect single, then
+you will get error like "Expected Uniq!!!". There is another version ~dexec1~ based
+on GADT instead of Proxy which looks more naturally.
+
+One note only, this is the proof of concept, so instead of real SQL layer usage, I made some
+mockup with doQuery and doQueryN functions:
+
+- doQuery :: IO Int - emulates single row result
+- doQuery :: IO [Int] - emulates multiple row results
+- doQueryN :: IO [Int] - emulates multiple row results and type is [a]
+- doQueryN :: IO [Float] - emulates single row result and result is [a]
+
+So, doQueryN emulates run-time variability of the result. Returning result as
+list ~[a]~ may be replaced with some special type (for dexec), to deconstruct
+underlying items easy (something like exists NotEmptyList).
+
+This P-o-C shows that database manipulation have some semantical/logical context:
+the same SQL query can depend on its parameters and result may be expected to be
+single or multiple. This is relative to different joins, etc. Context is knows at
+call-site, so there it must be set. All database communication must verify that
+expecting effects happen.
+
+In the real world, dynamic verification can be done on SQL-site (as triggers),
+this may be better solution.

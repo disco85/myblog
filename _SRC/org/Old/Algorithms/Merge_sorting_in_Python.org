@@ -1,0 +1,58 @@
+#+title: Merge sorting in Python
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:20]
+
+* Merge sorting in Python
+
+Early subject was implemented in C/C++, but actually I do prototyping usually
+in Python, so this was first :)
+
+
+#+BEGIN_SRC python
+def MergerSort(a):
+    def MergerGroup(a, left, m, right):
+        if left >= right: return None
+        if m < left or right < m: return None
+        print "left:", left, "m:", m, "right:", right
+        t = left
+        for j in xrange(m+1, right+1):
+            for i in xrange(t, j):
+                if a[j] < a[i]:
+                    r = a[j]
+                    for k in xrange(j, i, -1):
+                        a[k] = a[k - 1]
+                    a[i] = r
+                    t = i
+                    break
+    if len(a) < 2: return None
+    k=1
+    while k<len(a):
+       g=0
+       while g<len(a):
+            z = g + k + k - 1
+            r = z if z < len(a) else len(a) - 1
+            print "k =", k, "g =", g, "z =", z, "r =", r, " | "\
+                    "left:", g, "m:", g+k-1, "right:", r
+            MergerGroup(a, g, g + k - 1, r)
+            g+=2*k
+       k*=2
+
+def mergsort(arr):
+    arrlen = len(a)
+    k = 2
+    while k < 2*arrlen:
+        left = 0
+        while left < arrlen:
+            right = min(left + k - 1, arrlen-1)
+            print left, right, "|", k
+            left += k
+        k *= 2
+
+a = [10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121]
+print a, len(a)
+MergerSort(a)
+print a
+#+END_SRC

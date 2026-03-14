@@ -1,0 +1,91 @@
+#+title: AVR: UART for debug messages
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-09 Sun 08:36]
+
+* AVR: UART for debug messages
+
+If you need to print out a debug messages to UART port of AVR chip, you can use a simple way for it: switch stdout stream to UART. This is the code of the solution:
+
+#+BEGIN_SRC cpp
+#include <avr/io.h>
+#include <stdio.h>
+
+#ifndef NDEBUG
+
+#  if !defined(F_DEBUG_UART) && !defined(F_CPU)
+#    error F_DEBUG_UART frequency or F_CPU frequency should be defined!
+#  endif
+
+#  ifndef F_DEBUG_UART
+#    define F_DEBUG_UART F_CPU
+#  endif
+
+#  ifndef DEBUG_NUART
+#    error DEBUG_NUART should be defined!
+#  endif
+
+#  define __CONC3(X, Y, Z) X ## Y ## Z
+#  define _CONC3(X, Y, Z) __CONC3(X, Y, Z)
+// _CONC3(UDRE, DEBUG_NUART,) does not works
+#  define _UDRE (_CONC3(UDR, E, DEBUG_NUART))
+#  define _UDR (_CONC3(UDR, DEBUG_NUART,))
+#  define _UBRRH (_CONC3(UBRR, DEBUG_NUART, H))
+#  define _UBRRL (_CONC3(UBRR, DEBUG_NUART, L))
+#  define _UCSRA (_CONC3(UCSR, DEBUG_NUART, A))
+#  define _UCSRB (_CONC3(UCSR, DEBUG_NUART, B))
+#  define _UCSRC (_CONC3(UCSR, DEBUG_NUART, C))
+#  define _RXEN (_CONC3(RXEN, DEBUG_NUART,))
+#  define _TXEN (_CONC3(TXEN, DEBUG_NUART,))
+#  define _UCSZ0 (_CONC3(UCSZ, DEBUG_NUART, 0))
+#  define _U2X (_CONC3(U2X, DEBUG_NUART,))
+#  define DEBUG_UART_SUPPORT() \
+static int debug_uart_putchar(char c, FILE *stream); \
+static FILE mystdout = FDEV_SETUP_STREAM(debug_uart_putchar, NULL, _FDEV_SETUP_WRITE); \
+static int debug_uart_putchar(char c, FILE *stream) \
+{ \
+        while (0 == (_UCSRA & (1<<_UDRE))) ; \
+        _UDR = c; \
+        return (0); \
+}
+
+/* 8 bits data, 1 stop bit, 9600 kbps, async */
+#  define INIT_DEBUG_UART() do { \
+        stdout = &mystdout; \
+        _UCSRC = 0x06; \
+        _UCSRA = 0x00; \
+        _UCSRB = 0x18; /* receive, transmit, no interrupts */ \
+        uint16_t ubrr = (F_DEBUG_UART/16/9600-1); \
+        _UBRRL = (unsigned char)ubrr; \
+        _UBRRH = (unsigned char)(ubrr>>8); \
+} while (0)
+
+#  define DEBUG_UART_PRN(...) printf(__VA_ARGS__)
+
+#else
+#  define DEBUG_UART_SUPPORT()
+#  define INIT_DEBUG_UART()
+#  define DEBUG_UART_PRN(...)
+#endif
+#+END_SRC
+
+Save it into ~debug_uart.h~, for example.
+What you need to use it, it's only defining ~F_DEBUG_UART~ or ~F_CPU~, ~DEBUG_NUART~ and calling 3 macros: ~DEBUG_UART_SUPPORT()~ on module level (it generates code, so call it only once!), ~INIT_DEBUG_UART()~ to init UART and ~DEBUG_UART_PRN(...)~ where you need message printing. The example is:
+
+#+BEGIN_SRC cpp
+#define F_DEBUG_UART 7372800
+#define DEBUG_NUART 0
+#include "debug_uart.h"
+DEBUG_UART_SUPPORT();
+int
+main(void)
+{
+        INIT_DEBUG_UART();
+        DEBUG_UART_PRN("Hello world, %d\n", 99);
+        ... so on ...
+#+END_SRC
+
+~F_DEBUG_UART~ is the exact amount of the system oscillator frequency to calculate UART baud rate. Default value is equals to F_CPU, but it's possible, that you have value of ~fosc~ = 7.3728MHz (see AVR Datasheet about "Examples of UBRR settings") and you use in the Makefile F_CPU value as 8MHz - if you use 8MHz for UBRR calculation too, you will get errors in transmission! So use for ~F_DEBUG_UART~ exact values only!
+~DEBUG_NUART~ defined number of UART. If you define ~NDEBUG~, all macros will be empty - you don't need to delete it's calls. For more information see help on WinAVR.

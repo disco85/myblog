@@ -1,0 +1,97 @@
+#+title: Small tricks in shell
+#+description: My Blog
+#+keywords: scripting, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: scripting misc
+#+date: [2020-02-04 Tue 06:29]
+
+* Small tricks in shell
+
+!Directories tree view
+
+Set it to your ~.bashrc~ and run as ~tree [DIR]~.
+
+#+BEGIN_SRC bash
+tree() {
+find "${1:-.}" -type d -print 2>/dev/null|awk '!/\.$/ {for (i=1;i<NF;i++){d=length($i);if ( d < 5  && i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'  FS='/'
+}
+#+END_SRC
+
+!Patch selected file only
+
+If you have big patch file with many files there, to patch only one
+(filename.py in example):
+
+#+BEGIN_SRC bash
+filterdiff -i '*filename.py' patch.diff | patch -pN
+#+END_SRC
+
+and to list all files in patch file use ~lsdiff~ or ~filterdiff --list~.
+
+!Test HEAD HTTP with curl
+
+#+BEGIN_SRC bash
+curl -i -X HEAD http://...
+#+END_SRC
+
+!Paging in FAR
+
+#+BEGIN_SRC bash
+view:<command
+edit:<command
+#+END_SRC
+
+and to enable scrolling start with ~far -w~.
+
+!Run alternate shell commands
+
+This script run one of available command:
+
+#+BEGIN_SRC bash
+#!/bin/sh
+
+trycmd() {
+    a0=$1; shift
+    for c in $*; do $c $a0 2>/dev/null && break; done
+}
+
+# usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list
+trycmd list pipx pip0 pip1 pip3 pip
+#+END_SRC
+
+!Frozen keyboard in PyCharm (Linux)
+
+Bug in forever buggy Java:
+
+#+BEGIN_SRC bash
+ibus restart
+#+END_SRC
+
+!Remove passphrase from SSH key
+
+#+BEGIN_SRC bash
+openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa_new
+cp ~/.ssh/id_rsa ~/.ssh/id_rsa.backup
+rm ~/.ssh/id_rsa
+cp ~/.ssh/id_rsa_new ~/.ssh/id_rsa
+chmod 400 ~/.ssh/id_rsa
+#+END_SRC
+
+!Problem with RPC/NFS mount after update CentOS 7
+
+After some digging I finally found that the reason for
+this is a buggy systemd unit file in RHEL/CentOS 7.
+
+This is a bug in ~nfs-server.service~ and he fix is to copy
+~nfs-server.service~ to ~/etc/systemd/system~ and replace
+all occurrences of "rpcbind.target" with "rpcbind.service".
+
+See this bug for reference: https://bugzilla.redhat.com/show_bug.cgi?id=1171603
+
+!To allow connecting to CentOS
+
+If there is trouble try to stop iptables:
+
+#+BEGIN_SRC bash
+service iptables start iptables flush service iptables stop
+#+END_SRC

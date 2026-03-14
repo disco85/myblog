@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reduce points density</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="dsp, python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Reduce points density</h1>
+<div id="outline-container-orgb332e36" class="outline-2">
+<h2 id="orgb332e36">Reduce points density</h2>
+<div class="outline-text-2" id="text-orgb332e36">
+<p>
+Sometimes charts have so many points that drawing of them is very highweight.
+The solution is to reduce points density (to thinning them). Idea is simple:
+if there are too many samples per linear (of the output device) resolution.
+</p>
+
+<p>
+There are different possible approaches: a filtering - it's a bad solution
+because peaks will be lost or some kind of approximation - thinning, which
+is better because peaks are saved:
+</p>
+
+<p>
+Original chart and chart with reduced points density:
+</p>
+
+<p>
+<img src="../../assets/Density2.svg" alt="Density2.svg" class="org-svg" />  &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; <img src="../../assets/Density1.svg" alt="Density1.svg" class="org-svg" />
+</p>
+
+<p>
+The algorithm in Python language:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">reduce_density</span>(k, points):
+    <span style="color: #ffffff;">x0</span> = <span style="color: #ffffff;">y0</span> = <span style="color: #ffffff;">u0</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #ffffff;">last</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #696969;">for</span> i, (x, y, u) <span style="color: #696969;">in</span> <span style="color: #a52a2a;">enumerate</span>(points):
+        <span style="color: #696969;">if</span> i == 0:
+            <span style="color: #696969;">yield</span> (x, y, u)
+            <span style="color: #ffffff;">x0</span>, <span style="color: #ffffff;">y0</span>, <span style="color: #ffffff;">u0</span> = x, y, u
+        <span style="color: #696969;">else</span>:
+            <span style="color: #696969;">if</span> <span style="color: #a52a2a;">abs</span>(y - y0) &lt; k:
+                <span style="color: #ffffff;">last</span> = (x, y, u)
+                <span style="color: #696969;">continue</span>
+            <span style="color: #696969;">else</span>:
+                <span style="color: #ffffff;">x0</span>, <span style="color: #ffffff;">y0</span>, <span style="color: #ffffff;">u0</span> = x, y, u
+                <span style="color: #696969;">if</span> last <span style="color: #696969;">is</span> <span style="color: #696969;">not</span> <span style="color: #7fffd4;">None</span>:
+                    <span style="color: #696969;">yield</span> last
+                <span style="color: #696969;">yield</span> (x, y, u)
+                <span style="color: #ffffff;">last</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #696969;">if</span> last <span style="color: #696969;">is</span> <span style="color: #696969;">not</span> <span style="color: #7fffd4;">None</span>:
+        <span style="color: #696969;">yield</span> last
+</pre>
+</div>
+
+<p>
+<code>points</code> is the list/iterator of triplet: <code>(x, y, physical_value)</code>. <code>x, y</code> - are coordinates
+of the point, <code>physical_value</code> is the <code>0y</code> value in some physical units which can be used
+for a printing value near the chart point or something else. The idea is simple: enumerate
+over the points and looking for a change of the value (<code>y</code>) greater than some coefficient
+<code>k</code> (number of pixels of the output device) - while values change is less than <code>k</code> treat
+them as a line (skip them with <code>continue</code>). But otherwise - treat it as a valuable point
+and return it (with <code>yield</code>).
+</p>
+
+<p>
+This algorithm allows to minimize drawing points number which will improve output performance
+and will decrease the size of the files with the points without to loose valuable points.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

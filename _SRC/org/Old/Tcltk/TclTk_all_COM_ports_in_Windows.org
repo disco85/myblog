@@ -1,0 +1,52 @@
+#+title: Tcl/Tk: all COM ports in Windows
+#+description: My Blog
+#+keywords: windows, tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: windows tcl/tk
+#+date: [2020-02-09 Sun 08:04]
+
+* Tcl/Tk: all COM ports in Windows
+
+If you need helper for user like combobox with available COM ports (serial devices, and they can be real COM ports or virtual like FTDI "bridges") in Tcl/Tk, use this procedures:
+
+#+BEGIN_SRC tcl
+# list all ports as FTDIBUS and USB. Returns list of {PortName, FriendlyName, Auto?}
+# where Auto is flag - port for HMC6343 or not
+proc _ls_vports {} {
+    set res {}
+    foreach type {FTDIBUS USB} {
+        set k0 "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\$type"
+        set k0ch [registry keys "$k0" {V[iI][dD]_*}]
+        foreach k1 $k0ch {
+            set k1ch [registry keys "$k0\\$k1"]
+            foreach k2 $k1ch {
+                set Class [registry get "$k0\\$k1\\$k2" Class]
+                if {$Class == "Ports"} {
+                    set FriendlyName [registry get "$k0\\$k1\\$k2" FriendlyName]
+                    set PortName [registry get "$k0\\$k1\\$k2\\Device Parameters" PortName]
+                    set Auto [expr {"silabser" == [registry get "$k0\\$k1\\$k2" "Service"]}]; #auto-detected
+                    lappend res [list $PortName $FriendlyName $Auto]
+                }
+            }
+        }
+    }
+    return $res
+}
+
+# Returns list of {PortName, "Com Port", 0} -
+# auto-detect is impossible in this mode, no friendly name also
+proc _ls_all {} {
+    set serial_base "HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"
+    set values [registry values $serial_base]
+    set res {}
+    foreach valueName $values {
+        set PortName [registry get $serial_base $valueName]
+        set FriendlyName "COM Port"
+        set Auto 0
+        lappend res [list $PortName $FriendlyName $Auto]
+    }
+    return $res
+}
+#+END_SRC
+
+They returns list of triplets: ~{PortName, FriendlyName, Auto}~. Auto is the flag {0|1} - 1 is for auto-detection of the silabser service (for Sillicon Labs CP210x USB-to-UART bridge chip, used in the HMC6343 demo board).

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Select sorting</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Select sorting</h1>
+<div id="outline-container-org37b89be" class="outline-2">
+<h2 id="org37b89be">Select sorting</h2>
+<div class="outline-text-2" id="text-org37b89be">
+<p>
+We are searching for the least item and insert it into head of array.
+But on its place - head, i.e. swaps head and this item. Then we are shift head
+by 1 and make the same. Very simple algorithm :)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+
+<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span> <span style="color: #ff4500;">T</span>&gt;
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">selsort</span>(<span style="color: #ff4500;">T</span>* <span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">len</span>)
+{
+    <span style="color: #ff4500;">T</span> <span style="color: #ffffff;">elmin</span>;
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>, <span style="color: #ffffff;">off</span>, <span style="color: #ffffff;">imin</span>;
+    <span style="color: #696969;">if</span> (!arr||!len) <span style="color: #696969;">return</span> (0);
+
+    <span style="color: #696969;">for</span> (off=0; off&lt;len; off++) {
+        <span style="color: #696969;">for</span> (i=off, elmin=arr[off], imin=-1; i&lt;len; i++) {
+            <span style="color: #696969;">if</span> (elmin &gt; arr[i]) {
+                elmin = arr[i];
+                imin = i;
+            }
+        }
+        <span style="color: #696969;">if</span> (imin != -1) {
+            arr[imin] = arr[off];
+            arr[off] = elmin;
+        }
+    }
+    <span style="color: #696969;">return</span> (1);
+}
+
+<span style="color: #575757;">/*****************************************</span>
+<span style="color: #575757;">                    Main</span>
+<span style="color: #575757;"> ****************************************</span><span style="color: #575757;">*/</span>
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+{
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">arr</span>[] = {2, 1, 0, 10, 9, 99, 8, -1, 6, 15, 15};
+    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
+    selsort(arr, sizeofarray(arr));
+    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
+    <span style="color: #696969;">return</span> (0);
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

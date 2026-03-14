@@ -1,0 +1,104 @@
+#+title: Run jobs suite remotely via screen
+#+description: My Blog
+#+keywords: scripting, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: scripting misc
+#+date: [2020-02-04 Tue 06:26]
+
+* Run jobs suite remotely via screen
+
+Often in needed to run some jobs remotely, for example, tests on remote test
+environment. I used different custom "daemon"-like scripts for this, monitoring
+the jobs/tests, but another and simple solution for Linux is to use ~screen~
+tool. It supports sessions, detaching, so is good for such kind of tasks. Here
+is the script which runs multiple jobs on remote host (setted via ~$RMHOST~ env.
+var). Its syntax is:
+
+#+BEGIN_SRC bash
+  -cls
+  -run JOB-NUMBER 'JOB-COMMAND'
+  -runall < FILE-WITH-COMMANDS
+  -submit < FILE-WITH-COMMANDS
+Used env. vars: \$USER (login), \$RMHOST (hostname)
+#+END_SRC
+
+so to run it you must:
+
+- set ~$RMHOST~ env. var
+- create file with commands which will be ran remotely: each command is on own
+  line and can have any ~$~ variables for substitution: they will be
+  substituted locally
+- then call script as ~V1=a V2=b script -submit < created_file~. This will
+  substitute ~V1~ and ~V2~ in ~created_file~ and send resulting file over scp to
+  remote host ~$RMHOST~ (**you must have configured public-key access to
+  host**), then will send itself and call itself remotely with command ~-runall~.
+
+After it you can go to host, call ~screen -r~ to see your created session, to
+switch between windows (each job is ran on separate window). You will have local
+~$LOG~ file with decscription of running commands and remote log file per job
+with info about what and when was run (~job-<DATE>-<JOB_NUMBER>.log~). Yes, each
+job has number/index related to line number of job suite file. If you want you
+can include generating of screen log file too (with ~-L~ option IMO).
+
+While you are on remote host, you can run this script (which was scp-ed) with
+~-cls~ command: it will remove all log files there.
+
+That's it.
+
+#+BEGIN_SRC bash
+#!/bin/sh
+SCR=`basename "$0"`
+SESSION=${USER}_screen
+LOG=rmjobs.log
+
+_wrapjob() {
+    _wrapjob_f=job-`date +%s`-$1.log
+    echo "Started $1 at `date`: $2" > $_wrapjob_f
+    echo '===============================================================================' >> $_wrapjob_f
+    echo >> $_wrapjob_f
+    $2|tee -a $_wrapjob_f
+}
+
+_runjob() {
+    [ $1 = "0" ] && {
+        # add -L to both if screelog.* logs are needed
+        screen -dmS $SESSION -t "job$1" sh -c "~/$SCR -run $1 \"$2\";sh"
+    } || {
+        screen -S $SESSION -p 0 -X screen -t "job$1" sh -c "~/$SCR -run $1 \"$2\";sh"
+    }
+}
+
+case "$1" in
+    -cls) rm -f screenlog.*; rm -f job*.log;;
+    -run) _wrapjob "$2" "$3";;
+    -runall)
+        i=0
+        rm -f $LOG 2>/dev/null
+        while read -r c; do
+            c=`echo $c|tr -d '[:cntrl:]'`
+            echo $c|egrep '^-' >/dev/null && continue
+            _runjob $i "$c"
+            echo "Ran $c;" >> $LOG
+            i=`expr $i + 1`
+            sleep 2
+        done;;
+    -submit)
+        rm -f .jobs-suite.tmp 2>/dev/null
+        while read -r c; do
+            echo $c|egrep '^-' >/dev/null && continue
+            eval "echo $c" >> .jobs-suite.tmp
+        done
+        scp "$0" "$USER@$RMHOST:$SCR"
+        scp ".jobs-suite.tmp" $USER@$RMHOST:".jobs-suite.tmp"
+        ssh -n -l $USER $RMHOST "sh $SCR -runall < .jobs-suite.tmp";;
+    *)
+        echo "Syntax:"
+        echo "  -cls"
+        echo "  -run JOB-NUMBER 'JOB-COMMAND'"
+        echo "  -runall < FILE-WITH-COMMANDS"
+        echo "  -submit < FILE-WITH-COMMANDS"
+        echo "Used env. vars: \$USER (login), \$RMHOST (hostname)"
+        exit 1;;
+esac
+:
+#+END_SRC

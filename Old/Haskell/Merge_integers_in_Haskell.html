@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Merge integers in Haskell</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Merge integers in Haskell</h1>
+<div id="outline-container-orga4e1686" class="outline-2">
+<h2 id="orga4e1686">Merge integers in Haskell</h2>
+<div class="outline-text-2" id="text-orga4e1686">
+<p>
+This is the known task ("problem" from Clojure problems list): to
+convert integers list to intervals by merging them&#x2026; See:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-console">[1,2,3,5,7,6,10] -&gt; [&lt;1,3&gt;,&lt;5,7&gt;,10]
+</pre>
+</div>
+
+<p>
+First, I create type <code>El</code> which is input list element and can be point
+or already interval (with simple factory <code>iv</code>). Relation <code>Rel</code> is needed
+to determine relative location of point and interval. Join of point to
+interval is based on this result. <code>joinToIv</code> joins point to interval and
+returns possible new one. Function <code>joinToIvs</code> joins point to one of
+intervals but if it is not possible then returns original intervals with
+new one added. Main algorithm is a left folding of <code>joinToIvs</code>.
+</p>
+
+<p>
+Code is very dirty and sure may be more short :-)
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- Dirty code of turn integers to intervals
+module Intervals where
+
+-- element is interval Iv of 2 integers or point of 1 integer
+data El = Iv Integer Integer|Pt Integer
+instance Show El where
+  show (Iv n m)|n == m = show n
+               |otherwise = "&lt;" ++ show n ++ "," ++ show m ++ "&gt;"
+  show (Pt n) = show n
+
+-- constructor for intervals from 2 integers
+iv :: Integer -&gt; Integer -&gt; El
+iv n m|n &lt; m     = Iv n m
+      |otherwise = Iv m n
+
+-- relation pt/interval: L (left), LS (left-side), IN (included), RS (right-side), R (right)
+data Rel = L|LS|IN|RS|R deriving Show
+
+-- relation
+rel :: El -&gt; El -&gt; Rel
+rel (Iv a b) (Pt n)  |a - n == 1  = LS
+                     |a - n &gt; 1   = L
+                     |b - n &gt;= 0  = IN
+                     |b - n == -1 = RS
+                     |otherwise   = R
+rel (Iv a b) (Iv c d)|c - b == 1 = RS
+                     |otherwise  = R
+
+-- join integer to element (which is expected to be interval)
+-- joinToIv :: El -&gt; Integer -&gt; [El]
+joinToIv :: El -&gt; Integer -&gt; Maybe El
+joinToIv e@(Iv a b) n = let p = Pt n in
+  case rel e p of
+    LS -&gt; Just $ iv n b
+    IN -&gt; Just e
+    RS -&gt; Just $ iv a n
+    otherwise -&gt; Nothing
+
+-- join integer to list of intervals by extend some or add new one to the end
+joinToIvs :: [El] -&gt; Integer -&gt; [El]
+joinToIvs [] n = [iv n n]
+joinToIvs (e:es) n =
+  maybe ([e] ++ joinToIvs es n) (\e' -&gt; _add e' es) (joinToIv e n) where
+  _add (Iv a b) ((Iv c d):es1)|abs (c-b) == 1 = [Iv a d] ++ es1
+  _add e1 es1 = [e1] ++ es1
+
+-- Turn integers to intervals
+toIv :: [Integer] -&gt; [El]
+toIv [] = []
+toIv (n:ns) =
+  foldl (joinToIvs) [iv n n] ns
+
+--------------------------------------------------
+main :: IO ()
+main = print l &gt;&gt; print (toIv l) where
+  l = [1,2,3,5,6,4,0,10,11,9,12,100,-1,80,99,101,98,8,7]
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Merge sorting in Python</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Merge sorting in Python</h1>
+<div id="outline-container-org9885c99" class="outline-2">
+<h2 id="org9885c99">Merge sorting in Python</h2>
+<div class="outline-text-2" id="text-org9885c99">
+<p>
+Early subject was implemented in C/C++, but actually I do prototyping usually
+in Python, so this was first :)
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">MergerSort</span>(a):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">MergerGroup</span>(a, left, m, right):
+        <span style="color: #696969;">if</span> left &gt;= right: <span style="color: #696969;">return</span> <span style="color: #7fffd4;">None</span>
+        <span style="color: #696969;">if</span> m &lt; left <span style="color: #696969;">or</span> right &lt; m: <span style="color: #696969;">return</span> <span style="color: #7fffd4;">None</span>
+        <span style="color: #a52a2a;">print</span> <span style="color: #696969;">"left:"</span>, left, <span style="color: #696969;">"m:"</span>, m, <span style="color: #696969;">"right:"</span>, right
+        <span style="color: #ffffff;">t</span> = left
+        <span style="color: #696969;">for</span> j <span style="color: #696969;">in</span> <span style="color: #a52a2a;">xrange</span>(m+1, right+1):
+            <span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> <span style="color: #a52a2a;">xrange</span>(t, j):
+                <span style="color: #696969;">if</span> a[j] &lt; a[i]:
+                    <span style="color: #ffffff;">r</span> = a[j]
+                    <span style="color: #696969;">for</span> k <span style="color: #696969;">in</span> <span style="color: #a52a2a;">xrange</span>(j, i, -1):
+                        <span style="color: #ffffff;">a</span>[k] = a[k - 1]
+                    <span style="color: #ffffff;">a</span>[i] = r
+                    <span style="color: #ffffff;">t</span> = i
+                    <span style="color: #696969;">break</span>
+    <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(a) &lt; 2: <span style="color: #696969;">return</span> <span style="color: #7fffd4;">None</span>
+    <span style="color: #ffffff;">k</span>=1
+    <span style="color: #696969;">while</span> k&lt;<span style="color: #a52a2a;">len</span>(a):
+       <span style="color: #ffffff;">g</span>=0
+       <span style="color: #696969;">while</span> g&lt;<span style="color: #a52a2a;">len</span>(a):
+            <span style="color: #ffffff;">z</span> = g + k + k - 1
+            <span style="color: #ffffff;">r</span> = z <span style="color: #696969;">if</span> z &lt; <span style="color: #a52a2a;">len</span>(a) <span style="color: #696969;">else</span> <span style="color: #a52a2a;">len</span>(a) - 1
+            <span style="color: #a52a2a;">print</span> <span style="color: #696969;">"k ="</span>, k, <span style="color: #696969;">"g ="</span>, g, <span style="color: #696969;">"z ="</span>, z, <span style="color: #696969;">"r ="</span>, r, <span style="color: #696969;">" | "</span>\
+                    <span style="color: #696969;">"left:"</span>, g, <span style="color: #696969;">"m:"</span>, g+k-1, <span style="color: #696969;">"right:"</span>, r
+            MergerGroup(a, g, g + k - 1, r)
+            <span style="color: #ffffff;">g</span>+=2*k
+       <span style="color: #ffffff;">k</span>*=2
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">mergsort</span>(arr):
+    <span style="color: #ffffff;">arrlen</span> = <span style="color: #a52a2a;">len</span>(a)
+    <span style="color: #ffffff;">k</span> = 2
+    <span style="color: #696969;">while</span> k &lt; 2*arrlen:
+        <span style="color: #ffffff;">left</span> = 0
+        <span style="color: #696969;">while</span> left &lt; arrlen:
+            <span style="color: #ffffff;">right</span> = <span style="color: #a52a2a;">min</span>(left + k - 1, arrlen-1)
+            <span style="color: #a52a2a;">print</span> left, right, <span style="color: #696969;">"|"</span>, k
+            <span style="color: #ffffff;">left</span> += k
+        <span style="color: #ffffff;">k</span> *= 2
+
+<span style="color: #ffffff;">a</span> = [10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121]
+<span style="color: #a52a2a;">print</span> a, <span style="color: #a52a2a;">len</span>(a)
+MergerSort(a)
+<span style="color: #a52a2a;">print</span> a
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

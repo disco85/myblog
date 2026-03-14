@@ -1,0 +1,55 @@
+#+title: Insert sorting
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-04 Tue 18:20]
+
+* Insert sorting
+
+We take 2nd item and compare it with the next. If it less than next, then
+insert it in appropriate position. Then we are taking 3d item and it's
+comparing with previous two items and is inserting into appropriate position.
+Then we are taking 4th item and etc. By the way, the inserting actually is
+shifting all items by one position to right and then is inserting into free
+position.
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<typename T>
+void inssort_insert(T *arr, T item, unsigned int pielen, unsigned int pos)
+{
+    for (int i=pielen-1; i>pos; i--)
+        arr[i] = arr[i-1];
+    arr[pos] = item;
+}
+
+template<typename T>
+int inssort(T *arr, unsigned int len)
+{
+    if (!arr||!len) return (0);
+    for (int pie=1; pie<len; pie++) {
+        for (int i=0; i<=pie-1; i++) {
+            if (arr[pie] < arr[i]) {
+                inssort_insert(arr, arr[pie], pie+1, i);
+                break;
+            }
+        }
+    }
+    return (1);
+}
+
+/*****************************************
+                   main
+ ****************************************/
+int main(void)
+{
+    int arr[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
+    PRINTARR(arr, "%d");
+    inssort(arr, sizeofarray(arr));
+    PRINTARR(arr, "%d");
+    return (0);
+}
+#+END_SRC

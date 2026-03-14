@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ASF/AVR32: et024006_PutPixmap() format</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang, embedded" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">ASF/AVR32: et024006<sub>PutPixmap</sub>() format</h1>
+<div id="outline-container-org13469eb" class="outline-2">
+<h2 id="org13469eb">ASF/AVR32: et024006<sub>PutPixmap</sub>() format</h2>
+<div class="outline-text-2" id="text-org13469eb">
+<p>
+How to use bitmap on ET024006 with ASF (Atmel Software Framework)? Format of bitmap file, used in et024006<sub>PutPixmap</sub>(), is the R5G6B5, you can create image in the GIMP, then export to 'C source file' (select 'save as RGB 565 16 bits', and uncheck 'Use Glib types') and get something like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #575757;">/* </span><span style="color: #575757;">GIMP RGBA C-Source image dump (appicon.c)</span><span style="color: #575757;"> */</span>
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GIMP_IMAGE_WIDTH</span> (22)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GIMP_IMAGE_HEIGHT</span> (22)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GIMP_IMAGE_BYTES_PER_PIXEL</span> (4) <span style="color: #575757;">/* </span><span style="color: #575757;">3:RGB, 4:RGBA</span><span style="color: #575757;"> */</span>
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GIMP_IMAGE_PIXEL_DATA</span> ((<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span>*) GIMP_IMAGE_pixel_data)
+<span style="color: #696969;">static</span> <span style="color: #696969;">const</span> <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">GIMP_IMAGE_pixel_data</span>[22 * 22 * 4 + 1] =
+(<span style="color: #696969;">"\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"</span>
+...
+);
+</pre>
+</div>
+
+<p>
+I change it to:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #696969;">const</span> <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">appmenu_icon</span>[] =
+ (<span style="color: #696969;">"\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"</span>
+...
+);
+</pre>
+</div>
+
+<p>
+and then call:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp">et024006_PutPixmap((<span style="color: #ff4500;">et024006_color_t</span>*)appmenu_icon,
+     appmenu_icon_width,
+     0, 0, x, y,
+     appmenu_icon_width,
+     appmenu_icon_height);
+</pre>
+</div>
+
+<p>
+<code>appmenu_icon_width</code> and <code>appmenu_icon_height</code> may be #define's
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

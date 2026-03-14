@@ -1,0 +1,53 @@
+#+title: Parallel fold
+#+description: My Blog
+#+keywords: algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms
+#+date: [2020-02-05 Wed 05:20]
+
+* Parallel fold
+
+In one of my previous posts about recursive morphisms I end the text with
+question: how to parallelize it? Consider one of list recursive morphisms
+application - left folding of lists. Each result depends on previous result and
+seems like non-paralellizable. It looks like:
+
+#+BEGIN_SRC
+foldl($, {a, b, c, d}) = ((a $ b) $ c) $ d
+#+END_SRC
+
+where ~$~ is some abstract operation. But if ~<$, {a, b, c, d}>~ is ~semi-group~
+then we can do next:
+
+#+BEGIN_SRC
+Let
+    x = a $ b
+    y = c $ d
+(x $ c) $ d = x $ (c $ d) = x $ y
+#+END_SRC
+
+because ~$~ is associative operation. So, we see that we have 2 sub-expressions:
+~x~ and ~y~ which can be evaluated in parallel: ~(a $ b) $ (c $ d)~.
+
+If ~$~ is ~+~ it looks like, for example:
+
+#+BEGIN_SRC
+foldl(+, {1, 2, 3, 4})
+
+1   2    3   4
+  3   ||   7
+      10
+#+END_SRC
+
+Can we parallelize more complex expressions (not special related to folding)?
+For example, ~a + b - c - d~ ? Yes. If ~{a, b, c, d}~ is ~group~ then we can
+replace any ~'.. - x'~ by ~'.. + (-x)'~ where ~(-x)~ is the opposite element: our
+parallelized function must do something like this:
+
+<pre>if op is not associative:
+  op = op<sup>-1</sup>
+  y = -y
+  result <- x op y
+</pre>
+where op op<sup>-1</sup> = id. Fo sum. groups
++<sup>-1</sup> is ~-~, for prod. groups ~*~<sup>-1</sup> is ~/~.

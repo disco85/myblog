@@ -1,0 +1,44 @@
+#+title: Generic lists processing
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:18]
+
+* Generic lists processing
+
+~lst_tmpl()~ is the generic function of processing lists, all other functions
+may be implemented in easy way with using of it. Actually it's ported from Haskell:
+
+#+BEGIN_SRC python
+from operator import add, mul, concat
+
+def lst_tmpl(f1, f2, f3, f4, f5, l):
+    "Generic recursive processing of list (head, tail, empty list, etc)"
+    if not l: return f1([])
+    else:
+        x = l[0]
+        xs = l[1:]
+        return f2(f3(x), f4(lst_tmpl(f1, f2, f3, f4, f5, f5(xs))))
+
+lst_const = lambda n: lambda _: n
+lst_id = lambda x: x
+lst_swap = lambda op: lambda x, y: op(y, x)
+lst_list = lambda x: [x]
+lst_cons = lambda x, xs: [x] + xs
+
+lst_len = lambda l: lst_tmpl(lst_const(0), add, lst_const(1), lst_id, lst_id, l)
+
+lst_sum = lambda l: lst_tmpl(lst_const(0), add, lst_id, lst_id, lst_id, l)
+lst_mul = lambda l: lst_tmpl(lst_const(1), mul, lst_id, lst_id, lst_id, l)
+lst_rev = lambda l: lst_tmpl(lst_id, lst_swap(concat), lst_list, lst_id, lst_id, l)
+lst_map = lambda f, l: lst_tmpl(lst_id, lst_cons, f, lst_id, lst_id, l)
+
+
+###### test ############
+print lst_len([1, 2, 3, 4, 5])
+print lst_sum([1, 2, 3, 4, 5])
+print lst_mul([1, 2, 3, 4, 5])
+print lst_rev([1, 2, 3, 4, 5])
+print lst_map(lambda x: x*100, [1, 2, 3, 4, 5])
+#+END_SRC

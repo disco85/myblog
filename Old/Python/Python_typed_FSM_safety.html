@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python: typed FSM safety</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="safety, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Python: typed FSM safety</h1>
+<div id="outline-container-orgd9cdcf6" class="outline-2">
+<h2 id="orgd9cdcf6">Python: typed FSM safety</h2>
+<div class="outline-text-2" id="text-orgd9cdcf6">
+<p>
+One of the accusations against the OOP is state problems. They are divided
+into several sub-kinds, one of them is problem of transitions correctness,
+i.e. control when a transition from one state to another state is incorrect
+and should be avoided.
+</p>
+
+<p>
+People often say that no such problem in FP languages. It's not true, but such
+illusion exists because of explicit arguments flow from function to function.
+And this problem appears when all arguments collapse to one argument aggregating
+all others. In this case the situation is reducing to the case in OOP.
+</p>
+
+<p>
+There are multiple canonical solutions - working in compile-time with type-checker
+help or in run-time:
+</p>
+
+<p>
+Run-time solutions are:
+</p>
+
+<ul class="org-ul">
+<li>FSM - the best solution</li>
+<li>contracts - not so good, but OK</li>
+<li>asserts - reduced version of contracts</li>
+</ul>
+
+<p>
+For example, function <code>close()</code> makes sense only if something was opened (let's
+suppose the result of the open in <code>file</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">close</span>(<span style="color: #696969;">self</span>):
+    <span style="color: #696969;">assert</span> <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">file</span>, <span style="color: #696969;">"File was not opened"</span>
+    ...
+</pre>
+</div>
+
+<p>
+something like this. The same is possible in an any language.
+</p>
+
+<p>
+Compile-time solutions maybe:
+</p>
+
+<ul class="org-ul">
+<li>Linear types</li>
+<li>Unification (see Prolog) - more general solution</li>
+<li>Indexed monads (for Haskell, for example)</li>
+<li>Simple data-types (like <code>data Opened = Opened String; data Read = Read String</code>)</li>
+</ul>
+
+<p>
+So, if some function must be under such control then even if it does not
+expect arguments at least one argument must be presented always, it may be
+term without parameters.
+</p>
+
+<p>
+Of course, such a solution exists a long time ago in the OOP. Let's simulate it
+with a simple functionality - open a file, read it, parse it to integer, close it.
+</p>
+
+<p>
+So, we see that we have states: <code>{opened, read, parsed, closed}</code> and each state
+accepts only limited number of transitions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">open -&gt; read | close
+read -&gt; parse | close
+parse -&gt; close
+</pre>
+</div>
+<p>
+That is, each function allows only limited number of next functions in our flow:
+<code>open</code> allows only a call of <code>read</code> or <code>close</code> and so on. Graphically it looks
+like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">open -------&gt;.
+ |           |
+ v           |
+read -------&gt;.
+ |           |
+ v           |
+parse ------&gt;.
+             |
+             v
+           close
+</pre>
+</div>
+
+<p>
+<code>close</code> is allowed after any state.
+</p>
+
+<p>
+We can turn it upside down:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">       close
+         ^
+         |
+         +----- parse
+         |        ^
+         +----- read
+         |        ^
+         +----- open
+</pre>
+</div>
+
+<p>
+and to treat it as classes hierarchy: classes <code>parse</code>, <code>read</code>, <code>open</code> includes
+common feature - <code>close</code>, they know how to do it, so they inherit the <code>close</code>.
+Each class has some methods (one or more) and methods expect arguments of
+these classes types. This will guard us from wrong transitions in compile-time.
+Actually, this solution is possible even in Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">class</span> <span style="color: #ff4500;">Open</span>:
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">open</span>(<span style="color: #696969;">self</span>, path: <span style="color: #a52a2a;">str</span>) -&gt; <span style="color: #696969;">"Open"</span>:
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">file</span> = <span style="color: #a52a2a;">open</span>(path, <span style="color: #696969;">"r"</span>)
+        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Close</span>:
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">close</span>(<span style="color: #696969;">self</span>, state: Open) -&gt; <span style="color: #696969;">"Close"</span>:
+        state.<span style="color: #a52a2a;">file</span>.close()
+        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Read</span>(Close):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">read</span>(<span style="color: #696969;">self</span>, state: Open) -&gt; <span style="color: #696969;">"Read"</span>:
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">buf</span> = state.<span style="color: #a52a2a;">file</span>.read()
+        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Parse</span>(Close):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">parse</span>(<span style="color: #696969;">self</span>, state: Read) -&gt; <span style="color: #696969;">"Parse"</span>:
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">n</span> = <span style="color: #a52a2a;">int</span>(state.buf)
+        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>
+
+<span style="color: #ffffff;">o</span> = Open().<span style="color: #a52a2a;">open</span>(<span style="color: #696969;">"z"</span>)
+<span style="color: #ffffff;">r</span> = Read().read(o)
+<span style="color: #ffffff;">p</span> = Parse().parse(r)
+<span style="color: #a52a2a;">print</span>(p.n)
+p.close(o)
+</pre>
+</div>
+
+<p>
+All classes implement methods - what they can do. And each of them
+additionally can close opened file, so they inherit <code>Close</code> class
+(except <code>Open</code> sure). Their methods are typed with explicit argument
+<code>state</code> which restricts allowed transition, also it keeps data of
+the state. Pay attention that call <code>p.close(r)</code> for example, leads
+to "compile-time" (mypy checking, to be more accurate) error, i.e.
+transitions are explicit: <code>Parse</code> does not allow a parsing immediately
+after an opening of the file, without reading of it: <code>p = Parse().parse(o)</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">error: Argument 1 to "parse" of "Parse" has incompatible type "Open"; expected "Read"
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+</div>
+
+<p>
+A little improvement maybe to keep <code>Open</code> as instance attribute <code>.opened</code>
+to allow to close the file from any state, keeping the result of the opening
+(or something similar).
+</p>
+
+<p>
+Classical pattern helps us even better than modern FP languages like Haskell
+where developers use indexed monads very rarely (and do miss linear types).
+</p>
+
+<p>
+But there are not OOP languages where this is solving on type-level too: ATS,
+Clean, F*&#x2026;
+</p>
+
+<p>
+Another way is to use types literals.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,199 @@
+#+title: WinAVR: software SPI
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-09 Sun 08:45]
+
+* WinAVR: software SPI
+
+Sometimes you need software SPI MASTER (in my case it was needed to test one chip) implementation. It supports all SPI modes (0, 1, 2, 3), and clock dividers (but so it's software "SPI", that timing is not exact!), but sends only in MSBFIRST bit order (it's easy to add LSBFIRST support).
+See the code.
+To use it in your project, you need to define some macro-variables (with #define-s) before include the file. They are:
+
+- SWSPI_MOSI_PORT - port for MOSI "wire"
+- SWSPI_MOSI_PIN - pin for MOSI "wire"
+- SWSPI_MISO_PORT - like above but for MISO (only port)
+- SWSPI_MISO_PIN - line above, but pin for MISO
+- SWSPI_SCLK_PORT - port for SCLK "wire"
+- SWSPI_SCLK_PIN - pin for SCLK "wire"
+- SWSPI_MODE - mode of SPI communication
+- SWSPI_DIV - if not defined, 1 will be used
+
+The example:
+
+#+BEGIN_SRC cpp
+#define SWSPI_MOSI_PORT PORTB
+#define SWSPI_MOSI_PIN PB3
+#define SWSPI_MISO_PORT PINB
+#define SWSPI_MISO_PIN PB4
+#define SWSPI_SCLK_PORT PORTB
+#define SWSPI_SCLK_PIN PB5
+#define SWSPI_MODE SPI_MODE0
+#define SWSPI_DIV SPI_CLOCK_DIV2
+#+END_SRC
+
+In my real application I included .c file to local file in my project, it's not convenient way for C, but... seems like this:
+
+#+BEGIN_SRC
+common/   |  myprj/
+swspi.h   |    conf.h (#include <common/swspi.h> and defines macro-vars)
+swspi.h   |    spi.c (#include "conf.h" then #include <common/swspi.c>
+#+END_SRC
+
+You can use another scheme, it's trivial.
+Here is the code. The .h file:
+
+#+BEGIN_SRC cpp
+#ifndef _COMMON_SWSPI_H
+#define _COMMON_SWSPI_H
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdint.h>
+
+#define SPI_CLOCK_DIV4 4
+#define SPI_CLOCK_DIV16 16
+#define SPI_CLOCK_DIV64 64
+#define SPI_CLOCK_DIV128 128
+#define SPI_CLOCK_DIV2 2
+#define SPI_CLOCK_DIV8 8
+#define SPI_CLOCK_DIV32 32
+#define SPI_CLOCK_DIV64_2 64
+
+#define SPI_MODE0 0
+#define SPI_MODE1 1
+#define SPI_MODE2 2
+#define SPI_MODE3 3
+
+uint8_t spi_transfer(uint8_t data);
+uint8_t spi_ntransfer(const uint8_t *req, int reqlen, uint8_t *resp, int resplen);
+#define spi_interrupt_on()
+#define spi_interrupt_off()
+
+// for nCS (nSEL) select of device before sending
+#define BEGIN_SPI_SENDING(PORT, PIN) do { \
+        (PORT) &= ~_BV(PIN); \
+        _delay_loop_1(4); \
+} while (0)
+
+// for nCS (nSEL) unselect of device after sending
+#define END_SPI_SENDING(PORT, PIN) do { \
+        _delay_loop_1(4); \
+        (PORT) |= _BV(PIN); \
+} while (0)
+
+#endif /* !_COMMON_SWSPI_H*/
+#+END_SRC
+
+and the .c file (swspi.c):
+
+#+BEGIN_SRC cpp
+#include "swspi.h"
+#include <util/delay_basic.h>
+
+#if !defined(SWSPI_MOSI_PORT) || !defined(SWSPI_MOSI_PIN) || \
+    !defined(SWSPI_MISO_PORT) || !defined(SWSPI_MISO_PIN) || \
+    !defined(SWSPI_SCLK_PORT) || !defined(SWSPI_SCLK_PIN) || \
+    !defined(SWSPI_MODE)
+#  error Software SPI not configured! SWSPI_* should be configured!
+#endif
+
+#define setbit(P, B) ((P) |= (_BV(B)))
+#define clibit(P, B) ((P) &= ~(_BV(B)))
+#define getbit(P, B) (((P) & (_BV(B)))? 1:0)
+
+#ifdef SWSPI_DIV
+#  define SPIDELAYTIME ((SWSPI_DIV)/2)
+#else
+#  define SPIDELAYTIME 1
+#endif
+#define SPIHALFDELAY() _delay_loop_1(SPIDELAYTIME) // half of tact (bit transfer) - min 1 CPU tact
+
+#define SETMOSI() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+#define CLIMOSI() clibit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+#define NOMOSI() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+
+// instead of PORTX may be PINX?
+#define READMISO() getbit(SWSPI_MISO_PORT, SWSPI_MISO_PIN)
+
+#if (2 & SWSPI_MODE)
+#  define ONSCLK() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+#  define OFFSCLK() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+#else
+#  define ONSCLK() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+#  define OFFSCLK() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+#endif
+
+#if (1 & SWSPI_MODE)
+#  define SHIFTBIT(outbyte, inbyte) do { \
+        (outbyte) & 0x80 ? (SETMOSI()) : (CLIMOSI()); \
+        (outbyte) <<= 1; \
+        ONSCLK(); \
+        SPIHALFDELAY(); \
+        (inbyte) <<=1; \
+        (inbyte) |= READMISO(); \
+        OFFSCLK(); \
+        SPIHALFDELAY(); \
+} while (0)
+#else
+#  define SHIFTBIT(outbyte, inbyte) do { \
+        (outbyte) & 0x80 ? (SETMOSI()) : (CLIMOSI()); \
+        (outbyte) <<= 1; \
+        SPIHALFDELAY(); \
+        ONSCLK(); \
+        SPIHALFDELAY(); \
+        (inbyte) <<=1; \
+        (inbyte) |= READMISO(); \
+        OFFSCLK(); \
+} while (0)
+#endif
+
+uint8_t
+spi_transfer(uint8_t data) {
+        int nbit;
+        uint8_t res = 0;
+        for (nbit=0; nbit<8; nbit++) {
+                SHIFTBIT(data, res);
+        }
+        NOMOSI();
+        return (res);
+}
+
+/* resp - responce from slave device; resplen - max. expected resp. len (buf. size);
+ * if resp is NULL, not saved. Returns always the last byte of the response.
+ */
+uint8_t
+spi_ntransfer(const uint8_t *req, int reqlen, uint8_t *resp, int resplen) {
+        int nbit;
+        int nbyte;
+        register uint8_t outbyte;
+        uint8_t inbyte = 0;
+        for (nbyte=0; nbyte<reqlen; nbyte++) {
+                outbyte = req[nbyte];
+                inbyte = 0;
+                for (nbit=0; nbit<8; nbit++) {
+                        SHIFTBIT(outbyte, inbyte);
+                }
+                if (resp && nbyte < resplen) {
+                        resp[nbyte] = inbyte;
+                }
+        }
+        NOMOSI();
+        return (inbyte);
+}
+
+#undef ONSCLK
+#undef OFFSCLK
+#undef SETMOSI
+#undef CLIMOSI
+#undef NOMOSI
+#undef READMISO
+#undef SPIHALFDELAY
+#undef SPIDELAYTIME
+#undef SHIFTBIT
+#undef SHIFT0
+#+END_SRC
+
+To send and receive response ~spi_transfer()~ and ~spi_ntransfer()~ functions are needed. First sends one byte and returns responce's byte (from MISO), second - sends several bytes and saves them into ~resp~ buffer (constrained by ~resplen~) and if resp i NULL, returns the last byte only.
+Before any transfer (one or several bytes in the one request) to some chip you should call macro ~BEGIN_SPI_SENDING~ (~CHIP_NSEL_PORT~, ~CHIP_NSEL_PIN~), where ~CHIP_NSEL_PORT~ and ~CHIP_NSEL_PIN~ defines ~nCS~ wire for this concrete chip. After sending you should call ~END_SPI_SENDING~ (~CHIP_NSEL_PORT~, ~CHIP_NSEL_PIN~) to release the wire by ~nCS~.

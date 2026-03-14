@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stream integration by Simpson's rule</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="dsp, tcl/tk, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Stream integration by Simpson's rule</h1>
+<div id="outline-container-org243d0d2" class="outline-2">
+<h2 id="org243d0d2">Stream integration by Simpson's rule</h2>
+<div class="outline-text-2" id="text-org243d0d2">
+<p>
+About this method of numerical integration you can read here. To do it in streaming manner we should do little formal mathematics.
+</p>
+
+<p>
+Composite Simpson's rule:
+</p>
+
+<p>
+\[
+\int_a^bf(x)dx\approx \frac h3 \sum_{k=1,2}^{N-1}(f(x_{k-1}) + 4 f(x_k) + f(x_{k+1}))
+\]
+</p>
+
+<p>
+where k=1,2 means from 1 step by 2, N is even intervals number.
+</p>
+
+<p>
+The sum will be:
+</p>
+
+<p>
+\[\frac h3 \sum_{k=1,2}^{N-1}S_k\]
+</p>
+
+<p>
+Simpsone's method requires 3 points least so we can integrate not every point (sample) but through one, so neighboring samples are IN-2 and IN. Different between them is:
+</p>
+
+<p>
+\[I_N - I_{N-2} = \frac h3(\sum_{k=1,2}^{N-1}S_k - \sum_{k=1,2}^{N-3}S_k) = \frac h3(S_{N-1} + \sum_{k=1,2}^{N-3}S_k - \sum_{k=1,2}^{N-3}S_k)
+\]
+</p>
+
+<p>
+no S,,N-2,, member because of the step k=2.
+</p>
+
+<p>
+So difference is: \[\frac h3 S_{N-1}\]
+</p>
+
+<p>
+For example, \[I_4 - I_2 = \frac h3(y_2 + 4y_3 + y_4)\], where I,,4,, is 4th interval but 5th sample.
+</p>
+
+<p>
+And resulting formula of I,,i,, is:
+</p>
+
+<p>
+\[
+0, i\le1 \newline
+\frac h3(y_{i-2} + 4y_{i-1} + y_i) + I_{i-1}, i\ mod\ 2 = 0 \newline
+I_{i-1}, i\ mod\ 2 \ne 0
+\]
+</p>
+
+<p>
+where <code>i</code> is a number of input sample. We can not get values of I on each sample, but through one (skipping odds and 0-th, 1-th). On odds samples, value will repeat previous one.
+</p>
+
+<p>
+Example in SWIG (some.h file):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #575757;">// </span><span style="color: #575757;">Simpsone's rule integrator</span>
+<span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">CSIntr</span> {
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">I</span>; <span style="color: #575757;">// </span><span style="color: #575757;">last value of integral</span>
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">y_1</span>; <span style="color: #575757;">// </span><span style="color: #575757;">y[-1]</span>
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">y_2</span>; <span style="color: #575757;">// </span><span style="color: #575757;">y[-2]</span>
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h</span>; <span style="color: #575757;">// </span><span style="color: #575757;">step of subinterval</span>
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h_d</span>; <span style="color: #575757;">// </span><span style="color: #575757;">step of subinterval/3</span>
+        <span style="color: #ff4500;">long</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">i</span>; <span style="color: #575757;">// </span><span style="color: #575757;">iteration</span>
+} <span style="color: #ff4500;">CSIntr</span>;
+</pre>
+</div>
+
+<p>
+<code>some.i</code> file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp">%include <span style="color: #696969;">"some.h"</span>
+%extend CSIntr {
+    <span style="color: #575757;">// </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #575757;"> how is more right to do this?</span>
+    <span style="color: #ff4500;">void</span> <span style="color: #ffffff;">reset</span>() {
+        $self-&gt;I = 0.;
+        $self-&gt;y_1 = $self-&gt;y_2 = 0.;
+        $self-&gt;i = 0;
+    }
+
+    <span style="color: #ff4500;">void</span> <span style="color: #ffffff;">setup</span>(<span style="color: #ff4500;">double</span> h) {
+        $self-&gt;h = h;
+        $self-&gt;h_d = h/3.;
+    }
+
+    CSIntr(<span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h</span>) {
+        <span style="color: #ff4500;">CSIntr</span> *<span style="color: #ffffff;">obj</span>;
+
+        <span style="color: #696969;">if</span> (<span style="color: #7fffd4;">NULL</span> == (obj=(<span style="color: #ff4500;">CSIntr</span>*) malloc(<span style="color: #696969;">sizeof</span> (CSIntr))))
+            <span style="color: #696969;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        CSIntr_reset(obj);
+        CSIntr_setup(obj, h);
+        <span style="color: #696969;">return</span> (obj);
+    }
+
+    ~CSIntr() {
+        <span style="color: #696969;">if</span> ($self) free($self);
+    }
+
+    <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">calculate</span>(<span style="color: #ff4500;">double</span> y) {
+        <span style="color: #696969;">if</span> ($self-&gt;i &lt;= 1)
+            $self-&gt;I = 0;
+        <span style="color: #696969;">else</span> <span style="color: #696969;">if</span> (0 == $self-&gt;i % 2)
+            $self-&gt;I += $self-&gt;h_d * ($self-&gt;y_2 + 4. * $self-&gt;y_1 + y);
+
+        $self-&gt;y_2 = $self-&gt;y_1;
+        $self-&gt;y_1 = y;
+        $self-&gt;i++;
+        <span style="color: #696969;">return</span> ($self-&gt;I);
+    }
+};
+</pre>
+</div>
+
+<p>
+So, if we use Tcl, then we can build and test our class (<code>Makefile</code> fragment):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-Makefile">some_wrap.c: some.i some.h some.c
+ swig -tcl -pkgversion 1.0 some.i
+
+some.dll: some_wrap.c
+ gcc -Ic:/tcl/include -I./ -DUSE_TCL_STUBS -c some_wrap.c -o some_wrap.o
+ gcc -shared -o some.dll some/some_wrap.o -L c:/tcl/lib -ltclstub85 -lm
+</pre>
+</div>
+
+<p>
+test on linear function with <code>yi = {1, 2, 3, 4, 5}</code>: 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #a52a2a;">load</span> some
+% CSIntr cs 1
+_f85f7601_p_CSIntr
+% cs calculate 1
+0.0
+% cs calculate 2
+0.0
+% cs calculate 3
+4.0
+% cs calculate 4
+4.0
+% cs calculate 5
+12.0
+</pre>
+</div>
+
+<p>
+and I,,4,, is really 12.0
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

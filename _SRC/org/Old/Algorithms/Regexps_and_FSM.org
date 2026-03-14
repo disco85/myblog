@@ -1,0 +1,43 @@
+#+title: Regexps and FSM
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:24]
+
+* Regexps and FSM
+
+Actually regular expressions can be represented as FSM in easy way. Here is simple
+implementation of regexp ~"./(./007./)./"~. Idea is simple: we are matching more
+concrete case, if no success - more wide (less concrete), any symbol. If no
+success again then return to previous state. ~reduce()~ processes all FSM,
+result of reducing is checking - this must be final FSM state, in example it
+must be 5 which means that we processing to the end and pattern is matched.
+
+#+BEGIN_SRC python
+from functools import reduce
+
+def fsm(s0, c):
+    _ = None        # any symbol
+    rules = (
+        ( 0, '(', 1 ),
+        ( 0,  _,  0 ),
+        ( 1, '0', 2 ),
+        ( 1,  _,  1 ),
+        ( 2, '0', 3 ),
+        ( 2,  _,  1 ),
+        ( 3, '7', 4 ),
+        ( 3, '0', 3 ),
+        ( 3,  _,  1 ),
+        ( 4, ')', 5 ),
+        ( 4,  _,  4 ),
+        ( 5,  _,  5 ),
+    )
+    for _s0, _c, _s1 in rules:
+        if s0 == _s0 and (_c is _ or c == _c):
+            return _s1
+    raise Exception("Unexpected symbol '%s'" % c)
+
+def match007(s):
+    return 5 == reduce(fsm, s, 0)
+#+END_SRC

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HFit - fitting algorithms in Haskell</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="tcl/tk, haskell, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">HFit - fitting algorithms in Haskell</h1>
+<div id="outline-container-org3ea3615" class="outline-2">
+<h2 id="org3ea3615">HFit - fitting algorithms in Haskell</h2>
+<div class="outline-text-2" id="text-org3ea3615">
+<p>
+It's very interesting class of tasks - fitting of some figure using several input points with noise. The simplest method is
+<a href="https://en.wikipedia.org/wiki/Least_squares">Least Squares Algorithm</a>.
+</p>
+
+
+<div id="org70e929c" class="figure">
+<p><img src="../../assets/HFit1.svg" alt="HFit1.svg" class="org-svg" />
+</p>
+</div>
+
+
+<p>
+Idea of algorithm is to find <code>a</code> and <code>b</code> of line equation <code>a*x + b</code> using
+sum's minimization of difference's squares: &amp;Sum;(y&lt;sub&gt;i&lt;/sub&gt; -
+(a*x&lt;sub&gt;i&lt;/sub&gt; + b))&lt;sup&gt;2&lt;/sup&gt;. Result is 2 formulas:
+</p>
+
+<p>
+\[ a=\frac{n \sum\limits_{i=1}^n x_i y_i - \sum\limits_{i=1}^n x_i \sum\limits_{i=1}^n y_i}
+{n \sum\limits_{i=1}^n x_i^2 - ({\sum\limits_{i=1}^n x_i})^2} \]
+</p>
+
+<p>
+&lt;br&gt;
+</p>
+
+<p>
+\[ b=\frac{\sum\limits_{i=1}^n y_i - a \sum\limits_{i=1}^n x_i} {n}
+\]
+</p>
+
+<p>
+&lt;br&gt;
+</p>
+
+<p>
+And when we know <code>a</code> and <code>b</code> we can generates <code>(x0, y0) (x1, y1)</code> points to
+create line&#x2026;
+</p>
+
+<p>
+<a href="https://github.com/bapcyk/hfit">Application</a> initializes Tcl/Tk UI via
+sending Tcl code to wish interpreter:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">...
+  mainTcl &lt;- readFile "ui.tcl"
+  (Just si, Just so, Just sx, ph) &lt;- createProcess (proc wish []) {
+    std_in=CreatePipe, std_out=CreatePipe, std_err=CreatePipe, close_fds=False}
+  hSetBuffering si NoBuffering
+  hSetBuffering so NoBuffering
+  hPutStrLn si mainTcl
+...
+</pre>
+</div>
+
+<p>
+Communication loop lives in separate process:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">...
+  forkIO $ ioLoop si so
+  waitForProcess ph
+  putStrLn "bye."
+  where
+    ioLoop si so = forever $ do
+        resp &lt;- (hGetLine so) `catchIOError` (\_ -&gt; return "eof")
+        case resp of
+          "eof" -&gt; exitSuccess
+          _|resp `startsWith` "calc " -&gt;
+            putStrLn ("-&gt; " ++ resp) &gt;&gt; 
+            let res = calc resp in
+            putStrLn ("&lt;- " ++ res) &gt;&gt; hPutStrLn si res
+          _ -&gt; putStrLn resp &gt;&gt; return ()
+...
+</pre>
+</div>
+
+<p>
+and when new line is got from wish then it will be processed with <code>calc</code>
+function which gets request (here it's call <code>resp</code> from Wish, yep:) and parse
+coordinates like <code>"1 2 3 4", ie. x0 y0 x1 y1 ... xn yn</code> with <code>parsePt</code> (after
+splitting them into words):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">...
+-- Parse ["12", "34", "56", "78"] to [(12, 34), (56, 78)]
+parsePt :: [String] -&gt; [Pt]
+parsePt [] = []
+parsePt (k:v:t) = (read k, read v) : parsePt t
+...
+</pre>
+</div>
+
+<p>
+then done all calculation in <code>Double</code> domain. Result of calculation is Tcl
+command like <code>"takeCalc x0 y0 x1 y1"</code> with coordinates of found line 2 points:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">    -&gt; calc 119 285 194 235 379 64
+    &lt;- takeCalc 119  306  379  46
+</pre>
+</div>
+
+<p>
+Wish will get this command and create line on canvas.
+</p>
+
+<p>
+Actually it's initial state, so needs many improvement, adding new algorithms,
+etc&#x2026;
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

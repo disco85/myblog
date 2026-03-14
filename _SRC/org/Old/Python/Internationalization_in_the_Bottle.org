@@ -1,0 +1,139 @@
+#+title: Internationalization in the Bottle
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t 
+#+tags: python
+#+date: [2020-02-09 Sun 08:27]
+
+* Internationalization in the Bottle
+
+This approach is very limited! In serious sites you have to support Web-robots, links with language code... I use it for small (embedded Web console) projects only.
+
+I18N in the Bottle Python framework is easy. I prefer to do i18n for 2 different tasks:
+
+* i18n for messages (strings)
+* i18n for static text big pies (in the templates)
+
+I use gettext mechanism. In my application folder I have folders:
+
+#+BEGIN_SRC
+locale/
+    en/
+      TEMPLATES/
+        xxx.tpl
+    bg/
+      LC_MESSAGES/
+        messages.mo
+      TEMPLATES/
+        xxx.tpl
+    xx/
+      LC_MESSAGES/
+        messages.mo
+      TEMPLATES/
+        xxx.tpl
+bg_messages.po
+xx_messages.po
+#+END_SRC
+
+"locale" is the folder for i18n/i10n. Folders with language codes ("bg", "xx") are placed here. Each of them contents two subfolders: LC_MESSAGES with compiled .po file (messages.mo) and TEMPLAES (with .tpl files), except en/ folder: no LC_MESSAGES here.
+
+I use make-like mechanism for compilation .po-files, adding new locale - Python fabricate build tool. It's very lightweight and is written in single Python file!
+
+.po-files are very simple. I changed next strings in the one:
+
+#+BEGIN_SRC
+"Content-Type: text/plain; charset=utf8\n"
+"Content-Transfer-Encoding: utf8\n"
+#+END_SRC
+
+and encoded it into utf-8 (using vim, for example). Then added my msgid, msgstr pairs, as usual.
+
+So, my Bottle application have to know current language (preferred by user) and how to: a) found corresponding template b) how to translate word/text.
+
+#+BEGIN_SRC python
+# to test, change language in the browser (see priority of them!). Then
+# refresh page - you should see text in different language
+_LANGS = {}
+def initi18n():
+    """Init internationalization of UI
+    """
+    import __builtin__
+    global _LANGS
+    for l in ("bg","ru"): # list of supported language
+        trans = gettext.translation(I18N_DOMAIN, LOCALEDIR, languages=[l])
+        _LANGS[l] = trans
+    # default translator (i.e. _())
+    __builtin__.__dict__["_"] = unicode
+
+
+def request_lang(req):
+    """Determine preferred language of the user from WSGI environment
+    variable HTTP_ACCEPT_LANGUAGE. Default is 'en'
+    """
+    # if cfg module overrides user language
+    if cfg.LANG != "default":
+        return cfg.LANG
+
+    try:
+        return req.environ.get("HTTP_ACCEPT_LANGUAGE", "").split(";")[0].split("-")[0]
+    except:
+        return "en"
+
+
+def switch_lang(lang):
+    """Select language for output VIA GETTEXT
+    """
+    import __builtin__
+    trans = _LANGS.get(lang, None)
+    if trans:
+        trans.install(unicode=True)
+    else:
+        __builtin__.__dict__["_"] = unicode
+
+
+def templatei18n(name, lang=None, **kw):
+    """Like bottle template() but render for current language
+    from os.environ["LANGUAGE"]. And not like bottle's template,
+    doesn't support source, only name (not path!) as 1st arg!
+    If no lang, it will be selected from request
+    """
+    if not lang:
+        lang = request_lang(request)
+    tplpath = "%s/%s/TEMPLATES/%s" % (LOCALEDIR, lang, name)
+    tplpath = os.path.abspath(tplpath) + ".tpl"
+    if not os.path.exists(tplpath):
+        tplpath = name
+    return template(tplpath, **kw)
+
+
+def i18n(templ):
+    """Decorator for template rendering using current
+    language (i18n support)
+    """
+    def decor(view):
+        @functools.wraps(view)
+        def w(*a, **kw):
+            lang = request_lang(request)
+            switch_lang(lang)
+            d = view(*a, **kw)
+            return templatei18n(templ, lang=lang, **d)
+        return w
+    return decor
+#+END_SRC
+
+I use ~initi18n()~ before application starting and use ~@i18n~ decorator for localized templates. Nothing else:
+
+#+BEGIN_SRC cpp
+@i18n("tasks") # name of the template
+def tasks_list(self):
+    """Show table of tasks
+    """
+    ps = tasks_info()
+    for taskname in ps:
+        msg = self.runres.get(taskname, "") or ps[taskname]["msg"]
+        ps[taskname]["msg"] = msg
+        self.runres[taskname] = ""
+    return dict(ps=ps)
+#+END_SRC
+
+User should select preferred language in the Web browser options. You - create template "tasks.tpl" in all locale/*/TEMPLATES and translated messages in .mo-file to use _(..) function everywhere you need (Python code, templates).

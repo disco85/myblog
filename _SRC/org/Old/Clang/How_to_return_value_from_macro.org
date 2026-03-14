@@ -1,0 +1,24 @@
+#+title: How to return value from C macro
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-05 Wed 18:59]
+
+* How to return value from C macro
+
+Usually I use variable name in C macro as out parameter (it's standard way in Tcl, for example). But there is another way, something like in functional languages, with expression. See:
+
+#+BEGIN_SRC cpp
+#define GETX(X) ({ \
+        int x = (X)*2; \
+        x; \
+        })
+
+void main()
+{
+    printf("%d\n", GETX(56));
+}
+#+END_SRC
+
+This example shows hot to return value from GETX(), which really is expression. Works in GCC :)

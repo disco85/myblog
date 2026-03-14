@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TinyBSD installation</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">TinyBSD installation</h1>
+<div id="outline-container-org96ef246" class="outline-2">
+<h2 id="org96ef246">TinyBSD installation</h2>
+<div class="outline-text-2" id="text-org96ef246">
+<p>
+This is:
+</p>
+
+<ul class="org-ul">
+<li>Live USB system</li>
+<li>Installer of TinyBSD (MFS based FreeBSD 8) on 16Mb (of system partition) for embedded devices</li>
+</ul>
+
+<p>
+Script 'build.my' is used for image creation and copy to USB flash (all information will be destroyed!). Image is 32Mb. Original 'tinybsd' script is modified to support lists of includes and excludes files from image (see 'tinybsd.patch') via 'tinybsd.nofiles', 'tinybsd.basefiles' (last was in original TinyBSD).
+'kh<sub>inst</sub>' is the project/conf (similar to 'firewall', 'vpn', so on). Installation is made throught rc.d mechanism: etc/rc.d/osinst script will be called at start time and will ask user to boot from USB with live FS or to install system to HDD.
+/etc/instskel contents all configuration of installed system:
+</p>
+
+<ul class="org-ul">
+<li>bsdlabel</li>
+<li>csh.cshrc</li>
+<li>fdisk</li>
+<li>fstab</li>
+<li>motd</li>
+<li>nodes</li>
+<li>profile</li>
+<li>rc.conf</li>
+<li>ttys</li>
+</ul>
+
+<p>
+&#x2026;all are standard except 'nodes'. See them to know how installer will create slices, partitions, FSs, run-time configs&#x2026; As to 'nodes', it's only predefined values of IP addresses of predefined nodes, user can select IP by node's name (when install system) or to enter the value manually.
+</p>
+
+<p>
+Installed OS additionally contents 2 preinstalled tools: <code>mksh</code> shell (small but useful shell from MirBSD project) and <code>tmux</code> - BSD console multiplexer.
+</p>
+
+<p>
+This installer was tested on LX-800 (AMD based board for embedded solutions).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,161 @@
+#+title: AVR timers: calculate prescalers
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-09 Sun 08:16]
+
+* AVR timers: calculate prescalers
+
+Functions below are only for Atmega128, see "bitness" of timers, prescalers values...
+
+When you use AVR timers, you should setup it's prescalers' values. Often, programmers calculates prescaler on the paper and then hardcodes it into the code. And this is done every time for new delay value. This task can be done automatically by next algorithm. Next is the Python prototype of the algorithm.
+
+#+BEGIN_SRC cpp
+class Timer:
+    freq = 0 # freq. of timer
+    bits = 0 # "bitsness" of timer
+
+# We have for example 4 timers
+_timers = [Timer(), Timer(), Timer(), Timer()]
+
+def init_timers():
+    # setup bitness of the timers
+    global _timers
+    _timers[0].bits = 256
+    _timers[1].bits = 65536
+    _timers[2].bits = 256
+    _timers[3].bits = 65536
+
+# for Atmega128
+def _alarm_setup(timer, D):
+    prescales0 = (1, 8, 32, 64, 128, 256, 1024,)
+    prescales = (1, 8, 64, 256, 1024,)
+    # base freq of timer, the same for all but is possible to specify differents
+    freq = 8000000 # Freq. of MCU
+
+    if timer == 0:
+        psc = prescales0
+    else:
+        psc = prescales
+
+    _timers[timer].freq = freq
+
+    T = 1000000 * psc[-1] * _timers[timer].bits / freq
+    cycles = D/T
+    if cycles:
+        D -= cycles*T
+
+    for _psc in psc:
+        # T - timer period (step in usec)
+        T = 1000000 * _psc * _timers[timer].bits / freq
+        # D_T - how many T (timer periods) are in D (delay)
+        D_T = float(D)/T
+        if D_T <= .5:
+            # can not be rounded even to 1, too short delay time!
+            return None
+        elif D_T > _timers[timer].bits:
+            # delay is too long for this prescale value
+            continue
+        else:
+            # bingo!
+            cn = _timers[timer].bits - int(D_T) + 1
+            prescale = _psc
+            return (cn, prescale, cycles)
+    return None
+
+# test
+init_timers()
+print _alarm_setup(0, 10000000)
+print _alarm_setup(0, 256)
+#+END_SRC
+
+Function ~_alarm_setup()~ returns triplet (start value of timer counter, prescaler value, total cycles of the timer counter). These 3 values defines initial parameters of counter which should count to delay D microseconds. It's possible to define any values of delay time in this manner.
+This Python prototype example is only to show idea of algorithm. But next is the real implementation on C for WinAVR:
+
+#+BEGIN_SRC cpp
+/* Calculates prescale (divisor of timer: 1,8,...) and start
+ * counter value and total cycles number. Returns 0 on success, -1 on faulire.
+ * D is the delay in microseconds.  timer is number of timer.
+ * Out values are saved in corresponding timerc_t.
+ * Atmega128 implementation!!!
+ */
+int
+_alarm_setup(int timer,
+             unsigned long D)
+{
+        int i;
+        int max_psc; // max. value of prescaler of timer
+        int *psc; // prescalers of timer
+        unsigned long T; // period of tick
+        unsigned long Tclk; // period of clock
+        unsigned long Tall; // period of timer cycle (from 0 to bits)
+
+        psc = _timers[timer].prescalers;
+        max_psc = psc[_timers[timer].nprescalers-1];
+
+        /* Base frequency is F_CPU. Real frequency is F_CPU/prescaler.
+           One tick occupes 1/freq seconds (freq in MHz). N ticks occupes
+           N/freq. N is max ticks number in counter = bits of this counter =
+           _timers[timer].bits. So, total time to count all ticks of counter is
+           N/freq = N/(F_CPU/prescaler) = N*prescaler/F_CPU. Freq is in MHz, to
+           use microseconds instead of seconds, * 1000000.
+
+           T is the total time of count all the counter with slowest freq (with
+           last prescaler - max_psc). cycles is how many counter cycles are in
+           D with slowest prescaler on this timer-counter.
+
+           Then D set to D without cycles time.
+           */
+
+        // 1000000 * max_psc > F_CPU, so T/F_CPU != 0
+        T = (1000000 * max_psc / F_CPU) * _timers[timer].bits;
+        _timers[timer].cycles = D/T;
+
+        if (_timers[timer].cycles > 0) {
+                D -= (_timers[timer].cycles) * T;
+                _timers[timer].cycles_prescaler = max_psc;
+        }
+        else {
+                // If does not need cycles, cycles_prescaler will be 0
+                // (may be used as flag of this)
+                _timers[timer].cycles_prescaler = 0;
+        }
+
+        D *= 1000; // in nanoseconds
+        Tclk = 1000000000 / F_CPU; // in nanoseconds
+        for (i=0; i<_timers[timer].nprescalers; i++) {
+                T = Tclk * psc[i]; // time of one tick
+                Tall = T * _timers[timer].bits; // time to count all ticks of counter
+                if (D > Tall) {
+                        // delay D is too long for this Tall
+                        continue;
+                }
+                else {
+                        _timers[timer].prescaler = psc[i];
+                        // D/T how many ticks in D, cn is ticks from 0
+                        _timers[timer].cn = _timers[timer].bits - D/T;
+                        return (0);
+                }
+        }
+        return (-1);
+}
+#+END_SRC
+
+This function uses global array of timers: _timers. This is the array of the timerc_t structs:
+
+#+BEGIN_SRC cpp
+typedef struct timerc_t {
+        volatile timer_handler_t alarm_handler;
+        volatile unsigned long nover; // number of overflow
+        unsigned long bits; // number of bits
+        volatile unsigned long cn; // start from this count value
+        volatile unsigned long cycles; // cycles number
+        volatile int prescaler; // prescaler (1, 8, 32... - depends on arch. and timer)
+        volatile int cycles_prescaler; // prescaler (usually 1024) for total counter cycles
+        int *prescalers; // array of timer-counter prescalers
+        int nprescalers; // length of prescalers' array
+} timerc_t; 
+#+END_SRC
+
+Full implementation of timers support for AVR (Atmega128 only at the moment) can be found in my Github.

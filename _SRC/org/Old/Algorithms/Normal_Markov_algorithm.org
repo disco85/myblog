@@ -1,0 +1,104 @@
+#+title: Normal Markov algorithm
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:26]
+
+* Normal Markov algorithm
+
+[[https://en.wikipedia.org/wiki/Markov_algorithm][Normal Markov algorithm]] - is
+the abstract rewriting system or method of algorithms description/writing.
+Here is simple Python implementation. Idea of this A. is in the foundation of
+Refal.
+
+#+BEGIN_SRC python
+from __future__ import print_function
+
+class Rule:
+    def __init__(self, f, t, last=0):
+        self.f = f  # from
+        self.t = t  # to
+        self.len = len(self.f)
+        self.last = last  # last rule?
+
+    def __str__(self):
+        return "<Rule%s %s -> %s>" % ('.' if self.last else '', self.f, self.t)
+
+    def sub(self, text):
+        """ Substitution:
+        >>> Rule('a', 'b').sub('qweaaannn')
+        (1, 'qwebaannn')
+        >>> Rule('a', 'b').sub('aaa')
+        (1, 'baa')
+        >>> Rule('a', '').sub('qweaba')
+        (1, 'qweba')
+        >>> Rule('', 'xyz').sub('qweaba')
+        (1, 'xyzqweaba')
+        >>> Rule('', '').sub('qweaba')
+        (0, 'qweaba')
+        """
+        if not self.f and not self.t: return (0, text)
+        for i in range(0, len(text)):
+            end = i + self.len
+            if self.f == text[i:end]:
+                return (1, text[0:i] + self.t + text[end:])
+        return (0, text)
+
+
+
+class NM:
+    """ Normal Markov's Algorithm
+    >>> nm = NM([Rule("ba", "ab"),])
+    >>> nm('aababbbabababbaaa')
+    'aaaaaaaaabbbbbbbb'
+    >>> nm = NM([Rule("c", ""), Rule("bb", "ddd", last=1)])
+    >>> nm('abbcabbca')
+    'adddabba'
+    >>> nm('dcacb')
+    'dab'
+    >>> nm = NM([Rule("*a", "", last=1),
+    ...          Rule("*b", "", last=1),
+    ...          Rule("*", "", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    >>> nm('bbaba')
+    'baba'
+    >>> nm = NM([Rule("*0", "00*"),
+    ...          Rule("*1", "01*"),
+    ...          Rule("*2", "10*"),
+    ...          Rule("*3", "11*"),
+    ...          Rule("*", "", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    >>> nm('0123')
+    '00011011'
+    >>> nm = NM([Rule("*a", "a*"),
+    ...          Rule("*b", "b*"),
+    ...          Rule("*", "a", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    >>> nm('bbab')
+    'bbaba'
+    """
+    def __init__(self, rules):
+        self.rules = rules
+
+    def eval(self, text):
+        while 1:
+            changed = 0
+            for rule in self.rules:
+                oldtext = text
+                applied, text = rule.sub(text)
+                #print("%s -> %s [by %s]" % (oldtext, text, rule))
+                if applied:
+                    changed = 1
+                    if rule.last: return text
+                    else: break
+            if not changed:
+                return text
+    __call__ = eval
+
+import doctest
+doctest.testmod()
+#+END_SRC

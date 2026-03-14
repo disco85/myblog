@@ -1,0 +1,51 @@
+#+title: Select sorting
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-04 Tue 18:25]
+
+* Select sorting
+
+We are searching for the least item and insert it into head of array.
+But on its place - head, i.e. swaps head and this item. Then we are shift head
+by 1 and make the same. Very simple algorithm :)
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<typename T>
+int selsort(T* arr, unsigned int len)
+{
+    T elmin;
+    int i, off, imin;
+    if (!arr||!len) return (0);
+
+    for (off=0; off<len; off++) {
+        for (i=off, elmin=arr[off], imin=-1; i<len; i++) {
+            if (elmin > arr[i]) {
+                elmin = arr[i];
+                imin = i;
+            }
+        }
+        if (imin != -1) {
+            arr[imin] = arr[off];
+            arr[off] = elmin;
+        }
+    }
+    return (1);
+}
+
+/*****************************************
+                    Main
+ *****************************************/
+int main(void)
+{
+    int arr[] = {2, 1, 0, 10, 9, 99, 8, -1, 6, 15, 15};
+    PRINTARR(arr, "%d");
+    selsort(arr, sizeofarray(arr));
+    PRINTARR(arr, "%d");
+    return (0);
+}
+#+END_SRC

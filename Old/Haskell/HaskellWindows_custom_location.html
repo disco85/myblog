@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Haskell+Windows: custom location</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell, windows" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Haskell+Windows: custom location</h1>
+<div id="outline-container-org5feaf4b" class="outline-2">
+<h2 id="org5feaf4b">Haskell+Windows: custom location</h2>
+<div class="outline-text-2" id="text-org5feaf4b">
+<p>
+Often today we need to install Haskell on Windows in not-default location - due
+to SSD disks, for example, in <code>D:\somewhere</code> instead of standard <code>C:\</code>. This
+tutorial shows how to do it.
+</p>
+
+<p>
+!Install stack
+</p>
+
+<p>
+First, we need to install stack in non-typical location. Create directory
+<code>D:\stackroot</code> - all stack caches will be located there. Then add to environment
+variable binding <code>STACK_ROOT=D:\stackroot</code>. Install stack also on the same disk,
+for example, <code>D:\apps\stack</code> (or put in there if use download binary). 
+</p>
+
+<p>
+Now install the compiler as usual. After installation you will call <code>stack</code> with
+<code>--system-ghc</code>. Another (and right!) solution is to add next setting in
+<code>D:\stackroot\config.yaml</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml">local-bin-path: D:\apps\haskell\8.0.2\bin
+system-ghc: true
+</pre>
+</div>
+
+<p>
+I suppose you installed compiler in <code>D:\apps\haskell</code> (and it has version
+8.0.2). If not, change value to your path.
+</p>
+
+<p>
+Also you should add to environment variable <code>PATH</code> next path:
+<code>d:\apps\haskell\8.0.2\msys\usr\bin</code>.
+</p>
+
+<p>
+Now you can use <code>stack</code> to install other packages even which needs <code>./configure</code>
+script run.
+</p>
+
+<p>
+To check what paths uses stack, run <code>stack path</code>.
+</p>
+
+<p>
+!Integration with Spacemacs
+</p>
+
+<p>
+Install with stack packages:
+</p>
+
+<ul class="org-ul">
+<li>apply-refact</li>
+<li>hlint</li>
+<li>stylish-haskell</li>
+<li>hasktags</li>
+<li>hoogle (for local queries)</li>
+<li>ghc-mod</li>
+<li>intero (optional, because intero-layer install it byself)</li>
+<li>hindent</li>
+</ul>
+
+<p>
+In Spacemacs you should to add Haskell layer. To see types hints you must run Haskell REPL (<code>SPC m h s b</code>  IMHO:). Also you must add <code>syntax-checking</code> layer, <code>auto-completion</code>. And sure, path to <code>stack</code> must be in <code>PATH</code> environment variable :)
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

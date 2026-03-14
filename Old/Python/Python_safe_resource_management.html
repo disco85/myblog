@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python: safe resource management</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="safety, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Python: safe resource management</h1>
+<div id="outline-container-orgfb2966a" class="outline-2">
+<h2 id="orgfb2966a">Python: safe resource management</h2>
+<div class="outline-text-2" id="text-orgfb2966a">
+<p>
+Yet another example of the type safety in Python maybe a resources management.
+We can use typing to ensure that resources were released, so no any resoucres
+leak. Yes, it's possible. The idea is that we will check in compile time with
+types that resoucres were released by checking that they were returned as
+appropriated type after its usage. Look the example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> typing <span style="color: #696969;">import</span> *
+<span style="color: #696969;">from</span> abc <span style="color: #696969;">import</span> *
+
+<span style="color: #ffffff;">T</span> = TypeVar(<span style="color: #696969;">'T'</span>)
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Hold</span>(ABC): <span style="color: #696969;">pass</span>
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Free</span>(ABC): <span style="color: #696969;">pass</span>
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Resources</span>(Generic[T]):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, fp1:<span style="color: #a52a2a;">str</span>, fp2:<span style="color: #a52a2a;">str</span>):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">f1</span> = <span style="color: #a52a2a;">open</span>(fp1, <span style="color: #696969;">"r"</span>)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">f2</span> = <span style="color: #a52a2a;">open</span>(fp2, <span style="color: #696969;">"r"</span>)
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">_release</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">self</span>.f1.close()
+        <span style="color: #696969;">self</span>.f2.close()
+        <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"Resources were released"</span>)
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">get_resources</span>(fp1:<span style="color: #a52a2a;">str</span>, fp2:<span style="color: #a52a2a;">str</span>) -&gt; Resources[Hold]:
+    <span style="color: #696969;">return</span> Resources(fp1, fp2)
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">release_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
+    r._release()
+    <span style="color: #696969;">return</span> cast(Resources[Free], r)
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">use_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
+    <span style="color: #a52a2a;">print</span>(r.f1.read(), r.f2.read())
+    <span style="color: #696969;">return</span> release_resources(r)
+
+<span style="color: #ffffff;">r</span> = get_resources(<span style="color: #696969;">"f1.txt"</span>, <span style="color: #696969;">"f2.txt"</span>)
+use_resources(r)
+</pre>
+</div>
+
+<p>
+If we will try to omit <code>return</code> statement in the <code>use_resources()</code> function, then
+we will get an error <code>Missing return statement</code> from mypy. OK, if we will try to
+return <code>None</code>, then the error will be <code>Incompatible return value type (got "None", expected "Resources[Free]")</code>.
+OK, we will return the resource itself: <code>return r</code>. But an error again, now:
+<code>Incompatible return value type (got "Resources[Hold]", expected "Resources[Free]")</code>.
+</p>
+
+<p>
+It's a very good error: it says us that we don't release resources, we complete in the
+<code>Resources[Hold]</code> state. To fix it we will <code>return release_resources(r)</code> and now
+all is fine. The function <code>use_resources()</code> is wrapper which wraps the usage of them,
+tracks correct state of their life-cycle. It's typical for Haskell with phantom types,
+we tried to create one here, in Python. So, the function gets acquired resources, uses
+them and then releases them, and we will not forget to call <code>release_resources()</code>.
+</p>
+
+
+<p>
+PS. Those 3 resource related function can be implemented as class methods of <code>Resources</code> class.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

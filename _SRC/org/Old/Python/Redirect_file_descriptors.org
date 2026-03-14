@@ -1,0 +1,66 @@
+#+title: Redirect file descriptors
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-03 Mon 18:30]
+
+* Redirect file descriptors
+
+This is a Python trick with supressing of console output. Actually implementation
+does not supresses anything, but maps (dups) "source" file descriptors to "destination"
+file descriptors, so you can continue to use already existing descriptor, but it will
+point out to another one. "Another one" are got from list, but if ~dstfd~ list in lesser
+than ~srcfd~ list, then missing will be filled with "devnull", which allows us to
+suppress console output - this is the one way to use this class.
+
+It is OS independent and was tested in Linux, Windows. Such "magia" happens only in
+context, after exit from context old values of descriptors will be restored. Note,
+that this works for children process too, sure. So, if you start some child process,
+you can "mask" its descriptors (redirect them somewhere).
+
+
+#+BEGIN_SRC python
+import os, sys
+from itertools import zip_longest
+
+class FdRedir:
+    def __init__(self, srcfd, dstfd):
+        self.src = srcfd
+        self.dst = dstfd
+        self.null = os.open(os.devnull, os.O_RDWR)
+        self.dups = [os.dup(f) for f in self.src]
+    def __enter__(self):
+        homo = zip_longest(self.src, self.dst, fillvalue=self.null)
+        for t, f in homo:
+            os.dup2(f, t)
+        return self
+    def __exit__(self, xtyp, xval, xtb):
+        iso = zip(self.dups, self.src)
+        for f, t in iso:
+            os.dup2(f, t)
+        for f in self.dups:
+            os.close(f)
+        os.close(self.null)
+
+# Example of usage
+
+with FdRedir((1, 2), ()) as fr:
+    print('hidden')
+    print('hidden', file=sys.stderr)
+    with FdRedir([1], [fr.dups[0]]):
+        print('visible tmp')
+        print('hidden', file=sys.stderr)
+    print('hidden')
+print('visible end')
+#+END_SRC
+
+will print
+
+#+BEGIN_SRC console
+visible tmp
+visible end
+#+END_SRC
+
+which is expected: we suppress output to stdout, stderr descriptors in
+first context, then temporary allow stdout (by map it to ~fr.dups[0]~).

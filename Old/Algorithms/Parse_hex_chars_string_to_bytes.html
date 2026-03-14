@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Parse hex chars string to bytes</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Parse hex chars string to bytes</h1>
+<div id="outline-container-org0402b02" class="outline-2">
+<h2 id="org0402b02">Parse hex chars string to bytes</h2>
+<div class="outline-text-2" id="text-org0402b02">
+<p>
+Very simple task as for interview: to parse hex chars into bytes. Example:
+"123Ad" -&gt; "\x12\x3A\x0D". This procedure can be helpfull if you want to
+transmit some encoding string (in UTF8, UTF16, mbcs, etc) between different
+processes/OS and it's probably to get broken bytes, so best solution will be
+to use such hex chars (it's ASCII [0-9a-fA-F] only).
+</p>
+
+<p>
+Implementation in C may use sscanf() which will be slow or does not. Here is
+an example without sscanf:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">parse_hex_str</span>(<span style="color: #696969;">const</span> <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">s</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">slen</span>, <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">out</span>) {
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">__ord</span>(<span style="color: #ffffff;">c</span>) \
+    ((c) &gt;= <span style="color: #696969;">'0'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'9'</span>? (c) - <span style="color: #696969;">'0'</span> : \
+     (c) &gt;= <span style="color: #696969;">'a'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'f'</span>? (c) - <span style="color: #696969;">'a'</span> + 10 : \
+     (c) &gt;= <span style="color: #696969;">'A'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'F'</span>? (c) - <span style="color: #696969;">'A'</span> + 10 : -1)
+
+    <span style="color: #696969;">register</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">b</span>, <span style="color: #ffffff;">t</span>, <span style="color: #ffffff;">i</span>;
+    <span style="color: #696969;">for</span> (i=0; i&lt;slen; i++) {
+        t = __ord(s[i]);
+        <span style="color: #696969;">if</span> (-1 == t) <span style="color: #696969;">return</span> (1);
+        <span style="color: #696969;">if</span> (i%2) out[i/2] = (b &lt;&lt; 4) | t;
+        <span style="color: #696969;">else</span>     b = t;
+    }
+    <span style="color: #696969;">if</span> (i%2) out[i/2] = b;
+    <span style="color: #696969;">return</span> (0);
+
+<span style="color: #a52a2a;">#undef</span> __ord
+}
+
+<span style="color: #575757;">/*************************************************************/</span>
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>() {
+    <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">ins</span>[] = <span style="color: #696969;">"1230aAF0D"</span>;
+    <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">out</span>[20] = {0};
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">res</span> = parse_hex_str(ins, <span style="color: #696969;">sizeof</span>(ins) - 1, out);
+    printf(<span style="color: #696969;">"input = %s\n"</span>, ins);
+    printf(<span style="color: #696969;">"res=%d\n"</span>, res);
+    PRINTARRX(out, 10, <span style="color: #696969;">"%02X"</span>);
+    <span style="color: #696969;">return</span> (0);
+}
+</pre>
+</div>
+
+<p>
+Compilation:
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-console">gcc -ggdb -std=c99 -o hex.exe hex.c
+</pre>
+</div>
+
+<p>
+Output:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-console">input = 1230aAF0D
+res=0
+{ 12 30 AA F0 0D 00 00 00 00 00 }
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

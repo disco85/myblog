@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tcl: proc help</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="tcl/tk, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Tcl: proc help</h1>
+<div id="outline-container-org4dea014" class="outline-2">
+<h2 id="org4dea014">Tcl: proc help</h2>
+<div class="outline-text-2" id="text-org4dea014">
+<p>
+Often you write not only internal code but procs for user's usage (in console and so on). It's difficult to write documentation of procedures in different file, so let's use doc-strings like Lisp, Python and so on.
+It's not Java, so you don't need special tool :)
+Considering that out procedures/IncrTcl methods has comments like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">proc</span> <span style="color: #ff4500;">f</span> {args} {
+<span style="color: #575757;">## </span><span style="color: #575757;">Doc-string for this method.</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">Syntax: f ...</span>
+<span style="color: #575757;">##</span>
+... CODE ...
+}
+</pre>
+</div>
+
+<p>
+Or:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">proc</span> <span style="color: #ff4500;">f</span> {args} {
+<span style="color: #575757;">## </span><span style="color: #575757;">Doc-string for this method.</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">Syntax: f ...</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">Other help ##</span>
+... CODE ...
+}
+</pre>
+</div>
+
+<p>
+Well, doc-string is at proc body start, and begins with '##' and ends with '##' (at the same line or next), other comments are treated as usual comments and are ignored for doc-string mechanism. Here is example how to parse such doc-strings:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #a52a2a;">package</span> provide mydoc 1.1
+
+<span style="color: #a52a2a;">package</span> require Itcl
+
+<span style="color: #a52a2a;">namespace</span> <span style="color: #ff4500;">eval</span> mydoc {
+    <span style="color: #a52a2a;">namespace</span> <span style="color: #ff4500;">export</span> doc
+}
+
+<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_NOHELPMSG</span> <span style="color: #696969;">"No help."</span>
+
+<span style="color: #696969;">proc</span> <span style="color: #ff4500;">::mydoc::_docstring</span> {<span style="color: #696969;">body</span>} {
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">body</span> [<span style="color: #a52a2a;">string</span> trim $<span style="color: #ffffff;">body</span>]
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">docstring</span> <span style="color: #696969;">""</span>
+    <span style="color: #575757;"># without 1st '^' will match any FIRST docstring block even after</span>
+    <span style="color: #575757;"># commands!</span>
+    <span style="color: #696969;">if</span> {[<span style="color: #a52a2a;">regexp</span> {^#<span style="color: #575757;">#\s*([^\n]+\n?)+(##)} $body docstring]} {</span>
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">docstring</span> [<span style="color: #a52a2a;">regsub</span> -all {\s*#\s?} $<span style="color: #ffffff;">docstring</span> \n]
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">docstring</span> [<span style="color: #a52a2a;">string</span> trim $<span style="color: #ffffff;">docstring</span>]
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">docstring</span>
+    }
+}
+
+<span style="color: #696969;">proc</span> <span style="color: #ff4500;">::mydoc::doc</span> args {
+    <span style="color: #575757;">## Help on command: procedure or class method. Call:</span>
+    <span style="color: #575757;">#   doc some_object some_method</span>
+    <span style="color: #575757;">#   doc some_class some_method</span>
+    <span style="color: #575757;">#   doc some_proc ##</span>
+    <span style="color: #ff4500;">global</span> _NOHELPMSG
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">found</span> <span style="color: #696969;">""</span>
+    <span style="color: #696969;">switch</span> -- [<span style="color: #a52a2a;">llength</span> $<span style="color: #ffffff;">args</span>] {
+        1 {
+            <span style="color: #575757;"># args: proc</span>
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">name</span> [<span style="color: #a52a2a;">lindex</span> $<span style="color: #ffffff;">args</span> 0]
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">arguments</span> [<span style="color: #a52a2a;">info</span> args $<span style="color: #ffffff;">name</span>]
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">body</span> [<span style="color: #a52a2a;">info</span> <span style="color: #696969;">body</span> $<span style="color: #ffffff;">name</span>]
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">found</span> [_docstring $<span style="color: #ffffff;">body</span>]
+        }
+        2 {
+            <span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #575757;"> not optimal!</span>
+            <span style="color: #575757;"># args: object|class method</span>
+            lassign $<span style="color: #ffffff;">args</span> cls_obj meth
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">objs</span> [itcl::find objects]
+            <span style="color: #575757;"># cls_obj may be object OR class. What is it?</span>
+            <span style="color: #696969;">if</span> {-1 != [lsearch -regexp $<span style="color: #ffffff;">objs</span> :*$<span style="color: #ffffff;">cls_obj</span>]} {
+                <span style="color: #575757;"># this is the object</span>
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">arguments</span> [$<span style="color: #ffffff;">cls_obj</span> <span style="color: #a52a2a;">info</span> args $<span style="color: #ffffff;">meth</span>]
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">body</span> [$<span style="color: #ffffff;">cls_obj</span> <span style="color: #a52a2a;">info</span> <span style="color: #696969;">body</span> $<span style="color: #ffffff;">meth</span>]
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">found</span> [_docstring $<span style="color: #ffffff;">body</span>]
+            } <span style="color: #696969;">else</span> {
+                <span style="color: #575757;"># this is the class</span>
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">arguments</span> [<span style="color: #a52a2a;">namespace</span> <span style="color: #696969;">eval</span> ::$<span style="color: #ffffff;">cls_obj</span> <span style="color: #a52a2a;">info</span> args $<span style="color: #ffffff;">meth</span>]
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">body</span> [<span style="color: #a52a2a;">namespace</span> <span style="color: #696969;">eval</span> ::$<span style="color: #ffffff;">cls_obj</span> <span style="color: #a52a2a;">info</span> <span style="color: #696969;">body</span> $<span style="color: #ffffff;">meth</span>]
+                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">found</span> [_docstring $<span style="color: #ffffff;">body</span>]
+            }
+        }
+        <span style="color: #696969;">default</span> { <span style="color: #696969;">error</span> <span style="color: #696969;">"wrong args: proc | object method | class method"</span> }
+    }
+    <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">found</span> eq <span style="color: #696969;">""</span>} {
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">_NOHELPMSG</span>
+    } <span style="color: #696969;">else</span> {
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">found</span>
+    }
+}
+</pre>
+</div>
+
+<p>
+Usage is simple, you can call:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl">doc object <span style="color: #696969;">method</span>
+doc <span style="color: #696969;">class</span> <span style="color: #696969;">method</span>
+doc usual-procedure
+</pre>
+</div>
+
+<p>
+Class - is the IncrTcl class.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

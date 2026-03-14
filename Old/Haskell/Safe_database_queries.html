@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Safe database queries</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Safe database queries</h1>
+<div id="outline-container-org2ca5df9" class="outline-2">
+<h2 id="org2ca5df9">Safe database queries</h2>
+<div class="outline-text-2" id="text-org2ca5df9">
+<p>
+I recently encountered an error when my SQL queries affect more than one
+row. One of such bug was that query does select and got first row (I know
+that I get one), but truth is that I got more than one, so I select first,
+and, sure, it was not correct row.
+</p>
+
+<p>
+I don't use ORMs, there are a lot of reasons why better to avoid them. But
+ORM like a schema can offer only restrictions on relations (usually). So,
+I try to find some solution which will deny situation when query select
+unexpected number of rows (it can be expanding on modify, etc).
+</p>
+
+<p>
+I will try to cover 2 cases: statically verified and dynamically (at run-time).
+First is based on idea that I can know expected result and query property, which
+leads to such result. I mean, if I expect that result will contain single row,
+and I can classify queries as returning multiple/single rows then no problem
+to match them at compile time. In the second case, I expect single/multiple
+rows (again, as result or as modified set), but real result can be checked
+only at run-time (first, with result set size, second, with affected rows counter -
+it's available in many databases).
+</p>
+
+<p>
+The code is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE TypeFamilies  #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE GADTs  #-}
+
+
+module Lib () where
+
+import Data.Proxy
+
+data Uniq = Uniq deriving Show
+data NUniq = NUniq deriving Show
+data UUniq = UUniq deriving Show
+
+type family Un u where
+    Un [a] = NUniq
+    Un a = Uniq
+
+class VerDim u where
+  verDim :: [a] -&gt; Either u u
+instance VerDim Uniq where
+  verDim [] = Right Uniq
+  verDim [_] = Right Uniq
+  verDim _ = Left Uniq
+instance VerDim NUniq where
+  verDim [] = Right NUniq
+  verDim [_] = Left NUniq
+  verDim _ = Right NUniq
+
+-- maps value (term) to type (a): IsUniq -&gt; Uniq, IsNotUniq -&gt; NUniq
+data IsUniq a where
+  IsUniq :: IsUniq Uniq
+  IsNotUniq :: IsUniq NUniq
+
+-- emulation
+data SQL a = SQL { sqlStm :: String } deriving (Show, Eq)
+data Con = Con
+class Query r where
+    doQuery :: Con -&gt; String -&gt; IO r
+instance Query Int where
+    doQuery con s = return 123
+instance Query [Int] where
+    doQuery con s = return [5, 6]
+class QueryN r where
+    doQueryN :: Con -&gt; String -&gt; IO [r]
+instance QueryN Int where
+    doQueryN _ _ = return [1,2,3]
+instance QueryN Float where
+    doQueryN _ _ = return [1.0]
+
+
+sql1 :: SQL Uniq
+sql1 = SQL "select * from table where id=999"
+sql2 :: SQL NUniq
+sql2 = SQL "select * from table"
+sql3 :: SQL UUniq
+sql3 = SQL "select * from table where name='x'"
+
+-- n &lt;- exec sql1 Con :: IO Int
+-- n &lt;- exec sql1 Con :: IO [Int] -- DENIED
+-- n &lt;- exec sql2 Con :: IO Int -- DENIED
+-- n &lt;- exec sql2 Con :: IO [Int]
+type IxIO i a = IO a
+exec :: forall a i. (Query a, Un a ~ i) =&gt; SQL i -&gt; Con -&gt; IO a
+exec sql con = do
+    res &lt;- doQuery con (sqlStm sql) :: IxIO i a
+    return res
+
+-- n &lt;- dexec (Proxy::Proxy Uniq) sql3 Con :: IO [Float]
+-- n &lt;- dexec (Proxy::Proxy NUniq) sql3 Con :: IO [Float] -- DENIED
+-- n &lt;- dexec (Proxy::Proxy NUniq) sql3 Con :: IO [Int]
+-- n &lt;- dexec (Proxy::Proxy Uniq) sql3 Con :: IO [Int] -- DENIED
+dexec :: forall a u i j. (QueryN a, Show u, VerDim u) =&gt; Proxy u -&gt; SQL i -&gt; Con -&gt; IO [a]
+dexec _proxy sql con = do
+  res &lt;- doQueryN con (sqlStm sql) :: IxIO j [a]
+  case (verDim res :: Either u u) of
+    Right u -&gt; return res
+    Left u -&gt; error $ "Expected " ++ show u ++ "!!!"
+
+-- n &lt;- dexec IsUniq sql3 Con :: IO [Float]
+-- n &lt;- dexec IsNotUniq sql3 Con :: IO [Float] -- DENIED
+-- n &lt;- dexec IsNotUniq sql3 Con :: IO [Int]
+-- n &lt;- dexec IsUniq sql3 Con :: IO [Int] -- DENIED
+dexec1 :: forall a u i j. (QueryN a, Show u, VerDim u)
+  =&gt; IsUniq u -&gt; SQL i -&gt; Con -&gt; IxIO j [a]
+dexec1 _proxy sql con = do
+  res &lt;- doQueryN con (sqlStm sql) :: IxIO j [a]
+  case (verDim res :: Either u u) of
+    Right u -&gt; return res
+    Left u -&gt; error $ "Expected " ++ show u ++ "!!!"
+</pre>
+</div>
+
+<p>
+Terminology is a little bit strange :) Uniq - means only 1 (or 0) rows. NUniq
+means 0 or multiple rows. UUniq - unknown uniqueness. <code>exec</code> function executes
+SQL statement which is phantom and is marked with property - returning single
+(Uniq) or multiple (NUniq) rows. So, with <code>exec</code> it's easy to do queries which
+are verified at compile time: <code>exec</code> is polymorphic, but you can not select
+multiple rows with SQL statement returning only one and vice versa.
+</p>
+
+<p>
+<code>dexec</code> is more interesting function, it does dynamic queries and you use Proxy first argument
+to pass expecting result rows size (Uniq/NUniq) but SQL statements can ne any (sql1, sql2, sql3).
+If low level database query function returns multiple rows while you expect single, then
+you will get error like "Expected Uniq!!!". There is another version <code>dexec1</code> based
+on GADT instead of Proxy which looks more naturally.
+</p>
+
+<p>
+One note only, this is the proof of concept, so instead of real SQL layer usage, I made some
+mockup with doQuery and doQueryN functions:
+</p>
+
+<dl class="org-dl">
+<dt>doQuery</dt><dd>IO Int - emulates single row result</dd>
+<dt>doQuery</dt><dd>IO [Int] - emulates multiple row results</dd>
+<dt>doQueryN</dt><dd>IO [Int] - emulates multiple row results and type is [a]</dd>
+<dt>doQueryN</dt><dd>IO [Float] - emulates single row result and result is [a]</dd>
+</dl>
+
+<p>
+So, doQueryN emulates run-time variability of the result. Returning result as
+list <code>[a]</code> may be replaced with some special type (for dexec), to deconstruct
+underlying items easy (something like exists NotEmptyList).
+</p>
+
+<p>
+This P-o-C shows that database manipulation have some semantical/logical context:
+the same SQL query can depend on its parameters and result may be expected to be
+single or multiple. This is relative to different joins, etc. Context is knows at
+call-site, so there it must be set. All database communication must verify that
+expecting effects happen.
+</p>
+
+<p>
+In the real world, dynamic verification can be done on SQL-site (as triggers),
+this may be better solution.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

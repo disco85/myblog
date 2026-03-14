@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AVR: UART for debug messages</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">AVR: UART for debug messages</h1>
+<div id="outline-container-orgde09e2f" class="outline-2">
+<h2 id="orgde09e2f">AVR: UART for debug messages</h2>
+<div class="outline-text-2" id="text-orgde09e2f">
+<p>
+If you need to print out a debug messages to UART port of AVR chip, you can use a simple way for it: switch stdout stream to UART. This is the code of the solution:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;avr/io.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
+
+<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> NDEBUG
+
+<span style="color: #a52a2a;">#  if</span> !<span style="color: #a52a2a;">defined</span>(F_DEBUG_UART) &amp;&amp; !<span style="color: #a52a2a;">defined</span>(F_CPU)
+<span style="color: #a52a2a;">#    error</span> <span style="color: #696969;">F_DEBUG_UART frequency or F_CPU frequency should be defined!</span>
+<span style="color: #a52a2a;">#  endif</span>
+
+<span style="color: #a52a2a;">#  if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> F_DEBUG_UART
+<span style="color: #a52a2a;">#    define</span> <span style="color: #ffffff;">F_DEBUG_UART</span> F_CPU
+<span style="color: #a52a2a;">#  endif</span>
+
+<span style="color: #a52a2a;">#  if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> DEBUG_NUART
+<span style="color: #a52a2a;">#    error</span> <span style="color: #696969;">DEBUG_NUART should be defined!</span>
+<span style="color: #a52a2a;">#  endif</span>
+
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">__CONC3</span>(<span style="color: #ffffff;">X</span>, <span style="color: #ffffff;">Y</span>, <span style="color: #ffffff;">Z</span>) X ## Y ## Z
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">_CONC3</span>(<span style="color: #ffffff;">X</span>, <span style="color: #ffffff;">Y</span>, <span style="color: #ffffff;">Z</span>) __CONC3(X, Y, Z)
+<span style="color: #575757;">// </span><span style="color: #575757;">_CONC3(UDRE, DEBUG_NUART,) does not works</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UDRE</span> (_CONC3(UDR, E, DEBUG_NUART))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UDR</span> (_CONC3(UDR, DEBUG_NUART,))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UBRRH</span> (_CONC3(UBRR, DEBUG_NUART, H))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UBRRL</span> (_CONC3(UBRR, DEBUG_NUART, L))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRA</span> (_CONC3(UCSR, DEBUG_NUART, A))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRB</span> (_CONC3(UCSR, DEBUG_NUART, B))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRC</span> (_CONC3(UCSR, DEBUG_NUART, C))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_RXEN</span> (_CONC3(RXEN, DEBUG_NUART,))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_TXEN</span> (_CONC3(TXEN, DEBUG_NUART,))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSZ0</span> (_CONC3(UCSZ, DEBUG_NUART, 0))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_U2X</span> (_CONC3(U2X, DEBUG_NUART,))
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_SUPPORT</span>() \
+<span style="color: #696969;">static</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">debug_uart_putchar</span>(<span style="color: #ff4500;">char</span> c, FILE *stream); \
+<span style="color: #696969;">static</span> <span style="color: #ff4500;">FILE</span> <span style="color: #ffffff;">mystdout</span> = FDEV_SETUP_STREAM(debug_uart_putchar, <span style="color: #7fffd4;">NULL</span>, _FDEV_SETUP_WRITE); \
+<span style="color: #696969;">static</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">debug_uart_putchar</span>(<span style="color: #ff4500;">char</span> c, FILE *stream) \
+{ \
+        <span style="color: #696969;">while</span> (0 == (_UCSRA &amp; (1&lt;&lt;_UDRE))) ; \
+        _UDR = c; \
+        <span style="color: #696969;">return</span> (0); \
+}
+
+<span style="color: #575757;">/* </span><span style="color: #575757;">8 bits data, 1 stop bit, 9600 kbps, async</span><span style="color: #575757;"> */</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">INIT_DEBUG_UART</span>() <span style="color: #696969;">do</span> { \
+        stdout = &amp;mystdout; \
+        _UCSRC = 0x06; \
+        _UCSRA = 0x00; \
+        _UCSRB = 0x18; <span style="color: #575757;">/* </span><span style="color: #575757;">receive, transmit, no interrupts</span><span style="color: #575757;"> */</span> \
+        <span style="color: #ff4500;">uint16_t</span> <span style="color: #ffffff;">ubrr</span> = (F_DEBUG_UART/16/9600-1); \
+        _UBRRL = (<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span>)ubrr; \
+        _UBRRH = (<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span>)(ubrr&gt;&gt;8); \
+} <span style="color: #696969;">while</span> (0)
+
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_PRN</span>(...) printf(__VA_ARGS__)
+
+<span style="color: #a52a2a;">#else</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_SUPPORT</span>()
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">INIT_DEBUG_UART</span>()
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_PRN</span>(...)
+<span style="color: #a52a2a;">#endif</span>
+</pre>
+</div>
+
+<p>
+Save it into <code>debug_uart.h</code>, for example.
+What you need to use it, it's only defining <code>F_DEBUG_UART</code> or <code>F_CPU</code>, <code>DEBUG_NUART</code> and calling 3 macros: <code>DEBUG_UART_SUPPORT()</code> on module level (it generates code, so call it only once!), <code>INIT_DEBUG_UART()</code> to init UART and <code>DEBUG_UART_PRN(...)</code> where you need message printing. The example is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">F_DEBUG_UART</span> 7372800
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">DEBUG_NUART</span> 0
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"debug_uart.h"</span>
+DEBUG_UART_SUPPORT();
+<span style="color: #ff4500;">int</span>
+<span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+{
+        INIT_DEBUG_UART();
+        DEBUG_UART_PRN(<span style="color: #696969;">"Hello world, %d\n"</span>, 99);
+        ... so on ...
+</pre>
+</div>
+
+<p>
+<code>F_DEBUG_UART</code> is the exact amount of the system oscillator frequency to calculate UART baud rate. Default value is equals to F<sub>CPU</sub>, but it's possible, that you have value of <code>fosc</code> = 7.3728MHz (see AVR Datasheet about "Examples of UBRR settings") and you use in the Makefile F<sub>CPU</sub> value as 8MHz - if you use 8MHz for UBRR calculation too, you will get errors in transmission! So use for <code>F_DEBUG_UART</code> exact values only!
+<code>DEBUG_NUART</code> defined number of UART. If you define <code>NDEBUG</code>, all macros will be empty - you don't need to delete it's calls. For more information see help on WinAVR.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

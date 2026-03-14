@@ -1,0 +1,141 @@
+#+title: In-place non-recursive Merge Sort
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-05 Wed 18:54]
+
+* In-place non-recursive Merge Sort
+
+Merge sorting is a good known algorithm, but usually is used recursive implementation with additional array. This is an another version: without recursive and without usage of additional array.
+Merge sorting idea is to sort small parts (pairs) than longer (4 items) and etc, but each next sort phase is MERGE of previous sorted parts. Merging of 2 sorted parts should saves order of items:
+
+#+BEGIN_SRC
+1,5 merging 2,3 is 1,2,3,5.
+#+END_SRC
+
+If we avoid recursive implementation then we should generate indexes of all parts (2 items, 4 items...). This sub-task will be done in mergesort() function. Another sub-task is to merge 2 sorted parts into new one, but sorted too. This is implemented in _merge() function, which avoid additional array of result by using of swapping of items: we has 2 arrays with 2 indexes and compare both items (from one array and another, indexed by these 2 indexes). If they need reordering then we swap items. Index of lesser item is incremented (see code below).
+Main problem is to calculate middle index (for splitting input array into 2 parts for merging). Next formula is used:
+
+#+BEGIN_SRC
+mid = lev*2 + pielen*pie;
+if (pielen > len || mid > len-1) mid = lastleft;
+#+END_SRC
+
+where ~lev~ is the level of pseudo-recursion, ~pielen~ is the length of pie (part) = {2, 4, 8...}. ~len~ is the length of input array, ~lastleft~ is the index of left bound of previous "level". So, we should to get something like this:
+
+#+BEGIN_SRC
+lev=0 left=0   mid=0   right=2
+lev=0 left=2   mid=2   right=4
+lev=0 left=4   mid=4   right=6
+lev=0 left=6   mid=6   right=8
+lev=0 left=8   mid=8   right=10
+lev=0 left=10  mid=10  right=12
+lev=1 left=0   mid=2   right=4
+lev=1 left=4   mid=6   right=8
+lev=1 left=8   mid=10  right=12
+lev=2 left=0   mid=4   right=8
+lev=2 left=8   mid=8   right=12
+lev=3 left=0   mid=8   right=12
+#+END_SRC
+
+So, this is the code:
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<typename>
+static inline void _merge(T *arr, int left, int mid, int right)
+{
+    T tmp, // tmp item needed for inserting if head position on shift
+      *larr, // left subarray
+      *rarr; // right subarray
+    int llen, // length of left subarray
+        rlen; // length of right subarray
+    int l, r; // indexes of compared items in left, right subarrays
+
+    l = r = 0;
+    larr = &arr[left];
+    if (mid==left) {
+        // When len==2 swapping is more preferable
+        rarr = &arr[mid+1];
+        llen = mid - left + 1;
+        rlen = right - mid - 1;
+    } else {
+        // Common case
+        rarr = &arr[mid];
+        llen = mid - left;
+        rlen = right - mid;
+    }
+    // Index in left subarray is limited by "right" index
+    while ((larr+l < rarr+r) && r < rlen) {
+        if (larr[l] > rarr[r]) {
+            tmp = rarr[r];
+            RSHIFT_ARR(larr+l, llen-(l-r), 1);
+            larr[l] = tmp;
+            r++;
+        }
+        l++;
+    }
+}
+
+template<typename>
+int mergsort(T* arr, int len)
+{
+    int lev, // level of "recursion"
+        pie, // number of subarray (of part)
+        pielen, // subarray length: 2, 4, 8...
+        left, right, // bounds (right is not included)
+        mid, // middle point for splitting - is the same as left bound of subarray but on prev. level
+        lastleft; // last left index
+
+    if (!arr||!len) return (0);
+
+    lev = 0;
+    pielen = 2;
+    while (pielen < 2*len) {
+        pie = 0;
+        do {
+            left = pie*pielen;
+            right = left + pielen;
+            if (right > len) right = len;
+            mid = lev*2 + pielen*pie;
+            if (pielen > len || mid > len-1) mid = lastleft; //mid = len-2;
+            _merge(arr, left, mid, right);
+            pie++;
+        } while (right < len-1);
+        pielen *= 2;
+        lev++;
+        lastleft = left;
+    }
+    return (1);
+}
+
+
+/*****************************************
+                   main
+ ****************************************/
+int main(void)
+{
+    int arr1[] = {10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121};
+    mergsort(arr1, sizeofarray(arr1));
+    PRINTARR(arr1, "%d");
+    return (0);
+}
+#+END_SRC
+
+Macros RSHIFT_ARR() is trivial:
+
+#+BEGIN_SRC cpp
+/// Shift array @a ARR of length @a LEN by @a N positions to right
+#define RSHIFT_ARR(ARR, LEN, N) do { \
+    register int _rshift_arr_i_; \
+    for (_rshift_arr_i_=(N)+(LEN)-1; \
+         _rshift_arr_i_>(N)-1; \
+         _rshift_arr_i_--) \
+    { \
+        *((ARR)+_rshift_arr_i_) = *((ARR)+(_rshift_arr_i_-(N))); \
+    } \
+} while (0)
+#+END_SRC

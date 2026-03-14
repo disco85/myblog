@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VIM: command aliases in Windows</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="scripting, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">VIM: command aliases in Windows</h1>
+<div id="outline-container-org4df4956" class="outline-2">
+<h2 id="org4df4956">VIM: command aliases in Windows</h2>
+<div class="outline-text-2" id="text-org4df4956">
+<p>
+Considering, we have folder with Makefile, other useful files (tags file, some bat files and so on) and deep-deep folders with sources. We are working with make/gmake in top folder but need to change directory to another deep-deep folders to make something there, for example, run vim&#x2026; ^) To do it, I use script:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">@echo off
+PATH = C:\Program Files\Atmel\Atmel Studio 6.0\avrdbg;C:\Program Files\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.3.2.31\AVRToolchain\bin;C:\papps\PortableApps\MinGWPortable\App\MinGW\msys\1.0\bin;%PATH%
+start /D %CD%\deep\deep\src /B cmd.exe
+doskey <span style="color: #ffffff;">myvim</span>=c:\Vim\vim73\gvim.exe -c <span style="color: #696969;">":set tags=../../../tags"</span> $<span style="color: #ffffff;">*</span>
+</pre>
+</div>
+
+<p>
+You can see there set of PATH variable for new terminal, aliasing new command myvim with autoset tags file. You can also setup individual _vimrc (per project:), if you need.
+Save this script as cli.bat, run it and call in terminal: <code>myvim some_src.c</code>
+No more long paths and pushd/popd/cd! :)
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+#+title: algutils.h macros
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-04 Tue 18:29]
+
+* algutils.h macros
+
+Some useful macros for algorithms C/C++ (used early in related posts):
+
+#+BEGIN_SRC cpp
+#ifndef _ALGUTILS_H_
+#define _ALGUTILS_H_
+
+/// Array numbers
+#ifndef sizeofarray
+#define sizeofarray(ARR) (sizeof(ARR) / sizeof(ARR[0]))
+#endif
+
+/// Division with ceil rounding
+#define CEILDIV(X,Y) (((X)%(Y))? (1 + ((X)/(Y))) : ((X)/(Y)))
+
+/// min, max, abs
+#define MIN(X, Y) ((X)<(Y)?(X):(Y))
+#define MAX(X, Y) ((X)>(Y)?(X):(Y))
+#define ABS(X) ((X)<0?(-(X)):(X))
+
+/// Swaps two variables via temporary var @a tmp
+#define SWAP(x, y, tmp) do { \
+    tmp = x; x = y; y = tmp; \
+} while (0)
+
+/// Print array @a ARR with length @a LEN by item format @a ELFMT
+#define PRINTARRX(ARR, LEN, ELFMT) do { \
+    printf("{ "); \
+    for (unsigned int i=0; i<(LEN); i++) { \
+        printf(ELFMT " ", (ARR)[i]); \
+    } \
+    printf("}\n"); \
+} while (0)
+
+/// Print array @a ARR by item format @a ELFMT
+#define PRINTARR(ARR, ELFMT) PRINTARRX(ARR, sizeofarray(ARR), ELFMT)
+
+/// Shift array @a ARR of length @a LEN by @a N positions to right
+#define RSHIFT_ARR(ARR, LEN, N) do { \
+    register int _rshift_arr_i_; \
+    for (_rshift_arr_i_=(N)+(LEN)-1; \
+         _rshift_arr_i_>(N)-1; \
+         _rshift_arr_i_--) \
+    { \
+        *((ARR)+_rshift_arr_i_) = *((ARR)+(_rshift_arr_i_-(N))); \
+    } \
+} while (0)
+
+#endif /* EOF */
+#+END_SRC

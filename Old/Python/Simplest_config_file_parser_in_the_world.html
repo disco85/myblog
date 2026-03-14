@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simplest config file parser in the world!</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Simplest config file parser in the world!</h1>
+<div id="outline-container-org058d566" class="outline-2">
+<h2 id="org058d566">Simplest config file parser in the world!</h2>
+<div class="outline-text-2" id="text-org058d566">
+<p>
+Nothing then split/strip/filter "combinators":
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ffffff;">cfg</span> = <span style="color: #696969;">'''</span>
+<span style="color: #696969;">    a   = aa aaa = aaaa</span>
+<span style="color: #696969;">b   = bbb</span>
+<span style="color: #696969;">        c=cccccccccc</span>
+
+
+<span style="color: #696969;">'''</span>
+
+<span style="color: #ffffff;">split_pair</span> = <span style="color: #696969;">lambda</span> s: s.split(<span style="color: #696969;">'='</span>, 1)
+<span style="color: #ffffff;">strip_pair</span> = <span style="color: #696969;">lambda</span> p: <span style="color: #a52a2a;">map</span>(<span style="color: #a52a2a;">str</span>.strip, p)
+<span style="color: #ffffff;">parse_rc</span> = <span style="color: #696969;">lambda</span> s: <span style="color: #a52a2a;">map</span>(strip_pair, <span style="color: #a52a2a;">map</span>(split_pair, <span style="color: #a52a2a;">filter</span>(<span style="color: #7fffd4;">None</span>, s.splitlines())))
+<span style="color: #a52a2a;">print</span> <span style="color: #a52a2a;">dict</span>(parse_rc(cfg))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+#+title: Simplest config file parser in the world!
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-05 Wed 05:16]
+
+* Simplest config file parser in the world!
+
+Nothing then split/strip/filter "combinators":
+
+#+BEGIN_SRC python
+cfg = '''
+    a   = aa aaa = aaaa
+b   = bbb
+        c=cccccccccc
+
+
+'''
+
+split_pair = lambda s: s.split('=', 1)
+strip_pair = lambda p: map(str.strip, p)
+parse_rc = lambda s: map(strip_pair, map(split_pair, filter(None, s.splitlines())))
+print dict(parse_rc(cfg))
+#+END_SRC

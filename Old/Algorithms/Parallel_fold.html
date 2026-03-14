@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Parallel fold</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Parallel fold</h1>
+<div id="outline-container-orgdc372a9" class="outline-2">
+<h2 id="orgdc372a9">Parallel fold</h2>
+<div class="outline-text-2" id="text-orgdc372a9">
+<p>
+In one of my previous posts about recursive morphisms I end the text with
+question: how to parallelize it? Consider one of list recursive morphisms
+application - left folding of lists. Each result depends on previous result and
+seems like non-paralellizable. It looks like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">foldl($, {a, b, c, d}) = ((a $ b) $ c) $ d
+</pre>
+</div>
+
+<p>
+where <code>$</code> is some abstract operation. But if <code>&lt;$, {a, b, c, d}&gt;</code> is <code>semi-group</code>
+then we can do next:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Let
+    x = a $ b
+    y = c $ d
+(x $ c) $ d = x $ (c $ d) = x $ y
+</pre>
+</div>
+
+<p>
+because <code>$</code> is associative operation. So, we see that we have 2 sub-expressions:
+<code>x</code> and <code>y</code> which can be evaluated in parallel: <code>(a $ b) $ (c $ d)</code>.
+</p>
+
+<p>
+If <code>$</code> is <code>+</code> it looks like, for example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">foldl(+, {1, 2, 3, 4})
+
+1   2    3   4
+  3   ||   7
+      10
+</pre>
+</div>
+
+<p>
+Can we parallelize more complex expressions (not special related to folding)?
+For example, <code>a + b - c - d</code> ? Yes. If <code>{a, b, c, d}</code> is <code>group</code> then we can
+replace any <code>'.. - x'</code> by <code>'.. + (-x)'</code> where <code>(-x)</code> is the opposite element: our
+parallelized function must do something like this:
+</p>
+
+<p>
+&lt;pre&gt;if op is not associative:
+  op = op&lt;sup&gt;-1&lt;/sup&gt;
+  y = -y
+  result &lt;- x op y
+&lt;/pre&gt;
+where op op&lt;sup&gt;-1&lt;/sup&gt; = id. Fo sum. groups
++&lt;sup&gt;-1&lt;/sup&gt; is <code>-</code>, for prod. groups <code>*~&lt;sup&gt;-1&lt;/sup&gt; is ~/</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

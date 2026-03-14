@@ -1,0 +1,575 @@
+#+title: ASF: Qtouch sensors input
+#+description: My Blog
+#+keywords: clang, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t 
+#+tags: clang embedded
+#+date: [2020-02-06 Thu 04:52]
+
+* ASF: Qtouch sensors input
+
+There are several tasks when we try to process Qtouch input (Qtouch 60168):
+
+* fix random (false) signals (splashes or BOUNCE)
+* detecting PRESS state
+* detecting long "pressing" (touching) - sticking of key.
+
+1) means: really signal from Qt is not 000..0 or 111..1 but something like 000001000000... - with error '1' in sequence of '0' (and vise verse) because of signal bouncing, so it should be 'filtered' 2) means: we should detect when touch sensor is "pressed" 3) means: when user touches screen for long time we should detect this state as 'hold key' (like you can see in old mobile phones or key sticking in Windows) and call some special routine (callback) for processing such event.
+
+Next code processes all of this:
+
+#+BEGIN_SRC cpp
+/* Input from qTouch (qt60168) with 4 buttons and one wheel
+ * - There is some feature: sticking of key (long pressing detection) will occurs
+ *   after usual key event: first key is pressed - and application open some
+ *   window, only after this may occurs long-time-detection.
+ * - test_event() test of PRESSED state, not released.
+ * - simulation of repeatition simulate seq: pressed, released, no IDLE!
+ */ 
+
+#include "input.h"
+#include "myutl.h"
+
+#if !defined(FCPU)
+# error Define FCPU to support refresh screen!
+#endif
+
+input_t _input = INPUT_INITIALIZER();
+
+static void _qt60168_io_init(void);
+static inline void _input_scan_keys(input_t* self);
+static inline void _input_update_keys_state(input_t* self);
+static inline void input_process_sticking(input_t* self, input_keys_t key, input_state_t new_state);
+inline static bool input_fltbounce_filter(input_fltbounce_t* self, input_state_t new_state, int msdelay);
+inline static void input_stick_fsm(input_stick_t* self, input_t* input, input_stick_fsm_event_t ev, input_keys_t key);
+
+#define _INPUT_STICK_STOP(S) do { \
+  cpu_stop_timeout(&(S)->long_to); \
+  cpu_stop_timeout(&(S)->short_to); \
+} while (0)
+
+#define _INPUT_GET_SENSOR(INP, I) (INP)->sensors[I]
+
+/// set wheel to left
+#define _INPUT_SET_WHEEL_LEFT(INP) do { \
+  if (INPUT_RIGHT == (INP)->keys[INPUT_WHEEL]) { \
+    (INP)->wheel = 0; \
+  } \
+  (INP)->keys[INPUT_WHEEL] = INPUT_LEFT; \
+  (INP)->wheel++; \
+} while (0)
+/// set wheel to right
+#define _INPUT_SET_WHEEL_RIGHT(INP) do { \
+  if (INPUT_LEFT == (INP)->keys[INPUT_WHEEL]) { \
+    (INP)->wheel = 0; \
+  } \
+  (INP)->keys[INPUT_WHEEL] = INPUT_RIGHT; \
+  (INP)->wheel++; \
+} while (0)
+
+#define _INPUT_SET_SENSOR(INP, I, ST) (INP)->sensors[I] = (ST)
+#define _INPUT_SET_KEY(INP, I, ST) (INP)->keys[I] = (ST)
+
+// apply state of bounce filter FSM
+#define _INPUT_FLTBOUNCE_APPLY_STATE(F, NEW_STATE, MSDELAY) do { \
+  (F)->state = NEW_STATE; \
+  cpu_set_timeout(cpu_ms_2_cy(MSDELAY, FCPU), &(F)->to); \
+} while (0)
+
+// is timeout in bounce filter?
+#define _INPUT_FLTBOUNCE_IS_TO(F) cpu_is_timeout(&(F)->to)
+
+static void
+_qt60168_io_init(void) {
+  static const gpio_map_t QT60168_SPI_GPIO_MAP =
+  {
+    {QT60168_SPI_SCK_PIN, QT60168_SPI_SCK_FUNCTION},// SPI Clock.
+    {QT60168_SPI_MISO_PIN, QT60168_SPI_MISO_FUNCTION},// MISO.
+    {QT60168_SPI_MOSI_PIN, QT60168_SPI_MOSI_FUNCTION},// MOSI.
+    {QT60168_SPI_NPCS0_PIN, QT60168_SPI_NPCS0_FUNCTION}// Chip Select NPCS.
+  };
+
+  // SPI options.
+  spi_options_t spiOptions =
+  {
+    .reg    = QT60168_SPI_NCPS,
+    .baudrate   = QT60168_SPI_MASTER_SPEED, // Defined in conf_qt60168.h.
+    .bits   = QT60168_SPI_BITS,   // Defined in conf_qt60168.h.
+    .spck_delay   = 0,
+    .trans_delay  = 0,
+    .stay_act   = 0,
+    .spi_mode   = 3,
+    .modfdis  = 1
+  };
+
+  // Assign I/Os to SPI.
+  gpio_enable_module(QT60168_SPI_GPIO_MAP,
+      sizeof(QT60168_SPI_GPIO_MAP) / sizeof(QT60168_SPI_GPIO_MAP[0]));
+  // Initialize as master.
+  spi_initMaster(QT60168_SPI, &spiOptions);
+  // Set selection mode: variable_ps, pcs_decode, delay.
+  spi_selectionMode(QT60168_SPI, 0, 0, 0);
+  // Enable SPI.
+  spi_enable(QT60168_SPI);
+  // Initialize QT60168 with SPI clock Osc0 (=FCPU).
+  spi_setupChipReg(QT60168_SPI, &spiOptions, FCPU);
+}
+
+/// call after INPUT(...) initializer calling
+void
+input_init(input_t* self) {
+  // Initialize QT60168 resources: GPIO, SPI and QT60168.
+  _qt60168_io_init();
+  // Initialize QT60168 component.
+  qt60168_init(FCPU);
+  // TODO : need?
+  for (int i=0; i<INPUT_NUMBER_OF_KEYS; i++) {
+    _INPUT_STICK_STOP(&self->stick_keys[i]);
+  }
+}
+
+// for input task!
+static inline void
+_input_scan_keys(input_t* self) {
+
+  int all_keys = qt60168_report_all_key();
+  int mask = 1;
+  for (int i=0; i<QT60168_TOUCH_NUMBER_OF_SENSORS; i++ ) {
+    if (all_keys & (mask<<i)) {
+      // if pressed - set pressed
+      if (input_fltbounce_filter(self->fltsensors+i, INPUT_PRESSED, INPUT_SENS_TIME)) {
+        _INPUT_SET_SENSOR(self, i, INPUT_PRESSED);
+      }
+    }
+    else if (INPUT_PRESSED == _INPUT_GET_SENSOR(self, i)) {
+      // if WAS pressed but now is not - set released
+      if (input_fltbounce_filter(self->fltsensors+i, INPUT_RELEASED, INPUT_SENS_TIME)) {
+        _INPUT_SET_SENSOR(self, i, INPUT_RELEASED);
+      }
+      //if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 RELEASED"); }
+    }
+    else {
+      // else (not pressed now and WASN'T pressed early) - set idle
+      if (input_fltbounce_filter(self->fltsensors+i, INPUT_IDLE, INPUT_SENS_TIME)) {
+        _INPUT_SET_SENSOR(self, i, INPUT_IDLE);
+      }
+      //if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 IDLE"); }
+    }
+  }
+}
+
+static inline void
+_input_update_keys_state(input_t* self) {
+
+  // reset 'ready' flag. If some will be pressed, set to true. If
+  // released - not
+  self->ready = false;
+
+#define _UPDATE_BTKKEY(BTN, KEY) do { \
+  if (INPUT_PRESSED == _INPUT_GET_SENSOR(self, BTN)) { \
+    _INPUT_SET_KEY(self, KEY, INPUT_PRESSED); \
+    input_process_sticking(self, KEY, INPUT_PRESSED); \
+    self->ready = true; \
+  } \
+  else if (INPUT_RELEASED == _INPUT_GET_SENSOR(self, BTN)) { \
+    _INPUT_SET_KEY(self, KEY, INPUT_RELEASED); \
+    input_process_sticking(self, KEY, INPUT_RELEASED); \
+  } \
+} while (0)
+
+  _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_0, INPUT_F1);
+  _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_1, INPUT_F2);
+  _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_2, INPUT_F3);
+  _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_3, INPUT_F4);
+
+#define _UPDATE_WHKEY(SENS0, SENS1, ACT) do { \
+  if (_INPUT_GET_SENSOR(self, SENS0) == INPUT_RELEASED && \
+      _INPUT_GET_SENSOR(self, SENS1) == INPUT_PRESSED) { \
+    ACT(self); \
+    self->ready = true; \
+  } \
+} while (0)
+
+  // scroll to right
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
+      QT60168_TOUCH_SENSOR_WHEEL_1, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_1,
+      QT60168_TOUCH_SENSOR_WHEEL_2, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_2,
+      QT60168_TOUCH_SENSOR_WHEEL_3, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_3,
+      QT60168_TOUCH_SENSOR_WHEEL_4, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_4,
+      QT60168_TOUCH_SENSOR_WHEEL_5, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_5,
+      QT60168_TOUCH_SENSOR_WHEEL_6, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_6,
+      QT60168_TOUCH_SENSOR_WHEEL_7, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_7,
+      QT60168_TOUCH_SENSOR_WHEEL_8, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_8,
+      QT60168_TOUCH_SENSOR_WHEEL_9, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_9,
+      QT60168_TOUCH_SENSOR_WHEEL_10, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_10,
+      QT60168_TOUCH_SENSOR_WHEEL_11, _INPUT_SET_WHEEL_RIGHT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
+      QT60168_TOUCH_SENSOR_WHEEL_0, _INPUT_SET_WHEEL_RIGHT);
+
+  // scroll to left
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
+      QT60168_TOUCH_SENSOR_WHEEL_11, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
+      QT60168_TOUCH_SENSOR_WHEEL_10, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_10,
+      QT60168_TOUCH_SENSOR_WHEEL_9, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_9,
+      QT60168_TOUCH_SENSOR_WHEEL_8, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_8,
+      QT60168_TOUCH_SENSOR_WHEEL_7, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_7,
+      QT60168_TOUCH_SENSOR_WHEEL_6, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_6,
+      QT60168_TOUCH_SENSOR_WHEEL_5, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_5,
+      QT60168_TOUCH_SENSOR_WHEEL_4, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_4,
+      QT60168_TOUCH_SENSOR_WHEEL_3, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_3,
+      QT60168_TOUCH_SENSOR_WHEEL_2, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_2,
+      QT60168_TOUCH_SENSOR_WHEEL_1, _INPUT_SET_WHEEL_LEFT);
+  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_1,
+      QT60168_TOUCH_SENSOR_WHEEL_0, _INPUT_SET_WHEEL_LEFT);
+
+#undef _UPDATE_BTKKEY
+#undef _UPDATE_WHKEY
+}
+
+void
+input_task(input_t* self) {
+  _input_scan_keys(self);
+  _input_update_keys_state(self);
+  if (self->ready) {
+    MCALL(&self->gui_input, onready);
+    input_stick_fsm(self->stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);
+    input_stick_fsm(self->stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);
+    input_stick_fsm(self->stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);
+    input_stick_fsm(self->stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);
+  }
+}
+
+int
+input_test_event(input_t* self, gui_events_t event) {
+
+#define _KEY_STATE(KEY) \
+  (self->stick_keys[KEY].fsm.state==INPUT_STICK_FSM_NO_EMUL_ST? \
+   self->keys[KEY] : self->stick_keys[KEY].fsm.state)
+
+// FIXED: moved all FSM switching to input_task() to prevent problem with 2
+// and more test_event() calling in ONE input cycle and getting different results!
+  bool ret;
+  switch (event) {
+    case GUI_ESCAPE_EVENT:
+      ret = (_KEY_STATE(INPUT_F1) == INPUT_PRESSED);
+      //input_stick_fsm(self->stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);
+      break;
+    case GUI_UP_EVENT:
+      ret = (_KEY_STATE(INPUT_F2) == INPUT_PRESSED);
+      //input_stick_fsm(self->stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);
+      break;
+    case GUI_DOWN_EVENT:
+      ret = (_KEY_STATE(INPUT_F3) == INPUT_PRESSED);
+      //input_stick_fsm(self->stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);
+      break;
+    case GUI_ENTER_EVENT:
+      ret = (_KEY_STATE(INPUT_F4) == INPUT_PRESSED);
+      //input_stick_fsm(self->stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);
+      break;
+    default:
+      ret = 0;
+      break;
+  }
+  return (ret);
+#undef _KEY_STATE
+}
+
+void
+input_reset_event(input_t* self, gui_events_t event) {
+
+  switch (event) {
+    case GUI_ESCAPE_EVENT:
+      _INPUT_SET_KEY(self, INPUT_F1, INPUT_IDLE);
+      break;
+    case GUI_UP_EVENT:
+      _INPUT_SET_KEY(self, INPUT_F2, INPUT_IDLE);
+      break;
+    case GUI_DOWN_EVENT:
+      _INPUT_SET_KEY(self, INPUT_F3, INPUT_IDLE);
+      break;
+    case GUI_ENTER_EVENT:
+      _INPUT_SET_KEY(self, INPUT_F4, INPUT_IDLE);
+      break;
+  }
+#undef _MAKE_STICK_PAUSE
+}
+
+inline static void
+input_process_sticking(input_t* self, input_keys_t key, input_state_t new_state) {
+  input_stick_fsm_event_t fsm_ev;
+  // generate events for sticking fsm
+  if (cpu_is_timeout(&self->stick_keys[key].long_to)) {
+    fsm_ev = INPUT_STICK_FSM_RAISED_LTO_EV;
+  } else if (cpu_is_timeout(&self->stick_keys[key].short_to)) {
+    fsm_ev = INPUT_STICK_FSM_RAISED_STO_EV;
+  } else if (new_state != INPUT_PRESSED) {
+    fsm_ev = INPUT_STICK_FSM_CHG_KEYST_EV;
+  } else if (new_state == INPUT_PRESSED) {
+    fsm_ev = INPUT_STICK_FSM_SAME_KEYST_EV;
+  } else
+    return;
+
+  input_stick_fsm(&self->stick_keys[key], self, fsm_ev, key);
+}
+
+/// filter new state: returns true - allowed, false - bounce (rejected)
+inline static bool
+input_fltbounce_filter(input_fltbounce_t* self, input_state_t new_state, int msdelay) {
+  if (new_state == self->state) {
+    if (_INPUT_FLTBOUNCE_IS_TO(self)) {
+      return (true);
+    }
+  } else {
+    _INPUT_FLTBOUNCE_APPLY_STATE(self, new_state, msdelay);
+  }
+  return (false);
+}
+
+inline static void
+input_stick_fsm(input_stick_t* self, input_t* input, input_stick_fsm_event_t ev, input_keys_t key) {
+
+  switch (self->fsm.state) {
+    case INPUT_STICK_FSM_NO_EMUL_ST:
+        if (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+          DBG_ASSERT(0);
+        } else if (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+          DBG_ASSERT(0);
+        } else if (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+          ;
+        } else if (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+          cpu_set_timeout(cpu_ms_2_cy(INPUT_KEY_STICK_TIME, FCPU), &self->long_to);
+          self->fsm.state = INPUT_STICK_FSM_EMUL_PRESSED_ST;
+        } else if (ev == INPUT_STICK_FSM_RESET_EV) {
+          ;
+        }
+      break;
+
+
+    case INPUT_STICK_FSM_EMUL_PRESSED_ST:
+        if (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+          _INPUT_STICK_STOP(self);
+          MCALL(input, onstickkey, key);
+          self->fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
+        } else if (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+          DBG_ASSERT(0);
+        } else if (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+          _INPUT_STICK_STOP(self);
+          self->fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
+        } else if (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+          ;
+        } else if (ev == INPUT_STICK_FSM_RESET_EV) {
+          cpu_set_timeout(cpu_ms_2_cy(INPUT_REPEAT_TIME, FCPU), &self->short_to);
+          self->fsm.state = INPUT_STICK_FSM_EMUL_RELEASED_ST;
+        }
+      break;
+
+
+    case INPUT_STICK_FSM_EMUL_RELEASED_ST:
+        if (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+          _INPUT_STICK_STOP(self);
+          MCALL(input, onstickkey, key);
+          self->fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
+        } else if (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+          cpu_stop_timeout(&self->short_to);
+          self->fsm.state = INPUT_STICK_FSM_EMUL_PRESSED_ST;
+        } else if (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+          _INPUT_STICK_STOP(self);
+          self->fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
+        } else if (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+          ;
+        } else if (ev == INPUT_STICK_FSM_RESET_EV) {
+          ;
+        }
+      break;
+  }
+}
+#+END_SRC
+
+#+BEGIN_SRC cpp
+#ifndef INPUT_H_
+#define INPUT_H_
+
+#include <stdbool.h>
+#include <board.h>
+#include <gpio.h>
+#include <spi.h>
+#include <qt60168.h>
+#include <conf_qt60168.h>
+#include <cycle_counter.h>
+#include "config/conf_app.h"
+#include "gui.h"
+
+#if !defined(FCPU)
+# error Define FCPU to support sticking of keys!
+#endif
+
+// config {{{
+#ifndef INPUT_KEY_STICK_TIME
+# define INPUT_KEY_STICK_TIME 2500
+# warning Default INPUT_KEY_STICK_TIME is used: 2500 ms
+#endif
+#ifndef INPUT_SENS_TIME
+# define INPUT_SENS_TIME 10
+# warning Default INPUT_SENS_TIME is used: 10 ms
+#endif
+#ifndef INPUT_REPEAT_TIME
+# define INPUT_REPEAT_TIME 300
+# warning Default INPUT_REPEAT_TIME is used: 300 ms
+#endif
+// }}}
+
+struct input_t;
+
+/// state of key/sensor
+typedef enum input_state_t {
+  INPUT_IDLE,
+  INPUT_PRESSED,
+  INPUT_RELEASED,
+  INPUT_LEFT,
+  INPUT_RIGHT
+} input_state_t;
+
+/// keys
+typedef enum input_keys_t {
+  INPUT_F1, /* 0 */
+  INPUT_F2,
+  INPUT_F3,
+  INPUT_F4,
+  INPUT_WHEEL,
+  INPUT_NUMBER_OF_KEYS ///< total number, should be last
+} input_keys_t;
+
+/// for filter key bounce (there is, yes!)
+typedef struct input_fltbounce_t {
+  t_cpu_time to;
+  input_state_t state;
+} input_fltbounce_t;
+#define INPUT_FLTBOUNCE_INITIALIZER(...) { \
+  .to = {0}, \
+  .state = INPUT_IDLE, \
+  __VA_ARGS__ }
+
+/// for key sticking, repeat (long pressing)
+typedef enum input_stick_fsm_state_t {
+  INPUT_STICK_FSM_NO_EMUL_ST = INPUT_IDLE,
+  INPUT_STICK_FSM_EMUL_PRESSED_ST = INPUT_PRESSED,
+  INPUT_STICK_FSM_EMUL_RELEASED_ST = INPUT_RELEASED
+} input_stick_fsm_state_t;
+
+typedef enum input_stick_fsm_event_t {
+  INPUT_STICK_FSM_RAISED_LTO_EV,   // 0
+  INPUT_STICK_FSM_RAISED_STO_EV,   // 1
+  INPUT_STICK_FSM_CHG_KEYST_EV,  // 2
+  INPUT_STICK_FSM_SAME_KEYST_EV,   // 3
+  INPUT_STICK_FSM_RESET_EV   // 4
+} input_stick_fsm_event_t;
+
+typedef struct input_stick_t {
+  t_cpu_time long_to, ///< long timeout
+       short_to; ///< short (for emulating)
+  struct {
+    input_stick_fsm_state_t state; ///< the same values as input_state_t!
+  } fsm;
+} input_stick_t;
+
+#define INPUT_STICK_INITIALIZER(...) { \
+  .long_to = {.delay_start_cycle=0, .delay_end_cycle=0, .timer_state=CPU_TIMER_STATE_STOPPED}, \
+  .short_to = {.delay_start_cycle=0, .delay_end_cycle=0, .timer_state=CPU_TIMER_STATE_STOPPED}, \
+  .fsm = { .state=INPUT_STICK_FSM_NO_EMUL_ST }, \
+  __VA_ARGS__ }
+
+/// input class {{{
+typedef void (*input_onstickkey_t)(struct input_t* self, enum input_keys_t key);
+typedef struct input_t {
+  gui_input_if_t gui_input;
+  input_state_t sensors[QT60168_TOUCH_NUMBER_OF_SENSORS]; ///< states of sensors
+  input_fltbounce_t fltsensors[QT60168_TOUCH_NUMBER_OF_SENSORS]; ///< filtered states
+  input_state_t keys[INPUT_NUMBER_OF_KEYS]; ///< states of keys
+  input_stick_t stick_keys[INPUT_NUMBER_OF_KEYS]; ///< sticking of keys
+  int wheel; ///< wheel amount (counter)
+  bool ready; ///< there is some input
+  input_onstickkey_t onstickkey;
+} input_t;
+
+#define INPUT_INITIALIZER(...) { \
+  .gui_input = GUI_INPUT_IF_INITIALIZER( \
+      .test_event = (gui_input_if_test_event_t)input_test_event, \
+      .reset_event = (gui_input_if_reset_event_t)input_reset_event \
+      ), \
+  .sensors = {INPUT_IDLE}, \
+  .fltsensors = {INPUT_FLTBOUNCE_INITIALIZER()}, \
+  .keys = {INPUT_IDLE}, \
+  .stick_keys = {INPUT_STICK_INITIALIZER()}, \
+  .wheel = 0, \
+  .ready = false, \
+  .onstickkey = NULL, \
+  __VA_ARGS__ }
+
+// }}}
+
+/// Global instance (use *INPUT* pointer)
+extern struct input_t _input;
+#define INPUT (&_input)
+
+void input_init(input_t* self);
+void input_task(input_t* self);
+/// Check if event occurs (key pressing)
+int input_test_event(input_t* self, enum gui_events_t event);
+//int input_get_event(input_t* self, gui_event_t *event);
+void input_reset_event(input_t* self, enum gui_events_t event);
+
+#endif /* INPUT_H_ */
+#+END_SRC
+
+Example of the usage:
+
+#+BEGIN_SRC cpp
+...
+void onstickkey(input_t* self, input_keys_t key) {
+ // do something...
+}
+
+void main(void) {
+  ...
+  input_init(INPUT);
+  INPUT->onstickkey = onstickkey;
+  ...
+  while (1) { // main loop with "tasks"
+    ...
+    input_task(INPUT);
+    ...
+  }
+}
+#+END_SRC
+
+~onstickkey~ (callback on long pressing) will call automatically when user touch Qtouch sensor for long time.
+Somewhere in the program you can test pressed key:
+
+#+BEGIN_SRC cpp
+if (input->test_event(input, GUI_UP_EVENT)) {
+  // event UP
+  // do something...
+  input->reset_event(input, GUI_UP_EVENT);
+}
+#+END_SRC
+
+This approach of processing Qtouch sensors has only one limitation: it treats 'pressing' as touch ("down"), not as sensor release, IMHO it's more natural way when user has deal with touch sensors instead of real keys.

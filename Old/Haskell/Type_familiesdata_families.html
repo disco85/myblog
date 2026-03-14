@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Type families/data families</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Type families/data families</h1>
+<div id="outline-container-org9a2cb1e" class="outline-2">
+<h2 id="org9a2cb1e">Type families/data families</h2>
+<div class="outline-text-2" id="text-org9a2cb1e">
+<p>
+<a href="https://stackoverflow.com/questions/20870432/type-family-vs-data-family-in-brief">https://stackoverflow.com/questions/20870432/type-family-vs-data-family-in-brief</a>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">import Data.ByteString as S
+import Data.ByteString.Lazy as L
+
+-- Declare a family of type synonyms, called `Element` 
+-- `Element` has kind `* -&gt; *`; it takes one parameter, which we call `container`
+type family Element container
+
+-- ByteString is a container for Word8, so...
+-- The Element of a `S.ByteString` is a `Word8`
+type instance Element S.ByteString = Word8 
+
+-- and the Element of a `L.ByteString` is also `Word8`
+type instance Element L.ByteString = Word8  
+</pre>
+</div>
+
+<p>
+This is a type family - you pass different type params and get different types, ie, it's a family (of types) or a function on types. The left hand side of <code>=</code> and the right hand side of <code>=</code> - are equals in types sense and  you can pass to a function expecting <code>Word8</code> - a <code>Element L.ByteString</code> and vice versa - they are equal as types (something like a family of aliases).
+</p>
+
+<p>
+Such family can be closed as well:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">type family F a where
+  F Int = Maybe Int
+  F Bool = Int 
+</pre>
+</div>
+
+<p>
+But also there are ''data family'':
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- Declare a list-like data family
+data family XList a
+
+-- Declare a list-like instance for Char
+data instance XList Char = XCons Char (XList Char) | XNil
+
+-- Declare a number-like instance for ()
+data instance XList () = XListUnit Int
+
+-- ERROR: "Multiple declarations of `XListUnit'"
+data instance XList () = XListUnit Bool
+-- (Note: GHCI accepts this; the new declaration just replaces the previous one.)
+</pre>
+</div>
+
+<p>
+They are similar (types/data families) but on the right hand side - it's a new type, look, it has a constructor even! For example, <code>XCons ...</code> and you cannot use one type where another one was expected. Instances must not repeat by arguments (see the ERROR in the example).
+</p>
+
+<p>
+Also:
+</p>
+
+<p>
+&lt;&lt;&lt;
+Usually, type synonyms are just abbreviations, but type family synonyms have added power: They can make a simple type (kind /) become a synonym of a "type with kind / -&gt; * applied to an argument":
+&lt;&lt;&lt;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">type instance F A = B
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

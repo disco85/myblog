@@ -1,0 +1,74 @@
+#+title: Crossplatform software delays
+#+description: My Blog
+#+keywords: windows, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: windows clang
+#+date: [2020-02-09 Sun 09:00]
+
+* Crossplatform software delays
+
+This is the simple macros for different delays useful on Unix and Windows:
+
+#+BEGIN_SRC cpp
+#ifndef _DELAYS_H
+#define _DELAYS_H
+
+#include 
+#include 
+
+/* Converting between seconds and CPU ticks (clock_t):
+ *      MS2TICKS() converts milliseconds to ticks
+ *      US2TICKS() converts microseconds to ticks
+ *      TICKS2MS() converts ticks to milliseconds
+ *      TICKS2US() converts ticks to microseconds
+ */
+#define MS2TICKS(MS) ((MS)*(CLOCKS_PER_SEC)/1000)
+#define US2TICKS(US) ((US)*(CLOCKS_PER_SEC)/1000000)
+#define TICKS2MS(T)  ((T)/((CLOCKS_PER_SEC)*1000))
+#define TICKS2US(T)  ((T)/((CLOCKS_PER_SEC)*1000000))
+
+/*
+ * delay(MS)         sleeping on MS milliseconds
+ */
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+#  include 
+#  define delay(MS) Sleep(MS)
+#else
+#  if defined(HAVE_USLEEP)
+#    define delay(MS) usleep((MS)*1000)
+#  elif defined(HAVE_SLEEP)
+#    include 
+#    define delay(MS) sleep((MS)/1000) /* granularity only ONE SECOND! */
+#  else
+#    error Can not found any sleep_clocks() implementation ideas
+# endif
+#endif
+
+/*
+ * pthread_delay(MS) sleeping thread on MS milliseconds
+ */
+#if defined(HAVE_PTHREAD_DELAY_NP)
+#  define pthread_delay(MS) \
+     do { \
+             struct timespec __timespec={(MS)/1000,((MS)%1000)*1000000000}; \
+             pthread_delay_np(&__timespec); \
+     } \
+     while(0)
+#else
+#  define pthread_delay(MS) delay(MS)
+#endif
+
+/*
+ * unow(PNOW) store in var pointed by PNOW microseconds since Epoch
+ */
+#define unow(PNOW) \
+{ \
+        struct timeval __tv;  \
+        gettimeofday(&__tv, NULL); \
+        *(PNOW) = (__tv.tv_sec * 1000000) + __tv.tv_usec; \
+}
+
+#endif /*!_DELAYS_H*/
+#+END_SRC
+
+If ~HAVE_PTHREAD_DELAY_NP~ will be defined before including of this file, then ~pthread_delay()~ will be wrapper for ~pthread_delay_np()~ - see Pthreads for Win32 headers.

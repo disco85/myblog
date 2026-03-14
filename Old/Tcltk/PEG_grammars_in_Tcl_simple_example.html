@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PEG grammars in Tcl - simple example</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="tcl/tk" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">PEG grammars in Tcl - simple example</h1>
+<div id="outline-container-orga72c658" class="outline-2">
+<h2 id="orga72c658">PEG grammars in Tcl - simple example</h2>
+<div class="outline-text-2" id="text-orga72c658">
+<p>
+This is the very simple example how to create PEG grammar and parse some text with it in Tcllib (I used Tcllib 1.4).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #a52a2a;">package</span> require starkit
+starkit::startup
+<span style="color: #a52a2a;">package</span> require pt::peg::from::peg
+<span style="color: #a52a2a;">package</span> require pt::peg::container
+<span style="color: #a52a2a;">package</span> require pt::peg::interp
+
+<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">PEG</span> {
+PEG myapp (Exp)
+    IfKw       &lt;- 'i' 'f'                               ;
+    ThenKw     &lt;- 't' 'h' 'e' 'n'                       ;
+    ElseKw     &lt;- 'e' 'l' 's' 'e'                       ;
+    OSp        &lt;- ('\t' / '\n' / ' ')?                  ;
+    Sp         &lt;- ('\t' / '\n' / ' ')+                  ;
+    Block      &lt;- (Exp / 't') &amp;';'                      ;
+    Cond       &lt;- 'c' / 'o'                             ;
+    If         &lt;- IfKw Sp Cond OSp ':' OSp Block        ;
+    Exp        &lt;- If                                    ;
+END;
+}
+
+<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">CPEG</span> [pt::peg::from::peg convert $<span style="color: #ffffff;">PEG</span>]
+pt::peg::container cont
+cont deserialize = $<span style="color: #ffffff;">CPEG</span>
+<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">src</span> <span style="color: #696969;">"if c: if o:t;"</span>
+pt::peg::interp myint
+myint use cont
+<span style="color: #a52a2a;">puts</span> [myint parset $<span style="color: #ffffff;">src</span>]
+</pre>
+</div>
+
+<p>
+(I use startkit&#x2026;)
+This grammar is very simple (and non-realistic): it defines rules to parse nested 'if'-expression like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">if</span> c: <span style="color: #696969;">if</span> o: t;
+</pre>
+</div>
+
+<p>
+or
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">if</span> CONDITION: <span style="color: #696969;">if</span> CONDITION: BLOCK;
+</pre>
+</div>
+
+<p>
+where CONDITION is 'c' or 'o', BLOCK is another EXP (expression) or 't' followed by ';'; when blocks are nested, only one ';' is needed. Example has bugs (see Sp, OSp - Optional SPaces) but shows base tricks with PEG, for ex., PEG definition is loaded from variable, not imported from file, so you need for your App. not all Tcllib packages :) After running, you get:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">c:<span style="color: #696969;">\&gt;</span>tclkitsh.exe main.tcl
+Exp 0 11 {If 0 11 {IfKw 0 1} {Sp 2 2} {Cond 3 3} {OSp 4 3} {OSp 5 5} {Block 6 11 {Exp 6 11 {If 6 11 {IfKw 6 7} {Sp 8 8}
+{Cond 9 9} {OSp 10 9} {OSp 11 10} {Block 11 11}}}}}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

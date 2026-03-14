@@ -1,0 +1,112 @@
+#+title: Tcl: optional procedure arguments
+#+description: My Blog
+#+keywords: tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk
+#+date: [2020-02-09 Sun 08:01]
+
+* Tcl: optional procedure arguments
+
+They are very usable in many language. For example in Python:
+
+#+BEGIN_SRC python
+def f(a, b=0, **kw):
+  print kw
+
+f(1, 2, x=10, y=20)
+#+END_SRC
+
+~kw~ is the dictionary and is accessible in usual way (item existent checking, getting and so on). Argument b can be skipped and is optional too.
+
+For Tcl it's easy to write procedure for processing keyword arguments (like getopt):
+
+#+BEGIN_SRC tcl
+proc getargs {argsName kwArgsName arguments} {
+# like getopt for proc/method, ex:
+# 1) argsName may be ""|{} - to avoid positional args saving
+# 2) if no value of keyword argument, then it's value will be "Y"
+
+    upvar 1 $kwArgsName kwargs
+    set posargs {}
+
+    proc isKw opt {
+        return [expr {"-" eq [string index $opt 0]}]
+    }
+    proc setPosArg opt {
+        upvar 1 posargs posargs
+        lappend posargs $opt
+    }
+    proc setKwArg {name val} {
+        set ret "@NOMORE"; # used or not $val, it's possible positional opt
+        if {$name ne ""} {
+            upvar 1 kwargs kwargs
+            set defaultValue [lindex [array get kwargs $name] end]
+            if {$defaultValue in {"Y" "N"}} {
+                if {$val eq ""} {
+                    set val "Y"
+                } elseif {$val ni {"Y" "N"}} {
+                    set ret $val
+                    set val "Y"
+                }
+            }
+            set kwargs($name) $val
+        }
+        return $ret
+    }
+
+    set kw ""
+    set state OPT; # OPT|VAL|END
+    lappend arguments "@EOO"
+    foreach opt $arguments {
+        switch -- $state {
+            OPT {
+                if {$opt eq "@EOO"} {
+                    set state END
+                } elseif {[isKw $opt]} {
+                    set kw $opt
+                    set state VAL
+                } else {
+                    setPosArg $opt
+                }
+            }
+
+            VAL {
+                if {$opt eq "@EOO"} {
+                    setKwArg $kw ""
+                    set state END
+                } elseif {[isKw $opt]} {
+                    setKwArg $kw ""
+                    set kw $opt
+                } else {
+                    set maybePos [setKwArg $kw $opt]
+                    if {$maybePos ne "@NOMORE"} { setPosArg $maybePos }
+                    set state OPT
+                }
+            }
+
+            END { break; }
+        }
+    }
+
+    if {$argsName ne ""} {
+        upvar 1 $argsName _posargs
+        set _posargs $posargs
+    }
+}
+#+END_SRC
+
+Here is the example how to use:
+
+#+BEGIN_SRC tcl
+set args {}; # positional args
+array set kw {-a 1 -b 2}; # default kw-args
+set inputArgs {-a 20 -c 30 zzz -q -v xxx yyy}
+getargs args kw $inputArgs
+puts "Args:\n $args"
+puts "KW Args:"
+foreach {k v} [array get kw] {
+    puts " $k = $v"
+}
+#+END_SRC
+
+If positional arguments are not needed, use ~""~ or ~{}~ instead of its' variable name. If some keyword options has no value (it's flag only!), set it's default value ("Y" or "N") to ~kwArgsName~ (~kw~ array is example), so ~getargs~ will not interpret the next word as option value. But it's possible to has value if it is "Y" or "N": ~someCommand -someFlag or someCommand -someFlag N~

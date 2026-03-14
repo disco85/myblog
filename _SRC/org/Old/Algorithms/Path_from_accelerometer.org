@@ -1,0 +1,54 @@
+#+title: Path from accelerometer
+#+description: My Blog
+#+keywords: dsp, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: dsp algorithms
+#+date: [2020-02-06 Thu 17:52]
+
+* Path from accelerometer
+
+To get path or coordinates from accelerometer values you need to integrates them. From physics we know:
+
+$$v = dr/dt
+$$
+$$a = dv/dt = d^2r/dt^2
+$$
+
+If a (acceleration) is constant, motion is called uniform accelerated:
+
+$$v(t)=v(0)+at;
+r(t)=r(0)+v(0)t+0.5*at^2
+$$
+
+~v(0)~, ~r(0)~ - initial velocity and displacement. If ~a != const~, these formulas can not be used. If we know how a depends on ~t~ (for ex., ~a(t) = b + c*t~), we can use:
+
+$$v(t) = v(0) + b/t + 1/2/c*t^2
+$$
+
+$$r(t) = r(0) + v(0)/t + 1/2/b/t^2 + 1/6/c*t^3
+$$
+
+But if we don't know a(t), we can only use common rules:
+
+$$r(t)=r(0)+\int_0^tv(t)dt
+$$
+
+$$v(t)=v(0)+\int_0^ta(t)dt
+$$
+
+and calculate this with some [[http://en.wikipedia.org/wiki/Numerical_integration][numerical integration method]].
+
+Examples (models with plots) of such methods (in SciLab) you can found [[http://hmc-demo.googlecode.com/files/mathmodels.zip][there]] (in integral.sci file: Simpson's rule, Trapezoid rule, Leo Tick's rule). But we should know about 2 problems:
+
+- If there is some constant "component" in acceleration (or noise), this will be reason of BIG error in result
+- Each numerical integration method is filter and has transfer function, which give distortions on 0.2 - 0.4 Nyquist's frequency even [see R. W. Hamming, Digitals filters, 1977]
+
+So, you can use more smart methods. One of them is complex (chaining) integration with filters. Idea is to filter each dataflow: between each integrator and to filter output result too:
+
+a(t)->FILT->a,,f,,(t)->INT->v(t)->FILT->v,,f,,(t)->INT->x(t)->FILT->x,,f,,(t)
+
+where ~FILT~ - is a filter, ~INT~ - is an integrator.
+
+It can be implemented on dataflow model (as I done it in hmc-demo). You can found example of such model in SciLab source file "path.sci" where you can combine different integration methods with different filters and see result in plots.
+
+And remember, eventually, you never get correct result. Use sensors of velocity instead.

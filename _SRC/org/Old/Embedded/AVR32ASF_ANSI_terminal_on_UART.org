@@ -1,0 +1,88 @@
+#+title: AVR32/ASF: ANSI terminal on UART
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-06 Thu 05:02]
+
+* AVR32/ASF: ANSI terminal on UART
+
+It's good known goal - to run terminal (with some kind of shell) of one (or all) of the UARTs. This snippet shows how to process input byte from UART and to emulate ANSI terminal behavior:
+
+#+BEGIN_SRC cpp
+/**
+ * Handle input byte via USART; process it to emulate edit line behaviour.
+ * After processing, sets self->response array to 4 possible responses (until
+ * one is NULL). sh_task() will send these responses via UART...
+ * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user
+ * terminal should be in ANSI TERM mode. Supported:
+ * - BS/DEL - delete prev. char
+ * - ^U - delete entire line
+ * - ^L - clear screen but keep edited line
+ * - TAB - changed to SPACE
+ * On error sends BEL ('\7')
+ */
+void handle_input_byte(sh_t *self, uint8_t ch)
+{
+    switch (ch) {
+        case '\r':
+            ch = '\n';
+        case '\n':
+            self->inpos = 0;
+            self->inbuf[0] = 0;
+            _SETRESP(self, "\r\n", self->promptbuf, NULL, NULL);
+        break;
+
+        /* backspace, del */
+        case '\b':
+        case '\x7f':
+            if (self->inpos > 0) {
+                self->inpos--;
+                self->inbuf[self->inpos] = 0;
+                _SETRESP(self, "\b \b", NULL, NULL, NULL);
+            } else {
+                _SETRESP(self, "\a", NULL, NULL, NULL);
+            }
+        break;
+
+        /* ^U - del line */
+        case 'u' & 0x1f:
+            self->inpos = 0;
+            self->inbuf[self->inpos] = 0;
+            _SETRESP(self, "\x1B[2K\r", self->promptbuf, NULL, NULL);
+        break;
+
+        /* ^L - clear screen */
+        case 'l' & 0x1f:
+            _SETRESP(self, "\x1B[2J\x1B[H", self->promptbuf, self->inbuf, NULL);
+        break;
+
+        /* all other chars */
+        case '\t':
+            ch = ' ';
+        default:
+            if ((ch >= (uint8_t)' ' && ch <= (uint8_t)'\x7e')
+                            || ch >= (uint8_t)'\xa0') {
+                // printable
+                if (self->inpos < sizeofarray(self->inbuf) - 1) {
+                    // in bounds (-2 is for ch, -1 is for '\0')
+                    self->inbuf[self->inpos++] = ch;
+                    self->inbuf[self->inpos] = 0;
+                    _SETRESP(self, self->inbuf + (self->inpos-1), NULL, NULL, NULL);
+                } else {
+                    _SETRESP(self, "\a", NULL, NULL, NULL);
+                }
+            } else {
+                // non-printable
+                _SETRESP(self, "\a", NULL, NULL, NULL);
+            }
+        break;
+    }
+}
+#+END_SRC
+
+Nothing special: no support of editing in the middle of the line, only at the end, clearing of line, screen, deleting last char. It generates ANSI ESC sequencies. ~self~ is the pointer to special struct with ~inbuf~ char buffer and ~inpos~ - current position of added bytes, so entered line will be in the ~inbuf~. ~_SETRESP()~ is the macros - it sets 4 char pointers to be sent in ~sh_task()~ function (sends all 4 or until one of them is NULL) - it's looks similar like yielding of responses in WSGI Python Web application, but limited with 0 to 4 parts only :)
+~sh_task()~ is call in main loop and sends these responses, ~handle_input_byte()~ is called in UART ISR routine to save input and prepare responses. Using of struct, wrapped all needed resources helps us to avoid global and single shell only, so we can have several shells on several UARTs.
+~sizeofarray()~ is trivial macros, returns array items number. 
+
+Short [[https://vimeo.com/157903176][video]] how it looks.

@@ -1,0 +1,32 @@
+#+title: Changing icons in Windows Tcl Starpacks
+#+description: My Blog
+#+keywords: windows, tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: windows tcl/tk
+#+date: [2020-02-09 Sun 08:21]
+
+* Changing icons in Windows Tcl Starpacks
+
+Created Starpack will have default Tcl icons and you can see them in different view modes of Windows explorer (table, large icons...). This approach is based on <a href="http://wiki.tcl.tk/10922">http://wiki.tcl.tk/10922</a> receipt, but is in Makefile target form. And uses tools: <a href="http://www.angusj.com/resourcehacker/">reshacker.exe</a>,&nbsp; <a href="http://upx.sourceforge.net/">upx.exe</a> and windres.exe from <a href="http://www.mingw.org/">MinGW</a> installation (at $MINGWHOME/bin/windres.exe), also supposes that you are using <a href="http://code.google.com/p/tclkit/">tclkit.exe</a> as runtime.
+In my case I have application rfprg and "virtual" FS (catalog) - rfprg.vfs. And I have all these tools in the same catalog (with tclkit.exe). I created there the rfprg.rc file:
+
+#+BEGIN_SRC
+APPICONS ICON "rfprg.vfs/tclkit.ico"
+TK ICON "rfprg.vfs/tclkit.ico"
+#+END_SRC
+
+Then I added next target into my Makefile:
+
+#+BEGIN_SRC Makefile
+icons:
+	cp tclkit.exe tclkit1.exe
+	upx.exe -d tclkit1.exe
+	reshacker.exe -delete tclkit1.exe , tclkit2.exe , icongroup,,
+	windres.exe -i rfprg.rc -o rfprg.res -J rc -O res -r
+	reshacker.exe -add tclkit2.exe , tclkit3.exe , rfprg.res , ,,
+	upx.exe tclkit3.exe
+	mv tclkit3.exe tclkit.exe
+	rm rfprg.res tclkit2.exe tclkit1.exe
+#+END_SRC
+
+And them: ~make icons~. This will replace "system" icons of tclkit.exe with rfprg.vfs/tclkit.ico. So you can use this "patched" tclkit.exe runtime to create Starpack with your custom icon.

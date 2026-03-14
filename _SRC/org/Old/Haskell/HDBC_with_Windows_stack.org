@@ -1,0 +1,51 @@
+#+title: HDBC with Windows stack
+#+description: My Blog
+#+keywords: windows, haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: windows haskell
+#+date: [2020-02-04 Tue 06:16]
+
+* HDBC with Windows stack
+
+To link your Haskell application with HDBC for Sqlite3 under Windows, you have to:
+
+- install sqlite3 dev C package (headers and libs)
+- go to your Haskell MSYS2 installation (for example, ~D:\apps\haskell\8.0.2\msys\~) and run ~msys2.exe~
+- in opened terminal run:
+
+#+BEGIN_SRC bash
+pacman -Syu
+# if needed - close terminal and run again
+pacman -Su
+pacman -S libsqlite-devel
+pacman -S sqlite # to have CLI tool
+#+END_SRC
+
+- modify cabal and stack.yaml files
+
+- add to ~stack.yaml~:
+
+#+BEGIN_SRC yaml
+...
+extra-deps: [HDBC-sqlite3-2.3.3.1]
+...
+extra-include-dirs: ["d:/apps/haskell/8.0.2/msys/usr/include"]
+extra-lib-dirs: ["d:/apps/haskell/8.0.2/msys/usr/lib"]
+...
+#+END_SRC
+
+- add to cabal file:
+
+#+BEGIN_SRC yaml
+  build-depends:       base >= 4.7 && < 5
+                     , HDBC
+                     , HDBC-sqlite3
+#+END_SRC
+
+- now you can import modules:
+
+#+BEGIN_SRC haskell
+import Database.HDBC
+import Database.HDBC.Sqlite3
+...
+#+END_SRC

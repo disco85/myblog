@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fossil: clone Linux -&gt; Windows</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="fossil, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Fossil: clone Linux -&gt; Windows</h1>
+<div id="outline-container-org1b5c7b4" class="outline-2">
+<h2 id="org1b5c7b4">Fossil: clone Linux -&gt; Windows</h2>
+<div class="outline-text-2" id="text-org1b5c7b4">
+<p>
+There is interesting VCS - <a href="https://www.fossil-scm.org/">https://www.fossil-scm.org/</a>, written by
+SQLite3 author. When I tried to use it on remote Windows machines, I hit
+several problems: no local ssh.exe, problems with GSSAPI, authorization&#x2026;
+</p>
+
+<p>
+But these problems are solvable with SSH tunnel. Let's look at picture:
+</p>
+
+
+<div id="org708ba86" class="figure">
+<p><img src="../../assets/FossilTunnel1.svg" alt="FossilTunnel1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+We can create SSH tunnel with Putty (SSH alternative for Windows, and not
+only) and connect with fossil HTTP server via it. One machine will keep
+fossil repo. First, we create it (I called it <code>x</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">fossil init x
+fossil open x
+fossil add somefile
+fossil ci -m <span style="color: #696969;">"init"</span>
+fossil ui
+</pre>
+</div>
+
+<p>
+When fossil's UI will be opened, I add some user, for example, <code>user</code> and
+grant them permissions AND password. Then kill fossil with ^C and start it in
+serv mode (actually ui/serv mode lokks like the same). It will be bound to
+default port 8080 (you can see this on fig).
+</p>
+
+<p>
+On remote machine we start Putty, create some session and in SSH tunnel
+section creates tunnel (in "destination" input box) with local port 7777, IP
+of fossile machine and fossil port 8080, result should be:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">L7777 fossil_IP:8080
+</pre>
+</div>
+
+<p>
+Also we set "Local", "Auto" (or "Dynamic" - works too).  
+</p>
+
+<p>
+In session section we set host to fossil IP (where we created repo!),
+auto-login with name of fossil machine user. Now save session and open it. We
+are see console window, enter password and don't close it (another way is to
+use Putty agent). Open new console and enter there:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">fossil clone http://fossil-user@localhost:7777//path-to-x x
+fossil open x
+</pre>
+</div>
+
+<p>
+where <code>path-to-x</code> is the path to repo on fossil machine.
+</p>
+
+<p>
+Now you have <code>x</code> repo locally. Works with them, commit, then push changes:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">fossil push
+</pre>
+</div>
+
+<p>
+If it ask password, enter it (this is the password of early created fossil
+user).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

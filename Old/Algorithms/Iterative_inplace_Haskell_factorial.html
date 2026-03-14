@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Iterative in-place Haskell factorial</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Iterative in-place Haskell factorial</h1>
+<div id="outline-container-orgfdced0f" class="outline-2">
+<h2 id="orgfdced0f">Iterative in-place Haskell factorial</h2>
+<div class="outline-text-2" id="text-orgfdced0f">
+<p>
+This is the implementation of factorial which does not use recursion
+and does not pass result via stack but use 2 "global" vars: counter
+abd factorial value. For example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">fact 5 = 120
+
+       counter  | fact
+       ---------+-----------
+        5       | 5
+        4       | 20
+        3       | 60
+        2       | 120
+        1       | 120 =&gt; end
+</pre>
+</div>
+
+<p>
+Instead of pass temporary result of multiplication via stack, we'll
+create 2 states and use them as counter and factorial value. How to
+create 2 states? For one state we can use <code>State</code> monad, for 2&#x2026;
+state in the state. Adding state to another monad (possible state too)
+is responsibility of <code>StateT</code> transformer. Calculation will looks like
+<code>StateT Integer (State Integer) ()</code>. This means that we use <code>Integer</code>
+for counter and multiplication result, nothing will be returned as
+result because we use as result the state.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">import Control.Monad
+import Control.Monad.Trans.State
+import Control.Monad.Trans.Class
+
+
+-- | StateT s m a :: * -&gt; (* -&gt; *) -&gt; * -&gt; *
+-- here "external" is in signature, not actually - in call
+fact1 :: StateT Integer (State Integer) ()
+fact1 = do
+  i &lt;- get              -- ^ counter: external state
+  when (i &gt; 1) $ do     -- ^ if counter &gt; 1
+    lift $ modify (i*)  -- ^ mult internal state by counter (initial: 1)
+    modify (-1+)        -- ^ decrement external state
+    fact1               -- ^ to next iteration, changed states
+
+
+fact :: Integer -&gt; Integer
+fact n = execState (execStateT fact1 n) 1
+-- ^ external (internal in signature) state is fact, internal is counter
+
+
+main :: IO ()
+main = do
+  putStrLn "Result: "
+  print $ fact 5
+</pre>
+</div>
+
+<p>
+Implementation is simple. First, signature describes only types, not
+actual nesting structure, so in function body "internal" is the internal
+in signature. <code>lift~/~get</code> are relative for internal/external but in
+termins of signature. Really after transformation you will works with
+stack-like structure, so when you call your function, you should create
+all in reverse order: internal becomes external, so we get counter as
+external state but pass it in call as internal. No collision here: it's
+actually internal, only in signature it's looks like external, because
+signature looks like application of <code>StateT</code> (externally) to argument
+<code>State</code>.
+</p>
+
+<p>
+We nothing return because there is a way to return state instead of result.
+This does <code>exec*</code> functions family (<code>execState</code> is needed in external call).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

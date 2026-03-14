@@ -1,0 +1,75 @@
+#+title: Bakefile: Makefile's generator
+#+description: My Blog
+#+keywords: python, makefile, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python makefile misc
+#+date: [2020-02-09 Sun 09:01]
+
+* Bakefile: Makefile's generator
+
+It's known problem - general way of making the project. There are many tools for this task: CMake, automake/autoconf, ant (usual for Java) and many-many other. But some of them use own build system and very few uses standard way of Makefile (i.e. generates Makefiles). This method is based on some input format which is translated to Makefile for target compiler. For example, automake/autoconf, Premake (with Lua scripting) and Bakefile (written in Python and is crossplatform, like Premake and many other). It's authors are Vaclav Slavik, Francesco Montorsi.
+
+Bakefile uses XML as input format then generates standard Makefiles for the targets:
+
+#+BEGIN_SRC
+autoconf       Makefile.in for GNU Autoconf
+borland        Makefile for Borland C++ and Borland make
+dmars          Generic Makefile for Digital Mars C/C++
+dmars_smake    Makefile for Digital Mars C/C++ with SMAKE
+gnu            Makefile for GNU toolchain: GNU Make, GCC...
+mingw          Makefile for MinGW: mingw32-make, MinGW...
+msvc           Makefile for Visual C++ with Microsoft nmake
+msvc6prj       Microsoft Visual C++ 6.0 project files
+msevc4prj      Microsoft Embedded Visual C++ 4 project files
+msvs2003prj    MS Visual Studio 2003 project files
+msvs2005prj    MS Visual Studio 2005 project files
+msvs2008prj    MS Visual Studio 2008 project files
+suncc          GNU makefile for SunCC compiler
+symbian        Symbian development files
+watcom         Makefile for OpenWatcom C/C++
+xcode2         Apple Xcode 2.4 project files
+
+#+END_SRC
+
+(post was originally created in 2012, so the information may be outdated).
+
+It's input file looks like:
+
+#+BEGIN_SRC xml
+<exe id="test_sockets">
+        <cflags>-fpack-struct</cflags>
+        <sources>test_sockets.c</sources>
+        <sources>socks.c</sources>
+        <sys-lib>pthread</sys-lib>
+        <if cond="TOOLSET=='win32'">
+            <sys-lib>wsock32</sys-lib>
+        </if>
+</exe>
+#+END_SRC
+
+This pie of code will build (via native Makefile sure) test_sockets binary from test_sockets.c and socks.c, with pthread library (available on Unix and MinGW too) and with wsock32 library only on Windows.
+
+Another example of custom tag:
+
+#+BEGIN_SRC xml
+<include file="presets/simple.bkl">
+    <define-tag name="lit" rules="action">
+        <if cond="TOOLSET=='unix'">
+            <command></command>pyweb.py -s $(attributes['web']).w
+            <command></command>rst2html.py $(attributes['web']).rst $(attributes['web']).html
+        </if>
+        <if cond="TOOLSET=='win32'">
+            <command></command>cmd /C pyweb.py -s $(attributes['web']).w
+            <command></command>cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html
+        </if>
+    </define-tag>
+
+    <action id="lit">
+        <lit web="maintest">
+        <lit web="socks">
+    </lit></lit></action>
+</include>
+#+END_SRC
+
+This snippet will weave and tangle "literated" sources (with pyweb tool): maintest.w and socks.w but in different manners under Windows and Unix.
+All of these snippets should be in ~<makefile>~ tag! When you use some tag, see documentation on tag (what outer tags it expect).

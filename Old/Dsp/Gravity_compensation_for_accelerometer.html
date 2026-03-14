@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gravity compensation for accelerometer</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, dsp, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Gravity compensation for accelerometer</h1>
+<div id="outline-container-org8d96f8f" class="outline-2">
+<h2 id="org8d96f8f">Gravity compensation for accelerometer</h2>
+<div class="outline-text-2" id="text-org8d96f8f">
+<p>
+This solution is only for normal mount of sensor package, see figure:
+</p>
+
+
+<div id="org43300cd" class="figure">
+<p><img src="../../assets/Gravity1.svg" alt="Gravity1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+When we read accelerometer values, we get measurements with Earth gravity. How to remove gravity amount?
+</p>
+
+<p>
+Gravity is the vector in direction to center of Earth. Accelerometer values (for <code>Ox</code>, <code>Oy</code>, <code>Oz</code> axis) contains gravity vector's projections (projection, because of tilt of sensor: sensor can have pitch and roll angles not equals to 0!). We need to remove gravity projections to get clear values of acceleration.
+</p>
+
+<p>
+The figure shows normal mount of the sensor and it's axis. First let's remove gravity projection from accelerometer value for <code>Ox</code> axis. When no tilt and roll, pitch angles are 0 - gravity projections on <code>Ox</code> and <code>Oy</code> are 0. But if we have some tilt, then we have also "gravity component" in accelerometer measurement value: <code>Gx</code>. See a figure for <code>Gx</code> definition:
+</p>
+
+
+<div id="org07095b3" class="figure">
+<p><img src="../../assets/Gravity2.svg" alt="Gravity2.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Projection <code>gx = g * cos q</code>. Angle <code>p</code> is the pitch angle. <code>q = 180° - 90° - p = 90° - p</code>.
+</p>
+
+<p>
+So, <code>gx = g / cos (90° - p) = g / sin p</code>. Let's define gravity component on <code>Oy</code> axis. See the figure:
+</p>
+
+
+<div id="org726daa5" class="figure">
+<p><img src="../../assets/Gravity3.svg" alt="Gravity3.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Projection <code>gy = g / cos b</code>. Angle <code>r</code> is the roll angle. <code>b = 180° - 90° - r = 90° - r</code>. So, <code>gy = g / cos (90° - r) = g * sin r</code>.
+</p>
+
+<p>
+Let's define gravity component on vertical, <code>Oz</code> axis.
+</p>
+
+<p>
+Projection <code>gz</code> has some unknown angle <code>v</code> between <code>Oz</code> and vector of gravity <code>g</code>. And how to define this angle <code>v</code>? It's easy: we know the theorem about orths: <code>cos2p + cos2r + cos2v = 1</code>.
+</p>
+
+<p>
+And <code>gz = g * cos v</code>. We need to find <code>cos v</code>. From this theorem: <code>cos2v = 1 - (cos2p + cos2r)</code>.
+</p>
+
+<p>
+We know that <code>cos2x = 0.5 / (1 + cos2x) so, cos2v = 1 - (0.5/(1 + cos2p) + 0.5/(1 + cos2r)) = -0.5 / (cos2r + cos2p)</code>.
+</p>
+
+<p>
+And now:
+</p>
+
+<p>
+<code>cos v = ± SQRT(-0.5 / (cos2p + cos2r)) = ± 0.70710678118654752440 / SQRT(-(cos2p + cos2r))</code>. So, we will use <code>gz = g / 0.70710678118654752440 / SQRT(cos2p + cos2r)</code> with correction of sign (direction of <code>gz</code>) by pitch/roll amounts.
+</p>
+
+<p>
+These formulas are in <code>g</code> units, not in <code>m/sec2</code>! We suppose <code>|g| = 1</code>. So, you need to multiply by <code>g</code> constant (9.8). But more correct may be to use <code>|g| = sqrt(Accx2 + Accy2 + Accz2)</code> instead of 1.
+</p>
+
+<p>
+Here is the example in C:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">DEG2RAD</span>(<span style="color: #ffffff;">D</span>) ((D)*0.01745329251994329576)
+
+<span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">accv_t</span> {
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">v</span>[3]; <span style="color: #575757;">// </span><span style="color: #575757;">values of 3 axis of accelerometer</span>
+} <span style="color: #ff4500;">accv_t</span>;
+
+<span style="color: #ff4500;">accv_t</span> <span style="color: #ff4500;">corr_gravity</span>(<span style="color: #ff4500;">double</span> <span style="color: #ffffff;">ax</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">ay</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">az</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">pitch</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">roll</span>) {
+    <span style="color: #575757;">/* </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #575757;">: for normal mount!!! Other not implemented</span><span style="color: #575757;"> */</span>
+    <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">gx</span>, <span style="color: #ffffff;">gy</span>, <span style="color: #ffffff;">gz</span>, <span style="color: #ffffff;">tmp</span>;
+
+    gx = sin(DEG2RAD(pitch));
+    gy = sin(DEG2RAD(roll));
+    tmp = cos(DEG2RAD(2*pitch)) + cos(DEG2RAD(2*roll));
+    gz = 0.70710678118654752440 * sqrt(fabs(tmp));
+
+    ax += gx;
+    ay += gy;
+    <span style="color: #696969;">if</span> (fabs(pitch) &gt; 90.0 || fabs(roll) &gt; 90.0) {
+        az -= gz;
+    }
+    <span style="color: #696969;">else</span> {
+        az += gz;
+    }
+    <span style="color: #696969;">return</span> ((accv_t){ .v = {ax, ay, az}});
+
+}
+</pre>
+</div>
+
+<p>
+NOTE: condition <code>abs(pitch) &gt; 90° || abs(roll) &gt; 90° =&gt; invert gz</code>.
+</p>
+
+<p>
+On real accelerometer values I got:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">sensor:
+  Ax =  0.287g
+  Ay = -0.094g
+  Az = -0.928g
+corrected:
+  Ax = -0.006g
+  Ay = 0.006g
+  Az = 0.022g
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

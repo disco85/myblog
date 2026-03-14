@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Text format to columns on Haskell</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Text format to columns on Haskell</h1>
+<div id="outline-container-orge5da4a0" class="outline-2">
+<h2 id="orge5da4a0">Text format to columns on Haskell</h2>
+<div class="outline-text-2" id="text-orge5da4a0">
+<p>
+This is the language study excersice which reformat text input into text with
+columns. All process will have follow parameters:
+</p>
+
+<ul class="org-ul">
+<li><code>ncols</code> - number of columns</li>
+<li><code>nspaces</code> - spaces number between columns</li>
+<li><code>width</code> - width of columns</li>
+<li><code>pagesize</code> - lines of page</li>
+</ul>
+
+<p>
+We will use next modules and exported names:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">import           Data.List
+import           Data.Maybe            (fromMaybe, isJust)
+import           Prelude               hiding (Word)
+import           System.Console.GetOpt
+import           System.Environment
+</pre>
+</div>
+
+<p>
+Parameters of re-formating will be got from command line, which is parsing
+with standard Haskell module <code>GetOpt</code> (see above). Btw, this parser (be
+default?) supports "-aN" but not "-a N".
+</p>
+
+<p>
+This is the "record" for CLI options:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Stricts to get syntax errors immediately
+data CmdOpts = CmdOpts {
+  help     :: !Bool,
+  ncols    :: !Int, -- number of columns
+  nspaces  :: !Int, -- spaces between columns
+  width    :: !Int, -- width of column
+  pagesize :: !Int -- lines in page
+  } deriving Show
+</pre>
+</div>
+
+<p>
+Their fields are strict to get syntax error immediately. We are reading input
+text from "stdin" so will we are waiting for input (WITH OPTION ERROR!) we
+won't get error reporting - so, they will be strict.
+</p>
+
+<p>
+This null-arity function returns the default values of CLI options (if some
+are omitted):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Default values of command line options
+defaultCmdOpts :: CmdOpts
+defaultCmdOpts = CmdOpts {
+  help = False,
+  ncols = 2,
+  nspaces = 4,
+  width = 20,
+  pagesize = 24
+  }
+</pre>
+</div>
+
+<p>
+Then, as in other languages (argparse in Python ,for example) we should define
+options: their names, types, numbers, mandatory, etc.:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Definition of program command line options
+cmdSyntax :: [OptDescr (CmdOpts -&gt; CmdOpts)]
+cmdSyntax =
+  [
+    Option ['h', '?'] ["help"]
+      (NoArg (\cmdOpts -&gt; cmdOpts {help=True} ))
+      "print this help",
+
+    Option ['c'] ["cols"]
+      (OptArg (\s cmdOpts -&gt; cmdOpts {ncols=readOpt s}) "NCOLS")
+      "columns number (default: 2)",
+
+    Option ['s'] ["spaces"]
+      (OptArg (\s cmdOpts -&gt; cmdOpts {nspaces=readOpt s}) "NSPACES")
+      "spaces number (default: 4)",
+
+    Option ['w'] ["width"]
+      (OptArg (\s cmdOpts -&gt; cmdOpts {width=readOpt s}) "WIDTH")
+      "column width (default: 20)",
+
+    Option ['p'] ["pagesize"]
+      (OptArg (\s cmdOpts -&gt; cmdOpts {pagesize=readOpt s}) "PAGESIZE")
+      "page size in lines (default: 25)"
+  ] where
+  readOpt :: Read a =&gt; Maybe [Char] -&gt; a
+  readOpt s = (read $ fromMaybe "" s)
+</pre>
+</div>
+
+<p>
+First arg of <code>OptArg</code> is lambda which gets string value of option and
+aggregated options values - it must parse string to internal type and to save
+result into this <code>cmdOpts</code> for further processing.
+</p>
+
+<p>
+Parsing function is <code>parseCmdOpts</code> which works with external world so operates
+in ~IO~context:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Usage string
+usage :: String
+usage = usageInfo "SYNTAX: col [options...]" cmdSyntax
+
+
+-- | Parses command line options
+parseCmdOpts :: IO CmdOpts
+parseCmdOpts = do
+  argv &lt;- getArgs
+  case getOpt Permute cmdSyntax argv of
+    (opts, _, []) -&gt; return $ foldl (flip id) defaultCmdOpts opts
+    (_, _, errs) -&gt; error $ concat errs ++ "\n" ++ usage
+</pre>
+</div>
+
+<p>
+This is the utility function which split sequence into pies with size <code>n</code> and
+is based on standard function <code>splitAt</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Splits `xs` on pies with the same size `n`
+splitEvery :: Int -&gt; [a] -&gt; [[a]]
+splitEvery _ [] = []
+splitEvery n xs = as : splitEvery n bs
+  where (as, bs) = splitAt n xs
+</pre>
+</div>
+
+<p>
+To simplify our types expressions (signatures) we set types definitions for
+word (symbols without spaces), line, column and page:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Typedefs
+type Word = String
+type Line = String
+type Column = [Line]
+type Page = [Column]
+</pre>
+</div>
+
+<p>
+Here we begin actual processing. First, we need to make main working function
+which gets words and cuts (extracts) line from them but saves rest of words
+for further processing. It calculate how many words we need, then calculate
+how much they must be sparse (to fill width of column) and returns result as
+<code>Line</code> and list of words rest.  If it's impossible to extract line with such
+width then result will be <code>Nothing</code> (if possible - line is wrapped into
+<code>Just</code>). Idea is to calculate lengths of words but (to simplify further
+calculations) additively: not <code>[2, 3, 4]</code> but <code>[2, 6, 10]</code>, i.e. lengths of
+words plus one-symbol spaces (minimal needed symbols). Then we takes as much
+words as we need to keep line length <code>&lt;= width</code>. This does <code>wl = ...</code> line in
+the code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Cuts line with width `w` from words `ws` by drop some words and adding
+-- spaces between kept ones. If it's possible returns (Maybe line, rest-of-words),
+-- otherwise (Nothing, all-words)
+cutLine :: Int -&gt; [Word] -&gt; (Maybe Line, [Word])
+cutLine _ [] = (Just "", [])
+cutLine w ws =
+  let wl = takeWhile (&lt;=w) $ scanl1 ((+).(+1)) $ map length ws -- additive words lengths
+      wn = length wl -- words number
+      (w0, w1) = splitAt wn ws
+      gn = wn - 1 -- gaps number
+  in
+    case gn of
+      -1 -&gt; (Nothing, ws)
+      0 -&gt; (Just $ w0!!0, w1)
+      _ -&gt;
+        let ag = w - last wl -- additional gaps needed
+            gw = 1 + ag `div` gn -- gaps width (except last one)
+            lgw = gw + (ag `mod` gn) -- last gap width
+            gap = replicate gw ' '
+            lgap = replicate lgw ' '
+            (firstWords, lastWord) = splitAt (wn-1) w0
+        in
+          (Just $ intercalate gap firstWords ++ lgap ++ lastWord!!0, w1)
+</pre>
+</div>
+
+<p>
+We calculates needed spaces to sparse line to width <code>w</code> and add them into each
+gap, last gap will have remainder of division (if we are adding 5 spaces to 2
+gapes then last will have 3 spaces, not 2).
+</p>
+
+<p>
+Next function cuts column from words: actually we can think about resulting
+text as text with one column looking like snake :) So, we cut one column (all
+columns have the same width, laid snake column):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Cuts column (list of lines) with width `w` from words `ws`. If it's possible
+-- (to reformat words into new width `w`), returns Maybe column, Nothing otherwise
+cutColumn :: Int -&gt; [Word] -&gt; Maybe Column
+cutColumn w ws =
+  let (mbLine, othWords) = cutLine w ws in
+    do
+      line &lt;- mbLine
+      case othWords of
+        [] -&gt; return [line]
+        _ -&gt; do othLines &lt;- (cutColumn w othWords)
+                return $ [line] ++ othLines
+</pre>
+</div>
+
+<p>
+Now we will cut the "snake" into separate pies - real columns. We need (sure)
+to know page size (<code>ps</code> argument) and width of columns (<code>w</code>). We use <code>&gt;&gt;=</code>
+bind function to drop <code>Nothing</code> (into <code>Nothing</code>). And yes, we actually cut the
+snake - with <code>splitEvery</code> - into the same size parts (size is <code>ps</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Cuts columns with width `w` for page with size `ps` (lines in page) from input
+-- text `txt`
+cutColumns :: Int -&gt; Int -&gt; String -&gt; Maybe [Column]
+cutColumns w ps txt =
+  let ws = words txt in
+    cutColumn w ws &gt;&gt;= \c -&gt; return $ splitEvery ps c
+</pre>
+</div>
+
+<p>
+And last we cuts pages from list of columns, principle is the same:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Cuts pages from early cutted (reformatted) columns `mbCols` when number of columns
+-- is `nc`
+cutPages :: Int -&gt; Maybe [Column] -&gt; Maybe [Page]
+cutPages nc mbCols = mbCols &gt;&gt;= \cols -&gt; return $ splitEvery nc cols
+</pre>
+</div>
+
+<p>
+Now we need utility function, <code>zip</code> - not for 2 sequences, but for any number
+of them. <code>enumFrom</code> is analogue of Python <code>range(0)</code>, we select each time item
+with the same index - like in real <code>zip</code>. But since we have any number of
+sequence, they are represented as list of sequences <code>seqs</code>. Sequences can have
+different number of items, so we complement each one with <code>Nothing</code> (NULL),
+but then existing items will be wrapped in <code>Just</code>. We stop to consume
+resulting sub-lists when all their items will be <code>Nothing</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | zip for N sequences
+zipN :: [[a]] -&gt; [[Maybe a]]
+zipN seqs =
+  let seqs' = map (\sq -&gt; map Just sq ++ repeat Nothing) seqs in
+  takeWhile (any isJust) [[sq!!i | sq &lt;- seqs'] | i &lt;- enumFrom 0]
+</pre>
+</div>
+
+<p>
+See picture:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">  1     2     3     N     M        &lt;- seq1
+  2     3     N     N     N        &lt;- seq2
+[1,2] [2,3] [3,N] skip! skip! ...  &lt;- zipN
+</pre>
+</div>
+
+<p>
+Now we should "fold" results into text (from structured data). Folding of page
+will creates page into ONE column (the snake, yes:)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Folds page `page` with width of column `w` and vertical space `vSpace` into string
+foldPage :: String -&gt; Int -&gt; Page -&gt; Column
+foldPage vSpace w page =
+ let emptyCol = replicate w ' ' in
+ map (\c -&gt; intercalate vSpace $ map (fromMaybe emptyCol) c) (zipN page)
+</pre>
+</div>
+
+<p>
+Then we can fold pages into text (<code>String</code>). "Pages" - because result of cut
+is list of pages (which are columns which are lines which are words). Each
+page will be delimited with string like (page number):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">                      - 2 -
+</pre>
+</div>
+
+<p>
+named <code>colontit</code>. It is justified with <code>pw</code> - page width.
+</p>
+
+<p>
+<code>vSpace</code> here is vertical space between columns. <code>enumPage</code> is enumerated
+pages with&#x2026; <code>zip</code>, <code>zip</code> does it in very natural way - it "adds" to page
+it's number (from 1, see <code>enumFrom 1</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Folds pages `pages` with columns of width `w` and page width `pw` into string
+foldPages :: String -&gt; Int -&gt; Int -&gt; [Page] -&gt; String
+foldPages vSpace w pw pages =
+  let showPage i = "- " ++ show i ++ " -"
+      pdel = "\n\n"
+      colontit i = pdel
+                   ++ replicate (pw `div` 2 - length (showPage i) `div` 2) ' '
+                   ++ (showPage i) ++ pdel
+      enumPages = zip (map (intercalate "\n" . foldPage vSpace w) pages) (enumFrom 1)
+  in
+    intercalate "" $ map (\(p,i) -&gt; p ++ colontit (i::Integer)) enumPages
+</pre>
+</div>
+
+<p>
+<code>foldPage</code> folds pages into one column (list of lines) and then we are joing
+column lines with "\n". Last function is <code>col</code> which joins together all
+processing:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">-- | Reformats input text `txt` into new text with columns which options are setted
+-- in `opts`
+col :: CmdOpts -&gt; String -&gt; String
+col opts txt =
+  let mbCols = cutColumns (width opts) (pagesize opts) txt
+      mbPages = cutPages (ncols opts) mbCols
+      vSpace = replicate (nspaces opts) ' '
+      pageWidth = (ncols opts) * (width opts) + (ncols opts - 1) * (nspaces opts)
+  in
+  foldPages vSpace (width opts) pageWidth (fromMaybe [] mbPages)
+</pre>
+</div>
+
+<p>
+<code>pageWidth</code> we need to justify <code>colontit</code>.
+</p>
+
+<p>
+Main entry point is simple and runs all I/O: processing of "stdin" content
+(see <code>getContents</code>) with out <code>col</code> function. But if we have <code>fHelp</code> then we
+print usage help instead (user enters "-h" CLI option):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">main :: IO()
+main = do
+  cmdOpts &lt;- parseCmdOpts
+  let CmdOpts { help = fHelp } = cmdOpts in
+    if fHelp then putStrLn usage
+    else do
+         inTxt &lt;- getContents
+         putStr $ col cmdOpts inTxt
+</pre>
+</div>
+
+<p>
+<code>fHelp</code> is boolean flag mathed <code>help</code> field of our CLI options record. Actually
+it's simple example, but looks interesting. To run it use:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-console">cat somefile.txt | runghc col.hs -w40 | less
+</pre>
+</div>
+
+<p>
+This code is available in <a href="https://github.com/bapcyk/hcol">my Git</a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

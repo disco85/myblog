@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>"Strings" multiplication</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">"Strings" multiplication</h1>
+<div id="outline-container-org9f39f8f" class="outline-2">
+<h2 id="org9f39f8f">"Strings" multiplication</h2>
+<div class="outline-text-2" id="text-org9f39f8f">
+<p>
+This is the usual task in interview: solve multiplication of integer numbers presented as strings, for ex., "25" * "25" = "625". Length of these strings may be any (not 16 bits or 32 bits only).
+Implementation will use school way of multiplication of numbers (sign is ignored), see:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">   1856
+   1856
+   ----
+  11136
+  9280
+14848
+1856
+=======
+3444736
+</pre>
+</div>
+
+<p>
+So, "1856" * "1856" = "3444736", we multiply each digit of second number on each digit of first one, shift result number by one to left, summarize them and don't forget about carry. Carry is of 2 kinds: carry of multiplication and carry of sum. Algorithm is:
+</p>
+
+<ul class="org-ul">
+<li>multiply last digit of 2nd number by last digit of 1st one</li>
+<li>write result (only low digit) in result string at LAST POSITION</li>
+<li>if resulting number is &gt; 10, save carry (divided by 10)</li>
+<li>make the same with the 2nd digit of 2nd number, but instead of saving resulting digit, make summation: with carry of multiplication AND carry of sum</li>
+<li>don't forget to make shifting to left when go to next digit of 1nd number</li>
+</ul>
+
+<p>
+So, each "saving" of result digit should make summation and there are not number 9280 in middle result but sum of 11136 and 9280 ("103936"). Implementation on C looks like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdlib.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;string.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;time.h&gt;</span>
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">ASCII2I</span>(<span style="color: #ffffff;">CH</span>) ((CH)?((CH)-<span style="color: #696969;">'0'</span>):0)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">I2ASCII</span>(<span style="color: #ffffff;">I</span>) ((I)+<span style="color: #696969;">'0'</span>)
+
+<span style="color: #ff4500;">char</span>* <span style="color: #ff4500;">mul</span>(<span style="color: #696969;">const</span> <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">s1</span>, <span style="color: #696969;">const</span> <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">s2</span>, <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">res</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">reslen</span>)
+{
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">r</span>, <span style="color: #575757;">// </span><span style="color: #575757;">index in result string</span>
+        <span style="color: #ffffff;">i</span>, <span style="color: #575757;">// </span><span style="color: #575757;">index in s1</span>
+        <span style="color: #ffffff;">_i</span>, <span style="color: #575757;">// </span><span style="color: #575757;">offset (to left) of next middle number</span>
+        <span style="color: #ffffff;">j</span>, <span style="color: #575757;">// </span><span style="color: #575757;">index in s2</span>
+        <span style="color: #ffffff;">len1</span> = strlen(s1), <span style="color: #ffffff;">len2</span> = strlen(s2);
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">d1</span>, <span style="color: #575757;">// </span><span style="color: #575757;">digit in s1</span>
+        <span style="color: #ffffff;">d2</span>, <span style="color: #575757;">// </span><span style="color: #575757;">digit in s2</span>
+        <span style="color: #ffffff;">ts</span>, <span style="color: #575757;">// </span><span style="color: #575757;">temporary summ</span>
+        <span style="color: #ffffff;">c</span>, <span style="color: #575757;">// </span><span style="color: #575757;">curry in multiplication</span>
+        <span style="color: #ffffff;">cs</span>; <span style="color: #575757;">// </span><span style="color: #575757;">curry in summation</span>
+    memset(res, 0, reslen);
+    <span style="color: #696969;">for</span> (i=len2-1, _i=0, cs=0; i&gt;=0; i--, _i++) {
+        d2 = ASCII2I(s2[i]);
+        r = reslen - 2 - _i;
+        <span style="color: #696969;">for</span> (j=len1-1, c=0; j&gt;=0; j--) {
+            d1 = ASCII2I(s1[j]);
+            d1 = d1*d2 + c;
+            ts = ASCII2I(res[r]) + (d1%10) + cs;
+            res[r] = I2ASCII(ts%10);
+            cs = ts/10;
+            c = d1/10;
+            r--;
+        }
+        <span style="color: #696969;">do</span> {
+            <span style="color: #575757;">// </span><span style="color: #575757;">do rest of sum (high digits)</span>
+            ts = ASCII2I(res[r]) + (c%10) + cs;
+            <span style="color: #696969;">if</span> (!ts) <span style="color: #696969;">break</span>;
+            res[r] = I2ASCII(ts%10);
+            cs = ts/10;
+            r--;
+        } <span style="color: #696969;">while</span> (cs);
+    }
+    <span style="color: #696969;">return</span> (res + r + 1);
+}
+
+<span style="color: #575757;">///////////////////////////////////////////////</span>
+<span style="color: #575757;">//              </span><span style="color: #575757;">Main: tests</span>
+<span style="color: #575757;">///////////////////////////////////////////////</span>
+
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">RND</span>(<span style="color: #ffffff;">N</span>) (srand(time(<span style="color: #7fffd4;">NULL</span>)), rand()%(N))
+
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+{
+    <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">_res</span>[32], *<span style="color: #ffffff;">res</span>;
+    <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">s1</span>[32] = {0};
+    <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">s2</span>[32] = {0};
+    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">n1</span>, <span style="color: #ffffff;">n2</span>, <span style="color: #ffffff;">rn</span>, <span style="color: #ffffff;">resn</span>, <span style="color: #ffffff;">chk</span>;
+
+    <span style="color: #575757;">//</span><span style="color: #575757;">printf("%s\n", mul("1856", "1856", _res, sizeofarray(_res)));</span>
+    <span style="color: #575757;">//</span><span style="color: #575757;">return 0;</span>
+
+    <span style="color: #696969;">for</span> (<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>=0; i&lt;100; i++) {
+        sprintf(s1, <span style="color: #696969;">"%d"</span>, RND(9999999));
+        sprintf(s2, <span style="color: #696969;">"%d"</span>, 1+RND(9999999));
+        printf(<span style="color: #696969;">"STR: %s * %s = %s\n"</span>, s1, s2, (res=mul(s1, s2, _res, sizeofarray(_res))));
+        n1 = atoi(s1); n2 = atoi(s2); rn = n1*n2; resn = atoi(res);
+        printf(<span style="color: #696969;">"CTR: %d * %d = %d\n"</span>, n1, n2, rn);
+        printf(<span style="color: #696969;">"verify &lt;%d&gt;: %d (%d ? %d)\n"</span>, i, (chk=(resn==rn)), rn, resn);
+        <span style="color: #696969;">if</span> (!chk) { printf(<span style="color: #696969;">"FAILED!\n"</span>); <span style="color: #696969;">return</span> (1); }
+        <span style="color: #696969;">else</span> printf(<span style="color: #696969;">"\n\n"</span>);
+    }
+    printf(<span style="color: #696969;">"All tests are passed\n"</span>);
+    <span style="color: #696969;">return</span> (0);
+}
+</pre>
+</div>
+
+<p>
+Tests are cycle of multiplication of random numbers. If test is failed, cycle is break.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

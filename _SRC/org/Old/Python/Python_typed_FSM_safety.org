@@ -1,0 +1,152 @@
+#+title: Python: typed FSM safety
+#+description: My Blog
+#+keywords: safety, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: safety python
+#+date: [2020-02-03 Mon 18:37]
+
+* Python: typed FSM safety
+
+One of the accusations against the OOP is state problems. They are divided
+into several sub-kinds, one of them is problem of transitions correctness,
+i.e. control when a transition from one state to another state is incorrect
+and should be avoided.
+
+People often say that no such problem in FP languages. It's not true, but such
+illusion exists because of explicit arguments flow from function to function.
+And this problem appears when all arguments collapse to one argument aggregating
+all others. In this case the situation is reducing to the case in OOP.
+
+There are multiple canonical solutions - working in compile-time with type-checker
+help or in run-time:
+
+Run-time solutions are:
+
+- FSM - the best solution
+- contracts - not so good, but OK
+- asserts - reduced version of contracts
+
+For example, function ~close()~ makes sense only if something was opened (let's
+suppose the result of the open in ~file~):
+
+#+BEGIN_SRC python
+def close(self):
+    assert self.file, "File was not opened"
+    ...
+#+END_SRC
+
+something like this. The same is possible in an any language.
+
+Compile-time solutions maybe:
+
+- Linear types
+- Unification (see Prolog) - more general solution
+- Indexed monads (for Haskell, for example)
+- Simple data-types (like ~data Opened = Opened String; data Read = Read String~)
+
+So, if some function must be under such control then even if it does not
+expect arguments at least one argument must be presented always, it may be
+term without parameters.
+
+Of course, such a solution exists a long time ago in the OOP. Let's simulate it
+with a simple functionality - open a file, read it, parse it to integer, close it.
+
+So, we see that we have states: ~{opened, read, parsed, closed}~ and each state
+accepts only limited number of transitions:
+
+#+BEGIN_SRC
+open -> read | close
+read -> parse | close
+parse -> close
+#+END_SRC
+That is, each function allows only limited number of next functions in our flow:
+~open~ allows only a call of ~read~ or ~close~ and so on. Graphically it looks
+like:
+
+#+BEGIN_SRC
+open ------->.
+ |           |
+ v           |
+read ------->.
+ |           |
+ v           |
+parse ------>.
+             |
+             v
+           close
+#+END_SRC
+
+~close~ is allowed after any state.
+
+We can turn it upside down:
+
+#+BEGIN_SRC
+       close
+         ^
+         |
+         +----- parse
+         |        ^
+         +----- read
+         |        ^
+         +----- open
+#+END_SRC
+
+and to treat it as classes hierarchy: classes ~parse~, ~read~, ~open~ includes
+common feature - ~close~, they know how to do it, so they inherit the ~close~.
+Each class has some methods (one or more) and methods expect arguments of
+these classes types. This will guard us from wrong transitions in compile-time.
+Actually, this solution is possible even in Python:
+
+#+BEGIN_SRC python
+class Open:
+    def open(self, path: str) -> "Open":
+        self.file = open(path, "r")
+        return self
+
+class Close:
+    def close(self, state: Open) -> "Close":
+        state.file.close()
+        return self
+
+class Read(Close):
+    def read(self, state: Open) -> "Read":
+        self.buf = state.file.read()
+        return self
+
+class Parse(Close):
+    def parse(self, state: Read) -> "Parse":
+        self.n = int(state.buf)
+        return self
+
+o = Open().open("z")
+r = Read().read(o)
+p = Parse().parse(r)
+print(p.n)
+p.close(o)
+#+END_SRC
+
+All classes implement methods - what they can do. And each of them
+additionally can close opened file, so they inherit ~Close~ class
+(except ~Open~ sure). Their methods are typed with explicit argument
+~state~ which restricts allowed transition, also it keeps data of
+the state. Pay attention that call ~p.close(r)~ for example, leads
+to "compile-time" (mypy checking, to be more accurate) error, i.e.
+transitions are explicit: ~Parse~ does not allow a parsing immediately
+after an opening of the file, without reading of it: ~p = Parse().parse(o)~:
+
+#+BEGIN_SRC
+error: Argument 1 to "parse" of "Parse" has incompatible type "Open"; expected "Read"
+Found 1 error in 1 file (checked 1 source file)
+#+END_SRC
+
+A little improvement maybe to keep ~Open~ as instance attribute ~.opened~
+to allow to close the file from any state, keeping the result of the opening
+(or something similar).
+
+Classical pattern helps us even better than modern FP languages like Haskell
+where developers use indexed monads very rarely (and do miss linear types).
+
+But there are not OOP languages where this is solving on type-level too: ATS,
+Clean, F*...
+
+Another way is to use types literals.

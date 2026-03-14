@@ -1,0 +1,93 @@
+#+title: Functional Eratosthenes sieve
+#+description: My Blog
+#+keywords: python, haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python haskell algorithms
+#+date: [2020-02-04 Tue 18:16]
+
+* Functional Eratosthenes sieve
+
+Three implementations of subject on Python/Haskell/Ocaml
+
+Python version:
+
+#+BEGIN_SRC python
+# coding: cp1251
+
+# Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,
+# j=2,3,4,5,6,7... Then we are searching next unchecked, check all.
+# Each first unchecked is the prime number.
+
+#####################################################
+# С tail recursion ;)
+#####################################################
+
+def tag2(lst, n, m, j=2, i=1):
+    ''' Returns list with 0s - i.e. checked numbers in `lst` which
+    are multiple of n (m - max number, j - multiplier 2, 3, 4...,
+    i - serial number of our number :)
+    '''
+    if not lst: return []
+    elif i != n*j: return lst[0:1] + tag2(lst[1:], n, m, j, i+1)
+    else: return [0] + tag2(lst[1:], n, m, j+1, i+1)
+
+def tag(lst, n): return tag2(lst, n, len(lst))
+
+def erato2(lst, m, i):
+    if i >= m:
+        return []
+    elif lst[i]:
+        if i >= 1: lst = tag(lst, lst[i])
+        return [lst[i]] + erato2(lst, m, i+1)
+    else:
+        return erato2(lst, m, i+1)
+
+def erato(lst): return erato2(lst, len(lst), 0)
+lst = range(1, 200)
+print erato(lst)
+#+END_SRC
+
+Haskell:
+
+#+BEGIN_SRC haskell
+tag::[Int] -> Int -> [Int]
+tag lst n = [if 0 == x `rem` n then 0 else x | x <- lst]
+
+erato2::[Int] -> Int -> Int -> [Int]
+erato2 lst m i =
+  if i >= m then []
+  else if (lst!!i) /= 0 then
+      [lst!!i] ++ erato2 (if i>=1 then tag lst (lst!!i) else lst) m (i+1)
+  else
+      erato2 lst m (i+1)
+
+-- Returns all primes from 1 to m
+erato::Int -> [Int]
+erato m = erato2 lst (length lst) 0 where lst = [1..m]
+
+main::IO()
+main = putStrLn $ show $ erato 200
+#+END_SRC
+
+and Ocaml version:
+
+#+BEGIN_SRC ocaml
+open List
+
+let tag lst n = map (fun x -> if 0 == x mod n then 0 else x) lst
+
+let rec erato2 lst m i =
+    if i >= m then []
+    else if (nth lst i) <> 0 then
+        [nth lst i] @ erato2 (if i >= 1 then tag lst (nth lst i) else lst) m (i+1)
+    else
+        erato2 lst m (i+1)
+
+let prn_int n = print_int n; print_char ','
+let print_int_list lst = map prn_int lst
+let rec range i j = if i > j then [] else i :: (range (i+1) j)
+
+(* Returns all primes from 1 to m *)
+let erato m = let lst = range 1 m in erato2 lst (length lst) 0
+let _ = print_int_list (erato 200)
+#+END_SRC

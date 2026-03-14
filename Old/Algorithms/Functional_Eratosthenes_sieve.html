@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Functional Eratosthenes sieve</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, haskell, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Functional Eratosthenes sieve</h1>
+<div id="outline-container-orgb2e9d6e" class="outline-2">
+<h2 id="orgb2e9d6e">Functional Eratosthenes sieve</h2>
+<div class="outline-text-2" id="text-orgb2e9d6e">
+<p>
+Three implementations of subject on Python/Haskell/Ocaml
+</p>
+
+<p>
+Python version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">coding: cp1251</span>
+
+<span style="color: #575757;"># </span><span style="color: #575757;">Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">j=2,3,4,5,6,7... Then we are searching next unchecked, check all.</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">Each first unchecked is the prime number.</span>
+
+<span style="color: #575757;">#####################################################</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">&#1057; tail recursion ;)</span>
+<span style="color: #575757;">#####################################################</span>
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">tag2</span>(lst, n, m, j=2, i=1):
+    <span style="color: #696969;">''' Returns list with 0s - i.e. checked numbers in `lst` which</span>
+<span style="color: #696969;">    are multiple of n (m - max number, j - multiplier 2, 3, 4...,</span>
+<span style="color: #696969;">    i - serial number of our number :)</span>
+<span style="color: #696969;">    '''</span>
+    <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> lst: <span style="color: #696969;">return</span> []
+    <span style="color: #696969;">elif</span> i != n*j: <span style="color: #696969;">return</span> lst[0:1] + tag2(lst[1:], n, m, j, i+1)
+    <span style="color: #696969;">else</span>: <span style="color: #696969;">return</span> [0] + tag2(lst[1:], n, m, j+1, i+1)
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">tag</span>(lst, n): <span style="color: #696969;">return</span> tag2(lst, n, <span style="color: #a52a2a;">len</span>(lst))
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">erato2</span>(lst, m, i):
+    <span style="color: #696969;">if</span> i &gt;= m:
+        <span style="color: #696969;">return</span> []
+    <span style="color: #696969;">elif</span> lst[i]:
+        <span style="color: #696969;">if</span> i &gt;= 1: <span style="color: #ffffff;">lst</span> = tag(lst, lst[i])
+        <span style="color: #696969;">return</span> [lst[i]] + erato2(lst, m, i+1)
+    <span style="color: #696969;">else</span>:
+        <span style="color: #696969;">return</span> erato2(lst, m, i+1)
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">erato</span>(lst): <span style="color: #696969;">return</span> erato2(lst, <span style="color: #a52a2a;">len</span>(lst), 0)
+<span style="color: #ffffff;">lst</span> = <span style="color: #a52a2a;">range</span>(1, 200)
+<span style="color: #a52a2a;">print</span> erato(lst)
+</pre>
+</div>
+
+<p>
+Haskell:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">tag::[Int] -&gt; Int -&gt; [Int]
+tag lst n = [if 0 == x `rem` n then 0 else x | x &lt;- lst]
+
+erato2::[Int] -&gt; Int -&gt; Int -&gt; [Int]
+erato2 lst m i =
+  if i &gt;= m then []
+  else if (lst!!i) /= 0 then
+      [lst!!i] ++ erato2 (if i&gt;=1 then tag lst (lst!!i) else lst) m (i+1)
+  else
+      erato2 lst m (i+1)
+
+-- Returns all primes from 1 to m
+erato::Int -&gt; [Int]
+erato m = erato2 lst (length lst) 0 where lst = [1..m]
+
+main::IO()
+main = putStrLn $ show $ erato 200
+</pre>
+</div>
+
+<p>
+and Ocaml version:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-ocaml">open List
+
+let tag lst n = map (fun x -&gt; if 0 == x mod n then 0 else x) lst
+
+let rec erato2 lst m i =
+    if i &gt;= m then []
+    else if (nth lst i) &lt;&gt; 0 then
+        [nth lst i] @ erato2 (if i &gt;= 1 then tag lst (nth lst i) else lst) m (i+1)
+    else
+        erato2 lst m (i+1)
+
+let prn_int n = print_int n; print_char ','
+let print_int_list lst = map prn_int lst
+let rec range i j = if i &gt; j then [] else i :: (range (i+1) j)
+
+(* Returns all primes from 1 to m *)
+let erato m = let lst = range 1 m in erato2 lst (length lst) 0
+let _ = print_int_list (erato 200)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

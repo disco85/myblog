@@ -1,0 +1,92 @@
+#+title: Bottle application helper
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-09 Sun 08:24]
+
+* Bottle application helper
+
+Next is the helper class for creation of the Bottle Web Framework applications:
+
+#+BEGIN_SRC python
+def expose(path, **kw):
+    def decor(view):
+        view._route_path_ = path
+        view._kwargs_ = kw
+        return view
+    return decor
+
+class BottleBaseApp(object):
+    """
+    - Autosave attributes with names from __session__ attribute
+    - Session type is attr __session_type__ ('cookie'|'pickle'),
+      'cookie' is default
+    - Methods decorated with @expose will be auto-routed and
+      sessions' attrs will be flushed at the end
+    """
+    def __init__(self, bottleapp):
+        self.bottle = bottleapp
+        # Prepare session manager as attr sessions
+        if self.__session_type__ == "pickle":
+            self.sessions = PickleSession()
+        else:
+            self.sessions = CookieSession()
+
+        def router(meth):
+            """Return wrapped view-method"""
+            # meth is already bound to self
+            def wrp(f=meth, *a, **kw):
+                try:
+                    ret = f(*a, **kw) # bound, no needs self,
+                finally:
+                    self.flush_session()
+                return ret
+            functools.update_wrapper(wrp, meth)
+            return wrp
+
+        # Route all decorated methods
+        for attrname in dir(self):
+            attr = getattr(self, attrname)
+            path = getattr(attr, "_route_path_", None)
+            kw = getattr(attr, "_kwargs_", {})
+            if path:
+                self.bottle.route(path, callback=router(attr), **kw)
+
+    def flush_session(self):
+        """Copy to session all attrs and save session"""
+        try:
+            ses = self.sessions.get_session()
+            for a in self.__session__:
+                try:
+                    v = getattr(self, a)
+                    ses[a] = v
+                except:
+                    continue
+            self.sessions.save(ses)
+        except Exception as x:
+            pass
+#+END_SRC
+
+And now is the example how to use this:
+
+#+BEGIN_SRC python
+class MyApp(BottleBaseApp):
+    __session_type__ = "cookie"
+    __session__ = ["tasks_ctl_res", "tasks_prc", "prc_conns",]
+
+    def __init__(self, bottleapp):
+        super(MyApp, self).__init__(bottleapp)
+        self.tasks_ctl_res = {}
+        self.tasks_prc = []
+        self.prc_conns = {}
+
+
+    @expose("/index")
+    def index(self):
+        return "Index page is empty"
+
+    # ... etc ...
+#+END_SRC
+
+I use Session implementation by Sean Reifschneider (see [[http://www.tummy.com/journals/entries/jafo_20110102_180050][this]]).

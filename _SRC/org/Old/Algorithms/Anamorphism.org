@@ -1,0 +1,70 @@
+#+title: Anamorphism
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 06:20]
+
+* Anamorphism
+
+Anamorphism is the one of well known recursive schemes which is defined in
+pseudocode as:
+
+#+BEGIN_SRC source
+p :: B -> Bool
+g :: B -> A || B
+h :: B -> A*
+h b = Nil        ,  p b
+    = a : h b'   , ¬p b
+    where a, b' = g b
+#+END_SRC
+
+The scheme looks like:
+
+[[file:../../assets/Anamorphism1.svg]]
+
+~p~ (not shown) is the predicate which "decides" what to return on current step:
+Nil or to continue to recursion.
+
+It can be easy coded in Python:
+
+#+BEGIN_SRC python
+def ana(b, g, p):
+    if p(b): return []
+    else:
+        a, b_ = g(b)
+        return a + ana(b_, g, p)
+#+END_SRC
+
+Most known example of usage is:
+
+#+BEGIN_SRC python
+def myzip(l0, l1):
+    def g(b):
+        x, *xs = b[0]
+        y, *ys = b[1]
+        if not xs and ys: xs = [None]
+        if not ys and xs: ys = [None]
+        return ([(x, y)], (xs, ys))
+    def p(b):
+        return not (b[0] or b[1])
+    return ana((l0, l1), g, p)
+
+print(myzip([1,2,3,4], [10,20,30]))
+print(list(zip([1,2,3], [10,20,30])))
+#+END_SRC
+
+A specially ZIP looks like:
+
+[[file:../../assets/Anamorphism2.svg]]
+
+what is in pseudocode:
+
+#+BEGIN_SRC
+zip :: A* || B* -> (A || B)*
+zip = ANA<g, p>, where:
+  g (a:as, b:bs) = ((a,b), (as, bs))
+  p (as, bs) = (as=Nil) | (bs=Nil) -- until one of tails is not empty
+#+END_SRC
+
+Whether it is possible to imagine a parallel form?

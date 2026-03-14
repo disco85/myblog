@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple logging in C (1)</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Simple logging in C (1)</h1>
+<div id="outline-container-org77ab52b" class="outline-2">
+<h2 id="org77ab52b">Simple logging in C (1)</h2>
+<div class="outline-text-2" id="text-org77ab52b">
+<p>
+This snippet shows way to turning-on/-off different levels of log/debug messaging in C program:
+</p>
+
+<p>
+For example, lets create log messages support with 3 levels and possibility to select what levels are enabled:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">PRN</span>(...) printf(__VA_ARGS__)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L1</span> 1
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L2</span> 2
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L3</span> 4
+
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">PRN_L</span>(<span style="color: #ffffff;">L</span>, ...) PRN_##L(__VA_ARGS__)
+
+<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L3)
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L3</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a52a2a;">#else</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L3</span>(...)
+<span style="color: #a52a2a;">#endif</span>
+
+<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L2)
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L2</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a52a2a;">#else</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L2</span>(...)
+<span style="color: #a52a2a;">#endif</span>
+
+<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L1)
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L1</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a52a2a;">#else</span>
+<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L1</span>(...)
+<span style="color: #a52a2a;">#endif</span>
+</pre>
+</div>
+
+<p>
+And somewhere in our program use it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #575757;">// </span><span style="color: #575757;">enable only messages of levels 1 and 3 (equals to 1|4==5)</span>
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">LEVEL</span> (L1|L3)
+<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"logger.h"</span>
+
+<span style="color: #ff4500;">void</span> <span style="color: #ff4500;">main</span>() {
+    <span style="color: #575757;">// </span><span style="color: #575757;">use general macro or PRN_L1(), PRN_L2(), PRN_L3()</span>
+    PRN_L(L1, <span style="color: #696969;">"There %d\n"</span>, 1);
+    PRN_L(L2, <span style="color: #696969;">"There %d\n"</span>, 2); <span style="color: #575757;">// </span><span style="color: #575757;">no effect!</span>
+    PRN_L(L3, <span style="color: #696969;">"There %d\n"</span>, 3);
+}
+</pre>
+</div>
+
+<p>
+What else? With LEVEL definition you can control enabled levels: 0 - disable all levels or use OR-ed combination of L1..3.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

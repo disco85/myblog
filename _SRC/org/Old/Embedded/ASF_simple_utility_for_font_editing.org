@@ -1,0 +1,144 @@
+#+title: ASF: simple utility for font editing
+#+description: My Blog
+#+keywords: tcl/tk, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk embedded
+#+date: [2020-02-06 Thu 18:10]
+
+* ASF: simple utility for font editing
+
+Used fonts in Atmel Software Framework are simple: each glyph is described with array of bytes - each set bit is pixel, no bit - no pixel :)
+Next is the very-very simple Tcl utility to convert glyph bytes into console image of symbol and vice-verse.
+
+#+BEGIN_SRC tcl
+# parsing and loading font
+#------------------------------------------------------------------------------
+proc parsesymb str {
+    # Parse one symbol in notation like:
+    # "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"
+
+    set bytes [regexp -all -inline {0[xX][0-9a-fA-F]{2}} $str]
+    return $bytes
+}
+
+proc putsymbline byte {
+    # put on screen one line of a symbol
+
+    set mask 0b10000000
+    for {set i 0} {$i<8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="expr" data-blogger-escaped-i="i" data-blogger-escaped-incr="incr" data-blogger-escaped-mask="mask" data-blogger-escaped-set="set">>1}]
+        if $bit {
+            puts -nonewline "#"
+        } else {
+            puts -nonewline " "
+        }
+    }
+}
+
+proc putsymb symb_bytes {
+    # put on screen all symbol (all it's lines)
+
+    puts "+--------+"
+    foreach sb $symb_bytes {
+        puts -nonewline "|"
+        putsymbline $sb
+        puts "|"
+    }
+    puts "+--------+"
+}
+
+# Compile glyphs to font in C format
+#-------------------------------------------------------------------------------
+proc compsymbline line {
+    # Compile line like "# # # # " to 0xAA
+
+    set bits [string map { " " 0 # 1} $line]
+    return [format 0x%02X "0b$bits"]
+}
+
+proc compsymb symb_lines {
+    # Compile lines of symbol (what out 'putsymb')
+
+    set read 0
+    set res {}
+    foreach line $symb_lines {
+        if {0 == $read} {
+            if {$line eq "+--------+"} {
+                set read 1
+            }
+        } else {
+            if {$line eq "+--------+"} {
+                break
+            } else {
+                set line [string trim $line "|"]
+                lappend res [compsymbline $line]
+            }
+        }
+    }
+    return [join $res ","]
+}
+
+proc getlines {} {
+    set lines {}
+    while {[gets stdin line] >= 0} {
+        lappend lines $line
+    }
+    return $lines
+}
+
+proc main args {
+    global argc argv
+    if {$argc} {
+        set argv0 [lindex $argv 0]
+        if {$argv0 eq "comp"} {
+            set lines [getlines]
+            puts [compsymb $lines]
+            return
+        } elseif {$argv0 eq "put"} {
+            set line [gets stdin]
+            puts [putsymb [parsesymb $line]]
+            return
+        }
+    }
+    puts {\
+Syntax on Linux:
+    1. cat file|PRG comp
+    2. cat file|PRG put
+Syntax on Windows:
+    1. more file|PRG comp
+    2. more file|PRG put
+
+This means:
+    1. Compile glyph image into C hex array
+    2. Put glyph hex array on the screen as glyph image
+
+Glyph images and its' hex arrays are inverse}
+}
+
+main
+}
+#+END_SRC
+
+Example of usage:
+
+#+BEGIN_SRC bash
+$echo 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
++--------+
+|  #     |
+| ####   |
+|# #     |
+| ###    |
+|  # #   |
+|####    |
+|  #     |
+|        |
++--------+
+#+END_SRC
+
+This is the "$" symbol. It's bytes I get from et024006dhu.c (see const unsigned char FONT6x8[97][8]) From another hand, you can save this glyph (with ASCII-box!) in some file and then call:
+
+#+BEGIN_SRC bash
+$cat somefile.txt|tclkitsh font.tcl comp
+0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00
+#+END_SRC
+
+to get bytes of the glyph.

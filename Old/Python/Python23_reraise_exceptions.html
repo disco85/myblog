@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python2,3: re-raise exceptions</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Python2,3: re-raise exceptions</h1>
+<div id="outline-container-org5a99cc4" class="outline-2">
+<h2 id="org5a99cc4">Python2,3: re-raise exceptions</h2>
+<div class="outline-text-2" id="text-org5a99cc4">
+<p>
+Good practice is to keep original traceback (stack-trace) when you re-raise modified exception. In Python 2 it's simple:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">        <span style="color: #696969;">try</span>:
+            <span style="color: #696969;">return</span> buggy()
+        <span style="color: #696969;">except</span> <span style="color: #ff4500;">Exception</span> <span style="color: #696969;">as</span> x:
+            <span style="color: #ffffff;">cls</span>,<span style="color: #ffffff;">obj</span>,<span style="color: #ffffff;">tb</span> = sys.exc_info()
+            <span style="color: #575757;"># </span><span style="color: #575757;">modify obj OR create new the same class (cls), like here</span>
+            <span style="color: #696969;">raise</span> cls, SOME_ARGS, tb
+</pre>
+</div>
+
+<p>
+In Python 3 it's simple too, but now there is a special <code>BaseException</code> method for this and new syntax, so:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">        <span style="color: #696969;">try</span>:
+            <span style="color: #696969;">return</span> buggy()
+        <span style="color: #696969;">except</span> <span style="color: #ff4500;">Exception</span> <span style="color: #696969;">as</span> x:
+            <span style="color: #ffffff;">cls</span>,<span style="color: #ffffff;">obj</span>,<span style="color: #ffffff;">tb</span> = sys.exc_info()
+            <span style="color: #575757;"># </span><span style="color: #575757;">modify obj OR create new the same class (cls), like here</span>
+            <span style="color: #696969;">raise</span> cls(SOME_ARGS).with_traceback(tb)
+</pre>
+</div>
+
+<p>
+Now to make common code compatible with Python 2 and 3 we SHOULD save it in DIFFERENT files, to avoid syntax errors when Python compile it to byte-code. For example, let's save it to 'comp2.py' and 'comp3.py'. And lets represent it as function&#x2026; with signature <code>reraise(exclass, msg, traceb)</code>. In 'comp2.py':
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">reraise</span>(exc, msg, tb):
+    <span style="color: #696969;">raise</span> exc, msg, tb
+</pre>
+</div>
+
+<p>
+and similar in 'comp3.py' but with with<sub>traceback</sub>() usage. Now use it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">import</span> sys
+<span style="color: #ffffff;">_PY23</span> = 3 <span style="color: #696969;">if</span> sys.version_info.major &gt; 2 <span style="color: #696969;">else</span> 2
+<span style="color: #696969;">if</span> _PY23 == 2:
+    <span style="color: #696969;">from</span> comp2 <span style="color: #696969;">import</span> *
+<span style="color: #696969;">elif</span> _PY23 == 3:
+    <span style="color: #696969;">from</span> comp3 <span style="color: #696969;">import</span> *
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

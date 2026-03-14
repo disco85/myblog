@@ -1,0 +1,110 @@
+#+title: "Adaptive indexing" search
+#+description: My Blog
+#+keywords: algorithms, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms python
+#+date: [2022-07-11 Mon 14:25]
+
+* "Adaptive indexing" search
+
+Some kind of interpolation search. We take the first item and test it. If hit - return it, otherwise - shift to the next item by a step. The step is calculated from the current item value and the previous one's value: the idea is that we try to find the delta/difference between neighbor items and to calculate the offset to the searched item. It's something like adaptive indexing, I called it in such a way.
+
+It works good with integers without "gaps". But if we have "gaps" - the data access numbers is bigger. It depends on how random are items. The function ~partiallyrandomdata()~ has a parameter ~rate~ which can be used to simulate less or more randomization (0 - no "gaps", 1.0 - a lot of).
+
+If the test fails - we move forward/backward by a step. If we hit bounds then we correct the step - we take the next item after the previous one if it's possible, otherwise - the previous of the previous (~_prev +/-1~).
+
+This implementation is not perfect and can be optimized. I am not 100% sure in its correctness even, but some tests show that the item was successfully found. ''Also it loops infinitely if not such item at all''.
+
+
+#+BEGIN_SRC python
+import random
+from math import *
+
+
+# lst - ordered/sorted list
+def intersearch(lst, target):
+    upbound = len(lst) - 1
+    prev = -1
+    pos = 0
+    step = 1
+    _prev = None
+    d = 0
+    while True:
+        pos_el = lst[pos]
+        if pos_el == target:
+            return pos
+        elif prev != -1:
+            d = abs(pos_el - lst[prev])
+            if d == 0:
+                step = 1
+            else:
+                step = (target - pos_el) // d
+                if step == 0:
+                    step = 1
+                elif step < 0:
+                #elif (pos + step) < 0:
+                    step = 1
+        else:
+            step = 1
+        ###
+        if (pos + step > upbound) or (lst[pos + step] > target):
+            if prev + 1 > upbound:
+                _prev = prev
+                prev = pos
+                pos = _prev - 1
+            else:
+                _prev = prev
+                prev = pos
+                pos = _prev + 1
+        else:
+            prev = pos
+            pos += step
+
+
+#########################
+class ACCESS(list):
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self._access = 0
+    def __getitem__(self, i):
+        if i >= len(self):
+            print(f"{self._access}: [{i}]=OUT OF RANGE!")
+        res = super().__getitem__(i)
+        print(f"{self._access}: [{i}]={res}")
+        self._access += 1
+        return res
+
+
+def randomdata(num):
+    i = 0
+    res = []
+    while i < num:
+        r = random.randint(0, num*10)
+        res.append(r)
+        i += 1
+    res = sorted(res)
+    return (res, random.choice(res))
+
+
+def partiallyrandomdata(num, ratio=0.5):
+    res = list(range(NUM))
+    i = 0
+    cnt = min(num, num*ratio)
+    while i < cnt:
+        r = random.randint(num, num+cnt-1)
+        res[r - num] = r
+        i += 1
+    res = sorted(res)
+    return (res, random.choice(res))
+
+
+NUM = 10000
+arr, x = partiallyrandomdata(NUM, 0.5)
+print(f"Look for {x} in {arr}")
+try:
+    fnd = intersearch(ACCESS(arr), x)
+    #fnd = intersearch(arr, x)
+    print(f"Found {arr[fnd]} at {fnd}")
+except KeyboardInterrupt:
+    print(f"Looked for {x} in {arr}")
+#+END_SRC

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>makeFields, polymorphic lens</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">makeFields, polymorphic lens</h1>
+<div id="outline-container-org0883d4f" class="outline-2">
+<h2 id="org0883d4f">makeFields, polymorphic lens</h2>
+<div class="outline-text-2" id="text-org0883d4f">
+<p>
+<a href="https://stackoverflow.com/questions/66659693/how-to-use-setter-with-polymorphic-type/66660827#66660827">https://stackoverflow.com/questions/66659693/how-to-use-setter-with-polymorphic-type/66660827#66660827</a>
+</p>
+
+<p>
+Module A:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">data Xxx a = Xxx {
+    _xxxAaa :: Int,
+    _xxxBbb :: a
+}
+makeFields ''Xxx
+</pre>
+</div>
+
+<p>
+Module B:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">t :: IO Bool
+t = do
+    let n = "aaa" :: String
+    let xs = [Xxx 0 0, Xxx 1 1] :: [Xxx Int]
+        ys = [set bbb n $ x | x &lt;- xs]
+    pure False
+</pre>
+</div>
+
+<p>
+Error is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">• Couldn't match type ‘Int’ with ‘[Char]’
+    arising from a functional dependency between:
+      constraint ‘HasBbb (Xxx Int) String’ arising from a use of ‘bbb’
+      instance ‘HasBbb (Xxx a) a’
+        at .........
+</pre>
+</div>
+
+<p>
+Pay attention, <code>makeFields</code> generates not a polymorphic lenses, ie, it cannot change the type like with usual record constructors:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">let xs = [Xxx 0 0, Xxx 1 1]::[Xxx Int]
+    ys = [x {_xxxBbb="aaaa"} | x &lt;- xs]
+</pre>
+</div>
+
+<p>
+ie, from <code>Xxx Int</code> to <code>Xxx String</code>. But <code>makeLens</code> generates polymorphic lenses. It can be checked with <code>:i</code> in GHCI:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">ghci&gt; :i HasBbb
+class HasBbb s a | s -&gt; a where
+  bbb :: Lens' s a
+  {-# MINIMAL bbb #-}
+        -- Defined at A.hs:14:1
+instance HasBbb (Xxx a) a -- Defined at A.hs:14:1
+</pre>
+</div>
+
+<p>
+we see that <code>makeFields</code> generates class <code>HasBbb</code>. And it looks like <code>Lens' s a</code> is a short variant of <code>Lens ...</code> where type-from and type-to are the same (ie, it does not allow to change the type with a setting operation). But a lens via <code>makeLens</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-haskell">data Xxx a = Xxx {
+    _xxxAaa :: Int,
+    _xxxBbb :: a
+}
+makeFields ''Xxx
+makeLenses ''Xxx
+</pre>
+</div>
+
+<p>
+Let's check:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">ghci&gt; :i xxxBbb
+xxxBbb :: Lens (Xxx a1) (Xxx a2) a1 a2  -- Defined at A.hs:15:1
+ghci&gt; :t set xxxBbb "aaa" (Xxx 0 0)
+set xxxBbb "aaa" (Xxx 0 0) :: Xxx [Char]
+</pre>
+</div>
+
+<p>
+We see that <code>xxxBbb</code> is polymorphic and it changes the type <code>Xxx a1 -&gt; Xxx a2</code> when we set the field of type <code>a1</code> into <code>a2</code>. Something like this :)
+</p>
+
+<p>
+And <code>set xxxBbb "aaa" (Xxx 0 0)</code> works now (and with <code>.~</code> even).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

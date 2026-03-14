@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Intervals merge</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Intervals merge</h1>
+<div id="outline-container-org216c468" class="outline-2">
+<h2 id="org216c468">Intervals merge</h2>
+<div class="outline-text-2" id="text-org216c468">
+<p>
+Two simple algorithms of interval merge, which I designed yesterday while was
+sick :)
+</p>
+
+<p>
+!First (and simplest) algorithm
+</p>
+
+<p>
+First one is very dumb and it is based on the check of edges projection: if projected
+edge (node) is contained in another interval then we have solid interval as
+result (we must merge them), elsewhere - keep original intervals, see picture:
+</p>
+
+
+<div id="orgc629c4c" class="figure">
+<p><img src="../../assets/IntervalMerges1.svg" alt="IntervalMerges1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Python implementation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">predicat: `x` is contained in (x0, x1)</span>
+<span style="color: #ffffff;">c</span> = <span style="color: #696969;">lambda</span> x, x0, x1: x0 &lt;= x &lt;= x1
+
+<span style="color: #575757;"># </span><span style="color: #575757;">merge-I</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">m1</span>(i1, i2):
+    <span style="color: #ffffff;">i1</span>, <span style="color: #ffffff;">i2</span> = <span style="color: #a52a2a;">map</span>(isort, (i1,i2))
+    <span style="color: #ffffff;">sx</span> = isort(i1 + i2)
+    <span style="color: #ffffff;">x1</span>, <span style="color: #ffffff;">x2</span> = i1; <span style="color: #ffffff;">x3</span>, <span style="color: #ffffff;">x4</span> = i2
+    <span style="color: #696969;">if</span> c(x1, x3, x4) <span style="color: #696969;">or</span> c(x3, x1, x2) <span style="color: #696969;">or</span> c(x2, x3, x4) <span style="color: #696969;">or</span> c(x4, x1, x2):
+        <span style="color: #696969;">return</span> (sx[0], sx[-1])
+    <span style="color: #696969;">else</span>:
+        <span style="color: #696969;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
+</pre>
+</div>
+
+<p>
+where <code>isort()</code> is sort function, which returns tuple instead of list:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">sort interval `i`</span>
+<span style="color: #ffffff;">isort</span> = <span style="color: #696969;">lambda</span> i: <span style="color: #a52a2a;">tuple</span>(<span style="color: #a52a2a;">sorted</span>(i))
+</pre>
+</div>
+
+<p>
+Don't forget that first is sort of intervals (normalizing) and then sort of
+all points - see <code>sx</code>.
+</p>
+
+<p>
+!Second algorithm
+</p>
+
+<p>
+Second is more interesting. It is based on gap detection: we try to find - is
+there gap between intervals? If it exists then we return 2 intervals as is,
+otherwise - merge them into one by get (first, last) of sorted points.
+</p>
+
+
+<div id="orgd75b705" class="figure">
+<p><img src="../../assets/IntervalMerges2.svg" alt="IntervalMerges2.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+where <code>dx</code> is difference between 2nd point of 1st interval - 1st point of 2nd
+interval (intervals are sorted, so "1st" and "2nd" means index in order), i.e.
+</p>
+
+<p>
+D&lt;sub&gt;x&lt;/sub&gt; = I&lt;sub&gt;12&lt;/sub&gt; - I&lt;sub&gt;21&lt;/sub&gt;
+</p>
+
+<p>
+&lt;div style="background-color:white;padding:5px;font-family:monospace"&gt;
+X&lt;sub&gt;s&lt;/sub&gt; = {X&lt;sub&gt;1&lt;/sub&gt; &amp;#x227c; X&lt;sub&gt;2&lt;/sub&gt; &amp;#x227c; X&lt;sub&gt;3&lt;/sub&gt; &amp;#x227c; X&lt;sub&gt;4&lt;/sub&gt;}&lt;br/&gt;
+I&lt;sub&gt;s&lt;/sub&gt; = {I&lt;sub&gt;1&lt;/sub&gt; &amp;#x227c; I&lt;sub&gt;2&lt;/sub&gt;}&lt;br/&gt;
+&lt;br/&gt;
+I&lt;sub&gt;12&lt;/sub&gt; - I&lt;sub&gt;21&lt;/sub&gt; &amp;#x2265; 0 <code>&amp;gt;&amp;nbsp;&amp;nbsp;RESULT :</code> [X&lt;sub&gt;1&lt;/sub&gt;, X&lt;sub&gt;4&lt;/sub&gt;]&lt;br/&gt;
+I&lt;sub&gt;12&lt;/sub&gt; - I&lt;sub&gt;21&lt;/sub&gt; &amp;lt; 0&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;RESULT := [[X&lt;sub&gt;1&lt;/sub&gt;,
+X&lt;sub&gt;2&lt;/sub&gt;], [X&lt;sub&gt;3&lt;/sub&gt;, X&lt;sub&gt;4&lt;/sub&gt;]]
+&lt;/div&gt;
+</p>
+
+<p>
+where <code>I</code> is interval (pair of 2 <code>X</code> points).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">Tuple 0st item selector</span>
+<span style="color: #ffffff;">p1</span> = <span style="color: #696969;">lambda</span> p: p[0]
+
+<span style="color: #575757;"># </span><span style="color: #575757;">merge-II</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">m2</span>(i1, i2):
+    <span style="color: #ffffff;">i1</span>, <span style="color: #ffffff;">i2</span> = <span style="color: #a52a2a;">map</span>(isort, (i1,i2))
+    <span style="color: #ffffff;">sx</span> = isort(i1 + i2)
+    <span style="color: #ffffff;">si</span> = <span style="color: #a52a2a;">sorted</span>((i1, i2), key=p1)
+    <span style="color: #696969;">if</span> si[0][1] - si[1][0] &gt;= 0:
+        <span style="color: #696969;">return</span> (sx[0], sx[-1])
+    <span style="color: #696969;">else</span>:
+        <span style="color: #696969;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
+</pre>
+</div>
+
+<p>
+Test it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">assert</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">ass</span>(a, b):
+    <span style="color: #696969;">if</span> a != b: <span style="color: #696969;">raise</span> <span style="color: #ff4500;">AssertionError</span>(<span style="color: #696969;">'%r != %r'</span> % (a,b))
+
+<span style="color: #575757;"># </span><span style="color: #575757;">asserts algo. m1</span>
+ass(((1,2), (10,20)), m1((1,2), (10,20)))
+ass(((1,2), (10,20)), m1((2,1), (20,10)))
+ass((1,20), m1((2,1), (2,20)))
+ass((1,20), m1((10,1), (2,20)))
+ass((1,20), m1((20,1), (5,20)))
+ass((1,20), m1((20,1), (5,10)))
+ass((1,20), m1((20,1), (1,10)))
+ass((-1,20), m1((20,1), (-1,10)))
+ass((-1,20), m1((20,1), (-1,1)))
+ass(((-1,0), (1,20)), m1((20,1), (-1,0)))
+ass((1,20), m1((2,10), (20,1)))
+
+ass(((1,2), (10,20)), m2((1,2), (10,20)))
+ass(((1,2), (10,20)), m2((2,1), (20,10)))
+ass((1,20), m2((2,1), (2,20)))
+ass((1,20), m2((10,1), (2,20)))
+ass((1,20), m2((20,1), (5,20)))
+ass((1,20), m2((20,1), (5,10)))
+ass((1,20), m2((20,1), (1,10)))
+ass((-1,20), m2((20,1), (-1,10)))
+ass((-1,20), m2((20,1), (-1,1)))
+ass(((-1,0), (1,20)), m2((20,1), (-1,0)))
+ass((1,20), m2((2,10), (20,1)))
+
+<span style="color: #a52a2a;">print</span> <span style="color: #696969;">'ok.'</span>
+</pre>
+</div>
+
+<p>
+These algorithms are based on metrics: if we can map nodes to natural numbers,
+we can apply algorithms to intervals of such nodes, For example, nodes can be
+cities, and metric will be distance from some center, e.g. capital. This means
+that it's easy to merge path fragments where path nodes are cities. You can
+imagine any other case satisfied such condition.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

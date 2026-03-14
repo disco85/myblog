@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lost samples detection in circular buffers</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms, dsp" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Lost samples detection in circular buffers</h1>
+<div id="outline-container-org477cc02" class="outline-2">
+<h2 id="org477cc02">Lost samples detection in circular buffers</h2>
+<div class="outline-text-2" id="text-org477cc02">
+<p>
+Usually <a href="http://en.wikipedia.org/wiki/Circular_buffer">circular buffer</a> is used for saving samples by writer task and for consume samples by reader task. Often reader and writer tasks has different speed - reader may be slower then writer, so there are lost (skipped) samples. What can we do with them?
+</p>
+
+<p>
+There are many "policies" to process such situation but if we have only one fixed circular buffer, all what we can do is to detect such lost samples and to save somewhere. Some uses special attribute with each sample - time stamp/marker or control cyclic code. With this marker decoder of saved samples (in external file) can determines skipped samples and if decoder knows sampling frequency then he can determine width of such "hole" (number of skipped samples).
+</p>
+
+<p>
+When writer task overtakes reader task (and we should know how to detect such situation) it can save (and increment) number of skipped samples until reader task shifts and frees TWO cells in queue to flush "hole" and current sample ("hole" will be saved in the same samples queue but with special flag - HOLE and number of lost samples in this hole). This is simple idea of holes processing.
+</p>
+
+<p>
+On Wikipedia pages there are procedures for circular buffer. We need additional procedures for:
+</p>
+
+<ul class="org-ul">
+<li>checking when there are 2 (or more) free cells - to save "hole" and current sample</li>
+<li>adding new sample with "hole saving"</li>
+</ul>
+
+<p>
+In pseudocode it can be:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">how_many_free():
+  if rwrap == wwrap:
+    return len(samples) - wpos + rpos
+  else:
+    return rpos - wpos
+
+
+how_many_used():
+  if rwrap != wwrap:
+    return len(samples) - rpos + wpos
+  else:
+    return wpos - rpos
+
+
+add_sample(new_sample):
+  if holes != 0:
+    if how_many_free() &gt;= 2:
+      samples[wpos] = special_hole_sample
+      increment_pos(wpos)
+      samples[wpos] = new_sample
+      increment_pos(wpos)
+    else:
+      holes++
+  else:
+    if how_many_free() &gt;= 1:
+      samples[wpos] = new_sample
+      increment_pos(wpos)
+    else:
+      holes++
+</pre>
+</div>
+
+<p>
+See idea for <code>increment_pos()</code> on Wikipedia page.
+<code>wwrap</code>, <code>rwrap</code> are flags (bits) for wrapping writer/reader tasks and are modified in <code>increment_pos()</code> procedure.
+</p>
+
+<p>
+If we save "hole" as sample but with a special flag (in file), then we get "flat" stream of structures with the same size.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+#+title: Imperative Haskell quicksort
+#+description: My Blog
+#+keywords: haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell algorithms
+#+date: [2020-02-04 Tue 06:12]
+
+* Imperative Haskell quicksort
+
+This is the Haskell implementation of quicksort but in imperative style; yes,
+it's terrible and very naive implementation :-)
+
+Difference between all C/C++/Java implementations from the Web is that all
+indexes are checking on out of bounds.
+
+
+#+BEGIN_SRC haskell
+-- exit from array bounds is checking !
+import Data.Array
+import qualified Data.Array.ST as DAS
+import qualified Control.Monad.ST as CMS
+import qualified Data.Array.MArray as DAM
+
+
+findLeft :: (Ix i, Num i, Ord e) => DAS.STArray s i e -> i -> e -> CMS.ST s i
+findLeft arr l p = do
+  let n = l + 1
+  e <- DAM.readArray arr l
+  b <- DAM.getBounds arr
+  if e < p && (inRange b n) then findLeft arr n p else return l
+
+
+findRight :: (Ix i, Num i, Ord e) => DAS.STArray s i e -> i -> e -> CMS.ST s i
+findRight arr r p = do
+  let n = r - 1
+  e <- DAM.readArray arr r
+  b <- DAM.getBounds arr
+  if e > p && (inRange b n) then findRight arr n p else return r
+
+
+swap :: Ix i => DAS.STArray s i e -> i -> i -> CMS.ST s ()
+swap arr i j = do
+  vi <- DAM.readArray arr i
+  vj <- DAM.readArray arr j
+  DAM.writeArray arr i vj
+  DAM.writeArray arr j vi
+
+
+swapAll :: (Ix i, Num i, Ord e) => DAS.STArray s i e -> i -> i -> e -> CMS.ST s (i, i)
+swapAll arr l r p = do
+  l' <- findLeft arr l p
+  r' <- findRight arr r p
+  b <- DAM.getBounds arr
+  let nl = l' + 1
+      nr = r' - 1
+  if l' <= r' && (inRange b nl) && (inRange b nr) then do
+    swap arr l' r'
+    swapAll arr (l' + 1) (r' - 1) p
+  else return (l', r')
+
+
+qsortArray :: (Integral i, Ix i, Ord e) => DAS.STArray s i e -> i -> i -> CMS.ST s ()
+qsortArray arr i0 i1 =
+  let l = i0
+      r = i1
+      mid = (i0 + i1) `div` 2 -- pivot index
+  in do
+    p <- DAM.readArray arr mid -- pivot
+    (l', r') <- swapAll arr l r p
+    if i0 < r' then do
+      qsortArray arr i0 r'
+      else return ()
+    if l' < i1 then do
+      qsortArray arr l' i1
+      else return ()
+
+
+qsort  :: (Num e, Ord e) => [e] -> [e]
+qsort xs =
+  let len = length xs
+      i1 = len - 1
+  in elems $ DAS.runSTArray $
+    do
+      arr <- DAM.newListArray (0, i1) xs
+      qsortArray arr 0 i1
+      return arr
+
+
+main :: IO()
+main = print $ qsort [0, 0, 9, 10, 4, 3, 98, 100, 99, 2, 6, 1]
+#+END_SRC

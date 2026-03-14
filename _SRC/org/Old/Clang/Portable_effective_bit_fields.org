@@ -1,0 +1,61 @@
+#+title: Portable effective C bit fields
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-06 Thu 04:40]
+
+* Portable effective C bit fields
+
+As you know bit's fields in C are not portable when we're talking about external world (network/different architecture/file transmission): order of the fields is unspecified, also as real wrapper struct...
+Often bitwise operations are used instead of bitfield struct syntax but result code may be less readable opposite to original idea: bitfields. But there is simple solution to workaround weird syntax. Here you are:
+
+#+BEGIN_SRC cpp
+#define __BITSTRUCT_MASK(LEN) ((1<<(LEN))-1)
+
+#ifndef BITSTRUCT_GETBITS_IMPL
+# define BITSTRUCT_GETBITS_IMPL(BS, OFFSET, LEN) \
+    (((BS)>>(OFFSET)) & __BITSTRUCT_MASK(LEN))
+#endif
+#ifndef BITSTRUCT_SETBITS_IMPL
+# define BITSTRUCT_SETBITS_IMPL(BS, OFFSET, LEN, VALUE) \
+    ((BS) & ~(__BITSTRUCT_MASK(LEN)<<(OFFSET)) | \
+     (((VALUE) & __BITSTRUCT_MASK(LEN))<<(OFFSET)))
+#endif
+
+#define BITSTRUCT enum
+#define BITFIELD(NAME, OFFSET, LEN) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
+#define BITFIELD_MASK(NAME) __BITSTRUCT_MASK(NAME##_LEN)
+#define BITFIELD_GET(NAME, BS) \
+  BITSTRUCT_GETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN)
+#define BITFIELD_SET(NAME, BS, VALUE) \
+  BITSTRUCT_SETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN, VALUE)
+#+END_SRC
+
+So now it's possible to write something like this to describe register X:
+
+#+BEGIN_SRC
+|15.....8|7....4|3.....0|
+| ENABLE | FLAG | COUNT |
+#+END_SRC
+
+#+BEGIN_SRC cpp
+BITSTRUCT RegisterX {
+        // BITFIELD(NAME, OFFSET, LENGTH)
+        BITFIELD(RX_COUNT, 0, 4),
+        BITFIELD(RX_FLAG, 4, 4),
+        BITFIELD(RX_ENABLE, 8, 8)
+};
+
+int main(void)
+{
+        int x = 0x1234; // raw value of register
+        // example of get/set field of bits' struct
+        x = BITFIELD_SET(RX_ENABLE, x, 0x98);
+        printf("%0X", BITFIELD_GET(RX_ENABLE, x));
+        return (0);
+}
+#+END_SRC
+
+As you can see code is readable as in usual bitfield's struct, but instead of struct ~BITSTRUCT~ should be used, and ~BITFIELD()~ descriptor instead of type ~NAME:len~ form. To set or to get field value, use ~BITFIELD_SET~/~GET()~ macros. ~BITFIELD_MASK()~ returns mask of field but from zero bit.
+But note the ~*_IMPL~ macros, using they, you can customize behavior of SET/GET implementation, for example to use some DSP core what can improve program performance dramatically! What you need is only to define own GET/SET helpers-implementators (~BITSTRUCT_GETBITS_IMPL~/~BITSTRUCT_SETBITS_IMPL~).

@@ -1,0 +1,48 @@
+#+title: Python2,3: re-raise exceptions
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-06 Thu 05:06]
+
+* Python2,3: re-raise exceptions
+
+Good practice is to keep original traceback (stack-trace) when you re-raise modified exception. In Python 2 it's simple:
+
+#+BEGIN_SRC python
+        try:
+            return buggy()
+        except Exception as x:
+            cls,obj,tb = sys.exc_info()
+            # modify obj OR create new the same class (cls), like here
+            raise cls, SOME_ARGS, tb
+#+END_SRC
+
+In Python 3 it's simple too, but now there is a special ~BaseException~ method for this and new syntax, so:
+
+#+BEGIN_SRC python
+        try:
+            return buggy()
+        except Exception as x:
+            cls,obj,tb = sys.exc_info()
+            # modify obj OR create new the same class (cls), like here
+            raise cls(SOME_ARGS).with_traceback(tb)
+#+END_SRC
+
+Now to make common code compatible with Python 2 and 3 we SHOULD save it in DIFFERENT files, to avoid syntax errors when Python compile it to byte-code. For example, let's save it to 'comp2.py' and 'comp3.py'. And lets represent it as function... with signature ~reraise(exclass, msg, traceb)~. In 'comp2.py':
+
+#+BEGIN_SRC python
+def reraise(exc, msg, tb):
+    raise exc, msg, tb
+#+END_SRC
+
+and similar in 'comp3.py' but with with_traceback() usage. Now use it:
+
+#+BEGIN_SRC python
+import sys
+_PY23 = 3 if sys.version_info.major > 2 else 2
+if _PY23 == 2:
+    from comp2 import *
+elif _PY23 == 3:
+    from comp3 import *
+#+END_SRC

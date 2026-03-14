@@ -1,0 +1,53 @@
+#+title: Bubble search
+#+description: My Blog
+#+keywords: clang, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms
+#+date: [2020-02-04 Tue 18:16]
+
+* Bubble search
+
+Bubble search (with exchanging items). We compares neighboring items: if they
+needs exchanging - they have wrong order - do it. Then we do the same for next
+neighboring items, i.e. 0-1, 1-2, 2-3, ... After first pass over array the
+last item will be the biggest (like bubble fly to up :). So, in next pass over
+items we will process all without the last item. Then again, new last
+(pre-last actually) item will be biggest in current pass, so in next pass we
+must skip it, etc... Processing will stop when we are skipping all items OR
+when no more items swaps. 
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<typename T>
+int bubsort(T *arr, unsigned int len)
+{
+    if (!arr||!len) return (0);
+    T tmp;
+    int pie = len, nswaps;
+    do {
+        nswaps = 0;
+        for (int i=0; i<pie; i++) {
+            if (arr[i] > arr[i+1]) {
+                SWAP(arr[i], arr[i+1], tmp);
+                nswaps++;
+            }
+        }
+        pie--;
+    } while (pie && nswaps);
+    return (1);
+}
+
+/*****************************************
+                   main
+ ****************************************/
+int main(void)
+{
+    int arr[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
+    PRINTARR(arr, "%d");
+    bubsort(arr, sizeofarray(arr));
+    PRINTARR(arr, "%d");
+    return (0);
+}
+#+END_SRC

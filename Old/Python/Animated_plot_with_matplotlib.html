@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Animated plot with matplotlib</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Animated plot with matplotlib</h1>
+<div id="outline-container-org50dc87a" class="outline-2">
+<h2 id="org50dc87a">Animated plot with matplotlib</h2>
+<div class="outline-text-2" id="text-org50dc87a">
+<p>
+This is the components of auto-scrolled plots with matplotlib:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">class</span> <span style="color: #ff4500;">Plot</span>:
+    <span style="color: #696969;">"""Base attributes of an any plot"""</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>,
+            fig=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">matplotlib Figure</span>
+            canvas=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">matplotlib Canvas</span>
+            tkw=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">Tk widget</span>
+            title=<span style="color: #696969;">""</span>, <span style="color: #575757;">#</span>
+            xdata=[], <span style="color: #575757;"># </span><span style="color: #575757;">x data</span>
+            ydata=[], <span style="color: #575757;"># </span><span style="color: #575757;">y data</span>
+            xmin=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">left xlim:datetime (chages in scroll with set_xlim)</span>
+            xmax=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">right xlim:datetime (chages in scroll with set_xlim)</span>
+            tdelta=<span style="color: #7fffd4;">None</span>, <span style="color: #575757;"># </span><span style="color: #575757;">step (period of polling of sensors, etc.):timedelta</span>
+            ylabel=<span style="color: #696969;">""</span>, <span style="color: #575757;"># </span><span style="color: #575757;">y label</span>
+            lnc=<span style="color: #696969;">"red"</span>, <span style="color: #575757;"># </span><span style="color: #575757;">line color</span>
+            lnpt=<span style="color: #696969;">"-"</span>, <span style="color: #575757;"># </span><span style="color: #575757;">line point type</span>
+            lnw=1, <span style="color: #575757;"># </span><span style="color: #575757;">line width</span>
+            intc=<span style="color: #696969;">"#707070"</span>, <span style="color: #575757;"># </span><span style="color: #575757;">internal rect. color</span>
+            outc=<span style="color: #696969;">"#9E9E9E"</span>, <span style="color: #575757;"># </span><span style="color: #575757;">outter rect. color</span>
+            ylimpad=10, <span style="color: #575757;"># </span><span style="color: #575757;">padding around y axis limit (ylim is +/- ylimpad)</span>
+            ):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">fig</span> = fig
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">canvas</span> = canvas
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">tkw</span> = tkw
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">title</span> = title
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">xdata</span> = xdata
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ydata</span> = ydata
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">xmin</span> = xmin
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">xmax</span> = xmax
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">tdelta</span> = tdelta
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">xband</span> = <span style="color: #696969;">self</span>.xmax - <span style="color: #696969;">self</span>.xmin <span style="color: #575757;"># </span><span style="color: #575757;">width of axe 0x (timedelta)</span>
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ylabel</span> = ylabel
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">lnc</span> = lnc
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">lnpt</span> = lnpt
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">lnw</span> = lnw
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">intc</span> = intc
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">outc</span> = outc
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ylimpad</span> = ylimpad
+
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ymin</span> = 0
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ymax</span> = 0
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">AnimPlot</span>(Frame):
+    <span style="color: #696969;">"""One-line plot in own frame"""</span>
+    <span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #575757;">: blit not used</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, master, app, blit=<span style="color: #7fffd4;">False</span>, title=<span style="color: #696969;">""</span>, npoints=60, ylabel=<span style="color: #696969;">""</span>, lnc=<span style="color: #696969;">"red"</span>, lnpt=<span style="color: #696969;">"-"</span>, lnw=1, intc=<span style="color: #696969;">"#707070"</span>, outc=<span style="color: #696969;">"#9E9E9E"</span>, ylimpad=10, period=1, *a, **kw):
+        Frame.__init__(<span style="color: #696969;">self</span>, master, *a, **kw)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">app</span> = app
+
+        <span style="color: #ffffff;">xmin</span> = <span style="color: #696969;">self</span>.app.begin
+        <span style="color: #ffffff;">xmax</span> = xmin + timedelta(seconds=npoints*period) <span style="color: #575757;"># </span><span style="color: #575757;">period is secs</span>
+        <span style="color: #ffffff;">tdelta</span> = timedelta(seconds=period)
+
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">p</span> = Plot(title=title, ylabel=ylabel, lnc=lnc, lnpt=lnpt, lnw=lnw, intc=intc, outc=outc, xdata=deque(maxlen=npoints), ydata=deque(maxlen=npoints), xmin=xmin, xmax=xmax, tdelta=tdelta, ylimpad=ylimpad)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">blit</span> = blit <span style="color: #575757;"># </span><span style="color: #575757;">use double-buffering?</span>
+        <span style="color: #696969;">self</span>._create_matplot()
+        <span style="color: #696969;">self</span>.p.tkw.pack()
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">_create_matplot</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">"""Creates of matplotlib plot and changes</span>
+<span style="color: #696969;">        self.p"""</span>
+
+        <span style="color: #575757;"># </span><span style="color: #575757;">calculate plot size in inches; dpi is the pixels count per inch</span>
+        <span style="color: #ffffff;">dpi</span> = 75.
+        <span style="color: #ffffff;">figh</span> = <span style="color: #696969;">self</span>.winfo_screenheight()
+        <span style="color: #ffffff;">figh</span> = figh/dpi - 1 <span style="color: #575757;"># </span><span style="color: #575757;">1 for menu bar</span>
+        <span style="color: #ffffff;">figh</span> = figh/2 <span style="color: #575757;"># </span><span style="color: #575757;">two plots</span>
+        <span style="color: #ffffff;">figw</span> = figh*2.5 <span style="color: #575757;"># </span><span style="color: #575757;">aspect</span>
+        <span style="color: #ffffff;">fig</span> = Figure(figsize=(figw, figh), dpi=dpi)
+
+        fig.patch.set_facecolor(<span style="color: #696969;">self</span>.p.outc)
+        <span style="color: #ffffff;">ax</span> = fig.add_subplot(111)
+        ax.patch.set_facecolor(<span style="color: #696969;">self</span>.p.intc)
+        ax.set_title(<span style="color: #696969;">self</span>.p.title)
+        ax.grid(<span style="color: #7fffd4;">True</span>)
+        ax.set_ylabel(<span style="color: #696969;">self</span>.p.ylabel)
+
+        ax.plot_date([], [], <span style="color: #696969;">self</span>.p.lnpt, color=<span style="color: #696969;">self</span>.p.lnc, lw=<span style="color: #696969;">self</span>.p.lnw)
+        ax.set_xlim(mdates.date2num(<span style="color: #696969;">self</span>.p.xmin), mdates.date2num(<span style="color: #696969;">self</span>.p.xmax))
+
+        ax.xaxis.set_major_formatter(mdates.DateFormatter(<span style="color: #696969;">'%H:%M:%S'</span>, utils.tzinfo()))
+        ax.<span style="color: #ffffff;">fmt_xdata</span> = mdates.DateFormatter(<span style="color: #696969;">'%H:%M:%S'</span>, utils.tzinfo())
+
+        <span style="color: #ffffff;">canvas</span> = FigureCanvas(fig, master=<span style="color: #696969;">self</span>)
+        <span style="color: #ffffff;">tkw</span> = canvas.get_tk_widget()
+        tkw.config(relief=FLAT, bd=0, takefocus=0, highlightthickness=0)
+        <span style="color: #696969;">self</span>.p.<span style="color: #ffffff;">fig</span> = fig
+        <span style="color: #696969;">self</span>.p.<span style="color: #ffffff;">canvas</span> = canvas
+        <span style="color: #696969;">self</span>.p.<span style="color: #ffffff;">tkw</span> = tkw
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">_redraw</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">"""Redraws plot with data from self.p automatically after append of the new data"""</span>
+        <span style="color: #ffffff;">ax</span> = <span style="color: #696969;">self</span>.p.fig.axes[0]
+        <span style="color: #ffffff;">line</span> = ax.lines[0]
+
+        line.set_xdata(<span style="color: #696969;">self</span>.p.xdata)
+        line.set_ydata(<span style="color: #696969;">self</span>.p.ydata)
+
+        <span style="color: #ffffff;">x1</span> = <span style="color: #696969;">self</span>.p.xdata[-1]
+        <span style="color: #ffffff;">tm0</span> = mdates.num2date(x1) - <span style="color: #696969;">self</span>.p.xband + <span style="color: #696969;">self</span>.p.tdelta
+        <span style="color: #ffffff;">x0</span> = mdates.date2num(tm0)
+        ax.set_xlim(x0, x1)
+
+        <span style="color: #ffffff;">y0</span> = 0
+        <span style="color: #ffffff;">y1</span> = <span style="color: #696969;">self</span>.p.ymax
+        ax.set_ylim(y0 - <span style="color: #696969;">self</span>.p.ylimpad, y1 + <span style="color: #696969;">self</span>.p.ylimpad)
+        <span style="color: #696969;">self</span>.p.canvas.draw()
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">appendy</span>(<span style="color: #696969;">self</span>, y):
+        <span style="color: #ffffff;">tm</span> = utils.now()
+        <span style="color: #ffffff;">tm</span> = mdates.date2num(tm)
+        <span style="color: #696969;">self</span>.p.xdata.append(tm)
+        <span style="color: #696969;">self</span>.p.<span style="color: #ffffff;">ymax</span> = <span style="color: #a52a2a;">max</span>(<span style="color: #696969;">self</span>.p.ymax, y)
+        <span style="color: #696969;">self</span>.p.ydata.append(y)
+        <span style="color: #696969;">self</span>._redraw()
+</pre>
+</div>
+
+<p>
+Here is an example of usage:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ffffff;">aplt1</span> = AnimPlot(<span style="color: #696969;">self</span>.pltfr, app=<span style="color: #696969;">self</span>.app, name=<span style="color: #696969;">"tpm200plot1"</span>, lnc=<span style="color: #696969;">"red"</span>, lnw=2, title=u<span style="color: #696969;">"Sensor PV1"</span>, ylabel=u<span style="color: #696969;">"C"</span>, period=3)
+aplt1.pack(side=TOP, expand=YES, fill=Y)
+<span style="color: #575757;"># </span><span style="color: #575757;">...</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">onpolling</span>():
+    <span style="color: #ffffff;">val</span> = read_sensor()
+    aplt1.appendy(pv1)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

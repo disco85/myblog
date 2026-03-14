@@ -1,0 +1,58 @@
+#+title: Lost samples detection in circular buffers
+#+description: My Blog
+#+keywords: algorithms, dsp
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms dsp
+#+date: [2020-02-06 Thu 04:47]
+
+* Lost samples detection in circular buffers
+
+Usually [[http://en.wikipedia.org/wiki/Circular_buffer][circular buffer]] is used for saving samples by writer task and for consume samples by reader task. Often reader and writer tasks has different speed - reader may be slower then writer, so there are lost (skipped) samples. What can we do with them?
+
+There are many "policies" to process such situation but if we have only one fixed circular buffer, all what we can do is to detect such lost samples and to save somewhere. Some uses special attribute with each sample - time stamp/marker or control cyclic code. With this marker decoder of saved samples (in external file) can determines skipped samples and if decoder knows sampling frequency then he can determine width of such "hole" (number of skipped samples).
+
+When writer task overtakes reader task (and we should know how to detect such situation) it can save (and increment) number of skipped samples until reader task shifts and frees TWO cells in queue to flush "hole" and current sample ("hole" will be saved in the same samples queue but with special flag - HOLE and number of lost samples in this hole). This is simple idea of holes processing.
+
+On Wikipedia pages there are procedures for circular buffer. We need additional procedures for:
+
+- checking when there are 2 (or more) free cells - to save "hole" and current sample
+- adding new sample with "hole saving"
+
+In pseudocode it can be:
+
+#+BEGIN_SRC
+how_many_free():
+  if rwrap == wwrap:
+    return len(samples) - wpos + rpos
+  else:
+    return rpos - wpos
+
+
+how_many_used():
+  if rwrap != wwrap:
+    return len(samples) - rpos + wpos
+  else:
+    return wpos - rpos
+
+
+add_sample(new_sample):
+  if holes != 0:
+    if how_many_free() >= 2:
+      samples[wpos] = special_hole_sample
+      increment_pos(wpos)
+      samples[wpos] = new_sample
+      increment_pos(wpos)
+    else:
+      holes++
+  else:
+    if how_many_free() >= 1:
+      samples[wpos] = new_sample
+      increment_pos(wpos)
+    else:
+      holes++
+#+END_SRC
+
+See idea for ~increment_pos()~ on Wikipedia page.
+~wwrap~, ~rwrap~ are flags (bits) for wrapping writer/reader tasks and are modified in ~increment_pos()~ procedure.
+
+If we save "hole" as sample but with a special flag (in file), then we get "flat" stream of structures with the same size.

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Low-pass filter</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, dsp" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Low-pass filter</h1>
+<div id="outline-container-orgc54d97c" class="outline-2">
+<h2 id="orgc54d97c">Low-pass filter</h2>
+<div class="outline-text-2" id="text-orgc54d97c">
+<p>
+One of the low-pass filters software algorithm is described on <a href="http://en.wikipedia.org/wiki/Low-pass_filter">http://en.wikipedia.org/wiki/Low-pass<sub>filter</sub></a>. Here is the example of Python implementation:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">Low-pass filter</span>
+<span style="color: #696969;">import</span> random
+
+<span style="color: #ffffff;">RC</span> = 0.05 <span style="color: #575757;"># </span><span style="color: #575757;">time constant (inertion)</span>
+<span style="color: #ffffff;">DT</span> = 0.02 <span style="color: #575757;"># </span><span style="color: #575757;">sampling time</span>
+
+<span style="color: #ffffff;">A</span> = DT/( RC + DT)
+<span style="color: #575757;">#</span><span style="color: #575757;">A = 0.45</span>
+<span style="color: #ffffff;">xk_1</span> = 0
+<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"Measured;Filtered"</span>
+<span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> <span style="color: #a52a2a;">xrange</span>(0, 200):
+    <span style="color: #ffffff;">xm</span> = random.randint(0, 2)
+    <span style="color: #575757;"># </span><span style="color: #575757;">Both are equals:</span>
+    <span style="color: #575757;">#</span><span style="color: #575757;">xk = A*xm + (1-A)*xk_1</span>
+    <span style="color: #ffffff;">xk</span> = xk_1 + A * (xm - xk_1)
+    <span style="color: #a52a2a;">print</span> <span style="color: #696969;">"%d;%f"</span> % (xm, xk)
+    <span style="color: #ffffff;">xk_1</span> = xk
+</pre>
+</div>
+
+<p>
+With RC (tau) we can control inertia of the filter.
+</p>
+
+<p>
+Here is the example how looks low-pass filter with tilt angles getting data from HMC6343 (F-16 seems to be more stable):
+</p>
+
+<p>
+<a id="orga1bc4e5"></a>
+</p>
+
+<p>
+If you try to filtering tilt angles then you can see funny effect: turning of 3D model! It's happens due to error in sensor data which filter try to smooth, see image:
+</p>
+
+<p>
+<img src="../../assets/LowFilter1.svg" alt="LowFilter1.svg" class="org-svg" /> <img src="../../assets/LowFilter2.svg" alt="LowFilter2.svg" class="org-svg" /> <img src="../../assets/LowFilter3.svg" alt="LowFilter3.svg" class="org-svg" />
+</p>
+
+<p>
+Near the scale edges error seems to be small, but angles may be, for ex., 10°, 350°, and filter will smooth their to 10°, 20°, 30°&#x2026; 340°. And you can see rotation of the model on the screen.
+One of the approach to avoid this problem is to normalize angles. For example, 10°, 350° may be converted to 10°, -10°. After such normalization angles great then 360° should be normalized to canonical range. Algorithm is easy:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #ffffff;">absdiff</span> = <span style="color: #a52a2a;">abs</span>(v1 - v0)
+<span style="color: #696969;">if</span> absdiff &gt; 180.:
+  <span style="color: #ffffff;">d</span> = 360. - absdiff
+  <span style="color: #696969;">if</span> v0 &gt; v1:
+    <span style="color: #ffffff;">v1</span> = v0 + d
+  <span style="color: #696969;">else</span>:
+    <span style="color: #ffffff;">v1</span> = v0 - d
+</pre>
+</div>
+
+<p>
+And after filtering to avoid values great then 360° we can use something like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">if</span> <span style="color: #a52a2a;">abs</span>(v) &gt;= 360.:
+  <span style="color: #ffffff;">v</span> = v % 360.
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Generic lists processing</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Generic lists processing</h1>
+<div id="outline-container-org33d59a3" class="outline-2">
+<h2 id="org33d59a3">Generic lists processing</h2>
+<div class="outline-text-2" id="text-org33d59a3">
+<p>
+<code>lst_tmpl()</code> is the generic function of processing lists, all other functions
+may be implemented in easy way with using of it. Actually it's ported from Haskell:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> operator <span style="color: #696969;">import</span> add, mul, concat
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">lst_tmpl</span>(f1, f2, f3, f4, f5, l):
+    <span style="color: #696969;">"Generic recursive processing of list (head, tail, empty list, etc)"</span>
+    <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> l: <span style="color: #696969;">return</span> f1([])
+    <span style="color: #696969;">else</span>:
+        <span style="color: #ffffff;">x</span> = l[0]
+        <span style="color: #ffffff;">xs</span> = l[1:]
+        <span style="color: #696969;">return</span> f2(f3(x), f4(lst_tmpl(f1, f2, f3, f4, f5, f5(xs))))
+
+<span style="color: #ffffff;">lst_const</span> = <span style="color: #696969;">lambda</span> n: <span style="color: #696969;">lambda</span> _: n
+<span style="color: #ffffff;">lst_id</span> = <span style="color: #696969;">lambda</span> x: x
+<span style="color: #ffffff;">lst_swap</span> = <span style="color: #696969;">lambda</span> op: <span style="color: #696969;">lambda</span> x, y: op(y, x)
+<span style="color: #ffffff;">lst_list</span> = <span style="color: #696969;">lambda</span> x: [x]
+<span style="color: #ffffff;">lst_cons</span> = <span style="color: #696969;">lambda</span> x, xs: [x] + xs
+
+<span style="color: #ffffff;">lst_len</span> = <span style="color: #696969;">lambda</span> l: lst_tmpl(lst_const(0), add, lst_const(1), lst_id, lst_id, l)
+
+<span style="color: #ffffff;">lst_sum</span> = <span style="color: #696969;">lambda</span> l: lst_tmpl(lst_const(0), add, lst_id, lst_id, lst_id, l)
+<span style="color: #ffffff;">lst_mul</span> = <span style="color: #696969;">lambda</span> l: lst_tmpl(lst_const(1), mul, lst_id, lst_id, lst_id, l)
+<span style="color: #ffffff;">lst_rev</span> = <span style="color: #696969;">lambda</span> l: lst_tmpl(lst_id, lst_swap(concat), lst_list, lst_id, lst_id, l)
+<span style="color: #ffffff;">lst_map</span> = <span style="color: #696969;">lambda</span> f, l: lst_tmpl(lst_id, lst_cons, f, lst_id, lst_id, l)
+
+
+<span style="color: #575757;">###### </span><span style="color: #575757;">test ############</span>
+<span style="color: #a52a2a;">print</span> lst_len([1, 2, 3, 4, 5])
+<span style="color: #a52a2a;">print</span> lst_sum([1, 2, 3, 4, 5])
+<span style="color: #a52a2a;">print</span> lst_mul([1, 2, 3, 4, 5])
+<span style="color: #a52a2a;">print</span> lst_rev([1, 2, 3, 4, 5])
+<span style="color: #a52a2a;">print</span> lst_map(<span style="color: #696969;">lambda</span> x: x*100, [1, 2, 3, 4, 5])
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

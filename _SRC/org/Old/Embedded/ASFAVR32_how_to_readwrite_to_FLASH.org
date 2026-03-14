@@ -1,0 +1,17 @@
+#+title: ASF/AVR32: how to read/write to FLASH
+#+description: My Blog
+#+keywords: embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded
+#+date: [2020-02-06 Thu 04:57]
+
+* ASF/AVR32: how to read/write to FLASH
+
+First, open example ASF project on FLASHC read/write. Get code from and paste into your project. Also add *.lds file from example (~...asf/avr32/drivers/flashc/flash_example/.lds~) into your project. Then add to Linker options next:
+
+#+BEGIN_SRC
+--rodata-writable -Wl,--direct-data -T../src/asf/avr32/drivers/flashc/flash_example/at32uc3a3256_evk1104/link_uc3a3256.lds
+#+END_SRC
+
+(first in options line on tab "Miscellaneous" and correct path).
+Now build and no any linker errors about regions...

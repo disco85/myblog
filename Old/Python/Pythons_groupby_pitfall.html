@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python's groupby pitfall</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Python's groupby pitfall</h1>
+<div id="outline-container-org9be9a7f" class="outline-2">
+<h2 id="org9be9a7f">Python's groupby pitfall</h2>
+<div class="outline-text-2" id="text-org9be9a7f">
+<p>
+Python function <code>groupby</code> has one feature which can be cause of unexpected
+pitfall:
+</p>
+
+<p>
+&gt; &#x2026;The returned group is itself an iterator that shares the underlying iterable
+&gt; with groupby(). Because the source is shared, when the groupby() object is
+&gt; advanced, the previous group is no longer visible. So, if that data is needed
+&gt; later, it should be stored as a list&#x2026;
+</p>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> itertools <span style="color: #696969;">import</span> *
+
+<span style="color: #a52a2a;">input</span> = ((1, <span style="color: #696969;">"one"</span>), (1, <span style="color: #696969;">"one too"</span>), (1, <span style="color: #696969;">"also one"</span>),
+         (2, <span style="color: #696969;">"two"</span>), (2, <span style="color: #696969;">"another two"</span>), (2, <span style="color: #696969;">"two again"</span>)
+)
+
+<span style="color: #ffffff;">grp</span> = groupby(<span style="color: #a52a2a;">input</span>, <span style="color: #696969;">lambda</span> p: p[0])
+<span style="color: #575757;"># </span><span style="color: #575757;">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
+<span style="color: #ffffff;">maxg</span>, <span style="color: #ffffff;">maxi</span> = <span style="color: #a52a2a;">max</span>(grp, key=<span style="color: #696969;">lambda</span> g: g[0])
+<span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"maxg ="</span>, maxg, <span style="color: #696969;">"maxi ="</span>, <span style="color: #a52a2a;">list</span>(maxi))
+</pre>
+</div>
+
+<p>
+Output without (A) is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #696969;">'two again'</span>)]
+</pre>
+</div>
+
+<p>
+which is unexpected because we suppose to find "last" group to
+iterate than over it's items (they are 3!).
+</p>
+
+<p>
+But with (A) is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #696969;">'two'</span>), (2, <span style="color: #696969;">'another two'</span>), (2, <span style="color: #696969;">'two again'</span>)]
+</pre>
+</div>
+
+<p>
+This happens because sub-iterators of groups are not independent,
+iteration over groups "eats" sub-iterators too.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

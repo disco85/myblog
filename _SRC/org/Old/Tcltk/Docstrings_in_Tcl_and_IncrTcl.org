@@ -1,0 +1,288 @@
+#+title: Docstrings in Tcl (and IncrTcl)
+#+description: My Blog
+#+keywords: tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk
+#+date: [2020-02-07 Fri 17:21]
+
+* Docstrings in Tcl (and IncrTcl)
+
+Docstrings are very popular in Python, Lisp... This is the easy way to include documentation into implementation (reverse LP). But in Tcl are can be usable to generate help of commands for user. Here is the listing of one (it support procs and Itcl methods):
+
+#+BEGIN_SRC tcl
+package provide mydoc 1.0
+
+namespace eval mydoc {
+    namespace export doc
+}
+
+set _NOHELPMSG "No help."
+
+proc ::mydoc::_docstring {body} {
+    set body [string trim $body]
+    set docstring ""
+    # without 1st '^' will match any FIRST docstring block even after
+    # commands!
+    if {[regexp {^#\s*([^\n]+\n)+(\n\n)} $body docstring]} {
+        set docstring [regsub -all {\s*#\s?} $docstring \n]
+        set docstring [string trim $docstring]
+        return $docstring
+    }
+}
+
+proc ::mydoc::doc args {
+    # Help on command: procedure or class method. Call:
+    #   doc some_object some_method
+    #   doc some_class some_method
+    #   doc some_proc
+
+
+    global _NOHELPMSG
+    set found ""
+    switch -- [llength $args] {
+        1 {
+            # args: proc
+            set name [lindex $args 0]
+            set arguments [info args $name]
+            set body [info body $name]
+            set found [_docstring $body]
+        }
+        2 {
+            # FIXME not optimal!
+            # args: object|class method
+            lassign $args cls_obj meth
+            set objs [itcl::find objects]
+            # cls_obj may be object OR class. What is it?
+            if {-1 != [lsearch -regexp $objs :*$cls_obj]} {
+                # this is the object
+                set arguments [$cls_obj info args $meth]
+                set body [$cls_obj info body $meth]
+                set found [_docstring $body]
+            } else {
+                # this is the class
+                set arguments [namespace eval ::$cls_obj info args $meth]
+                set body [namespace eval ::$cls_obj info body $meth]
+                set found [_docstring $body]
+            }
+        }
+        default { error "wrong args: proc | object method | class method" }
+    }
+    if {$found eq ""} {
+        return $_NOHELPMSG
+    } else {
+        return $found
+    }
+}
+
+# txt is the string with \n, shifter is like '\t' or '\t\t'..
+proc mydoc::_shift_strings {txt shifter} {
+    if {$txt ne ""} {
+        return "$shifter[regsub -all \n $txt \n$shifter]"
+    }
+}
+
+
+# Generate only for documented with docstrings
+proc mydoc::_genrst {fname} {
+    set result {}
+    # Collect help on objects and it's methods
+    set clshelp {}
+    foreach cls [itcl::find classes] {
+        set her [namespace eval $cls "info heritage"]
+
+        set varhelp {}
+        foreach v [namespace eval $cls info variable] {
+            catch {
+                #lappend varhelp [namespace eval $cls info variable $v -protection public]
+                if {[string first "::_" $v] == -1} {
+                    switch -- [namespace eval $cls info variable $v -protection] {
+                        public { set vprot "public" }
+                        protected { set vprot "protected" }
+                        private { set vprot "private" }
+                    }
+                    lappend varhelp "- $vprot $v"
+                }
+            }
+        }
+
+        set methelp {}
+        foreach func [namespace eval $cls "info function"] {
+            catch {
+                set body [string trim [namespace eval $cls "info body $func"]]
+                if {$body ne ""} {
+                    set arguments [namespace eval $cls "info args $func"]
+                    if {$arguments eq ""} { set arguments "no args." }
+                    set docstring [_shift_strings [_docstring $body] \t]
+                    if {$docstring ne ""} {
+                        lappend methelp "*${func}*: **${arguments}**"
+                        lappend methelp ""
+                        lappend methelp "::"
+                        lappend methelp ""
+                        lappend methelp $docstring
+                        lappend methelp ""
+                        lappend methelp ""
+                    }
+                }
+            }
+        }
+        if {$methelp ne ""} {
+            # there are methods with docstrings!
+            if {[llength $her] > 1} {
+                # there are base classes
+                set bases [lrange $her 1 end]
+                set her "[lindex $her 0] (*extends ${bases}*)"
+            }
+            lappend clshelp "$her"
+            lappend clshelp [string repeat "-" [string length $her]]
+            lappend clshelp ""
+            lappend clshelp "Variables"
+            lappend clshelp "~~~~~~~~~"
+            lappend clshelp ""
+            if {$varhelp ne ""} {
+                lappend clshelp [join $varhelp "\n"]
+            } else {
+                lappend clshelp "No variables."
+            }
+            lappend clshelp ""
+            lappend clshelp "Methods"
+            lappend clshelp "~~~~~~~"
+            lappend clshelp ""
+            lappend clshelp {*}$methelp
+        }
+    }
+    # Collect procs help
+    set prochelp {}
+    foreach func [uplevel #0 info procs] {
+        catch {
+            set body [string trim [uplevel #0 info body $func]]
+            if {$body ne ""} {
+                set arguments [uplevel #0 info args $func]
+                if {$arguments eq ""} { set arguments "no args." }
+                set docstring [_shift_strings [_docstring $body] \t]
+                if {$docstring ne ""} {
+                    lappend prochelp "*${func}*: **${arguments}**"
+                    lappend prochelp ""
+                    lappend prochelp "::"
+                    lappend prochelp ""
+                    lappend prochelp $docstring
+                    lappend prochelp ""
+                    lappend prochelp ""
+                }
+            }
+        }
+    }
+
+    if {$clshelp ne ""} {
+        lappend result ""
+        lappend result "Classes"
+        lappend result "======="
+        lappend result ""
+        lappend result {*}$clshelp
+    }
+    if {$prochelp ne ""} {
+        lappend result ""
+        lappend result "Procedures"
+        lappend result "=========="
+        lappend result ""
+        lappend result {*}$prochelp
+    }
+
+
+    set fid [open $fname w]
+    puts -nonewline $fid [join $result "\n"]
+    close $fid
+}
+#+END_SRC
+
+This mechanism supports not only interactive help system for user (doc proc) but also help generating (to ReStructured Text format). Example of using (remember that two empty lines are used to end docstring section:
+
+#+BEGIN_SRC tcl
+proc fun {args} {
+  # Do something. Syntax:
+  #  -one -- first action
+  #  -two -- second action
+
+
+  .. code ..
+}
+
+# OR
+
+itcl::class C {
+  method f {args} {
+    # My method. Syntax:
+    #  f one two -- do something
+    #  f three four -- do something else
+
+
+    .. code ..
+  }
+}
+#+END_SRC
+
+and then call:
+
+#+BEGIN_SRC cpp
+doc fun
+doc C f
+C cobj
+doc cobj f
+#+END_SRC
+
+_genrst procedure is used to generate documentation. It looks like this:
+
+#+BEGIN_SRC
+Classes
+::HMC6343PROTOCOL
+Variables
+protected ::HMC6343Protocol::this
+Methods
+::HMC6343Protocol::get: cmd what
+Returns protocol info (what) about command cmd. What is:
+  -def - definition of command (Tcl commands list to be execute for request)
+  -resplen - length of response in bytes
+  -respfmt - format of response
+  -all - as fields as list
+ 
+::HMC6343Protocol::unpack: cmd buf
+Returns unpacked (as list) values from buf for cmd
+
+::HMC6343Protocol::commands: no args.
+Returns known commands names
+
+::HMC6343Protocol::constructor: defs
+Creates object.
+  - defs is the list of CMD RESPONSE_LEN RESPONSE_FMT { Serial commands }...
+  - RESPONSE_FMT is like in binary command
+#+END_SRC
+
+It's easy to use it in Makefile for help generation:
+
+#+BEGIN_SRC Makefile
+RST2HTML = C:/Python32/python.exe C:/Python32/Scripts/rst2html.py
+hlp:
+ tclkit.exe gendoc.tcl
+ $(RST2HTML) hlp.rst hlp.html
+#+END_SRC
+
+Use tclkit.exe if you have Tk code (instead of tclkitsh.exe). Python and docutils Python package are used to trnasform .rst into .html. gendoc.tcl looks like this:
+
+#+BEGIN_SRC tcl
+# Generate hlp.rst file with references to all classes, its methods
+# and procedures with docstrings (see lib/mydoc.tcl)
+package require starkit
+starkit::startup
+starkit::autoextend [file join $starkit::topdir]
+package require myutl
+set packages [glob -directory lib -tails "*.tcl"]
+foreach pkg $packages {
+    set pkg [regsub {.tcl$} $pkg ""]
+    if {$pkg ne "pkgIndex"} {
+        package require $pkg
+    }
+}
+mydoc::_genrst help.rst
+exit 0
+#+END_SRC
+
+It imports all packages from lib directory and generates help.rst file for its' procs and methods. Makefile magic: ~make hlp~

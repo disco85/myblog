@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Catamorphism</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms, haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Catamorphism</h1>
+<div id="outline-container-orgf69c485" class="outline-2">
+<h2 id="orgf69c485">Catamorphism</h2>
+<div class="outline-text-2" id="text-orgf69c485">
+<p>
+Catamorphism is yet another good known recursive scheme which is assitiated
+with folding.
+It's simple too and can be shown as pseudocode:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">b::B
+⊕::A||B-&gt;B
+h::A*-&gt;B
+
+h Nil = b
+
+h([a|as]) = a ⊕ (h as)
+</pre>
+</div>
+
+<p>
+This strange operation ⊕ is dyadic operation between list item of type <code>A</code> and "zero"-item
+of type <code>B</code>.
+</p>
+
+<p>
+Scheme graphically looks like:
+</p>
+
+
+
+
+<div id="org9468b7c" class="figure">
+<p><img src="../../assets/Catamorphism1.svg" alt="Catamorphism1.svg" class="org-svg" />
+</p>
+</div>
+
+
+<p>
+Some famous functions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-source">length = CATA&lt;0, ⊕&gt;,  a ⊕ n = 1 + n
+map = CATA&lt;Nil, ⊕&gt;,  a ⊕ bs = [f a | bs]
+</pre>
+</div>
+
+<p>
+All of these are easy coded in Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">cata</span>(b, l, op):
+    <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> l: <span style="color: #696969;">return</span> b
+    <span style="color: #ffffff;">x</span>, *<span style="color: #ffffff;">xs</span> = l
+    <span style="color: #696969;">return</span> op(x, cata(b, xs, op))
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">length</span>(l):
+    <span style="color: #696969;">return</span> cata(0, l, <span style="color: #696969;">lambda</span> x, n: 1 + n)
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">mymap</span>(f, l):
+    <span style="color: #696969;">return</span> cata([], l, <span style="color: #696969;">lambda</span> a, bs: [f(a)] + bs)
+
+<span style="color: #a52a2a;">print</span>(length([1,2,3,4]))
+<span style="color: #a52a2a;">print</span>(mymap(<span style="color: #696969;">lambda</span> x: x+10, [1,2,3]))
+</pre>
+</div>
+
+<p>
+And again: most interesting here is: how to transform it to become parallel.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

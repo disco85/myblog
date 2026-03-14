@@ -1,0 +1,21 @@
+#+title: Two useful C macros
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-06 Thu 18:20]
+
+* Two useful C macros
+
+As for me, there are 2 very simple but usefull C macros for safe calling of function (or method - callback in struct member):
+
+#+BEGIN_SRC cpp
+#define SAFE_CALL(F, ...) do { if ((F)) (*(F))(##__VA_ARGS__); } while(0)
+#define MCALL(SELF, CB, ...) do { if((SELF)->CB) (*(SELF)->CB)(SELF, ##__VA_ARGS__); } while(0)
+#+END_SRC
+
+Note two '#' - this is the GNU GCC extension to avoid problem with comma in variadic macros - with they we can use or not var. args. Usage is simple too:
+
+#+BEGIN_SRC cpp
+MCALL(my_struct_ptr, onpaint, area_t* area);
+#+END_SRC

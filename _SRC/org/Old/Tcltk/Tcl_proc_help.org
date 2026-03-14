@@ -1,0 +1,110 @@
+#+title: Tcl: proc help
+#+description: My Blog
+#+keywords: tcl/tk, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk misc
+#+date: [2020-02-06 Thu 05:17]
+
+* Tcl: proc help
+
+Often you write not only internal code but procs for user's usage (in console and so on). It's difficult to write documentation of procedures in different file, so let's use doc-strings like Lisp, Python and so on.
+It's not Java, so you don't need special tool :)
+Considering that out procedures/IncrTcl methods has comments like this:
+
+#+BEGIN_SRC tcl
+proc f {args} {
+## Doc-string for this method.
+# Syntax: f ...
+##
+... CODE ...
+}
+#+END_SRC
+
+Or:
+
+#+BEGIN_SRC tcl
+proc f {args} {
+## Doc-string for this method.
+# Syntax: f ...
+# Other help ##
+... CODE ...
+}
+#+END_SRC
+
+Well, doc-string is at proc body start, and begins with '##' and ends with '##' (at the same line or next), other comments are treated as usual comments and are ignored for doc-string mechanism. Here is example how to parse such doc-strings:
+
+#+BEGIN_SRC tcl
+package provide mydoc 1.1
+
+package require Itcl
+
+namespace eval mydoc {
+    namespace export doc
+}
+
+set _NOHELPMSG "No help."
+
+proc ::mydoc::_docstring {body} {
+    set body [string trim $body]
+    set docstring ""
+    # without 1st '^' will match any FIRST docstring block even after
+    # commands!
+    if {[regexp {^##\s*([^\n]+\n?)+(##)} $body docstring]} {
+        set docstring [regsub -all {\s*#\s?} $docstring \n]
+        set docstring [string trim $docstring]
+        return $docstring
+    }
+}
+
+proc ::mydoc::doc args {
+    ## Help on command: procedure or class method. Call:
+    #   doc some_object some_method
+    #   doc some_class some_method
+    #   doc some_proc ##
+    global _NOHELPMSG
+    set found ""
+    switch -- [llength $args] {
+        1 {
+            # args: proc
+            set name [lindex $args 0]
+            set arguments [info args $name]
+            set body [info body $name]
+            set found [_docstring $body]
+        }
+        2 {
+            # FIXME not optimal!
+            # args: object|class method
+            lassign $args cls_obj meth
+            set objs [itcl::find objects]
+            # cls_obj may be object OR class. What is it?
+            if {-1 != [lsearch -regexp $objs :*$cls_obj]} {
+                # this is the object
+                set arguments [$cls_obj info args $meth]
+                set body [$cls_obj info body $meth]
+                set found [_docstring $body]
+            } else {
+                # this is the class
+                set arguments [namespace eval ::$cls_obj info args $meth]
+                set body [namespace eval ::$cls_obj info body $meth]
+                set found [_docstring $body]
+            }
+        }
+        default { error "wrong args: proc | object method | class method" }
+    }
+    if {$found eq ""} {
+        return $_NOHELPMSG
+    } else {
+        return $found
+    }
+}
+#+END_SRC
+
+Usage is simple, you can call:
+
+#+BEGIN_SRC tcl
+doc object method
+doc class method
+doc usual-procedure
+#+END_SRC
+
+Class - is the IncrTcl class.

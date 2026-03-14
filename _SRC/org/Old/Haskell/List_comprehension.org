@@ -1,0 +1,16 @@
+#+title: List comprehension
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2022-07-07 Thu 07:08]
+
+* List comprehension
+
+It filters out items, where ~fn~ returns ~Nothing~ and extracts the value from ~Just ...~ (like ~catMaybes~):
+
+#+BEGIN_SRC
+> let fn n = if n > 10 then Just (n*100) else Nothing
+> [(k,v)|v <- [11,1,2,3,4,10,12,13], Just k <- [fn v]]
+[(1100,11),(1200,12),(1300,13)]
+#+END_SRC

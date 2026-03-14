@@ -1,0 +1,54 @@
+#+title: Haskell+Windows: custom location
+#+description: My Blog
+#+keywords: haskell, windows
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell windows
+#+date: [2020-02-03 Mon 18:22]
+
+* Haskell+Windows: custom location
+
+Often today we need to install Haskell on Windows in not-default location - due
+to SSD disks, for example, in ~D:\somewhere~ instead of standard ~C:\~. This
+tutorial shows how to do it.
+
+!Install stack
+
+First, we need to install stack in non-typical location. Create directory
+~D:\stackroot~ - all stack caches will be located there. Then add to environment
+variable binding ~STACK_ROOT=D:\stackroot~. Install stack also on the same disk,
+for example, ~D:\apps\stack~ (or put in there if use download binary). 
+
+Now install the compiler as usual. After installation you will call ~stack~ with
+~--system-ghc~. Another (and right!) solution is to add next setting in
+~D:\stackroot\config.yaml~:
+
+#+BEGIN_SRC yaml
+local-bin-path: D:\apps\haskell\8.0.2\bin
+system-ghc: true
+#+END_SRC
+
+I suppose you installed compiler in ~D:\apps\haskell~ (and it has version
+8.0.2). If not, change value to your path.
+
+Also you should add to environment variable ~PATH~ next path:
+~d:\apps\haskell\8.0.2\msys\usr\bin~.
+
+Now you can use ~stack~ to install other packages even which needs ~./configure~
+script run.
+
+To check what paths uses stack, run ~stack path~.
+
+!Integration with Spacemacs
+
+Install with stack packages:
+
+- apply-refact
+- hlint
+- stylish-haskell
+- hasktags
+- hoogle (for local queries)
+- ghc-mod
+- intero (optional, because intero-layer install it byself)
+- hindent
+
+In Spacemacs you should to add Haskell layer. To see types hints you must run Haskell REPL (~SPC m h s b~  IMHO:). Also you must add ~syntax-checking~ layer, ~auto-completion~. And sure, path to ~stack~ must be in ~PATH~ environment variable :)

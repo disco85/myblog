@@ -1,0 +1,118 @@
+#+title: C: code-generator
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-06 Thu 17:35]
+
+* C: code-generator
+
+Sometimes we need to code algorithms on C in very general way, alternatives - many functions for different parameters (optimization reasons, parametrized code, etc.). And if we want to avoid function pointers and other slow methods then we can use strong macros tricks. One of them is code generators with self-including.
+Idea is that header file has sections:
+
+- Common, included in anyway
+- Parametrized codegenerator sections
+- Start of generation of code
+
+and it looks like this (file self.h):
+
+#+BEGIN_SRC cpp
+#ifndef _USUAL_H_GUARD
+#define _USUAL_H_GUARD
+
+// common code, included in anyway
+
+#endif /*_USUAL_H_GUARD*/
+
+// templates of codegenerators:
+#ifdef SOME_CODEGEN_ARG
+// some template with DEFINE's substitution
+#else if defined(ANOTHER_CODEGEN_ARG0) && defined(ANOTHER_CODEGEN_ARG1)
+// another template
+#endif
+
+// start of code generating:
+// one version of general algorithm:
+#ifndef SOME_CODEGEN_ARG /* guard of recursive including! */
+#define SOME_CODEGEN_ARG "something"
+#include "self.h"
+#endif
+// another version of the same generalized algorithm:
+#ifndef SOME_CODEGEN_ARG /* guard of recursive including! */
+#define SOME_CODEGEN_ARG "something else"
+#include "self.h"
+#+END_SRC
+
+You also can have generalized function names! See:
+
+#+BEGIN_SRC cpp
+#define __CONC3(X, Y, Z) X ## Y ## Z
+#define _CONC3(X, Y, Z) __CONC3(X, Y, Z)
+#define FUNC_NAME(N) _CONC3(N, ANOTHER_CODEGEN_ARG0, ANOTHER_CODEGEN_ARG1)
+#+END_SRC
+
+And use this macro in your codegen. templates as: FUNC_NAME(myfunc). Resulted name will be myfunc_AB() if you defined ANOTHER_CODEGEN_ARGs as A and B before starting of code generation (auto-including).
+And yes, you can "generalize" your algorithm (name and body!) with previous defined PARAMETERS (before auto-including).
+
+YOU SHOULD MODIFY LINE WITH GUARD OF RECURSION WHEN ADD NEW TEMPLATE! BETTER IS TO USE ONE MACRO SYMBOL TO DETERMINE 'GENERATING' MODE, ANOTHER - AS PARAMETERS
+
+It does the same what does C++ templates. Better way is to use different files instead of one big with embedded "templates" - included .def files.
+
+Generalization includes unique names generation for different argument types/different sub-algorithm used.
+Considering, we have algorithm which is general but has some different parts depended on different "sub-methods", for example, using of ~MAX~ or ~MIN~, using of some ~FLAG~ or not.
+Our function can have names like ~func_MAXFLAG()~, ~func_MINFLAG()~, ~func_MAXNOFLAG()~, ~func_MINNOFLAG()~, general algorithm will use one of them (or all). Something like overloading C++ methods/functions, but depended not on types, but on any parameter value.
+First, we should generate suffix for function depended on parameters. We ca use trick with ~_CONC3()~ (see below):
+
+#+BEGIN_SRC cpp
+#define ARG1 MAX
+#define ARG2 NOFLAG
+#+END_SRC
+
+and in the .def-file:
+
+#+BEGIN_SRC cpp
+int FUNC_NAME(func_, ARG1, ARG2)(int a, int b);
+#+END_SRC
+
+to get name ~func_MAXNOFLAG~. But here is the pitfall. If we decide to use conditional compilation, with ~#if ARG1==MAX~ we'll get ERROR! Bcz ~MAX~ is undefined, test will be every time TRUE:#if "" == "". So you CAN NOT distinguish MAX or MIN values of ~ARG1~!
+So, you need to define ~MAX~, ~MIN~, ~FLAG~, ~NOFLAG~ to test it's values in #if's!
+
+To minimize code you can use instead of many parameters, one with bitfields. Testing on them - for #if's and also for name generating:
+
+#+BEGIN_SRC cpp
+#define MAX (1<<1)
+#define MIN (1<<2)
+#define FLAG (1<<3)
+#define NOFLAG (1<<4)
+...
+#define ARGS (MIN|NOFLAG)
+#include "template.def"
+#+END_SRC
+
+and in template.def something like this:
+
+#+BEGIN_SRC cpp
+#if ARGS&MIN
+#define N1 MIN
+#else
+#define N1 MAX
+#endif
+... and the same for FLAG/NOFLAG
+
+// generator for similar functions with one, common, general algorithm.
+int FUNC_NAME(func_, N1, N2)(int a, int b) {
+#if ARGS&MIN
+... code for min
+#else
+... code for max
+#endif
+}
+
+#undef ARGS
+#undef N1
+#undef N2
+#+END_SRC
+
+Also it's easy to split template.def with #ifdef ~ONLY_DECLARATIONS~ to 2 parts: declarations (for .h file includes) and code (for .c file includes). In this case checking of ARGS and "undefinings" should be out of ~#ifdef ONLY_DECLARATIONS~.
+
+So, what you can do in C++, you can do in C, exceptionally matching of values/types (but you can use static checks in this case). How is this necessary - is the big question, for example, many language designers don't like restrictions like types - in dynamic languages, some like checks in Run-time (more flexible then only type/inheritance checking)

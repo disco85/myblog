@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bakefile: Makefile's generator</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, makefile, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Bakefile: Makefile's generator</h1>
+<div id="outline-container-orgcdaba33" class="outline-2">
+<h2 id="orgcdaba33">Bakefile: Makefile's generator</h2>
+<div class="outline-text-2" id="text-orgcdaba33">
+<p>
+It's known problem - general way of making the project. There are many tools for this task: CMake, automake/autoconf, ant (usual for Java) and many-many other. But some of them use own build system and very few uses standard way of Makefile (i.e. generates Makefiles). This method is based on some input format which is translated to Makefile for target compiler. For example, automake/autoconf, Premake (with Lua scripting) and Bakefile (written in Python and is crossplatform, like Premake and many other). It's authors are Vaclav Slavik, Francesco Montorsi.
+</p>
+
+<p>
+Bakefile uses XML as input format then generates standard Makefiles for the targets:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">autoconf       Makefile.in for GNU Autoconf
+borland        Makefile for Borland C++ and Borland make
+dmars          Generic Makefile for Digital Mars C/C++
+dmars_smake    Makefile for Digital Mars C/C++ with SMAKE
+gnu            Makefile for GNU toolchain: GNU Make, GCC...
+mingw          Makefile for MinGW: mingw32-make, MinGW...
+msvc           Makefile for Visual C++ with Microsoft nmake
+msvc6prj       Microsoft Visual C++ 6.0 project files
+msevc4prj      Microsoft Embedded Visual C++ 4 project files
+msvs2003prj    MS Visual Studio 2003 project files
+msvs2005prj    MS Visual Studio 2005 project files
+msvs2008prj    MS Visual Studio 2008 project files
+suncc          GNU makefile for SunCC compiler
+symbian        Symbian development files
+watcom         Makefile for OpenWatcom C/C++
+xcode2         Apple Xcode 2.4 project files
+
+</pre>
+</div>
+
+<p>
+(post was originally created in 2012, so the information may be outdated).
+</p>
+
+<p>
+It's input file looks like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #ff4500;">exe</span> <span style="color: #ffffff;">id</span>=<span style="color: #696969;">"test_sockets"</span>&gt;
+        &lt;<span style="color: #ff4500;">cflags</span>&gt;-fpack-struct&lt;/<span style="color: #ff4500;">cflags</span>&gt;
+        &lt;<span style="color: #ff4500;">sources</span>&gt;test_sockets.c&lt;/<span style="color: #ff4500;">sources</span>&gt;
+        &lt;<span style="color: #ff4500;">sources</span>&gt;socks.c&lt;/<span style="color: #ff4500;">sources</span>&gt;
+        &lt;<span style="color: #ff4500;">sys-lib</span>&gt;pthread&lt;/<span style="color: #ff4500;">sys-lib</span>&gt;
+        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='win32'"</span>&gt;
+            &lt;<span style="color: #ff4500;">sys-lib</span>&gt;wsock32&lt;/<span style="color: #ff4500;">sys-lib</span>&gt;
+        &lt;/<span style="color: #ff4500;">if</span>&gt;
+&lt;/<span style="color: #ff4500;">exe</span>&gt;
+</pre>
+</div>
+
+<p>
+This pie of code will build (via native Makefile sure) test<sub>sockets</sub> binary from test<sub>sockets.c</sub> and socks.c, with pthread library (available on Unix and MinGW too) and with wsock32 library only on Windows.
+</p>
+
+<p>
+Another example of custom tag:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-xml">&lt;<span style="color: #ff4500;">include</span> <span style="color: #ffffff;">file</span>=<span style="color: #696969;">"presets/simple.bkl"</span>&gt;
+    &lt;<span style="color: #ff4500;">define-tag</span> <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"lit"</span> <span style="color: #ffffff;">rules</span>=<span style="color: #696969;">"action"</span>&gt;
+        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='unix'"</span>&gt;
+            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;pyweb.py -s $(attributes['web']).w
+            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;rst2html.py $(attributes['web']).rst $(attributes['web']).html
+        &lt;/<span style="color: #ff4500;">if</span>&gt;
+        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='win32'"</span>&gt;
+            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;cmd /C pyweb.py -s $(attributes['web']).w
+            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html
+        &lt;/<span style="color: #ff4500;">if</span>&gt;
+    &lt;/<span style="color: #ff4500;">define-tag</span>&gt;
+
+    &lt;<span style="color: #ff4500;">action</span> <span style="color: #ffffff;">id</span>=<span style="color: #696969;">"lit"</span>&gt;
+        &lt;<span style="color: #ff4500;">lit</span> <span style="color: #ffffff;">web</span>=<span style="color: #696969;">"maintest"</span>&gt;
+        &lt;<span style="color: #ff4500;">lit</span> <span style="color: #ffffff;">web</span>=<span style="color: #696969;">"socks"</span>&gt;
+    &lt;/<span style="color: #ff4500;">lit</span>&gt;&lt;/<span style="color: #ff4500;">lit</span>&gt;&lt;/<span style="color: #ff4500;">action</span>&gt;
+&lt;/<span style="color: #ff4500;">include</span>&gt;
+</pre>
+</div>
+
+<p>
+This snippet will weave and tangle "literated" sources (with pyweb tool): maintest.w and socks.w but in different manners under Windows and Unix.
+All of these snippets should be in <code>&lt;makefile&gt;</code> tag! When you use some tag, see documentation on tag (what outer tags it expect).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

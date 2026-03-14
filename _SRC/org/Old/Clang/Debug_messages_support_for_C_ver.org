@@ -1,0 +1,129 @@
+#+title: Debug messages support for C, ver 2
+#+description: My Blog
+#+keywords: clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang
+#+date: [2020-02-05 Wed 19:00]
+
+* Debug messages support for C, ver 2
+
+This C module support debug/logging system with custom levels of messages. Suppressing of some level/levels are possible via ~DBG_LEVEL~ macro variable. Each custom level is created with ~DBG_LEVEL_ALIAS()~ macro. User can define own print/dump implementations via ~DBG_PRN_IMPL~/~DBG_DUMP_IMPL~.
+
+#+BEGIN_SRC cpp
+#ifndef __DBG_H
+#define __DBG_H
+
+#include <stdint.h>
+#include <inttypes.h>
+#include <stdio.h>
+
+#define DBG_LEVEL_ALIAS(L) (1<<(L))
+
+#ifndef DBG_LEVEL
+#define DBG_LEVEL 0
+#endif
+
+#ifndef DBG_LEVEL_FMT
+#define DBG_LEVEL_FMT "%s: "
+#endif
+
+#define _DBG_PRN_IMPL_L(L, F, ...) printf(F, L, __VA_ARGS__)
+#define _DBG_PRN_IMPL(F, ...) printf(F, __VA_ARGS__)
+#define _DBG_DUMP_IMPL_L(L, p, sz) do { \
+    int i; \
+    for (i=0; i<(sz); i++) { \
+        if (0 == i%16) { \
+            DBG_PRN_IMPL("", "%s%s%08" PRIXPTR ": %02X "/*"%s%s%08lX: %02X "*/, i?"\n":"", \
+                    16*i/16 + (uintptr_t)p, (uint8_t)(p)[i]); \
+        } else if (0 == (i-7)%16) { \
+            DBG_PRN_IMPL("", "%s%02X|", (uint8_t)(p)[i]); \
+        } else { \
+            DBG_PRN_IMPL("", "%s%02X ", (uint8_t)(p)[i]); \
+        } \
+    } \
+    DBG_PRN_IMPL("", "%s%s", "\n"); \
+} while (0)
+#define _DBG_DUMP_IMPL(p, sz) do { \
+    int i; \
+    for (i=0; i<(sz); i++) { \
+        if (0 == i%16) { \
+            DBG_PRN_IMPL("%s%08" PRIXPTR ": %02X "/*"%s%08lX: %02X "*/, i?"\n":"", \
+                    16*i/16 + (uintptr_t)p, (uint8_t)(p)[i]); \
+        } else if (0 == (i-7)%16) { \
+            DBG_PRN_IMPL("%02X|", (uint8_t)(p)[i]); \
+        } else { \
+            DBG_PRN_IMPL("%02X ", (uint8_t)(p)[i]); \
+        } \
+    } \
+    DBG_PRN_IMPL("%s", "\n"); \
+} while (0)
+
+#ifdef DBG_LEVEL_IS_ARG
+
+#ifndef DBG_PRN_IMPL
+#define DBG_PRN_IMPL _DBG_PRN_IMPL_L
+#endif
+#ifndef DBG_DUMP_IMPL
+#define DBG_DUMP_IMPL _DBG_DUMP_IMPL_L
+#endif
+
+#define DBG_PRN(L, F, ...) if ((DBG_LEVEL) & (L)) DBG_PRN_IMPL(#L, DBG_LEVEL_FMT F, __VA_ARGS__)
+#define DBG_DUMP(L, ...) if ((DBG_LEVEL) & (L)) DBG_DUMP_IMPL(#L, __VA_ARGS__)
+
+#else
+
+#ifndef DBG_PRN_IMPL
+#define DBG_PRN_IMPL _DBG_PRN_IMPL
+#endif
+#ifndef DBG_DUMP_IMPL
+#define DBG_DUMP_IMPL _DBG_DUMP_IMPL
+#endif
+
+#define DBG_PRN(L, ...) if ((DBG_LEVEL) & (L)) DBG_PRN_IMPL(__VA_ARGS__)
+#define DBG_DUMP(L, ...) if ((DBG_LEVEL) & (L)) DBG_DUMP_IMPL(__VA_ARGS__)
+
+#endif
+
+/// Print without level
+#define DBG_PRN_UL(L, F, ...) if ((DBG_LEVEL) & (L)) DBG_PRN_IMPL("", "%s" F, __VA_ARGS__)
+
+#endif /* EOF */
+#+END_SRC
+
+Usage:
+
+#+BEGIN_SRC cpp
+#include <string.h>
+
+// use level name as 1st argument of out DBG_PRN_IMPL
+#define DBG_LEVEL_IS_ARG
+#define DBG_LEVEL_FMT "[%s] "
+#include "dbg.h"
+
+// define levels
+#define HARDWARE_LEVEL   DBG_LEVEL_ALIAS(1)
+#define WRAPPER_LEVEL   DBG_LEVEL_ALIAS(2)
+#define APP_LEVEL       DBG_LEVEL_ALIAS(3)
+
+#undef DBG_LEVEL
+#define DBG_LEVEL (HARDWARE_LEVEL|APP_LEVEL)
+
+void main() {
+    char dim[] = "0123456789Hello World!";
+    DBG_PRN(HARDWARE_LEVEL, "There %d\n", 1);
+    DBG_PRN(WRAPPER_LEVEL, "There %d\n", 2);
+    DBG_PRN(APP_LEVEL, "There %d\n", 3);
+    DBG_DUMP(APP_LEVEL, dim, strlen(dim));
+    DBG_PRN_UL(APP_LEVEL, "%s\n", "Done.");
+}
+#+END_SRC
+
+Output:
+
+#+BEGIN_SRC
+[HARDWARE_LEVEL] There 1
+[APP_LEVEL] There 3
+0022FEF5: 30 31 32 33 34 35 36 37 38|39 48 65 6C 6C 6F 20
+0022FF05: 57 6F 72 6C 64 21
+Done.
+#+END_SRC

@@ -1,0 +1,74 @@
+#+title: Equation solver
+#+description: My Blog
+#+keywords: algorithms, fortran
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms fortran
+#+date: [2022-07-12 Tue 10:40]
+
+* Equation solver
+
+#+BEGIN_SRC fortran
+module utils
+implicit none
+
+  interface
+    function f_if(x)
+      real :: f_if, x
+    end function f_if
+  end interface
+
+contains
+
+  !Custom equation: f = ...
+  function f(x)
+    real :: f, x
+
+    f = x**3 + (1.1 * x**2) + 0.9 * x - 1.4
+  end function f
+
+  function next_x(x, x_1, fn)
+    real :: next_x, x, x_1
+    procedure(f_if), pointer :: fn
+
+    next_x = x_1 - (fn(x_1) * (x - x_1))/(fn(x) - fn(x_1))
+  end function next_x
+
+  function solve(x, x_1, fn, eps)
+    real :: solve, root, root_1, delta, eps_
+    real, intent(inout) :: x, x_1
+    real, optional :: eps
+    integer :: i = 0
+    procedure(f_if), pointer :: fn
+
+    if (.not. present(eps)) then
+      eps_ = 0.001
+    else
+      eps_ = eps
+    end if
+    do
+      root = next_x(x, x_1, fn)
+      if (i /= 0 ) then
+        delta = abs(root - root_1)
+        if (delta <= eps_) then
+          exit
+        end if
+      end if
+      i = i + 1
+      x_1 = x
+      x = root
+      root_1 = root
+    end do
+    solve = root
+  end function solve
+
+end module utils
+
+program eqsolver
+  use utils
+  implicit none
+  real :: x=1., x_1=0.
+  procedure(f_if), pointer :: fn => f
+  !write(*,*) next_x(1., 0., fn)
+  write(*,*) solve(x, x_1, fn)
+end program eqsolver
+#+END_SRC

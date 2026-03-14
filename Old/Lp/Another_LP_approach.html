@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Another LP approach</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="misc, lp" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Another LP approach</h1>
+<div id="outline-container-orgc7eeb9a" class="outline-2">
+<h2 id="orgc7eeb9a">Another LP approach</h2>
+<div class="outline-text-2" id="text-orgc7eeb9a">
+<p>
+Another approach is to use reStructuredText document generator system (see docutils). How to? It's easy: instead of embedding into source code the hyper-text formatting, images, links, you can write your program like story (in usual LP style), use RST syntax (like WiKi) for images embedding and various styles - your code is Literate Programming story as before. But now you can embed code fragments where you need with "include" directive of docutils. This directive requires "startd-after" and "end-before" options for this case. These options defines line (string fragment) the code starts after, and line - the code ends before. I use for this lines Vim foldering lines. See:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #575757;">// </span><span style="color: #575757;">Source code:</span>
+<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">x</span>;
+<span style="color: #575757;">// </span><span style="color: #575757;">Opening port {{{</span>
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">open_port</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">port</span>) {
+...
+}
+<span style="color: #575757;">// </span><span style="color: #575757;">}}}</span>
+</pre>
+</div>
+
+<p>
+This is very usuable for folding big source code!
+And in your .rst file (which plays a role of the .w file but for weaving only):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">and we define the function for a port opening:
+
+.. include:: port.c
+    :start-after: // Opening port {{{
+    :end-before: // }}}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

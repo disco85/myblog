@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LM3S9B92 and FreeRTOS example</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">LM3S9B92 and FreeRTOS example</h1>
+<div id="outline-container-org408db8f" class="outline-2">
+<h2 id="org408db8f">LM3S9B92 and FreeRTOS example</h2>
+<div class="outline-text-2" id="text-org408db8f">
+<p>
+Usual all developers starts with example of Web-server on FreeRTOS for this board. But always it does not work: Ethernet link is lost. How to cure it?
+</p>
+
+<p>
+First, download last version of FreeRTOS (I tryed FreeRTOSv7.0.2.exe archive). Then unpack it. You can cut unnecessary folders from Demo folder: all except "Common" and "CORTEX<sub>LM3Sxxxx</sub><sub>Eclipse</sub>".
+</p>
+
+<p>
+Then download Yagarto GNU toolchain (I used yagarto-bu-2.21<sub>gcc</sub>-4.6.0-c-c++<sub>nl</sub>-1.19.0<sub>gdb</sub>-7.2<sub>eabi</sub><sub>20110429</sub>) and install it.
+</p>
+
+<p>
+Then open main.c in "Demo\CORTEX<sub>LM3Sxxxx</sub><sub>Eclipse\RTOSDemo</sub>" and change prvSetupHardware() function to:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #ff4500;">void</span> <span style="color: #ff4500;">prvSetupHardware</span>(<span style="color: #ff4500;">void</span>)
+{
+ SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+ SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+ GPIODirModeSet(GPIO_PORTF_BASE, (GPIO_PIN_2 | GPIO_PIN_3), GPIO_DIR_MODE_HW);
+ GPIOPadConfigSet(GPIO_PORTF_BASE, (GPIO_PIN_2 | GPIO_PIN_3 ), GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD);
+ vParTestInitialise();
+}
+</pre>
+</div>
+
+<p>
+After it call make in console (Makefile is near main.c :). And now program RTOSDemo.bin into your chip with LM Flash Programmer tool. MAC address of the device should be set. Now reboot MCU and try to ping it - default IP address is 172.25.218.19. You can set static IP of your PC to 172.25.218.10/255.255.0.0 for this reason. And don't forget to disconnect your WiFi :)
+</p>
+
+<p>
+There are pong packets! Now try to open in the Web browser <code>http://172.25.218.19</code> - page will be refresh after 1 second and tasks will be shown.
+Thanks to <a href="http://e2e.ti.com/members/1438520/default.aspx">Yingxin Huang</a> and it's <a href="http://e2e.ti.com/support/microcontrollers/stellaris_arm_cortex-m3_microcontroller/f/473/t/74384.aspx">help</a> here.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

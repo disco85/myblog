@@ -1,0 +1,16 @@
+#+title: ASF: RGB macros
+#+description: My Blog
+#+keywords: clang, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang embedded
+#+date: [2020-02-06 Thu 18:14]
+
+* ASF: RGB macros
+
+Famouse RGB macros for R5G6B5 for ET0240006 (analogue of et024006_Color(R, G, B) in Atmel Software Framework):
+
+#+BEGIN_SRC cpp
+#define GUI_RGB(R, G, B) ((((R) & 0xF8)<<8) | (((G) & 0xFC)<<3) | ((B)>>3))
+#+END_SRC
+
+may be used anywhere - where you need constant, not function call (initializer of structs members and so on)

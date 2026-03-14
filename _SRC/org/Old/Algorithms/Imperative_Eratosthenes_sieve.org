@@ -1,0 +1,31 @@
+#+title: Imperative Eratosthenes sieve
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:19]
+
+* Imperative Eratosthenes sieve
+
+Algorithm is very-very simple and is learning at the school :)
+
+
+#+BEGIN_SRC python
+def erato(m):
+    # list of all numbers to m: 1 - free cell, 0 - aliquot to prime
+    lst = [1 for i in range(m)]
+    n = 2 # starts from 2
+    while n < m: # take next prime
+        for i in range(n, m): # looking for free cell
+            if lst[i]: break # 1 - free, i.e. not aliquot to others
+        if i == m-1: return # no more free, stop
+        n = i # keep found free
+        yield n # and it's prime!
+        j = 2 # multiplier: 2, 3, 4, 5...
+        while i < m: # checks aliquot to found prime n
+            lst[i] = 0
+            i = n*j # checks 2n, 3n, 4n, 5n, 6n, ...
+            j += 1 # multipliers: 2, 3, 4, 5...
+
+print list(erato(300))
+#+END_SRC

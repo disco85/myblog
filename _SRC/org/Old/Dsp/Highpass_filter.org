@@ -1,0 +1,89 @@
+#+title: High-pass filter
+#+description: My Blog
+#+keywords: clang, dsp
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang dsp
+#+date: [2020-02-07 Fri 17:17]
+
+* High-pass filter
+
+Simple high-pass filter in form of IIR of 1st order. See more info [[http://en.wikipedia.org/wiki/High-pass_filter][here]].
+In my application HMC demo I poll sensor (accelerometer) and filter Ax signal:
+
+#+BEGIN_SRC
+HPFilter hpf
+hpf configure -datatype flt -datatypes {phys}
+Saver saver1
+saver1 listen -on
+saver listen -on
+listen phvals:hpf
+listen hpf:saver1
+serial open 4
+sensor poll -loop
+#+END_SRC
+
+This will create 2 CSV files with native and with filtered signals (after saving we rename them). We can render signals with [[http://www.gle-graphics.org/index.html][GLE tool]]:
+
+#+BEGIN_SRC
+begin graph
+    title "Accelerations"
+    xtitle "Time [sec]"
+    ytitle "Ax [g]"
+    axis grid
+    ticks color grey40
+    subticks on
+    subticks lstyle 2
+    set font "texcmr"
+
+    d1 file "c:/tmp/saver.csv,0,5"
+    let d2 = d1
+    d1 line color red
+    d2 deresolve 10 average line color red lwidth 0.1
+
+    d3 file "c:/tmp/saver1.csv,0,5"
+    let d4 = d3
+    d3 line color blue
+    d4 deresolve 10 average line color blue lwidth 0.1
+end graph
+
+begin key
+    set fill yellow
+    line color red text "Native"
+    line color blue text "Filtered"
+end key
+#+END_SRC
+
+ Removing of slow drift is used in position estimation of sensor (from acceleration) in multicascading scheme:
+
+~HPF -> INTEGR -> HPF -> INTEGR -> HPF~
+
+Here is the C code (for SWIG) of this kind of filter:
+
+#+BEGIN_SRC cpp
+double* filter(double *v) {
+        int i;
+        int vlen;
+
+        vlen = (int)v[0];
+        if (vlen != $self->n) {
+            return (NULL);
+        }
+
+        for (i=1; i <= vlen; i++) {
+            $self->v[i] = $self->a * ($self->v[i] + v[i] - $self->x[i]);
+            $self->x[i] = v[i];
+        }
+        return ($self->v);
+}
+#+END_SRC
+
+$self is the pointer to CHPFilter struct:
+
+#+BEGIN_SRC cpp
+typedef struct CHPFilter {
+        int n; // length of v
+        double a; // alpha
+        double *v; // calculated values (keep prev. before filter)
+        double *x; // prev. input
+} CHPFilter;
+#+END_SRC

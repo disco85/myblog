@@ -1,0 +1,258 @@
+#+title: Interpolation search
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-15 Sat 09:41]
+
+* Interpolation search
+
+A special case of this algorithm: in general, the assumption is made that the elements are not just ordered, but correspond to some increasing series, for example, to arithmetic progression with some errors. If it's truth then we can "calculate" approximated item position - it's better than binary search. But only if the series is close to the assumption (ideal) values: the larger the error, the more steps we need to take.
+
+Let's look at arithmetic progression:
+
+#+BEGIN_SRC
+o . . o . . o
+a1    ax    an
+#+END_SRC
+
+We have some sequence (we can easy access a,,1,, and a,,n,, - the first and last items), so we should to find the position of a,,x,, - i.e. ~x~.
+
+$$a_n = a_1 + (n-1)d
+\newline
+a_x = a_1 + (x-1)d
+\newline
+d = \frac{a_n-a_1}{n-1}
+\newline
+d = \frac{a_x-a_1}{x-1}
+\newline
+\frac{a_n-a_1}{n-1} = \frac{a_x-a_1}{x-1}
+$$
+
+So, this means that the position ~x~:
+
+$$x = \frac{(a_x-a_1)(n-1)}{a_n-a_1} + 1
+$$
+
+The base ideas of this search are:
+
+- it search similarly to the binary search but it uses some empiric - the knowledge of the items distribution law
+- this law helps to hit initial position which will be final position of the searching item if the sequence is ideal
+- otherwise it will use the knowledge that items are ordered to find where to move next: to left or to right.
+
+To compare this kind of search with the binary search let's create some test class:
+
+#+BEGIN_SRC python
+from math import *
+import random
+
+class Test:
+    def __init__(self, count, maxerr):
+        self.reset_counters()
+        self.seq = []
+        self.seqlen = count
+        self.maxerr = maxerr
+        self.steps_f = open('steps.csv', 'wt', encoding='utf-8')
+        self.seq_f = open('seq.csv', 'wt', encoding='utf-8')
+
+    def reset_counters(self):
+        self.bin = 0
+        self.int = 0
+
+    def setup_seq(self, err):
+        self.seq = []
+        prev = 1
+        for n in range(1, self.seqlen+1):
+            ax = prev + random.randint(1, err)
+            self.seq.append(ax)
+            prev = ax
+
+    def binary_search(self, ax):
+        n = len(self.seq)
+        L = 0
+        R = n-1
+        while L <= R:
+            self.bin += 1
+            mid = floor((L+R)/2)
+            if self.seq[mid] < ax:
+                L = mid + 1
+            elif self.seq[mid] > ax:
+                R = mid - 1
+            else:
+                return mid
+        raise Exception('%d not found in %s' % (ax, self.seq))
+
+    def isearch(self, ax, a=None):
+        self.int += 1
+        if not a: a = self.seq
+        n = len(a)
+        if ax < a[0] or ax > a[-1]:
+            raise Exception('%d not found in %s (origin: %d..%d)' % (ax, a, self.seq[0], self.seq[-1]))
+        elif ax == a[0]: return 0
+        elif ax == a[-1]: return n - 1
+        rat0 = (ax - a[0]) * (n - 1)
+        rat1 = a[-1] - a[0]
+        x = (1 + rat0 // rat1) - 1 # coz indexes are zero-based
+        if a[x] < ax:
+            return x + 1 + self.isearch(ax, a[x+1:])
+        elif a[x] > ax:
+            return self.isearch(ax, a[:x])
+        else:
+            return x
+
+    def test(self, err):
+        self.setup_seq(err)
+        bin_counter = 0
+        int_counter = 0
+        for ax in self.seq:
+            self.reset_counters()
+            f = self.binary_search(ax)
+            if ax != self.seq[f]:
+                raise Exception('Binary found wrong value!')
+            f = self.isearch(ax)
+            if ax != self.seq[f]:
+                raise Exception('Interpolation found wrong value!')
+            bin_counter += self.bin
+            int_counter += self.int
+        bin_counter = round(bin_counter / self.seqlen)
+        int_counter = round(int_counter / self.seqlen)
+        return (err, bin_counter, int_counter)
+
+    def test_all(self):
+        self.steps_f.write('err,bin,int\n')
+        self.seq_f.write(','.join(str(x) for x in range(self.seqlen)) + '\n')
+        for err in range(1, self.maxerr):
+            r = self.test(err)
+            self.seq_f.write(','.join(str(x) for x in self.seq) + '\n')
+            self.steps_f.write(','.join(str(x) for x in r) + '\n')
+
+
+t = Test(500, 500)
+t.test_all()
+#+END_SRC
+
+We collect the results in CSV files. The content of ~steps.csv~ looks like:
+
+#+BEGIN_SRC
+err,bin,int
+1,8,1
+2,8,2
+3,8,2
+4,8,2
+5,8,2
+6,8,2
+7,8,2
+8,8,3
+9,8,2
+10,8,2
+11,8,2
+12,8,2
+13,8,2
+14,8,2
+15,8,2
+16,8,3
+...
+#+END_SRC
+
+where the 1st column is the ~err~ (some delta from ideal arithmetic progression), 2nd one is the average number of the iterations for binary search and 3rd - the same for interpolation search.
+
+We see that interpolation search requires 1..3 steps, while binary search requires 8 steps (for 500 items with ~err~ 1..500).
+
+If we know the law of the items, we can use another empiric instead of arithmetic progression law, for example, geometric progression or something else.
+
+If we change the generating of the sequence to geometric progression (with error ~err~):
+
+#+BEGIN_SRC python
+...
+    def setup_seq(self, err):
+        self.seq = []
+        prev = 1
+        q = 2
+        for n in range(1, self.seqlen+1):
+            ax = err + prev * q
+            self.seq.append(ax)
+            prev = ax
+...
+#+END_SRC
+
+then average steps will look very differently:
+
+#+BEGIN_SRC
+err,bin,int
+1, 1, 1
+2, 8, 244
+3, 8, 246
+4, 8, 247
+5, 8, 247
+6, 8, 247
+7, 8, 248
+8, 8, 248
+...
+#+END_SRC
+
+and we see that binary search still does 8 steps in average, but our implementation of the interpolation search is not so effective more and does in average in 31 times more steps.
+
+This result means that our empiric (prediction) is not accurate enough more, so we should change it.
+
+If use the geometric progression as a model, so we can use it (this is the idea of the algorithm - to know the model!):
+
+$$b_n = b_1q^{n-1}
+\newline
+b_x = b_1q^{x-1}
+\newline
+q^{n-1}=\frac{b_n}{b_1}
+\newline
+q^{x-1}=\frac{b_x}{b_1}
+\newline
+\sqrt[n-1]{\frac{b_n}{b_1}} = \sqrt[x-1]{\frac{b_x}{b_1}}
+\newline
+(\sqrt[n-1]{\frac{b_n}{b_1}})^{x-1} = \frac{b_x}{b_1}
+\newline
+s = \sqrt[n-1]{\frac{b_n}{b_1}}
+\newline
+x - 1 = \log_s{\frac{b_x}{b_1}}
+\newline
+x = 1 + \log_s{\frac{b_x}{b_1}}
+$$
+
+We will implement this equation, but another expression for ~x~ is:
+
+$$x = 1 + \log_{\frac{b_n}{b_1}}(\frac{b_x}{b_1})^{n-1}
+$$
+
+We can use Python function: $$pow(x, 1/y) = \sqrt[y]x$$
+
+#+BEGIN_SRC python
+    def isearch_g(self, ax, a=None):
+        self.int += 1
+        if not a: a = self.seq
+        n = len(a)
+        if ax < a[0] or ax > a[-1]:
+            raise Exception('%d not found in %s (origin: %d..%d)' % (ax, a, self.seq[0], self.seq[-1]))
+        elif ax == a[0]: return 0
+        elif ax == a[-1]: return n - 1
+        s = pow(a[n-1] / a[0], 1 / (n - 1))
+        x = 1 + round(log(ax / a[0], s))
+        if a[x] < ax:
+            return x + 1 + self.isearch_g(ax, a[x+1:])
+        elif a[x] > ax:
+            return self.isearch_g(ax, a[:x])
+        else:
+            return x
+#+END_SRC
+
+And now we get different result:
+
+#+BEGIN_SRC
+(1, 8, 2)
+(2, 8, 2)
+(3, 8, 2)
+(4, 8, 2)
+(5, 8, 2)
+(6, 8, 2)
+(7, 8, 2)
+(8, 8, 2)
+...
+#+END_SRC
+
+and now our interpolation search is faster again. But we run the test with ~Test(250, 500)~ to avoid overflow related errors (it happens with 1st parameter = 500).

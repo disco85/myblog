@@ -1,0 +1,327 @@
+#+title: Text format to columns on Haskell
+#+description: My Blog
+#+keywords: haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell algorithms
+#+date: [2020-02-04 Tue 06:09]
+
+* Text format to columns on Haskell
+
+This is the language study excersice which reformat text input into text with
+columns. All process will have follow parameters:
+
+- ~ncols~ - number of columns
+- ~nspaces~ - spaces number between columns
+- ~width~ - width of columns
+- ~pagesize~ - lines of page
+
+We will use next modules and exported names:
+
+#+BEGIN_SRC haskell
+import           Data.List
+import           Data.Maybe            (fromMaybe, isJust)
+import           Prelude               hiding (Word)
+import           System.Console.GetOpt
+import           System.Environment
+#+END_SRC
+
+Parameters of re-formating will be got from command line, which is parsing
+with standard Haskell module ~GetOpt~ (see above). Btw, this parser (be
+default?) supports "-aN" but not "-a N".
+
+This is the "record" for CLI options:
+
+#+BEGIN_SRC haskell
+-- | Stricts to get syntax errors immediately
+data CmdOpts = CmdOpts {
+  help     :: !Bool,
+  ncols    :: !Int, -- number of columns
+  nspaces  :: !Int, -- spaces between columns
+  width    :: !Int, -- width of column
+  pagesize :: !Int -- lines in page
+  } deriving Show
+#+END_SRC
+
+Their fields are strict to get syntax error immediately. We are reading input
+text from "stdin" so will we are waiting for input (WITH OPTION ERROR!) we
+won't get error reporting - so, they will be strict.
+
+This null-arity function returns the default values of CLI options (if some
+are omitted):
+
+#+BEGIN_SRC haskell
+-- | Default values of command line options
+defaultCmdOpts :: CmdOpts
+defaultCmdOpts = CmdOpts {
+  help = False,
+  ncols = 2,
+  nspaces = 4,
+  width = 20,
+  pagesize = 24
+  }
+#+END_SRC
+
+Then, as in other languages (argparse in Python ,for example) we should define
+options: their names, types, numbers, mandatory, etc.:
+
+#+BEGIN_SRC haskell
+-- | Definition of program command line options
+cmdSyntax :: [OptDescr (CmdOpts -> CmdOpts)]
+cmdSyntax =
+  [
+    Option ['h', '?'] ["help"]
+      (NoArg (\cmdOpts -> cmdOpts {help=True} ))
+      "print this help",
+
+    Option ['c'] ["cols"]
+      (OptArg (\s cmdOpts -> cmdOpts {ncols=readOpt s}) "NCOLS")
+      "columns number (default: 2)",
+
+    Option ['s'] ["spaces"]
+      (OptArg (\s cmdOpts -> cmdOpts {nspaces=readOpt s}) "NSPACES")
+      "spaces number (default: 4)",
+
+    Option ['w'] ["width"]
+      (OptArg (\s cmdOpts -> cmdOpts {width=readOpt s}) "WIDTH")
+      "column width (default: 20)",
+
+    Option ['p'] ["pagesize"]
+      (OptArg (\s cmdOpts -> cmdOpts {pagesize=readOpt s}) "PAGESIZE")
+      "page size in lines (default: 25)"
+  ] where
+  readOpt :: Read a => Maybe [Char] -> a
+  readOpt s = (read $ fromMaybe "" s)
+#+END_SRC
+
+First arg of ~OptArg~ is lambda which gets string value of option and
+aggregated options values - it must parse string to internal type and to save
+result into this ~cmdOpts~ for further processing.
+
+Parsing function is ~parseCmdOpts~ which works with external world so operates
+in ~IO~context:
+
+#+BEGIN_SRC haskell
+-- | Usage string
+usage :: String
+usage = usageInfo "SYNTAX: col [options...]" cmdSyntax
+
+
+-- | Parses command line options
+parseCmdOpts :: IO CmdOpts
+parseCmdOpts = do
+  argv <- getArgs
+  case getOpt Permute cmdSyntax argv of
+    (opts, _, []) -> return $ foldl (flip id) defaultCmdOpts opts
+    (_, _, errs) -> error $ concat errs ++ "\n" ++ usage
+#+END_SRC
+
+This is the utility function which split sequence into pies with size ~n~ and
+is based on standard function ~splitAt~:
+
+#+BEGIN_SRC haskell
+-- | Splits `xs` on pies with the same size `n`
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n xs = as : splitEvery n bs
+  where (as, bs) = splitAt n xs
+#+END_SRC
+
+To simplify our types expressions (signatures) we set types definitions for
+word (symbols without spaces), line, column and page:
+
+#+BEGIN_SRC haskell
+-- | Typedefs
+type Word = String
+type Line = String
+type Column = [Line]
+type Page = [Column]
+#+END_SRC
+
+Here we begin actual processing. First, we need to make main working function
+which gets words and cuts (extracts) line from them but saves rest of words
+for further processing. It calculate how many words we need, then calculate
+how much they must be sparse (to fill width of column) and returns result as
+~Line~ and list of words rest.  If it's impossible to extract line with such
+width then result will be ~Nothing~ (if possible - line is wrapped into
+~Just~). Idea is to calculate lengths of words but (to simplify further
+calculations) additively: not ~[2, 3, 4]~ but ~[2, 6, 10]~, i.e. lengths of
+words plus one-symbol spaces (minimal needed symbols). Then we takes as much
+words as we need to keep line length ~<= width~. This does ~wl = ...~ line in
+the code:
+
+#+BEGIN_SRC haskell
+-- | Cuts line with width `w` from words `ws` by drop some words and adding
+-- spaces between kept ones. If it's possible returns (Maybe line, rest-of-words),
+-- otherwise (Nothing, all-words)
+cutLine :: Int -> [Word] -> (Maybe Line, [Word])
+cutLine _ [] = (Just "", [])
+cutLine w ws =
+  let wl = takeWhile (<=w) $ scanl1 ((+).(+1)) $ map length ws -- additive words lengths
+      wn = length wl -- words number
+      (w0, w1) = splitAt wn ws
+      gn = wn - 1 -- gaps number
+  in
+    case gn of
+      -1 -> (Nothing, ws)
+      0 -> (Just $ w0!!0, w1)
+      _ ->
+        let ag = w - last wl -- additional gaps needed
+            gw = 1 + ag `div` gn -- gaps width (except last one)
+            lgw = gw + (ag `mod` gn) -- last gap width
+            gap = replicate gw ' '
+            lgap = replicate lgw ' '
+            (firstWords, lastWord) = splitAt (wn-1) w0
+        in
+          (Just $ intercalate gap firstWords ++ lgap ++ lastWord!!0, w1)
+#+END_SRC
+
+We calculates needed spaces to sparse line to width ~w~ and add them into each
+gap, last gap will have remainder of division (if we are adding 5 spaces to 2
+gapes then last will have 3 spaces, not 2).
+
+Next function cuts column from words: actually we can think about resulting
+text as text with one column looking like snake :) So, we cut one column (all
+columns have the same width, laid snake column):
+
+#+BEGIN_SRC haskell
+-- | Cuts column (list of lines) with width `w` from words `ws`. If it's possible
+-- (to reformat words into new width `w`), returns Maybe column, Nothing otherwise
+cutColumn :: Int -> [Word] -> Maybe Column
+cutColumn w ws =
+  let (mbLine, othWords) = cutLine w ws in
+    do
+      line <- mbLine
+      case othWords of
+        [] -> return [line]
+        _ -> do othLines <- (cutColumn w othWords)
+                return $ [line] ++ othLines
+#+END_SRC
+
+Now we will cut the "snake" into separate pies - real columns. We need (sure)
+to know page size (~ps~ argument) and width of columns (~w~). We use ~>>=~
+bind function to drop ~Nothing~ (into ~Nothing~). And yes, we actually cut the
+snake - with ~splitEvery~ - into the same size parts (size is ~ps~):
+
+#+BEGIN_SRC haskell
+-- | Cuts columns with width `w` for page with size `ps` (lines in page) from input
+-- text `txt`
+cutColumns :: Int -> Int -> String -> Maybe [Column]
+cutColumns w ps txt =
+  let ws = words txt in
+    cutColumn w ws >>= \c -> return $ splitEvery ps c
+#+END_SRC
+
+And last we cuts pages from list of columns, principle is the same:
+
+#+BEGIN_SRC haskell
+-- | Cuts pages from early cutted (reformatted) columns `mbCols` when number of columns
+-- is `nc`
+cutPages :: Int -> Maybe [Column] -> Maybe [Page]
+cutPages nc mbCols = mbCols >>= \cols -> return $ splitEvery nc cols
+#+END_SRC
+
+Now we need utility function, ~zip~ - not for 2 sequences, but for any number
+of them. ~enumFrom~ is analogue of Python ~range(0)~, we select each time item
+with the same index - like in real ~zip~. But since we have any number of
+sequence, they are represented as list of sequences ~seqs~. Sequences can have
+different number of items, so we complement each one with ~Nothing~ (NULL),
+but then existing items will be wrapped in ~Just~. We stop to consume
+resulting sub-lists when all their items will be ~Nothing~:
+
+#+BEGIN_SRC haskell
+-- | zip for N sequences
+zipN :: [[a]] -> [[Maybe a]]
+zipN seqs =
+  let seqs' = map (\sq -> map Just sq ++ repeat Nothing) seqs in
+  takeWhile (any isJust) [[sq!!i | sq <- seqs'] | i <- enumFrom 0]
+#+END_SRC
+
+See picture:
+
+#+BEGIN_SRC
+  1     2     3     N     M        <- seq1
+  2     3     N     N     N        <- seq2
+[1,2] [2,3] [3,N] skip! skip! ...  <- zipN
+#+END_SRC
+
+Now we should "fold" results into text (from structured data). Folding of page
+will creates page into ONE column (the snake, yes:)
+
+#+BEGIN_SRC haskell
+-- | Folds page `page` with width of column `w` and vertical space `vSpace` into string
+foldPage :: String -> Int -> Page -> Column
+foldPage vSpace w page =
+ let emptyCol = replicate w ' ' in
+ map (\c -> intercalate vSpace $ map (fromMaybe emptyCol) c) (zipN page)
+#+END_SRC
+
+Then we can fold pages into text (~String~). "Pages" - because result of cut
+is list of pages (which are columns which are lines which are words). Each
+page will be delimited with string like (page number):
+
+#+BEGIN_SRC
+                      - 2 -
+#+END_SRC
+
+named ~colontit~. It is justified with ~pw~ - page width.
+
+~vSpace~ here is vertical space between columns. ~enumPage~ is enumerated
+pages with... ~zip~, ~zip~ does it in very natural way - it "adds" to page
+it's number (from 1, see ~enumFrom 1~):
+
+#+BEGIN_SRC haskell
+-- | Folds pages `pages` with columns of width `w` and page width `pw` into string
+foldPages :: String -> Int -> Int -> [Page] -> String
+foldPages vSpace w pw pages =
+  let showPage i = "- " ++ show i ++ " -"
+      pdel = "\n\n"
+      colontit i = pdel
+                   ++ replicate (pw `div` 2 - length (showPage i) `div` 2) ' '
+                   ++ (showPage i) ++ pdel
+      enumPages = zip (map (intercalate "\n" . foldPage vSpace w) pages) (enumFrom 1)
+  in
+    intercalate "" $ map (\(p,i) -> p ++ colontit (i::Integer)) enumPages
+#+END_SRC
+
+~foldPage~ folds pages into one column (list of lines) and then we are joing
+column lines with "\n". Last function is ~col~ which joins together all
+processing:
+
+#+BEGIN_SRC haskell
+-- | Reformats input text `txt` into new text with columns which options are setted
+-- in `opts`
+col :: CmdOpts -> String -> String
+col opts txt =
+  let mbCols = cutColumns (width opts) (pagesize opts) txt
+      mbPages = cutPages (ncols opts) mbCols
+      vSpace = replicate (nspaces opts) ' '
+      pageWidth = (ncols opts) * (width opts) + (ncols opts - 1) * (nspaces opts)
+  in
+  foldPages vSpace (width opts) pageWidth (fromMaybe [] mbPages)
+#+END_SRC
+
+~pageWidth~ we need to justify ~colontit~.
+
+Main entry point is simple and runs all I/O: processing of "stdin" content
+(see ~getContents~) with out ~col~ function. But if we have ~fHelp~ then we
+print usage help instead (user enters "-h" CLI option):
+
+#+BEGIN_SRC haskell
+main :: IO()
+main = do
+  cmdOpts <- parseCmdOpts
+  let CmdOpts { help = fHelp } = cmdOpts in
+    if fHelp then putStrLn usage
+    else do
+         inTxt <- getContents
+         putStr $ col cmdOpts inTxt
+#+END_SRC
+
+~fHelp~ is boolean flag mathed ~help~ field of our CLI options record. Actually
+it's simple example, but looks interesting. To run it use:
+
+#+BEGIN_SRC console
+cat somefile.txt | runghc col.hs -w40 | less
+#+END_SRC
+
+This code is available in [[https://github.com/bapcyk/hcol][my Git]]

@@ -1,0 +1,90 @@
+#+title: Harmonic series
+#+description: My Blog
+#+keywords: haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell algorithms
+#+date: [2020-02-04 Tue 06:13]
+
+* Harmonic series
+
+This is the very simple interview question: check that series are harmonic, i.e.
+list of numbers are line (~kx + b~) - two close elements always have the same difference (~k~).
+
+Naive implementation is:
+
+
+#+BEGIN_SRC haskell
+-- Naive version of checking if sequence of numbers are harmonic (difference
+-- between neighbords is the const)
+
+-- Folding function with args (prev, diff, result)
+rf (p, d, Nothing) c = (c, d', Just True) where d' = c - p
+rf (p, d, Just False) c = (c, d, Just False)
+rf (p, d, Just True) c = (c, d', Just $ d == d') where d' = c - p
+
+harm [] = False
+harm (hd:xs) = let (_, _, Just x) = foldl rf (hd, 0, Nothing) xs in x
+
+
+main = do
+  print $ harm [1, 2, 3, 4, 5, 6, 9]
+  print $ harm [1, 2, 3, 4, 5, 6]
+  print $ harm [2, 4, 6, 8]
+
+#+END_SRC
+
+where we are folding items and keep on each step tuple ~(prev, diff, result)~, where result
+is ~Just True~, ~Just False~ or ~Nothing~ on first item. Actually this code has problem: it
+can not process ~harm [2]~ or ~harm []~.
+
+Another version may calculate difference between neighboards and then to calculate difference
+in the same way again:
+
+#+BEGIN_SRC code
+1    2    3    4    6
+  -1   -1   -1   -2
+     0    0   -1!
+#+END_SRC
+
+After it we can summarize all items and if result is 0 then we have harmonic numbers:
+
+#+BEGIN_SRC haskell
+neighOp op [] = []
+neighOp op l@(hd:xs) = zipWith op l xs
+
+harm [] = False
+harm [x] = False
+harm ns = 0 == (foldl1 (+) $ neighOp (-) $ (neighOp (-) ns))
+
+
+main = do
+  print $ harm [1, 2, 3, 4, 5, 6, 9]
+  print $ harm [1, 2, 3, 4, 5, 6]
+  print $ harm [2, 4, 6, 8]
+  print $ harm [2]
+  print $ harm []
+#+END_SRC
+
+3d version does not folding all items but drops all 0's until find first non zero
+which means that non-harmonic series are found:
+
+#+BEGIN_SRC haskell
+neighOp op [] = []
+neighOp op l@(hd:xs) = zipWith op l xs
+
+harm [] = False
+harm [x] = False
+harm ns = case dropWhile (==0) $ neighOp (-) $ neighOp (-) ns of
+  [] -> True
+  _ -> False
+
+
+main = do
+  print $ harm [1, 2, 3, 4, 5, 6, 9]
+  print $ harm [1, 2, 3, 4, 5, 6]
+  print $ harm [2, 4, 6, 8]
+  print $ harm [2]
+  print $ harm []
+#+END_SRC
+
+Case will be lazy so calculations happens until first non-zero item in 2nd difference.

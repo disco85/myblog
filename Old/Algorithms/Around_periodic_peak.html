@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Around periodic peak?</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms, dsp" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Around periodic peak?</h1>
+<div id="outline-container-org1eae205" class="outline-2">
+<h2 id="org1eae205">Around periodic peak?</h2>
+<div class="outline-text-2" id="text-org1eae205">
+<p>
+Does the sample is located around periodic peak? Next pseudo-code (Python) function tests does sample is located in domain around periodic peak:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #ff4500;">def</span> <span style="color: #ff4500;">isclose</span>(a, b, lim):
+<span style="color: #a52a2a;">    # is</span> b close to a OR to aliquot of a in lim
+    <span style="color: #696969;">if</span> a == 0:
+        <span style="color: #696969;">return</span> abs(b - a) &lt;= lim
+    <span style="color: #696969;">else</span>:
+        n = b/a
+        <span style="color: #696969;">if</span> b%a &gt; a/2:
+            n += 1
+        c = a*n # closest aliquot to b
+        m = abs(b - c)
+        <span style="color: #696969;">return</span> m &lt;= lim
+</pre>
+</div>
+
+<p>
+&#x2026;returns boolean.
+It's usable to test dispersion of sample around peaks.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Diagrams</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="Paradigms Logo" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Simple Diagrams</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgff8050c">My simplification of existing diagrams</a></li>
+<li><a href="#org913a09e">Structure diagram</a></li>
+<li><a href="#org52cb98c">Conceptual structural diagram</a></li>
+<li><a href="#org03b1ff9">Variations</a></li>
+<li><a href="#orgf605934">Important: the main idea of the structural diagrams</a></li>
+<li><a href="#org8d29b5e">Algorithmic diagrams</a></li>
+<li><a href="#org9488138">Why do we need diagrams?</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgff8050c" class="outline-2">
+<h2 id="orgff8050c">My simplification of existing diagrams</h2>
+<div class="outline-text-2" id="text-orgff8050c">
+<p>
+There are many diagramming standards. Different diagrams serve
+different purposes.  Diagrams are a language, albeit a visual
+one. Unlike most programming languages, they can often describe more
+than just a program. Well-known and fairly good diagramming standards
+are:
+</p>
+
+<ul class="org-ul">
+<li>OPM</li>
+<li>Grafcet</li>
+<li>JSP</li>
+<li>ERD</li>
+<li>FlowChart</li>
+<li>FlowProcess</li>
+<li>N2</li>
+<li>NS</li>
+<li>UML&#x2026;</li>
+</ul>
+
+<p>
+Some are clear, easy to learn, and enjoyable to use. Others are
+complex and unintuitive. The main idea of diagrams is to present
+information in a language that's easy to read so you can quickly find
+the information you need: no need to read lengthy texts or try to
+understand the intricacies of programming language semantics. Most
+diagramming standards, however, require time to learn.
+</p>
+
+<p>
+I decided to develop diagrams that are as simple, clear, and useful as
+possible. I identified several types of diagrams:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Diagrams
+|
++-- Structural Diagrams
+|   |
+|   +-- Conceptual Structural Diagrams
+|
++-- Algorithmic Diagrams
+</pre>
+</div>
+
+<p>
+When creating them, I followed the following idea: <b><b>diagrams should
+be like maps: they should help find a path to the information/details
+you're interested in</b></b> - people understand maps; they're simply a flat
+path.
+</p>
+</div>
+</div>
+<div id="outline-container-org913a09e" class="outline-2">
+<h2 id="org913a09e">Structure diagram</h2>
+<div class="outline-text-2" id="text-org913a09e">
+<p>
+It depicts concepts in rectangles. In a program, these could be
+classes, structures, records. Concepts depend on each other; they are
+logically related, and this is represented by arrows.  Solid arrows
+represent relationships such as "has" and "owns." Dashed arrows
+represent relationships such as "is" or "is"
+(inheritance). Relationships have a direction, which is logical. But
+it's important to understand that <b>relationships have a direction in
+my diagram type because my diagrams are maps, and the direction of a
+relationship/arrow is the path available to get data from one concept
+to another!</b>
+</p>
+
+<p>
+For example, if you know the model of a car, you can <b>follow the arrow</b>
+and determine/find what engine that model has. If the arrows
+are bidirectional, this means you can get information from one concept
+to another, and you can get information about the first from the
+second. This isn't always true. For example, you can't identify a
+buggy by knowing its headlights, since they could be used on other
+buggies as well. Of course, the example drawn in the diagram is very
+schematic and doesn't reflect the real nuances of the subject area.
+</p>
+
+<p>
+In ellipses, processes are represented by arrows associated with
+processes, interpreted as "input," "submitted for processing,"
+"output," and "is a product." Arrows can have arity; for example, a
+car may or may not have a satellite navigation system, meaning it has
+(solid arrow) 0 or 1 SAT-NAV system. This can be represented as 0..1
+or 0/1. Arity can be different, for example, a car has exactly 4
+wheels. By default, the arity is 1.
+</p>
+
+<p>
+The diagnostic report generation process generates a list of
+problematic car parts that need to be replaced, ranging from zero (no
+problems) to a reasonable number. Yes, we believe diagnostics is smart
+enough for this.
+</p>
+
+<p>
+Here's the diagram:
+</p>
+
+
+<div id="orgd449e3a" class="figure">
+<p><img src="../assets/Classes_ER.svg" alt="Classes_ER.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org52cb98c" class="outline-2">
+<h2 id="org52cb98c">Conceptual structural diagram</h2>
+<div class="outline-text-2" id="text-org52cb98c">
+<p>
+Another type of structure diagram is the conceptual structure
+diagram. It's very similar to the previous one, but it hides
+implementation details and isn't concerned with programming. It
+instead reflects concepts and their relationships more semantically,
+conceptually, and abstractly, without specifying inheritance or
+aggregation (inclusion as part of itself). Therefore, it doesn't have
+dotted lines; all the lines are the same - they are simply relationships
+between concepts and processes. However, the relationships are
+labeled - this is their semantics. <b>It must correspond to the
+directions</b>. When this label is in square brackets, like <code>[has]</code>,
+it's the default relationship, and unlabeled relationships are
+implied. Otherwise, everything is the same:
+</p>
+
+
+<div id="org5dcfe94" class="figure">
+<p><img src="../assets/Classes_ER_conceptual.svg" alt="Classes_ER_conceptual.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Structural diagrams describe a subject area, the concepts within it,
+how they are related, how one can be learned from another, and how to
+work with this information.
+</p>
+
+<p>
+This diagram has semantics, for example, from it you understand that a
+buggy is a type of car, but it does not impose on you how you will
+represent this relationship - as inheritance or implicit aggregation.
+</p>
+
+<p>
+Processes can be shown also as terms, in the end - they are: this
+diagram avoids implementation details (as implementation, processes
+calso can be classes, but it's important to think about terms, drawing
+the conceptual diagram).
+</p>
+
+<p>
+It's free of redundancy - the fact that a buggy has the same engine,
+model, and perhaps even a single satellite navigation system isn't
+repeated in a buggy. To figure this out, if you "own a buggy," you
+"go" to the more basic concept of "car" and see what information is
+available for any car (including buggies). A buggy may also have
+unique information, such as a spotlight. And it's impossible to claim
+that it's typical for any car.
+</p>
+</div>
+</div>
+<div id="outline-container-org03b1ff9" class="outline-2">
+<h2 id="org03b1ff9">Variations</h2>
+<div class="outline-text-2" id="text-org03b1ff9">
+<p>
+If there is a bidirectional relation, name of it from one side and
+another one can be different, it can be represented as <code>A | B</code> or
+<code>A / B</code> where <code>A</code> is how it's called from the side of that <code>A</code>:
+</p>
+
+
+<div id="orgb32d951" class="figure">
+<p><img src="../assets/Classes_ER_variations1.svg" alt="Classes_ER_variations1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+The brackets show that this relation name is used as the default
+relation (where there is no name at all).
+</p>
+
+<p>
+Another situation: some term/notion has some attribute sharing its
+value with all instances of this term/notion. In programming it's
+called class variable. Here, it is some registry of known messages
+that a window (any of this type/class of windows) can handle.
+</p>
+
+<p>
+And instances also have their own, individual values-attributes
+(instance variables):
+</p>
+
+
+<div id="org48b3c70" class="figure">
+<p><img src="../assets/Classes_ER_variations2.svg" alt="Classes_ER_variations2.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+So, usual structural diagram covers it as well. The relation between
+the class and its instance usually is from an instance to a class: we
+can determine the class of the object. Looking at the name John we
+determine that it's a male from English-speaking country (its class),
+usually classes don't store their instances, so the direction of the
+arrow is from the instance to the class and its caption is
+"instantiates" (particular window object instantiates general/abstract
+term "windows"). The arity is <code>0..N</code> which means: "a particular object
+of windows instantiates this concept 0 to N times". Anyway, <code>0..N</code> is
+the number of objects "Window instance" in this relation. This arity
+here can be skipped sure (preferred), but if it's <b>singleton</b> then
+it must be shown as <code>1</code> if the diagrams shows both - the class and
+its singleton separately. Another option could be to write <code>1</code> near
+the class but not close to an arrow.
+</p>
+
+
+<div id="orga9f501f" class="figure">
+<p><img src="../assets/Classes_ER_variations3.svg" alt="Classes_ER_variations3.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+Another option is to write a type of the relation in math sense
+(instead of an arity), like <code>bijection: implies</code>. <a href="https://en.wikipedia.org/wiki/Bijection,_injection_and_surjection">More about it</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf605934" class="outline-2">
+<h2 id="orgf605934">Important: the main idea of the structural diagrams</h2>
+<div class="outline-text-2" id="text-orgf605934">
+<p>
+In essence, <b>these diagrams are a distillation of semantic networks
+and ERD diagrams</b>. Try to see it as a knowledge map that leads you
+from known knowledge to the unknown.
+</p>
+
+<p>
+You have not draw all attributes of objects like in ERD: you draw
+only attributes needed to reach some goal, if your map is dedicated,
+focused on some goal. For ex, a map/diagram can illustrate how to
+find a salary of employees. Draw only attrobutes helped to reach
+a salary.
+</p>
+</div>
+</div>
+<div id="outline-container-org8d29b5e" class="outline-2">
+<h2 id="org8d29b5e">Algorithmic diagrams</h2>
+<div class="outline-text-2" id="text-org8d29b5e">
+
+<div id="orgc9b7c82" class="figure">
+<p><img src="../assets/Algo_Diag1.svg" alt="Algo_Diag1.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+The principle is the same - it's a map (more on that later). This type
+of diagram depicts an algorithm: conditions and actions. The
+rectangles outlined with a thick line represent conditions that "act"
+like road signs: you must obey them, otherwise you can't pass
+them. The remaining rectangles represent actions. This diagram is read
+intuitively: like a map, you follow the arrows, and to get somewhere
+and perform an action, you "pass" through "road signs" if you satisfy
+them. For example, if you encounter a "smaller indent," you can pass
+that sign. Otherwise, you're left with one of the "bigger indent"
+signs, or the "same indent," and you choose the one whose condition
+you satisfy and follow its path (the path it's on).
+</p>
+
+<p>
+If you satisfy the "smaller indent," your next "stop" is "pop until
+this indent (including it)" - you fulfill its instructions.
+</p>
+
+<p>
+<b>Looks like a child's game!</b>
+</p>
+
+<p>
+Looking at this diagram, you can see that the "path to result" is the
+final stop; you can't "leave" it. In principle, it could also be
+marked, for example, with a different line thickness.
+</p>
+
+<p>
+Some "roads" are combined, so to help you navigate, routes are
+indicated on them, for example, as letters. For example, route "A":
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">same indent -&gt; path: join name to full path from stack names -&gt; in stack: change top name  
+</pre>
+</div>
+
+<p>
+while "smaller indent" and "bigger indent" will go through "push
+indent, name" - they have an unnamed route (to avoid cluttering the
+map).
+</p>
+
+<p>
+Elsewhere, another route uses the same letter "A":
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">not first line -&gt; from line: indent, name -&gt; smaller indent/bigger indent/same indent  
+</pre>
+</div>
+
+<p>
+The beginning is also obvious: first line/not first line, and since processing begins
+from the first line, it is even more precise - the beginning is "first line."
+</p>
+
+<p>
+An algorithm map resembles a game of Monopoly or something similar. If
+you haven't yet guessed the inspiration for the algorithm diagram,
+take a look at this algorithm:
+</p>
+
+
+<div id="orgade4274" class="figure">
+<p><img src="../assets/Algo_Diag2.svg" alt="Algo_Diag2.svg" class="org-svg" />
+</p>
+</div>
+
+<p>
+In essence, these are modified <b>syntactic diagrams</b>.
+</p>
+
+<p>
+In the last diagram, the thick rectangles are "road signs" (conditions).
+</p>
+
+<p>
+It's read like this:
+</p>
+
+<p>
+if we see a special character, a space, but not "-", we take that
+road, looping in the first rectangle.
+</p>
+
+<p>
+Because when we see the character, we exit the rectangle and see a
+fork in the road.
+</p>
+
+<p>
+The first rectangle is a turn back, and the second is "-". If we see
+the same character again, we follow the sign back (a loop). To take
+the straight road, we need to encounter the character "-" in the
+string. After "-", there's a triple fork: loop if we encounter "-"
+again, then go straight ahead if the next character is a space,
+otherwise (neither one nor the other) - down to alphanum.
+</p>
+
+<p>
+After a space, we expect alphanum - we must match this
+character; there are no alternatives (although an alternative path to
+the error could have been drawn, but it's usually not drawn in syntax
+diagrams, and even here it's clear from the context).
+</p>
+
+<p>
+As you can see, these diagrams are simpler than FlowChart or DRAKON,
+and more important: they are so intuitive that you don't need time
+to learn them - compare it with UML!
+</p>
+</div>
+</div>
+<div id="outline-container-org9488138" class="outline-2">
+<h2 id="org9488138">Why do we need diagrams?</h2>
+<div class="outline-text-2" id="text-org9488138">
+<p>
+Try starting your algorithm development with a diagram: you'll spot
+all the errors right from the start, and the implemented algorithm
+will be almost error-free.
+</p>
+
+<p>
+Diagrams also help you write code faster: you see it from above, on a
+two-dimensional map, easily identifying where you can go next and what
+data you need to achieve your goal.
+</p>
+
+<p>
+Think in terms of maps.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

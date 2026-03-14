@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Changing icons in Windows Tcl Starpacks</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="windows, tcl/tk" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Changing icons in Windows Tcl Starpacks</h1>
+<div id="outline-container-org6ecf1d0" class="outline-2">
+<h2 id="org6ecf1d0">Changing icons in Windows Tcl Starpacks</h2>
+<div class="outline-text-2" id="text-org6ecf1d0">
+<p>
+Created Starpack will have default Tcl icons and you can see them in different view modes of Windows explorer (table, large icons&#x2026;). This approach is based on &lt;a href="<a href="http://wiki.tcl.tk/10922">http://wiki.tcl.tk/10922</a>"&gt;<a href="http://wiki.tcl.tk/10922%3C/a%3E">http://wiki.tcl.tk/10922%3C/a%3E</a> receipt, but is in Makefile target form. And uses tools: &lt;a href="<a href="http://www.angusj.com/resourcehacker/">http://www.angusj.com/resourcehacker/</a>"&gt;reshacker.exe&lt;/a&gt;,&amp;nbsp; &lt;a href="<a href="http://upx.sourceforge.net/">http://upx.sourceforge.net/</a>"&gt;upx.exe&lt;/a&gt; and windres.exe from &lt;a href="<a href="http://www.mingw.org/">http://www.mingw.org/</a>"&gt;MinGW&lt;/a&gt; installation (at $MINGWHOME/bin/windres.exe), also supposes that you are using &lt;a href="<a href="http://code.google.com/p/tclkit/">http://code.google.com/p/tclkit/</a>"&gt;tclkit.exe&lt;/a&gt; as runtime.
+In my case I have application rfprg and "virtual" FS (catalog) - rfprg.vfs. And I have all these tools in the same catalog (with tclkit.exe). I created there the rfprg.rc file:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">APPICONS ICON "rfprg.vfs/tclkit.ico"
+TK ICON "rfprg.vfs/tclkit.ico"
+</pre>
+</div>
+
+<p>
+Then I added next target into my Makefile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-Makefile">icons:
+	cp tclkit.exe tclkit1.exe
+	upx.exe -d tclkit1.exe
+	reshacker.exe -delete tclkit1.exe , tclkit2.exe , icongroup,,
+	windres.exe -i rfprg.rc -o rfprg.res -J rc -O res -r
+	reshacker.exe -add tclkit2.exe , tclkit3.exe , rfprg.res , ,,
+	upx.exe tclkit3.exe
+	mv tclkit3.exe tclkit.exe
+	rm rfprg.res tclkit2.exe tclkit1.exe
+</pre>
+</div>
+
+<p>
+And them: <code>make icons</code>. This will replace "system" icons of tclkit.exe with rfprg.vfs/tclkit.ico. So you can use this "patched" tclkit.exe runtime to create Starpack with your custom icon.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

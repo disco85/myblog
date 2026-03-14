@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Random search</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Random search</h1>
+<div id="outline-container-orge5f2bbd" class="outline-2">
+<h2 id="orge5f2bbd">Random search</h2>
+<div class="outline-text-2" id="text-orge5f2bbd">
+<p>
+Random search ''does not require data to be ordered/sorted''.
+</p>
+
+<p>
+Random search (simple implementation): randomly select some point (an index in the array) then again and again. The trick only is to avoid repeating of random indexes. We do it by excluding missing index from the next random generation. How? We generate random index from ''some range''. If the index is missing then we change the range:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">_
+1 2 3      -&gt;  2..3              (1)
+    _
+1 2 3      -&gt;  1..2              (2)
+  _
+1 2 3      -&gt;  1..1, 3..3        (3)
+    _
+1 2 3 4 5  -&gt;  1..2, 4..5        (3)
+_
+1 2        -&gt;  2..2              (1)
+  _
+1 2        -&gt;  1..1              (2)
+_
+1 1        -&gt;  []                (1)
+</pre>
+</div>
+
+<p>
+Actually we have only 3 cases with optional normalization (when after the removal operation the range becomes abnormal: <code>left &gt; right</code> which means that it must be empty now, ie, excluding from generating at all).
+</p>
+
+<p>
+What does it mean "excluding from generating" for a range? We generate random indexes from ''random ranges'' - this means it - we exclude the range itself, so we cannot generate indexes from it more.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">import</span> random
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Rng</span>:
+    <span style="color: #696969;">'''Range'''</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, i0, i1):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i0</span> = i0; <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i1</span> = i1
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__len__</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.i1 - <span style="color: #696969;">self</span>.i0 + 1
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__repr__</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> f<span style="color: #696969;">'</span>{<span style="color: #696969;">self</span>.i0}<span style="color: #696969;">..</span>{<span style="color: #696969;">self</span>.i1}<span style="color: #696969;">'</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">isnormal</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.i0 &lt;= <span style="color: #696969;">self</span>.i1
+
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">exclude_pt</span>(rng, i):
+    <span style="color: #575757;"># </span><span style="color: #575757;">Exclude the point (random index) from the range</span>
+    <span style="color: #575757;"># </span><span style="color: #575757;">BCS it is missing, so it should not participate</span>
+    <span style="color: #575757;"># </span><span style="color: #575757;">in random indexes generation more.</span>
+    <span style="color: #575757;"># </span><span style="color: #575757;">The result may be a new range(s) or no more</span>
+    <span style="color: #575757;"># </span><span style="color: #575757;">new range</span>
+    <span style="color: #696969;">if</span> i == rng.i0:
+        <span style="color: #ffffff;">res</span> = [Rng(rng.i0 + 1, rng.i1)]
+        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> res[0].isnormal():
+            <span style="color: #ffffff;">res</span> = []
+    <span style="color: #696969;">elif</span> i == rng.i1:
+        <span style="color: #ffffff;">res</span> = [Rng(rng.i0, rng.i1 - 1)]
+        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> res[0].isnormal():
+            <span style="color: #ffffff;">res</span> = []
+    <span style="color: #696969;">elif</span> rng.i0 &lt; i &lt; rng.i1:
+        <span style="color: #ffffff;">res</span> = [Rng(rng.i0, i - 1), Rng(i + 1, rng.i1)]
+    <span style="color: #696969;">else</span>:
+        <span style="color: #696969;">raise</span> <span style="color: #ff4500;">ValueError</span>(f<span style="color: #696969;">'Invalid pt </span>{i}<span style="color: #696969;"> for range </span>{rng}<span style="color: #696969;">'</span>)
+    <span style="color: #696969;">return</span> res
+
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">rndsearch</span>(arr, target):
+    <span style="color: #ffffff;">_tested</span> = <span style="color: #a52a2a;">set</span>()
+    <span style="color: #ffffff;">ranges</span> = [Rng(0, <span style="color: #a52a2a;">len</span>(arr) - 1)]
+    <span style="color: #696969;">while</span> <span style="color: #7fffd4;">True</span>:
+        <span style="color: #ffffff;">rngi</span> = random.randint(0, <span style="color: #a52a2a;">len</span>(ranges) - 1)
+        <span style="color: #ffffff;">rng</span> = ranges[rngi]
+        <span style="color: #ffffff;">i</span> = random.randint(rng.i0, rng.i1) <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(rng) <span style="color: #696969;">else</span> rng.i0
+
+        <span style="color: #575757;"># </span><span style="color: #575757;">Assert that no repeated tests</span>
+        <span style="color: #696969;">assert</span> i <span style="color: #696969;">not</span> <span style="color: #696969;">in</span> _tested, f<span style="color: #696969;">'</span>{i}<span style="color: #696969;"> already tested!'</span>
+        _tested.add(i)
+        
+        <span style="color: #696969;">if</span> arr[i] == target:
+            <span style="color: #696969;">return</span> i
+        <span style="color: #696969;">else</span>:
+            <span style="color: #696969;">if</span> rng:
+                <span style="color: #ffffff;">new_rngs</span> = exclude_pt(rng, i)
+                <span style="color: #696969;">if</span> new_rngs:
+                    <span style="color: #ffffff;">ranges</span>[rngi] = new_rngs[0]
+                    <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(new_rngs) &gt; 1:
+                        <span style="color: #ffffff;">new_rngi</span> = rngi + 1
+                        <span style="color: #696969;">if</span> new_rngi &gt;= <span style="color: #a52a2a;">len</span>(ranges):
+                            ranges.append(new_rngs[1])
+                        <span style="color: #696969;">else</span>:
+                            ranges.insert(rngi + 1, new_rngs[1])
+                <span style="color: #696969;">else</span>:
+                    <span style="color: #696969;">del</span> ranges[rngi]
+            <span style="color: #696969;">else</span>:
+                <span style="color: #696969;">del</span> ranges[rngi]
+        <span style="color: #575757;"># </span><span style="color: #575757;">Did we completed?</span>
+        <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(ranges) == 0:
+            <span style="color: #696969;">return</span> -1
+
+
+<span style="color: #575757;">#########################</span>
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">ACCESS</span>(<span style="color: #a52a2a;">list</span>):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, *a, **kw):
+        <span style="color: #a52a2a;">super</span>().__init__(*a, **kw)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> = 0
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__getitem__</span>(<span style="color: #696969;">self</span>, i):
+        <span style="color: #696969;">if</span> i &gt;= <span style="color: #a52a2a;">len</span>(<span style="color: #696969;">self</span>):
+            <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=OUT OF RANGE!"</span>)
+        <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">super</span>().__getitem__(i)
+        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=</span>{res}<span style="color: #696969;">"</span>)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> += 1
+        <span style="color: #696969;">return</span> res
+
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">list</span>(<span style="color: #a52a2a;">range</span>(num))
+    <span style="color: #ffffff;">i</span> = 0
+    <span style="color: #ffffff;">cnt</span> = <span style="color: #a52a2a;">min</span>(num, num*ratio)
+    <span style="color: #696969;">while</span> i &lt; cnt:
+        <span style="color: #ffffff;">r</span> = random.randint(num, num + cnt - 1)
+        <span style="color: #ffffff;">res</span>[r - num] = r
+        <span style="color: #ffffff;">i</span> += 1
+    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">sorted</span>(res)
+    <span style="color: #696969;">return</span> (res, random.choice(res))
+
+
+<span style="color: #ffffff;">NUM</span> = 100
+<span style="color: #ffffff;">arr</span>, <span style="color: #ffffff;">x</span> = partiallyrandomdata(NUM, 1)
+<span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Look for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
+<span style="color: #696969;">try</span>:
+    <span style="color: #ffffff;">fnd</span> = rndsearch(ACCESS(arr), x)
+    <span style="color: #696969;">if</span> 0 &lt;= fnd &lt; NUM:
+        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Found </span>{x}<span style="color: #696969;"> at </span>{fnd}<span style="color: #696969;">: </span>{arr[fnd]}<span style="color: #696969;">"</span>)
+    <span style="color: #696969;">else</span>:
+        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{x}<span style="color: #696969;"> not found"</span>)
+<span style="color: #696969;">except</span> <span style="color: #ff4500;">KeyboardInterrupt</span>:
+    <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Looked for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

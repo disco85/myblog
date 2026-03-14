@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AVR timers support</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded, clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">AVR timers support</h1>
+<div id="outline-container-org6c0dadc" class="outline-2">
+<h2 id="org6c0dadc">AVR timers support</h2>
+<div class="outline-text-2" id="text-org6c0dadc">
+<p>
+These modules implements for AVR8, AVR128, AVR168P chips next functions:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #ff4500;">void</span> <span style="color: #ff4500;">init_timers</span>(<span style="color: #ff4500;">void</span>);
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">alarm_action</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">timer</span>, <span style="color: #ff4500;">timer_handler_t</span> <span style="color: #ffffff;">alarm_handler</span>);
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">_alarm</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">timer</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">usec</span>);
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">alarm</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">timer</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">usec</span>);
+<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ff4500;">tclock</span>(<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">timer</span>);
+<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ff4500;">millis</span>(<span style="color: #ff4500;">void</span>);
+<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">long</span> <span style="color: #ff4500;">micros</span>(<span style="color: #ff4500;">void</span>);
+</pre>
+</div>
+
+<p>
+<code>alarm()</code> is like standard C function (but for AVR), it's wrapped by <code>cli()~/~sei()</code>, <code>_alarm()</code>. <code>int timer</code> is the number of the used timer. <code>tclock()</code> is like C's <code>clock()</code> but used timer id. <code>clock()</code> is the <code>tclock(0)</code> - standard C function, implemented on timer 0. <code>millis()~/~micros()</code> returns milliseconds/microseconds from last call. Before use, call <code>init_timer()</code> first.
+</p>
+
+<p>
+Before to use, define <code>F_CPU</code>. <code>CLOCKS_PER_SEC</code> should not be defined. If is, this means that some timer for <code>clock()</code> is already in use. Tested with WinAVR-20100110, but may be needs more testing&#x2026;
+</p>
+
+<p>
+The code can be found in my Github.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

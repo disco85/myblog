@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Run jobs suite remotely via screen</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="scripting, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Run jobs suite remotely via screen</h1>
+<div id="outline-container-org1feeade" class="outline-2">
+<h2 id="org1feeade">Run jobs suite remotely via screen</h2>
+<div class="outline-text-2" id="text-org1feeade">
+<p>
+Often in needed to run some jobs remotely, for example, tests on remote test
+environment. I used different custom "daemon"-like scripts for this, monitoring
+the jobs/tests, but another and simple solution for Linux is to use <code>screen</code>
+tool. It supports sessions, detaching, so is good for such kind of tasks. Here
+is the script which runs multiple jobs on remote host (setted via <code>$RMHOST</code> env.
+var). Its syntax is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">  -cls
+  -run JOB-NUMBER <span style="color: #696969;">'JOB-COMMAND'</span>
+  -runall &lt; FILE-WITH-COMMANDS
+  -submit &lt; FILE-WITH-COMMANDS
+Used env. vars: <span style="color: #696969;">\$</span><span style="color: #ffffff;">USER</span> (login), <span style="color: #696969;">\$</span><span style="color: #ffffff;">RMHOST</span> (hostname)
+</pre>
+</div>
+
+<p>
+so to run it you must:
+</p>
+
+<ul class="org-ul">
+<li>set <code>$RMHOST</code> env. var</li>
+<li>create file with commands which will be ran remotely: each command is on own
+line and can have any <code>$</code> variables for substitution: they will be
+substituted locally</li>
+<li>then call script as <code>V1=a V2=b script -submit &lt; created_file</code>. This will
+substitute <code>V1</code> and <code>V2</code> in <code>created_file</code> and send resulting file over scp to
+remote host <code>$RMHOST</code> (<b><b>you must have configured public-key access to
+host</b></b>), then will send itself and call itself remotely with command <code>-runall</code>.</li>
+</ul>
+
+<p>
+After it you can go to host, call <code>screen -r</code> to see your created session, to
+switch between windows (each job is ran on separate window). You will have local
+<code>$LOG</code> file with decscription of running commands and remote log file per job
+with info about what and when was run (<code>job-&lt;DATE&gt;-&lt;JOB_NUMBER&gt;.log</code>). Yes, each
+job has number/index related to line number of job suite file. If you want you
+can include generating of screen log file too (with <code>-L</code> option IMO).
+</p>
+
+<p>
+While you are on remote host, you can run this script (which was scp-ed) with
+<code>-cls</code> command: it will remove all log files there.
+</p>
+
+<p>
+That's it.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+<span style="color: #ffffff;">SCR</span>=<span style="color: #fa8072;">`basename "$0"`</span>
+<span style="color: #ffffff;">SESSION</span>=${<span style="color: #ffffff;">USER</span>}_screen
+<span style="color: #ffffff;">LOG</span>=rmjobs.log
+
+<span style="color: #ff4500;">_wrapjob</span>() {
+    <span style="color: #ffffff;">_wrapjob_f</span>=job-<span style="color: #fa8072;">`date +%s`</span>-$<span style="color: #ffffff;">1</span>.log
+    <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"Started $1 at `date`: $2"</span> &gt; $<span style="color: #ffffff;">_wrapjob_f</span>
+    <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">'==============================================================================='</span> &gt;&gt; $<span style="color: #ffffff;">_wrapjob_f</span>
+    <span style="color: #a52a2a;">echo</span> &gt;&gt; $<span style="color: #ffffff;">_wrapjob_f</span>
+    $<span style="color: #ffffff;">2</span>|tee -a $<span style="color: #ffffff;">_wrapjob_f</span>
+}
+
+<span style="color: #ff4500;">_runjob</span>() {
+    [ $<span style="color: #ffffff;">1</span> = <span style="color: #696969;">"0"</span> ] &amp;&amp; {
+        <span style="color: #575757;"># </span><span style="color: #575757;">add -L to both if screelog.* logs are needed</span>
+        screen -dmS $<span style="color: #ffffff;">SESSION</span> -t <span style="color: #696969;">"job$1"</span> sh -c <span style="color: #696969;">"~/$SCR -run $1 \"$2\";sh"</span>
+    } || {
+        screen -S $<span style="color: #ffffff;">SESSION</span> -p 0 -X screen -t <span style="color: #696969;">"job$1"</span> sh -c <span style="color: #696969;">"~/$SCR -run $1 \"$2\";sh"</span>
+    }
+}
+
+<span style="color: #696969;">case</span> <span style="color: #696969;">"$1"</span><span style="color: #696969;"> in</span>
+    -cls) rm -f screenlog.*; rm -f job*.log;;
+    -run) _wrapjob <span style="color: #696969;">"$2"</span> <span style="color: #696969;">"$3"</span>;;
+    -runall)
+        <span style="color: #ffffff;">i</span>=0
+        rm -f $<span style="color: #ffffff;">LOG</span> 2&gt;/dev/null
+        <span style="color: #696969;">while </span><span style="color: #a52a2a;">read</span> -r c; <span style="color: #696969;">do</span>
+            <span style="color: #ffffff;">c</span>=<span style="color: #fa8072;">`echo $c|tr -d '[:cntrl:]'`</span>
+            <span style="color: #a52a2a;">echo</span> $<span style="color: #ffffff;">c</span>|egrep <span style="color: #696969;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: #696969;">continue</span>
+            _runjob $<span style="color: #ffffff;">i</span> <span style="color: #696969;">"$c"</span>
+            <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"Ran $c;"</span> &gt;&gt; $<span style="color: #ffffff;">LOG</span>
+            <span style="color: #ffffff;">i</span>=<span style="color: #fa8072;">`expr $i + 1`</span>
+            sleep 2
+        <span style="color: #696969;">done</span>;;
+    -submit)
+        rm -f .jobs-suite.tmp 2&gt;/dev/null
+        <span style="color: #696969;">while </span><span style="color: #a52a2a;">read</span> -r c; <span style="color: #696969;">do</span>
+            <span style="color: #a52a2a;">echo</span> $<span style="color: #ffffff;">c</span>|egrep <span style="color: #696969;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: #696969;">continue</span>
+            <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"echo $c"</span> &gt;&gt; .jobs-suite.tmp
+        <span style="color: #696969;">done</span>
+        scp <span style="color: #696969;">"$0"</span> <span style="color: #696969;">"$USER@$RMHOST:$SCR"</span>
+        scp <span style="color: #696969;">".jobs-suite.tmp"</span> $<span style="color: #ffffff;">USER</span>@$<span style="color: #ffffff;">RMHOST</span>:<span style="color: #696969;">".jobs-suite.tmp"</span>
+        ssh -n -l $<span style="color: #ffffff;">USER</span> $<span style="color: #ffffff;">RMHOST</span> <span style="color: #696969;">"sh $SCR -runall &lt; .jobs-suite.tmp"</span>;;
+    *)
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"Syntax:"</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"  -cls"</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"  -run JOB-NUMBER 'JOB-COMMAND'"</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"  -runall &lt; FILE-WITH-COMMANDS"</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"  -submit &lt; FILE-WITH-COMMANDS"</span>
+        <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"Used env. vars: \$USER (login), \$RMHOST (hostname)"</span>
+        <span style="color: #696969;">exit</span> 1;;
+<span style="color: #696969;">esac</span>
+:
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

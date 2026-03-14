@@ -1,0 +1,74 @@
+#+title: AVR32: prescalers for ticks generation
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-06 Thu 05:12]
+
+* AVR32: prescalers for ticks generation
+
+It's for AVR32 with usage of ASF. If we need to generate ticks, we can use one of wave generation mode of AVR32 TCs. For this we need to define value of RC register and to select clock source (internal line). We use PBA line divided by 2, 8, 32, 128 dividers (so sources are ~TC_CLOCK_SOURCE2..5~ in ASF 'terminology' - macroses :).
+Here is the source of calculator of RC, divider:
+
+#+BEGIN_SRC cpp
+#include <stdint.h>
+#include <limits.h>
+
+// max value of RC register with type uint16_t (unsigned short of AVR32 GCC)
+#define MAX_RC (1<<(sizeof(uint16_t)*CHAR_BIT))
+int
+calc_tc_params(long *freq, long *err, uint16_t *presc, uint16_t *rc)
+{
+        static const long divs[] = {2, 8, 32, 128};
+        static const int ndivs = sizeof divs/sizeof divs[0];
+        long _err = 0, _merr = *err;
+        uint16_t _rc = 0, _mrc = 0, _idiv = 0, _midiv = 0;
+
+        for (_idiv = 0; _idiv < ndivs; _idiv++) {
+                _rc = (FPBA / divs[_idiv]) / (*freq);
+                _rc = (_rc==0? 1 : _rc>MAX_RC? MAX_RC : _rc);
+                _err = abs((*freq) - (FPBA / divs[_idiv]) / (long)_rc);
+                if (_err <= _merr) {
+                        _merr = _err;
+                        _midiv = _idiv;
+                        _mrc = _rc;
+                }
+                if (!_err) break;
+        }
+
+        if (_mrc) {
+                *rc = _mrc;
+                *err = _merr;
+                *presc = divs[_midiv];
+                *freq = (FPBA / divs[_midiv]) / _mrc;
+                return (1);
+        } else
+                return (0);
+}
+#+END_SRC
+
+NOTE: FPBA is the frequency of PBA line. Inputs are:
+
+- freq - frequency in Hz
+- err - absolute error in Hz
+
+Outputs are:
+
+- freq - real frequency for calculated params
+- err - real absolute error
+- presc - divider value (2..128)
+- rc - value for RC register to load
+
+Timer source can be found in this way:
+
+#+BEGIN_SRC cpp
+#define PRESC2TCSRC(PRESC) ((PRESC)==2? TC_CLOCK_SOURCE_TC2 \
+                            :(PRESC)==8? TC_CLOCK_SOURCE_TC3 \
+                            :(PRESC)==32? TC_CLOCK_SOURCE_TC4 \
+                            :(PRESC)==128? TC_CLOCK_SOURCE_TC5 \
+                            :-1)
+#+END_SRC
+
+and it's result should be used as ~tcclks~ member of ~tc_waveform_opt_t~ struct.
+On success, returns 1, 0 otherwise.
+For more information how to start 'ticks' generation, see ASF example TC_EXAMPLE3 of TC module.

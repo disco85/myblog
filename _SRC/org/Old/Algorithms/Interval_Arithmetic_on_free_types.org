@@ -1,0 +1,49 @@
+#+title: Interval Arithmetic on free types
+#+description: My Blog
+#+keywords: haskell, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell algorithms
+#+date: [2020-02-05 Wed 05:06]
+
+* Interval Arithmetic on free types
+
+I had already post about interval arithmetic, so here is only additional
+example of 2nd algorithm, based on analyzing of sorted edges of the interval:
+
+[[file:../../assets/IntervalMerges2.svg]]
+
+But now implementation will be in Haskell and shows how to do interval arithmetic
+with not integers only, but any other type (which can have some metric, i.e. be
+ordering):
+
+#+BEGIN_SRC haskell
+{-# LANGUAGE ExistentialQuantification #-}
+import Data.List
+
+data Iv e = Ord e => Iv e e
+
+makeIv e1 e2 =
+  Iv e1' e2' where [e1', e2'] = sort [e1, e2]
+
+ivFst (Iv e _) = e
+ivSnd (Iv _ e) = e
+iv2List (Iv e1 e2) = [e1, e2]
+
+mergeIv :: Ord e => Iv e -> Iv e -> [Iv e]
+mergeIv i1 i2 =
+  let sx = sort $ (iv2List i1) ++ (iv2List i2)
+      [isx1, isx2] = sortBy (\x y->compare (ivSnd x) (ivSnd y)) [i1, i2] in
+    case (ivSnd isx1) `compare` (ivFst isx2) of
+      LT -> [Iv (sx!!0) (sx!!1), Iv (sx!!2) (sx!!3)]
+      _ -> [Iv (sx!!0) (sx!!3)]
+
+
+-- Examples:
+data Color = Red|Orange|Yellow|Green|Blue|Indigo|Violet deriving (Eq, Ord, Show)
+
+main = do
+  print $ map iv2List $ mergeIv (makeIv 20 1) (makeIv (-1) 10)
+  print $ map iv2List $ mergeIv (makeIv Red Blue) (makeIv Orange Indigo)
+#+END_SRC
+You see example with colors: merging of ~[Red; Blue]~ interval with ~[Orange; Indigo]~
+gives us result as ~[Red; Indigo]~ interval :-)

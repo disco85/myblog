@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tcl: regsub replacing by proc</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="misc, tcl/tk" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Tcl: regsub replacing by proc</h1>
+<div id="outline-container-orgbcff820" class="outline-2">
+<h2 id="orgbcff820">Tcl: regsub replacing by proc</h2>
+<div class="outline-text-2" id="text-orgbcff820">
+<p>
+This is the procedure like <code>regsub</code> but replacement is happens with procedure - not text:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">proc</span> <span style="color: #ff4500;">regsub2</span> {re inStr by {varName <span style="color: #696969;">""</span>}} {
+<span style="color: #575757;"># </span><span style="color: #575757;">Simple version of regsub but support substitution by proc:</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">regsub2 $re $str $by, where $by can be {proc \1 \2...}</span>
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">result</span> $<span style="color: #ffffff;">inStr</span>
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">byCallStr</span> [<span style="color: #a52a2a;">regsub</span> -all {\\(\d+)} $<span style="color: #ffffff;">by</span> {$<span style="color: #ffffff;">m</span>\1}]
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">matchedVarsCount</span> [<span style="color: #a52a2a;">lindex</span> [<span style="color: #a52a2a;">regexp</span> -about $<span style="color: #ffffff;">re</span>] 0]
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">matchedVarNames</span> {all}
+    <span style="color: #696969;">for</span> {<span style="color: #a52a2a;">set</span> i 1} {$<span style="color: #ffffff;">i</span> &lt;= $<span style="color: #ffffff;">matchedVarsCount</span>} {<span style="color: #a52a2a;">incr</span> i} {
+        <span style="color: #a52a2a;">lappend</span> matchedVarNames <span style="color: #696969;">"m$i"</span>
+    }
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">nsubs</span> 0
+    <span style="color: #696969;">foreach</span> $<span style="color: #ffffff;">matchedVarNames</span> [<span style="color: #a52a2a;">regexp</span> -all -inline $<span style="color: #ffffff;">re</span> $<span style="color: #ffffff;">result</span>] {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">byRes</span> [<span style="color: #696969;">eval</span> $<span style="color: #ffffff;">byCallStr</span>]
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">result</span> [<span style="color: #a52a2a;">regsub</span> $<span style="color: #ffffff;">re</span> $<span style="color: #ffffff;">result</span> $<span style="color: #ffffff;">byRes</span>]
+        <span style="color: #a52a2a;">incr</span> nsubs
+    }
+    <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">varName</span> eq <span style="color: #696969;">""</span>} {
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">result</span>
+    } <span style="color: #696969;">else</span> {
+        <span style="color: #ff4500;">upvar</span> 1 $<span style="color: #ffffff;">varName</span> varName_
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">varName_</span> $<span style="color: #ffffff;">result</span>
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">nsubs</span>
+    }
+}
+</pre>
+</div>
+
+<p>
+If you call it with IncrTcl then use <code>::itcl::code</code> proc.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

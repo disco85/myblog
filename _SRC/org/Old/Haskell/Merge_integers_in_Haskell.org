@@ -1,0 +1,85 @@
+#+title: Merge integers in Haskell
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2020-02-03 Mon 18:40]
+
+* Merge integers in Haskell
+
+This is the known task ("problem" from Clojure problems list): to
+convert integers list to intervals by merging them... See:
+
+#+BEGIN_SRC console
+[1,2,3,5,7,6,10] -> [<1,3>,<5,7>,10]
+#+END_SRC
+
+First, I create type ~El~ which is input list element and can be point
+or already interval (with simple factory ~iv~). Relation ~Rel~ is needed
+to determine relative location of point and interval. Join of point to
+interval is based on this result. ~joinToIv~ joins point to interval and
+returns possible new one. Function ~joinToIvs~ joins point to one of
+intervals but if it is not possible then returns original intervals with
+new one added. Main algorithm is a left folding of ~joinToIvs~.
+
+Code is very dirty and sure may be more short :-)
+
+
+#+BEGIN_SRC haskell
+-- Dirty code of turn integers to intervals
+module Intervals where
+
+-- element is interval Iv of 2 integers or point of 1 integer
+data El = Iv Integer Integer|Pt Integer
+instance Show El where
+  show (Iv n m)|n == m = show n
+               |otherwise = "<" ++ show n ++ "," ++ show m ++ ">"
+  show (Pt n) = show n
+
+-- constructor for intervals from 2 integers
+iv :: Integer -> Integer -> El
+iv n m|n < m     = Iv n m
+      |otherwise = Iv m n
+
+-- relation pt/interval: L (left), LS (left-side), IN (included), RS (right-side), R (right)
+data Rel = L|LS|IN|RS|R deriving Show
+
+-- relation
+rel :: El -> El -> Rel
+rel (Iv a b) (Pt n)  |a - n == 1  = LS
+                     |a - n > 1   = L
+                     |b - n >= 0  = IN
+                     |b - n == -1 = RS
+                     |otherwise   = R
+rel (Iv a b) (Iv c d)|c - b == 1 = RS
+                     |otherwise  = R
+
+-- join integer to element (which is expected to be interval)
+-- joinToIv :: El -> Integer -> [El]
+joinToIv :: El -> Integer -> Maybe El
+joinToIv e@(Iv a b) n = let p = Pt n in
+  case rel e p of
+    LS -> Just $ iv n b
+    IN -> Just e
+    RS -> Just $ iv a n
+    otherwise -> Nothing
+
+-- join integer to list of intervals by extend some or add new one to the end
+joinToIvs :: [El] -> Integer -> [El]
+joinToIvs [] n = [iv n n]
+joinToIvs (e:es) n =
+  maybe ([e] ++ joinToIvs es n) (\e' -> _add e' es) (joinToIv e n) where
+  _add (Iv a b) ((Iv c d):es1)|abs (c-b) == 1 = [Iv a d] ++ es1
+  _add e1 es1 = [e1] ++ es1
+
+-- Turn integers to intervals
+toIv :: [Integer] -> [El]
+toIv [] = []
+toIv (n:ns) =
+  foldl (joinToIvs) [iv n n] ns
+
+--------------------------------------------------
+main :: IO ()
+main = print l >> print (toIv l) where
+  l = [1,2,3,5,6,4,0,10,11,9,12,100,-1,80,99,101,98,8,7]
+#+END_SRC

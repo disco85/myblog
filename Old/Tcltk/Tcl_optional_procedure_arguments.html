@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tcl: optional procedure arguments</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="tcl/tk" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Tcl: optional procedure arguments</h1>
+<div id="outline-container-org5f11e9e" class="outline-2">
+<h2 id="org5f11e9e">Tcl: optional procedure arguments</h2>
+<div class="outline-text-2" id="text-org5f11e9e">
+<p>
+They are very usable in many language. For example in Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">f</span>(a, b=0, **kw):
+  <span style="color: #a52a2a;">print</span> kw
+
+f(1, 2, x=10, y=20)
+</pre>
+</div>
+
+<p>
+<code>kw</code> is the dictionary and is accessible in usual way (item existent checking, getting and so on). Argument b can be skipped and is optional too.
+</p>
+
+<p>
+For Tcl it's easy to write procedure for processing keyword arguments (like getopt):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #696969;">proc</span> <span style="color: #ff4500;">getargs</span> {argsName kwArgsName arguments} {
+<span style="color: #575757;"># </span><span style="color: #575757;">like getopt for proc/method, ex:</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">1) argsName may be ""|{} - to avoid positional args saving</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">2) if no value of keyword argument, then it's value will be "Y"</span>
+
+    <span style="color: #ff4500;">upvar</span> 1 $<span style="color: #ffffff;">kwArgsName</span> kwargs
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">posargs</span> {}
+
+    <span style="color: #696969;">proc</span> <span style="color: #ff4500;">isKw</span> opt {
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">expr</span> {<span style="color: #696969;">"-"</span> eq [<span style="color: #a52a2a;">string</span> index $<span style="color: #ffffff;">opt</span> 0]}]
+    }
+    <span style="color: #696969;">proc</span> <span style="color: #ff4500;">setPosArg</span> opt {
+        <span style="color: #ff4500;">upvar</span> 1 posargs posargs
+        <span style="color: #a52a2a;">lappend</span> posargs $<span style="color: #ffffff;">opt</span>
+    }
+    <span style="color: #696969;">proc</span> <span style="color: #ff4500;">setKwArg</span> {name val} {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">ret</span> <span style="color: #696969;">"@NOMORE"</span>; <span style="color: #575757;"># used or not $val, it's possible positional opt</span>
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">name</span> ne <span style="color: #696969;">""</span>} {
+            <span style="color: #ff4500;">upvar</span> 1 kwargs kwargs
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">defaultValue</span> [<span style="color: #a52a2a;">lindex</span> [<span style="color: #a52a2a;">array</span> get kwargs $<span style="color: #ffffff;">name</span>] end]
+            <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">defaultValue</span> <span style="color: #696969;">in</span> {<span style="color: #696969;">"Y"</span> <span style="color: #696969;">"N"</span>}} {
+                <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">val</span> eq <span style="color: #696969;">""</span>} {
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">val</span> <span style="color: #696969;">"Y"</span>
+                } <span style="color: #696969;">elseif</span> {$<span style="color: #ffffff;">val</span> ni {<span style="color: #696969;">"Y"</span> <span style="color: #696969;">"N"</span>}} {
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">ret</span> $<span style="color: #ffffff;">val</span>
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">val</span> <span style="color: #696969;">"Y"</span>
+                }
+            }
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">kwargs</span>($<span style="color: #ffffff;">name</span>) $<span style="color: #ffffff;">val</span>
+        }
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">ret</span>
+    }
+
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">kw</span> <span style="color: #696969;">""</span>
+    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">state</span> OPT; <span style="color: #575757;"># OPT|VAL|END</span>
+    <span style="color: #a52a2a;">lappend</span> arguments <span style="color: #696969;">"@EOO"</span>
+    <span style="color: #696969;">foreach</span> opt $<span style="color: #ffffff;">arguments</span> {
+        <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">state</span> {
+            OPT {
+                <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">opt</span> eq <span style="color: #696969;">"@EOO"</span>} {
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">state</span> END
+                } <span style="color: #696969;">elseif</span> {[isKw $<span style="color: #ffffff;">opt</span>]} {
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">kw</span> $<span style="color: #ffffff;">opt</span>
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">state</span> VAL
+                } <span style="color: #696969;">else</span> {
+                    setPosArg $<span style="color: #ffffff;">opt</span>
+                }
+            }
+
+            VAL {
+                <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">opt</span> eq <span style="color: #696969;">"@EOO"</span>} {
+                    setKwArg $<span style="color: #ffffff;">kw</span> <span style="color: #696969;">""</span>
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">state</span> END
+                } <span style="color: #696969;">elseif</span> {[isKw $<span style="color: #ffffff;">opt</span>]} {
+                    setKwArg $<span style="color: #ffffff;">kw</span> <span style="color: #696969;">""</span>
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">kw</span> $<span style="color: #ffffff;">opt</span>
+                } <span style="color: #696969;">else</span> {
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">maybePos</span> [setKwArg $<span style="color: #ffffff;">kw</span> $<span style="color: #ffffff;">opt</span>]
+                    <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">maybePos</span> ne <span style="color: #696969;">"@NOMORE"</span>} { setPosArg $<span style="color: #ffffff;">maybePos</span> }
+                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">state</span> OPT
+                }
+            }
+
+            END { <span style="color: #696969;">break</span>; }
+        }
+    }
+
+    <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">argsName</span> ne <span style="color: #696969;">""</span>} {
+        <span style="color: #ff4500;">upvar</span> 1 $<span style="color: #ffffff;">argsName</span> _posargs
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_posargs</span> $<span style="color: #ffffff;">posargs</span>
+    }
+}
+</pre>
+</div>
+
+<p>
+Here is the example how to use:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">args</span> {}; <span style="color: #575757;"># positional args</span>
+<span style="color: #a52a2a;">array</span> <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">kw</span> {-a 1 -b 2}; <span style="color: #575757;"># default kw-args</span>
+<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">inputArgs</span> {-a 20 -c 30 zzz -q -v xxx yyy}
+getargs args kw $<span style="color: #ffffff;">inputArgs</span>
+<span style="color: #a52a2a;">puts</span> <span style="color: #696969;">"Args:\n $args"</span>
+<span style="color: #a52a2a;">puts</span> <span style="color: #696969;">"KW Args:"</span>
+<span style="color: #696969;">foreach</span> {k v} [<span style="color: #a52a2a;">array</span> get kw] {
+    <span style="color: #a52a2a;">puts</span> <span style="color: #696969;">" $k = $v"</span>
+}
+</pre>
+</div>
+
+<p>
+If positional arguments are not needed, use <code>""</code> or <code>{}</code> instead of its' variable name. If some keyword options has no value (it's flag only!), set it's default value ("Y" or "N") to <code>kwArgsName</code> (<code>kw</code> array is example), so <code>getargs</code> will not interpret the next word as option value. But it's possible to has value if it is "Y" or "N": <code>someCommand -someFlag or someCommand -someFlag N</code>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

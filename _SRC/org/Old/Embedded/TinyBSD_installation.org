@@ -1,0 +1,33 @@
+#+title: TinyBSD installation
+#+description: My Blog
+#+keywords: embedded, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded misc
+#+date: [2020-02-09 Sun 08:56]
+
+* TinyBSD installation
+
+This is:
+
+- Live USB system
+- Installer of TinyBSD (MFS based FreeBSD 8) on 16Mb (of system partition) for embedded devices
+
+Script 'build.my' is used for image creation and copy to USB flash (all information will be destroyed!). Image is 32Mb. Original 'tinybsd' script is modified to support lists of includes and excludes files from image (see 'tinybsd.patch') via 'tinybsd.nofiles', 'tinybsd.basefiles' (last was in original TinyBSD).
+'kh_inst' is the project/conf (similar to 'firewall', 'vpn', so on). Installation is made throught rc.d mechanism: etc/rc.d/osinst script will be called at start time and will ask user to boot from USB with live FS or to install system to HDD.
+/etc/instskel contents all configuration of installed system:
+
+- bsdlabel
+- csh.cshrc
+- fdisk
+- fstab
+- motd
+- nodes
+- profile
+- rc.conf
+- ttys
+
+...all are standard except 'nodes'. See them to know how installer will create slices, partitions, FSs, run-time configs... As to 'nodes', it's only predefined values of IP addresses of predefined nodes, user can select IP by node's name (when install system) or to enter the value manually.
+
+Installed OS additionally contents 2 preinstalled tools: ~mksh~ shell (small but useful shell from MirBSD project) and ~tmux~ - BSD console multiplexer.
+
+This installer was tested on LX-800 (AMD based board for embedded solutions).

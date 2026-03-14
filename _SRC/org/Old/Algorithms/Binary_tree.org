@@ -1,0 +1,851 @@
+#+title: Binary tree
+#+description: My Blog
+#+keywords: algorithms, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms python
+#+date: [2022-07-13 Wed 17:13]
+
+* Binary tree
+
+Binary tree is a container useful for a search of elements and their sorting. Each item has a left and a right branch and the whole structure has a special item - a root:
+
+#+BEGIN_SRC
+         a
+        / \
+       c   f
+      / \
+     d   e
+#+END_SRC
+
+and every item is oriented relatively to it's parent in the way:
+
+- if it's greater then the parent - it's on right branch (a child of the parent, the root of the left sub-tree of the parent)
+- otherwise it's on the left branch (a child of the parent)
+
+Sure, the relation can be swapped: greater to left, but the rule is the one on the whole tree.
+
+We can add items to this container and then to use it for fast search for the item, for remove of the item, etc. In the bad case, when all items grow up (like 1, 2, 3, 4...) it becomes a simple list and need re-balancing:
+
+#+BEGIN_SRC
+       1
+        \
+         2
+          \
+           3
+#+END_SRC
+
+Binary tree can keep not only plain items, but items data under their keys (like maps ~my_map[k] = v~) - we implement exactly such one.
+
+Let's see it's implementation (some operations are not so trivial):
+
+!Add
+
+Let's add ~v~ under ~k~ key.
+
+If we are the first node (the key of root is missing, which is possible only when no any data in the tree), then we save key and value in the root tree and that's all - the root stays alone, but now with key and value.
+
+Otherwise let's see what we have to do when there are some items in the tree.
+
+If the key is greater than the key of the current node ("current", because operations on the tree are recursive), then if we still have not right node - create a new tree and set it as our right child. But if the right child already exists, call recursively add operation on it (it will try to check it's parent or to transfer adding item down by the own subtrees.
+
+The logic for the left subtree is the same.
+
+If the key is the same (equal) to the current node - then just replace current node's value (like it happens in maps ~m[k] = new_value~):
+
+#+BEGIN_SRC
+      p(w)                     p(v)
+     /       p.k = k  =>      /
+    l                        l
+#+END_SRC
+
+#+BEGIN_SRC
+       p                        p
+      /      k > p.k, !p.r     / \
+     l            =>          l   k
+#+END_SRC
+
+#+BEGIN_SRC
+       p                        p
+        \    k < p.k, !p.l     / \
+         r        =>          k   r
+#+END_SRC
+
+call it on ~r~, ~l~ recursively (it will be added somewhere down to ~r~, ~l~ branches):
+
+#+BEGIN_SRC
+                        p
+k > p.k, p.l           / \           k < p.k, p.r
+add recursively  =>   l   r   <=  add recursively 
+here                 / \ / \                 here
+#+END_SRC
+
+There is another interesting thing in the adding: the calculation of the size: each node has a property ~size~ which means "how many items this tree/subtree contains". So, when we add an item we calculate these sizes. The way is not very tricky:
+
+- when the tree is empty - increment its size (its root TBH)
+- when ~k~ must go to the right subtree, and no right subtree - create a new node and set its size to 1. And the current node (getting this new right node) - increment its size too
+- but if we add it in the right subtree and the right child (of the current node) already exists, we increment our (current node) side only if the new node will be really added (somewhere in the recursive depth)
+- the same logic for the left subtree
+- if ~k~ is the same as our current node key, then we will return NIL as the adding result (nothing new was added), so recursive calls results finally will end with this NIL, so parents node will not increment their sizes
+
+!Remove
+
+Let's remove a ~v~ value under the ~k~ key.
+
+No data - no remove :) But if there is data then... If ~k~ is greater than the parent then remove it recursively from the right subtree. If it's less - from the left subtree. BTW, here are the cases when we fail to delete the item:
+
+- empty tree
+- ~k~ is greater than ~p.k~ and must be looked for in ~p~'s right subtree but no right subtree (so just attempt to remove missing key)
+- ~k~ is less than ~p.k~ and must be looked for in ~p~'s left subtree but no left subtree (so just attempt to remove missing key)
+
+But if ~k~ is equal to the parent's key ~p.k~ - it's more tricky: if you remove a node that have children, they cannot be trivially shifted up to the place of the parent of the remove node (to to gap) - because in the worst case we have 4 children, but each node has only 2 children maximum (left and right subtrees). What to do? The rule is - do anything but keep the ordering. There are 5 special cases when the ~k~ is equal to the parent's key ~p.k~:
+
+- no children
+- both children exist
+** right child has not a left child
+** right child has a left child
+- there is only a left child
+- there is only a right child
+
+Let's illustrate it. ~p~ is some parent (algorithms are recursive!).
+
+First, the simple case, when ~k <> p.k~, just do it recursively:
+
+#+BEGIN_SRC
+                        p
+k < p.k: remove        / \       k > p.k: remove
+recursively      =>   .   .   <=     recursively
+here                 / \ / \                here
+#+END_SRC
+
+Now special cases (~k = p.k~)...
+
+No children, sets the reference to itself in its parent to NIL (shown as ~?~, and ~?(?)~ means a node with key nil and a value nil - another option is not to draw this branch at all):
+
+#+BEGIN_SRC
+        1: not root                                   2: root
+
+    P                      P               P         =>       ?(?)
+   / \             =>     / \                 k=P.k
+  .   p    k=p.k         .   ?
+#+END_SRC
+
+Now both children exist.
+
+My right has not a left. It's right because we keep the ordering: ~p~ is removing, but we know that early ~l < p < r < c~, so after the removal of the ~p~ we get now ~l < r < c~:
+
+#+BEGIN_SRC
+      p      k = p.k     r(w)
+     / \                 / \
+    l  r(w)     =>      l   c
+   / \   \             / \
+  a   b   c           a   b
+#+END_SRC
+
+Now a case when the left of ~r~ exists. How to remove ~p~ in this case? If we will remove ~p~ then what should be shifted to its gap? ~r~? It's impossible because this "gap" (becoming ~r~) will have 3 children: ~l~, ~c(w)~, ~d~. The rule is: ''keep the ordering!'' We know that: ~l < p < c(w) < r < d~. If we remove the ~p~ from this inequality, we automatically get: ~l < c(w) < r < d~. It's exactly the second tree! But ~c(w)~ was shifted to the gap after the ~p~ removal, so we cannot have 2 ~c~ in the tree. So, we remove it from its original position. In the recursive way.
+
+#+BEGIN_SRC
+         p       k = p.k      c(w)
+      /    \                 /    \
+     /      \               /      \
+    l        r      =>     l        r
+   / \      / \           / \      / \
+  a   b  c(w)  d         a   b    .   d
+#+END_SRC
+
+Now another case - ~k = p.k~ but we have only one child - the left. The ordering is kept:
+
+#+BEGIN_SRC
+       p     k = p.k     l(w)
+      /                  / \
+    l(w)       =>       .   .
+    / \
+   .   .
+#+END_SRC
+
+And again - ~k = p.k~ and we have again just an one child - the right now:
+
+#+BEGIN_SRC
+     p       k = p.k     r(w)
+      \                  / \
+     r(w)      =>       .   .
+      / \
+     .   .
+#+END_SRC
+
+So, the rules are:
+
+- keep ordering!
+- write original inequality, remove the key from it and you automaticall get the result tree!
+
+
+OK, another important note: ''if we support additional node properties ~size~, ~p~ (parent) - it requires more tricky code!''.
+
+Look, instead of remove a node, we inherits data from the existing node into the current (itself), something like shifting or merging - we do it to avoid deallocate/allocate nodes. But we must process ~size~ and ~p~ properties in this case. Example for the processing of ~p~:
+
+#+BEGIN_SRC
+         .
+          \
+           A
+          / \      remove of C (move C into A) needs A.size-=1
+         B   C
+            / \
+           D   E   D.p=E.p=C; after "remove" of C (ie, move of C
+                   "cell" data to A "cell") D, E parents must refer
+                   to cell A: d.p=E.p=A
+#+END_SRC
+
+!Find
+
+Let's find an item (its value ~v~) with a key ~k~.
+
+It's simple, if the tree is empty - not found, else - check own key. If it is the key - return own value, but if it is not then compare own key and the key we are looking for. If it's greater then the own key then recursively look for it in the right subtree, otherwise - in the left subtree:
+
+#+BEGIN_SRC
+                          p     <= k=p.k
+                         / \
+k < p.k: look here =>   .   .   <= k > p.k: look here
+                       /\   /\
+#+END_SRC
+
+!Walk
+
+The main idea of a traversing is: we visit the node (from the root, to down, sure, the root is the only "enter" to the tree). And we can some function on it (maybe print). And we walk recursively in its left and right subtrees. The question here is - how do we touch these 3 items: the node itself, its left subtree (recursively) and its right subtree. There are different ways and they have 3 names:
+
+- INFIX - left, self, right (another name: in-order)
+- PREFIX - self, left, right (another name: pre-order)
+- POSTFIX - left, right, self (another name: post-order)
+
+If we look at the binary tree as at AST (Abstract Syntax Tree) then we will understand the names:
+
+#+BEGIN_SRC
+          +        2 + 3  -- infix
+         / \       + 2 3  -- prefix
+        2   3      2 3 +  -- postfix
+#+END_SRC
+
+If to walk in a infix way (like walk into the left subtree, then me - itself, then the right subtree) - we will get flatten (list) version of the tree. If in the way like right subtree, then me, then the left subtree, then we will get again the flatten representation of the tree but in the reverse order. Why? Because first, we collect all smallest items then middle value items and the last - the largest ones. And vice versa for reversed ordering. The reversed ordering is shown (numbers are step order):
+
+#+BEGIN_SRC
+          4
+        /   \
+       6     2
+      / \   / \
+     7   5 3   1
+#+END_SRC
+
+!Turn to the left
+
+If we add 1,2,3,4... we get abnormal tree - a list. To normalize it (balance) we can use turn operations - to the left and to the right.
+
+It's useful really, look:
+
+#+BEGIN_SRC
+  1                  1                  3
+   \                  \                / \
+    2                  3              1   4
+     \      =>        / \      =>      \
+      3              2   4              2
+       \
+        4
+#+END_SRC
+
+and we get more balanced tree just with 2 left turns!
+
+Left turn of the subtree with a key ~k~ looks like. It's like usual turn but ''we must to keep ordering''!
+
+#+BEGIN_SRC
+    a               b
+   / \    a = k    / \
+  L   b     =>    a   R
+     / \         / \
+    C   R       L   C
+#+END_SRC
+
+In both cases the relations are ~L < a < C < b < R~. So, we turn it correctly. More tricky is to keep ~size~ correctly and ~p~ (a parent), but the idea is that we know all sizes (and subtrees too), so we calculate the new size from them. __The operation makes sense only if ~a~ has a right subtree.__ ~L~ is optional and can me missing. ~C~ is optional too.
+
+Right turn is very similar:
+
+#+BEGIN_SRC
+      a               b
+     / \   a = k     / \
+    b   R    =>     L   a
+   / \                 / \
+  L   C               C   R
+#+END_SRC
+
+The order is ~L < b < C < a < R~ in both cases.
+
+!Balancing
+
+The next method is my own, I am not sure how is it optimal and robust.
+
+First, we need to calculate disbalance factor: ~right-tree-size - left-tree-size~ (~0~ if a child is missing). The central idea is that we will call balance operation until we detect that balancing is not needed more (we do it in the loop and break the loop when the balancing is not required/available more).
+
+Each iterative step looks like:
+
+- find the disbalance factor
+- if ~disbalance factor >= 2~ turn self to the left
+- but if ~disbalance factor <= -2~ turn self to the right
+- then if we have a left child, then balance the left subtree
+- and if we have a right child, then balance the right subtree
+
+Very important this is to calculate the criteria (return value of the function) when to stop infinite loop over balancing operations. The logic is:
+
+- if left/right turn of itself succeeded then re-calculate the disbalance factor and if its absolute value ~< 2~ and it is not the same value as before but multiplied by ~-1~ then we treat it as succeeded in a balancing at concrete this step
+- recursive calls on the left/right subtrees re-returns the result from the recursive calls (sure)
+- and we check the status of the concrete balancing step and if it is not succeeded then we did idle ("empty", "redundant") balancing, so no reason to continue loop - then we stop the loop
+
+
+The tricky moments here are:
+
+- sometimes before a turn we have a disbalance factor > 2 (eg, 3) but after the turn it is ~-3~, not ~< 2~, so it cannot be improved more with turns, we treat it as we failed/nothing done
+
+!Python implementation
+
+Some tricks:
+
+- ~BinTree~ is a container itself and the leaf of the tree. It's OK because a binary tree is naturally recursive structure: a left and right subtrees are binary trees too.
+- ~root~ is a reference to the root of whole tree, common for all subtrees
+- ~root~ exists laways, it's a reference to the ~BinTree~ itself when it's the first subtree, otherwise it's copied from the parent when we add a new node (every node is a ~BinTree~)
+- ~p~ is for the parent - the parent reference of the node
+- walking/traversing orders like inorder, preorder, postorder are named as infix, prefix, postfix - in more AST style (imagine that left/right nodes are variables, the parent is an operation)
+- to remove a node, we must to tell its parent to forget it - we find its slot in its parent and change the value of this slot - it's done by ~set_my_parent_slot()~
+- find operation is called ~get()~ - more Pythonish naming
+- ~inherit_node()~ inherits data of some node (who inherits? ~self~). It happens when we remove the node but it has a data and children, so we move another node (its data) into the current, instead of to reallocate new node, delete old... It's typical in many languages, some people call it "shift-node"
+- in Python nodes are not deallocated (garbage collector!) but we mark their keys with ~None~ (useful for porting to C - marked must be ~free()~-ed)
+
+The implementation is interactive and supports commands like:
+
+#+BEGIN_SRC
+q        quit
+D [KEY]  dump a subtree with a KEY top. Default: whole tree
+d KEY    remove key
+g KEY    get an item by key
+a KEY    append an item with a value=key=KEY
+o        flatten tree in asc order
+O        flatten tree in desc order
+s [KEY]  size of a subtree with a KEY top. Default: whole tree
+t KEY    turn subtree with a KEY top to the left
+T KEY    turn subtree with a KEY top to the right
+#+END_SRC
+
+It dumps tree (with ~D~ command) like:
+
+#+BEGIN_SRC
+Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T)? D
+k=0(0)  self=2209593827552  l=0  r=2209593827456  p=0  size=10  level=0  no_brothers=False  pos=3
+k=5(5)  self=2209593827456  l=2209593708448  r=2209593822032  p=2209593827552  size=9  level=1  no_brothers=False  pos=3
+k=4(4)  self=2209593708448  l=2209593669136  r=0  p=2209593827456  size=3  level=2  no_brothers=False  pos=3
+k=1(1)  self=2209593669136  l=0  r=2209593669232  p=2209593708448  size=2  level=3  no_brothers=False  pos=3
+k=2(2)  self=2209593669232  l=0  r=0  p=2209593669136  size=1  level=4  no_brothers=True  pos=3
+k=12(12)  self=2209593822032  l=2209593709456  r=2209593709408  p=2209593827456  size=5  level=2  no_brothers=False  pos=3
+k=6(6)  self=2209593709456  l=0  r=0  p=2209593822032  size=1  level=3  no_brothers=True  pos=3
+k=90(90)  self=2209593709408  l=2209593616768  r=0  p=2209593822032  size=3  level=3  no_brothers=False  pos=3
+k=44(44)  self=2209593616768  l=0  r=2209593616624  p=2209593709408  size=2  level=4  no_brothers=False  pos=3
+k=55(55)  self=2209593616624  l=0  r=0  p=2209593616768  size=1  level=5  no_brothers=True  pos=3
+
++- 0
+   +- .
+   +- 5
+      +- 4
+         +- 1
+            +- .
+            +- 2
+         +- .
+      +- 12
+         +- 6
+         +- 90
+            +- 44
+               +- .
+               +- 55
+            +- .
+#+END_SRC
+
+Let's see the implementation:
+
+#+BEGIN_SRC python
+import random
+import traceback
+
+
+class Walk:
+    '''Traverse way
+    INFIX   - inorder   - l, root, r  -  l (OP) r
+    PREFIX  - preorder  - root, l, r  -  (OP) l r
+    POSTFIX - postorder - l, r, root  -  l r (OP)
+    '''
+    INFIX = 1
+    PREFIX = 2
+    POSTFIX = 3
+
+
+class WalkPos:
+    LEFT = 1
+    RIGHT = 2
+    SELF = 3
+
+
+
+class BinTree:
+    def __init__(self, *, k=None, v=None, p=None):
+        "k - key, v - value, p - parent"
+        if p is None:
+            self.root = self
+        else:
+            self.root = p.root
+        self.size = 0
+        self.l = None
+        self.r = None
+        self.k = k
+        self.v = v
+        self.p = p
+
+        self._prn = SimplePrefixPrinter()
+        self._dumprn = DumpPrinter()
+
+        
+    def inherit_node(self, node, *, r=False, l=False):
+        '''Inherits some node data (node is removing and myself will keep all
+        node's data including its children). Flag arguments tell what optional
+        data must be inherit.
+        '''
+        self.root = node.root
+        if l: self.l = node.l
+        if r: self.r = node.r
+        self.k = node.k
+        self.v = node.v
+        # Fix parent links in node left, right, they referred to the node early,
+        # now we (self) steal all node's data including its l,r children, so
+        # children must refer myself, not removed node
+        if node.l: node.l.p = self
+        if node.r: node.r.p = self
+        return self
+
+
+    def dump(self):
+        return f'k=%s(%s) self=%s l=%s r=%s p=%s size=%s lsize=%s rsize=%s' % (self.k, self.v,
+            id(self), myid(self.l), myid(self.r), myid(self.p), self.size,
+            '-' if self.l is None else self.l.size,
+            '-' if self.r is None else self.r.size)
+
+
+    def __repr__(self):
+        return f'{self.k}:{self.v}'
+
+
+    def new_leaf(self, k, v, *, p=None):
+        return BinTree(k=k, v=v, p=p)
+
+
+    def set_my_parent_slot(self, node):
+        "Sets the value in my slot in the parent to new `node` value"
+        # Just try to find my slot in my parent and handle NILs
+        if self.p is not None:
+            if self.p.r is not None and self.p.r.k == self.k:
+                self.p.r = node
+            elif self.p.l is not None and self.p.l.k == self.k:
+                self.p.l = node
+
+
+    @property
+    def is_empty(self): return self.root.k is None
+
+
+    @property
+    def tree_size(self): return self.root.size
+
+
+    @property
+    def no_children(self): return self.l is None and self.r is None
+
+
+    @property
+    def no_left(self): return self.l is None
+
+
+    @property
+    def no_right(self): return self.r is None
+
+
+    @property
+    def both_children(self): return self.l is not None and self.r is not None
+
+
+    @property
+    def is_left(self): return not self.no_left
+
+
+    @property
+    def is_right(self): return not self.no_right
+
+
+    def add(self, k, v):
+        '''Returns added the node if still no such key.
+        '''
+        if self.is_empty:
+            self.k = k
+            self.v = v
+            self.size += 1
+            return self
+        elif k > self.k:
+            if self.no_right:
+                self.r = self.new_leaf(k, v, p=self)
+                self.r.size += 1
+                self.size += 1
+                return self.r
+            else:
+                new = self.r.add(k, v)
+                if new is not None:
+                    self.size += 1
+                return new
+        elif k < self.k:
+            if self.no_left:
+                self.l = self.new_leaf(k, v, p=self)
+                self.l.size += 1
+                self.size += 1
+                return self.l
+            else:
+                new = self.l.add(k, v)
+                if new is not None:
+                    self.size += 1
+                return new
+        elif k == self.k:
+            self.v = v
+            return None
+
+
+    def remove(self, k):
+        if self.is_empty:
+            print('case-1')
+            return None
+        elif k > self.k and self.is_right:
+            print('case 2')
+            old = self.r.remove(k)
+            if old is not None:
+                self.size -= 1
+            return old
+        elif k < self.k and self.is_left:
+            print('case 3')
+            old = self.l.remove(k)
+            if old is not None:
+                self.size -= 1
+            return old
+        elif k == self.k:
+            v = self.v
+            if self.no_children:
+                print('case 4')
+                self.set_my_parent_slot(None)
+                # this is relevant mostly for the root (the last node), but it's required (!):
+                self.k = self.v = None  # deallocation for non-root in C/C++
+                self.size -= 1
+            elif self.both_children:
+                if self.r.no_left:
+                    print('case 5')
+                    old_self_r = self.r
+                    self.inherit_node(self.r, r=True)
+                    old_self_r.k = old_self_r.v = None  # deallocation for non-root in C/C++
+                    self.size -= 1
+                else:
+                    print('case 6')
+                    self.k = self.r.l.k
+                    self.v = self.r.l.v
+                    old = self.r.remove(self.r.l.k)
+                    if old is not None:
+                        self.size -= 1
+            elif self.is_left:
+                print('case 7')
+                old_self_l = self.l
+                self.inherit_node(self.l, l=True, r=True)
+                old_self_l.k = old_self_l.v = None  # deallocation for non-root in C/C++
+                self.size -= 1
+            elif self.is_right:
+                print('case 8')
+                old_self_r = self.r
+                self.inherit_node(self.r, l=True, r=True)
+                old_self_r.k = old_self_r.v = None  # deallocation for non-root in C/C++
+                self.size -= 1
+            return (k, v)
+        else:
+            return None  # not found
+
+
+    def get(self, k):
+        "Returns a node (not a value) by a key"
+        if self.is_empty:
+            return None
+        elif k == self.k:
+            return self  #.v
+        elif self.is_right and k > self.k:
+            return self.r.get(k)
+        elif self.is_left and k < self.k:
+            return self.l.get(k)
+        else:
+            return None
+
+
+    def walk(self, fn, way=Walk.INFIX, level=0):
+        if not self.is_empty:
+            if way == Walk.PREFIX:
+                fn(self, level, self.no_children, WalkPos.SELF)
+            if self.is_left:
+                self.l.walk(fn, way, level+1)
+            else:
+                fn(None, level+1, self.no_children, WalkPos.LEFT)
+            if way == Walk.INFIX:
+                fn(self, level, self.no_children, WalkPos.SELF)
+            if self.is_right:
+                self.r.walk(fn, way, level+1)
+            else:
+                fn(None, level+1, self.no_children, WalkPos.RIGHT)
+            if way == Walk.POSTFIX:
+                fn(self, level, self.no_children, WalkPos.SELF)
+
+
+    def asc(self):
+        if not self.is_empty:
+            if self.is_left:
+                for node in self.l.asc():
+                    yield node
+            yield self
+            if self.is_right:
+                for node in self.r.asc():
+                    yield node
+
+
+    def desc(self):
+        if not self.is_empty:
+            if self.is_right:
+                for node in self.r.desc():
+                    yield node
+            yield self
+            if self.is_left:
+                for node in self.l.desc():
+                    yield node
+
+
+    def union(self, tr):
+        pass
+
+
+    def split(self, k):
+        pass
+
+
+    def left_turn(self):
+        '''Turns the subtree to the left
+        '''
+        if self.is_right:
+            tmp = BinTree().inherit_node(self, l=True)
+            tmp.size = 1 + \
+                (0 if self.l is None else self.l.size) + (0 if self.r.l is None else self.r.l.size)
+            tmp.r = self.r.l
+            if tmp.r is not None:
+                tmp.r.p = tmp
+            tmp.p = self
+            my_old_r = self.r
+            self.inherit_node(self.r, r=True)
+            # Just mark it as deallocated (not needed in Python, sure). Alternative
+            # is to use this node instead of tmp
+            my_old_r.k = None
+            self.l = tmp
+            return True
+        else:
+            return False
+
+
+    def right_turn(self):
+        '''Turns the subtree to the right
+        '''
+        if self.is_left:
+            tmp = BinTree().inherit_node(self, r=True)
+            tmp.size = 1 + \
+                (0 if self.r is None else self.r.size) + (0 if self.l.r is None else self.l.r.size)
+            tmp.l = self.l.r
+            if tmp.l is not None:
+                tmp.l.p = tmp
+            tmp.p = self
+            my_old_l = self.l
+            self.inherit_node(self.l, l=True)
+            # Just mark it as deallocated - see left_turn()
+            my_old_l.k = None
+            self.r = tmp
+            return True
+        else:
+            return False
+
+
+
+    def disbalance_factor(self):
+        return (0 if self.r is None else self.r.size) - (0 if self.l is None else self.l.size)
+
+
+    def _balance(self):
+        r = False
+        #chsize = lambda child: 0 if child is None else child.size
+        if not self.is_empty:
+            d = self.disbalance_factor()
+            #print(self, d)
+            if d >= 2:
+                r1 = self.left_turn()
+                #if self.disbalance_factor() != -d:
+                #    r |= True
+                if r1:
+                    d1 = self.disbalance_factor()
+                    if abs(d1) < 2 and d1 != -1*d:
+                        #print(f'  ...end on {self}')
+                        r |= True
+                    #print(f'  left turned {self}')
+            elif d <= -2:
+                r2 = self.right_turn()
+                #if self.disbalance_factor() != -d:
+                #    r |= True
+                if r2:
+                    d1 = self.disbalance_factor()
+                    if abs(d1) < 2 and d1 != -1*d:
+                        #print(f'  ...end on {self}')
+                        r |= True
+                    #print(f'  right turned {self}')
+
+            if self.is_left:
+                r |= self.l._balance()
+                #print(f'  left turned L {self.l}')
+            if self.is_right:
+                r |= self.r._balance()
+                #print(f'  left turned R {self.r}')
+        
+        return r
+
+
+    def balance(self):
+        i = 0
+        while True:
+            if not self._balance():
+                print(f'\nDone for {i} steps')
+                break
+            i += 1
+            #self._prn.walk(bt)
+            #if self._prn: print(self._prn, '\n')
+            #print(self._dumprn.walk(self))
+
+
+
+class SimplePrefixPrinter:
+    def __init__(self, with_value=False):
+        self.lines = []
+        self.with_value = with_value
+
+    def __len__(self): return len(self.lines)
+
+    def visiting_node(self, el, level, no_brothers, pos):
+        if el is None:
+            if no_brothers:
+                return
+            el = '.'
+        else:
+            el = '%s[%s]' % (el.k, el.v) if self.with_value else '%s' % el.v
+        indent = level * ' '
+        if level:
+            indent += level*2*' '
+        self.lines.append('%s+- %s' % (indent, el))
+
+    def __repr__(self):
+        return '\n'.join(self.lines)
+
+    def walk(self, bt):
+        self.lines = []
+        bt.walk(self.visiting_node, Walk.PREFIX)
+        return str(self)
+
+
+class DumpPrinter:
+    def __init__(self):
+        self.lines = []
+
+    def __len__(self): return len(self.lines)
+
+    def visiting_node(self, el, level, no_brothers, pos):
+        if el is not None:
+            s = el.dump()
+            s += f'  level={level}  no_brothers={no_brothers}  pos={pos}'
+            self.lines.append(s)
+
+    def __repr__(self):
+        return '\n'.join(self.lines)
+
+    def walk(self, bt):
+        self.lines = []
+        bt.walk(self.visiting_node, Walk.PREFIX)
+        return str(self)
+
+
+########################################
+def partiallyrandomdata(num, ratio=0.5):
+    res = list(range(num))
+    i = 0
+    cnt = min(num, num*ratio)
+    while i < cnt:
+        r = random.randint(num, num + cnt - 1)
+        res[r - num] = r
+        i += 1
+    res = sorted(res)
+    return (res, random.choice(res))
+
+
+def myid(obj):
+    return (0 if obj is None else id(obj))
+
+
+NUM = 100
+bt = BinTree()
+#arr, x = partiallyrandomdata(NUM, 0.01)
+arr = [] #0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]
+for el in arr:
+    bt.add(el, el)
+while True:
+    prn = SimplePrefixPrinter()
+    dumprn = DumpPrinter()
+    prn.walk(bt)
+    if prn:
+        print(prn, '\n')
+    entered = input("Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T/b)? ").split()
+    if not entered:
+        print("?")
+        continue
+    cmd, *args = entered
+    if cmd == 'q':
+        break
+    else:
+        try:
+            if cmd == 'd':
+                res = bt.remove(int(args[0]))
+            elif cmd == 's':
+                if len(args):
+                    res = bt.get(int(args[0])).size
+                else:
+                    res = bt.tree_size
+            elif cmd == 'g':
+                res = bt.get(int(args[0]))
+            elif cmd == 'a':
+                res = bt.add(int(args[0]), int(args[0]))
+            elif cmd == 'D':
+                if len(args):
+                    res = bt.get(int(args[0]))
+                    res = res.dump()
+                else:
+                    res = dumprn.walk(bt)
+            elif cmd == 'o':
+                res = list(bt.asc())
+            elif cmd == 'O':
+                res = list(bt.desc())
+            elif cmd == 't':
+                res = bt.get(int(args[0])).left_turn()
+            elif cmd == 'T':
+                res = bt.get(int(args[0])).right_turn()
+            elif cmd == 'b':
+                res = bt.balance()
+            else:
+                raise RuntimeError('Unknown command')
+            print(res, '\n')
+        except Exception as x:
+            traceback.print_exc()
+#+END_SRC

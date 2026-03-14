@@ -1,0 +1,26 @@
+#+title: AVR timers support
+#+description: My Blog
+#+keywords: embedded, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: embedded clang
+#+date: [2020-02-09 Sun 08:41]
+
+* AVR timers support
+
+These modules implements for AVR8, AVR128, AVR168P chips next functions:
+
+#+BEGIN_SRC cpp
+void init_timers(void);
+int alarm_action(int timer, timer_handler_t alarm_handler);
+int _alarm(int timer, unsigned long usec);
+int alarm(int timer, unsigned long usec);
+unsigned long tclock(int timer);
+unsigned long millis(void);
+unsigned long micros(void);
+#+END_SRC
+
+~alarm()~ is like standard C function (but for AVR), it's wrapped by ~cli()~/~sei()~, ~_alarm()~. ~int timer~ is the number of the used timer. ~tclock()~ is like C's ~clock()~ but used timer id. ~clock()~ is the ~tclock(0)~ - standard C function, implemented on timer 0. ~millis()~/~micros()~ returns milliseconds/microseconds from last call. Before use, call ~init_timer()~ first.
+
+Before to use, define ~F_CPU~. ~CLOCKS_PER_SEC~ should not be defined. If is, this means that some timer for ~clock()~ is already in use. Tested with WinAVR-20100110, but may be needs more testing...
+
+The code can be found in my Github.

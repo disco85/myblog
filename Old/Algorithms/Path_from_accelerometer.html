@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Path from accelerometer</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="dsp, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Path from accelerometer</h1>
+<div id="outline-container-org120ee40" class="outline-2">
+<h2 id="org120ee40">Path from accelerometer</h2>
+<div class="outline-text-2" id="text-org120ee40">
+<p>
+To get path or coordinates from accelerometer values you need to integrates them. From physics we know:
+</p>
+
+<p>
+\[v = dr/dt
+\]
+\[a = dv/dt = d^2r/dt^2
+\]
+</p>
+
+<p>
+If a (acceleration) is constant, motion is called uniform accelerated:
+</p>
+
+<p>
+\[v(t)=v(0)+at;
+r(t)=r(0)+v(0)t+0.5*at^2
+\]
+</p>
+
+<p>
+<code>v(0)</code>, <code>r(0)</code> - initial velocity and displacement. If <code>a != const</code>, these formulas can not be used. If we know how a depends on <code>t</code> (for ex., <code>a(t) = b + c*t</code>), we can use:
+</p>
+
+<p>
+\[v(t) = v(0) + b/t + 1/2/c*t^2
+\]
+</p>
+
+<p>
+\[r(t) = r(0) + v(0)/t + 1/2/b/t^2 + 1/6/c*t^3
+\]
+</p>
+
+<p>
+But if we don't know a(t), we can only use common rules:
+</p>
+
+<p>
+\[r(t)=r(0)+\int_0^tv(t)dt
+\]
+</p>
+
+<p>
+\[v(t)=v(0)+\int_0^ta(t)dt
+\]
+</p>
+
+<p>
+and calculate this with some <a href="http://en.wikipedia.org/wiki/Numerical_integration">numerical integration method</a>.
+</p>
+
+<p>
+Examples (models with plots) of such methods (in SciLab) you can found <a href="http://hmc-demo.googlecode.com/files/mathmodels.zip">there</a> (in integral.sci file: Simpson's rule, Trapezoid rule, Leo Tick's rule). But we should know about 2 problems:
+</p>
+
+<ul class="org-ul">
+<li>If there is some constant "component" in acceleration (or noise), this will be reason of BIG error in result</li>
+<li>Each numerical integration method is filter and has transfer function, which give distortions on 0.2 - 0.4 Nyquist's frequency even [see R. W. Hamming, Digitals filters, 1977]</li>
+</ul>
+
+<p>
+So, you can use more smart methods. One of them is complex (chaining) integration with filters. Idea is to filter each dataflow: between each integrator and to filter output result too:
+</p>
+
+<p>
+a(t)-&gt;FILT-&gt;a,,f,,(t)-&gt;INT-&gt;v(t)-&gt;FILT-&gt;v,,f,,(t)-&gt;INT-&gt;x(t)-&gt;FILT-&gt;x,,f,,(t)
+</p>
+
+<p>
+where <code>FILT</code> - is a filter, <code>INT</code> - is an integrator.
+</p>
+
+<p>
+It can be implemented on dataflow model (as I done it in hmc-demo). You can found example of such model in SciLab source file "path.sci" where you can combine different integration methods with different filters and see result in plots.
+</p>
+
+<p>
+And remember, eventually, you never get correct result. Use sensors of velocity instead.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

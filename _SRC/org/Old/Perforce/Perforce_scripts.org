@@ -1,0 +1,92 @@
+#+title: Perforce scripts
+#+description: My Blog
+#+keywords: perforce, misc
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: perforce misc
+#+date: [2020-02-05 Wed 05:17]
+
+* Perforce scripts
+
+This is useful Perforce old my scripts-helpers.
+
+Common utils:
+
+#+BEGIN_SRC bash
+# Returns number of changelists, prints list of changelists
+find_p4cl() {
+	p4 changes -u $USER -s pending|awk '
+		BEGIN { found=0 }
+		/^Change / {
+			p4cl[found, 0] = $2
+			p4cl[found, 1] = $4
+			w = match($0, /\*pending\* /)
+			if (w) d = substr($0, w + length("*pending* "))
+			else d = ""
+			p4cl[found, 2] = d
+			found++
+		}
+		END {
+			if (found) {
+				print "Available ChangeLists:"
+				print "======================"
+				for (i=0; i<found; i++) {
+					printf "  %s on %s: %s...\n",
+						p4cl[i, 0],
+						p4cl[i, 1],
+						p4cl[i, 2]
+				}
+			}
+			exit found
+		}
+	'
+}
+
+# Input from user changelist (show default value if it one only).
+# If no input, returns default
+read_p4cl() {
+	local changelists _p4cl p4clhint
+	changelists=`find_p4cl`
+	if [ $? -eq 1 ]; then
+		_p4cl=`echo "$changelists"|awk 'NR==3{print $1}'`
+		p4clhint=" [${_p4cl}]"
+	else
+		_p4cl=""
+		p4clhint=""
+	fi
+	echo "$changelists"
+	echo
+	echo -n "Enter P4 ChangeList number${p4clhint}: "; read p4cl; : ${p4cl:=$_p4cl}
+}
+
+# if not Perforce workspace then report it
+check_p4ws() {
+	CF=${P4CONFIG:-.p4config}
+	[ -f "$CF" ] || { echo 'Seems not P4 workspace!' >&2; return 1; }
+	return 0
+}
+#+END_SRC
+
+List of modified files without switch it to "Edit" mode (devs often forget to do it :)
+
+#+BEGIN_SRC bash
+#!/bin/sh
+# List of locally modified files without put them into ChangeList
+
+. .p4utils
+check_p4ws || exit 1
+p4 reconcile -e -n
+#+END_SRC
+
+Review sending:
+
+#+BEGIN_SRC bash
+#!/bin/sh
+# Send ChangeList review request
+
+. .p4utils
+check_p4ws || exit 1
+read_p4cl
+echo "Posting review now. Wait, please..."
+post-review $p4cl
+
+#+END_SRC

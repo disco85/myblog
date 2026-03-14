@@ -1,0 +1,49 @@
+#+title: Python's groupby pitfall
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-05 Wed 05:04]
+
+* Python's groupby pitfall
+
+Python function ~groupby~ has one feature which can be cause of unexpected
+pitfall:
+
+> ...The returned group is itself an iterator that shares the underlying iterable
+> with groupby(). Because the source is shared, when the groupby() object is
+> advanced, the previous group is no longer visible. So, if that data is needed
+> later, it should be stored as a list...
+
+Example:
+
+#+BEGIN_SRC python
+from itertools import *
+
+input = ((1, "one"), (1, "one too"), (1, "also one"),
+         (2, "two"), (2, "another two"), (2, "two again")
+)
+
+grp = groupby(input, lambda p: p[0])
+# grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)
+maxg, maxi = max(grp, key=lambda g: g[0])
+print("maxg =", maxg, "maxi =", list(maxi))
+#+END_SRC
+
+Output without (A) is:
+
+#+BEGIN_SRC bash
+maxg = 2 maxi = [(2, 'two again')]
+#+END_SRC
+
+which is unexpected because we suppose to find "last" group to
+iterate than over it's items (they are 3!).
+
+But with (A) is:
+
+#+BEGIN_SRC bash
+maxg = 2 maxi = [(2, 'two'), (2, 'another two'), (2, 'two again')]
+#+END_SRC
+
+This happens because sub-iterators of groups are not independent,
+iteration over groups "eats" sub-iterators too.

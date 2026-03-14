@@ -1,0 +1,61 @@
+#+title: Python: safe resource management
+#+description: My Blog
+#+keywords: safety, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: safety python
+#+date: [2020-02-04 Tue 06:44]
+
+* Python: safe resource management
+
+Yet another example of the type safety in Python maybe a resources management.
+We can use typing to ensure that resources were released, so no any resoucres
+leak. Yes, it's possible. The idea is that we will check in compile time with
+types that resoucres were released by checking that they were returned as
+appropriated type after its usage. Look the example:
+
+#+BEGIN_SRC python
+from typing import *
+from abc import *
+
+T = TypeVar('T')
+class Hold(ABC): pass
+class Free(ABC): pass
+
+class Resources(Generic[T]):
+    def __init__(self, fp1:str, fp2:str):
+        self.f1 = open(fp1, "r")
+        self.f2 = open(fp2, "r")
+    def _release(self):
+        self.f1.close()
+        self.f2.close()
+        print("Resources were released")
+
+def get_resources(fp1:str, fp2:str) -> Resources[Hold]:
+    return Resources(fp1, fp2)
+def release_resources(r: Resources[Hold]) -> Resources[Free]:
+    r._release()
+    return cast(Resources[Free], r)
+
+def use_resources(r: Resources[Hold]) -> Resources[Free]:
+    print(r.f1.read(), r.f2.read())
+    return release_resources(r)
+
+r = get_resources("f1.txt", "f2.txt")
+use_resources(r)
+#+END_SRC
+
+If we will try to omit ~return~ statement in the ~use_resources()~ function, then
+we will get an error ~Missing return statement~ from mypy. OK, if we will try to
+return ~None~, then the error will be ~Incompatible return value type (got "None", expected "Resources[Free]")~.
+OK, we will return the resource itself: ~return r~. But an error again, now:
+~Incompatible return value type (got "Resources[Hold]", expected "Resources[Free]")~.
+
+It's a very good error: it says us that we don't release resources, we complete in the
+~Resources[Hold]~ state. To fix it we will ~return release_resources(r)~ and now
+all is fine. The function ~use_resources()~ is wrapper which wraps the usage of them,
+tracks correct state of their life-cycle. It's typical for Haskell with phantom types,
+we tried to create one here, in Python. So, the function gets acquired resources, uses
+them and then releases them, and we will not forget to call ~release_resources()~.
+
+
+PS. Those 3 resource related function can be implemented as class methods of ~Resources~ class.

@@ -1,0 +1,42 @@
+#+title: Hanged LM3S9B92 board
+#+description: My Blog
+#+keywords: embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t 
+#+tags: embedded
+#+date: [2020-02-09 Sun 08:13]
+
+* Hanged LM3S9B92 board
+
+After trying FreeRTOS example for LM3S9B92 my board seems "hanged" (dead) - no response over Ethernet, no adventure game :) And I get message "Error to initializing target".
+Last was cured by several turning on/off USB connector. But no game... :) And Finder can not find my board's IP...
+After opening Putty on virtual COM port (created after installation of FTDI drivers - I'm talking about Windows:) with baudrate 115200 and reseting board by button on the board, I see message:
+
+#+BEGIN_SRC
+Colossal Cave Adventure
+-----------------------
+Connect to either the USB virtual COM port or
+telnet into the Ethernet port in order to play.
+
+MAC Address Not Programmed!
+#+END_SRC
+
+Aha! I ran LM Flash Programmer and on "Other Utilities" tab and:
+
+* Reset device by "Debug port unlock" feature (select "Tempest Class", click "Unlock" and follow instructions on message boxes)
+* Switch to "MAC Address Mode" and programmed MAC address (it's possible to use FF-...-FF).
+* Re-program device by original firmware (always save original firmwares!)
+
+After this resetting device show in Putty session:
+
+#+BEGIN_SRC
+Colossal Cave Adventure
+-----------------------
+Connect to either the USB virtual COM port or
+telnet into the Ethernet port in order to play.
+
+IP: 169.254.3.0
+Netmask: 255.255.0.0
+Gateway: 0.0.0.0
+#+END_SRC
+
+...after "Wait..." and obtaining IP address. Finder found this IP address, and colossal game is working... over Ethernet :)

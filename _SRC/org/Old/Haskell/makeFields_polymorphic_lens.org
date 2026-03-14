@@ -1,0 +1,83 @@
+#+title: makeFields, polymorphic lens
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2022-07-07 Thu 06:59]
+
+* makeFields, polymorphic lens
+
+https://stackoverflow.com/questions/66659693/how-to-use-setter-with-polymorphic-type/66660827#66660827
+
+Module A:
+
+#+BEGIN_SRC haskell
+data Xxx a = Xxx {
+    _xxxAaa :: Int,
+    _xxxBbb :: a
+}
+makeFields ''Xxx
+#+END_SRC
+
+Module B:
+
+#+BEGIN_SRC haskell
+t :: IO Bool
+t = do
+    let n = "aaa" :: String
+    let xs = [Xxx 0 0, Xxx 1 1] :: [Xxx Int]
+        ys = [set bbb n $ x | x <- xs]
+    pure False
+#+END_SRC
+
+Error is:
+
+#+BEGIN_SRC
+• Couldn't match type ‘Int’ with ‘[Char]’
+    arising from a functional dependency between:
+      constraint ‘HasBbb (Xxx Int) String’ arising from a use of ‘bbb’
+      instance ‘HasBbb (Xxx a) a’
+        at .........
+#+END_SRC
+
+Pay attention, ~makeFields~ generates not a polymorphic lenses, ie, it cannot change the type like with usual record constructors:
+
+#+BEGIN_SRC haskell
+let xs = [Xxx 0 0, Xxx 1 1]::[Xxx Int]
+    ys = [x {_xxxBbb="aaaa"} | x <- xs]
+#+END_SRC
+
+ie, from ~Xxx Int~ to ~Xxx String~. But ~makeLens~ generates polymorphic lenses. It can be checked with ~:i~ in GHCI:
+
+#+BEGIN_SRC
+ghci> :i HasBbb
+class HasBbb s a | s -> a where
+  bbb :: Lens' s a
+  {-# MINIMAL bbb #-}
+        -- Defined at A.hs:14:1
+instance HasBbb (Xxx a) a -- Defined at A.hs:14:1
+#+END_SRC
+
+we see that ~makeFields~ generates class ~HasBbb~. And it looks like ~Lens' s a~ is a short variant of ~Lens ...~ where type-from and type-to are the same (ie, it does not allow to change the type with a setting operation). But a lens via ~makeLens~:
+
+#+BEGIN_SRC haskell
+data Xxx a = Xxx {
+    _xxxAaa :: Int,
+    _xxxBbb :: a
+}
+makeFields ''Xxx
+makeLenses ''Xxx
+#+END_SRC
+
+Let's check:
+
+#+BEGIN_SRC
+ghci> :i xxxBbb
+xxxBbb :: Lens (Xxx a1) (Xxx a2) a1 a2  -- Defined at A.hs:15:1
+ghci> :t set xxxBbb "aaa" (Xxx 0 0)
+set xxxBbb "aaa" (Xxx 0 0) :: Xxx [Char]
+#+END_SRC
+
+We see that ~xxxBbb~ is polymorphic and it changes the type ~Xxx a1 -> Xxx a2~ when we set the field of type ~a1~ into ~a2~. Something like this :)
+
+And ~set xxxBbb "aaa" (Xxx 0 0)~ works now (and with ~.~~ even).

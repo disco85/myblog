@@ -1,0 +1,61 @@
+#+title: PEG grammars in Tcl - simple example
+#+description: My Blog
+#+keywords: tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk
+#+date: [2020-02-06 Thu 05:26]
+
+* PEG grammars in Tcl - simple example
+
+This is the very simple example how to create PEG grammar and parse some text with it in Tcllib (I used Tcllib 1.4).
+
+#+BEGIN_SRC tcl
+package require starkit
+starkit::startup
+package require pt::peg::from::peg
+package require pt::peg::container
+package require pt::peg::interp
+
+set PEG {
+PEG myapp (Exp)
+    IfKw       <- 'i' 'f'                               ;
+    ThenKw     <- 't' 'h' 'e' 'n'                       ;
+    ElseKw     <- 'e' 'l' 's' 'e'                       ;
+    OSp        <- ('\t' / '\n' / ' ')?                  ;
+    Sp         <- ('\t' / '\n' / ' ')+                  ;
+    Block      <- (Exp / 't') &';'                      ;
+    Cond       <- 'c' / 'o'                             ;
+    If         <- IfKw Sp Cond OSp ':' OSp Block        ;
+    Exp        <- If                                    ;
+END;
+}
+
+set CPEG [pt::peg::from::peg convert $PEG]
+pt::peg::container cont
+cont deserialize = $CPEG
+set src "if c: if o:t;"
+pt::peg::interp myint
+myint use cont
+puts [myint parset $src]
+#+END_SRC
+
+(I use startkit...)
+This grammar is very simple (and non-realistic): it defines rules to parse nested 'if'-expression like this:
+
+#+BEGIN_SRC tcl
+if c: if o: t;
+#+END_SRC
+
+or
+
+#+BEGIN_SRC tcl
+if CONDITION: if CONDITION: BLOCK;
+#+END_SRC
+
+where CONDITION is 'c' or 'o', BLOCK is another EXP (expression) or 't' followed by ';'; when blocks are nested, only one ';' is needed. Example has bugs (see Sp, OSp - Optional SPaces) but shows base tricks with PEG, for ex., PEG definition is loaded from variable, not imported from file, so you need for your App. not all Tcllib packages :) After running, you get:
+
+#+BEGIN_SRC bash
+c:\>tclkitsh.exe main.tcl
+Exp 0 11 {If 0 11 {IfKw 0 1} {Sp 2 2} {Cond 3 3} {OSp 4 3} {OSp 5 5} {Block 6 11 {Exp 6 11 {If 6 11 {IfKw 6 7} {Sp 8 8}
+{Cond 9 9} {OSp 10 9} {OSp 11 10} {Block 11 11}}}}}
+#+END_SRC

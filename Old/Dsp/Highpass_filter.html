@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>High-pass filter</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang, dsp" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">High-pass filter</h1>
+<div id="outline-container-orgc372c15" class="outline-2">
+<h2 id="orgc372c15">High-pass filter</h2>
+<div class="outline-text-2" id="text-orgc372c15">
+<p>
+Simple high-pass filter in form of IIR of 1st order. See more info <a href="http://en.wikipedia.org/wiki/High-pass_filter">here</a>.
+In my application HMC demo I poll sensor (accelerometer) and filter Ax signal:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">HPFilter hpf
+hpf configure -datatype flt -datatypes {phys}
+Saver saver1
+saver1 listen -on
+saver listen -on
+listen phvals:hpf
+listen hpf:saver1
+serial open 4
+sensor poll -loop
+</pre>
+</div>
+
+<p>
+This will create 2 CSV files with native and with filtered signals (after saving we rename them). We can render signals with <a href="http://www.gle-graphics.org/index.html">GLE tool</a>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">begin graph
+    title "Accelerations"
+    xtitle "Time [sec]"
+    ytitle "Ax [g]"
+    axis grid
+    ticks color grey40
+    subticks on
+    subticks lstyle 2
+    set font "texcmr"
+
+    d1 file "c:/tmp/saver.csv,0,5"
+    let d2 = d1
+    d1 line color red
+    d2 deresolve 10 average line color red lwidth 0.1
+
+    d3 file "c:/tmp/saver1.csv,0,5"
+    let d4 = d3
+    d3 line color blue
+    d4 deresolve 10 average line color blue lwidth 0.1
+end graph
+
+begin key
+    set fill yellow
+    line color red text "Native"
+    line color blue text "Filtered"
+end key
+</pre>
+</div>
+
+<p>
+Removing of slow drift is used in position estimation of sensor (from acceleration) in multicascading scheme:
+</p>
+
+<p>
+<code>HPF -&gt; INTEGR -&gt; HPF -&gt; INTEGR -&gt; HPF</code>
+</p>
+
+<p>
+Here is the C code (for SWIG) of this kind of filter:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #ff4500;">double</span>* <span style="color: #ff4500;">filter</span>(<span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">v</span>) {
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>;
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">vlen</span>;
+
+        vlen = (<span style="color: #ff4500;">int</span>)v[0];
+        <span style="color: #696969;">if</span> (vlen != $self-&gt;n) {
+            <span style="color: #696969;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        }
+
+        <span style="color: #696969;">for</span> (i=1; i &lt;= vlen; i++) {
+            $self-&gt;v[i] = $self-&gt;a * ($self-&gt;v[i] + v[i] - $self-&gt;x[i]);
+            $self-&gt;x[i] = v[i];
+        }
+        <span style="color: #696969;">return</span> ($self-&gt;v);
+}
+</pre>
+</div>
+
+<p>
+$self is the pointer to CHPFilter struct:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">CHPFilter</span> {
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">n</span>; <span style="color: #575757;">// </span><span style="color: #575757;">length of v</span>
+        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">a</span>; <span style="color: #575757;">// </span><span style="color: #575757;">alpha</span>
+        <span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">v</span>; <span style="color: #575757;">// </span><span style="color: #575757;">calculated values (keep prev. before filter)</span>
+        <span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">x</span>; <span style="color: #575757;">// </span><span style="color: #575757;">prev. input</span>
+} <span style="color: #ff4500;">CHPFilter</span>;
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

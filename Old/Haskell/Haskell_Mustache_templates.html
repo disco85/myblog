@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Haskell Mustache templates</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Haskell Mustache templates</h1>
+<div id="outline-container-org8dd4af5" class="outline-2">
+<h2 id="org8dd4af5">Haskell Mustache templates</h2>
+<div class="outline-text-2" id="text-org8dd4af5">
+<p>
+This is a small example how to use Mustache template implementation in Haskell.
+Main idea of Mustache is to avoid complex syntax and all semantics is getting
+from variable itself: boolean vairables using as sections allow to hide/show its
+content, lists - to enumerate its content, etc. Example is very simple! You need
+to add <code>mustache</code> and <code>text</code> packages into your .cabal file only.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-haskell">{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+module Main where
+import qualified Data.Text             as T
+import           Text.Mustache
+import           Text.Mustache.Compile
+
+-- Tutorial: https://www.stackbuilders.com/tutorials/haskell/mustache-templates/
+
+templ :: Template
+templ = [mustache|We are the good Company "{{name}}":
+{{#persons}}
+- my name is {{name}} and I'm {{age}} years old
+{{/persons}}
+|]
+
+data Company = Company {
+  cName :: T.Text
+, cPersons :: [Person]
+                       }
+instance ToMustache Company where
+  toMustache c = object
+    [ "persons" ~&gt; cPersons c
+    , "name" ~&gt; cName c
+    ]
+
+
+data Person = Person {
+  pName :: T.Text
+, pAge  :: Int
+                     }
+instance ToMustache Person where
+  toMustache per = object
+    [ "age" ~&gt; pAge per
+    , "name" ~&gt; pName per
+    ]
+
+main :: IO ()
+main = do
+  let c = Company "MS" [Person "Alex" 20, Person "Jane" 21, Person "John" 25]
+  putStr $ T.unpack $ substitute templ $ c
+</pre>
+</div>
+
+<p>
+Output is:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-console">We are the good Company "MS":
+- my name is Alex and I'm 20 years old
+- my name is Jane and I'm 21 years old
+- my name is John and I'm 25 years old
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

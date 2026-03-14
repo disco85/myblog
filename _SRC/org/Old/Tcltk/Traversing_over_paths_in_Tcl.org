@@ -1,0 +1,99 @@
+#+title: Traversing over paths in Tcl
+#+description: My Blog
+#+keywords: misc, tcl/tk
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: misc tcl/tk
+#+date: [2020-02-06 Thu 05:23]
+
+* Traversing over paths in Tcl
+
+If we have paths - string like directories of DOS, we can want to group them and walking on all of them:
+
+#+BEGIN_SRC
+Input:
+  a/b/c
+  a/y/u
+  a/b/d
+  a/y/i
+
+Walking:
+  a (a)
+   b (a/b)
+    c (a/b/c)
+    d (a/b/d)
+   y (a/y)
+    u (a/y/u)
+    i (a/y/i)
+#+END_SRC
+
+Next procedure does it, but paths are list of lists (each item is list of directories' names).
+
+#+BEGIN_SRC tcl
+proc forpaths {boundVarNames paths body} {
+# walk on paths, each is list of dirs. $body will execute on visit each dir,
+# variables bound:
+#   $keyName - current path
+#   $levelName - current level (0...N)
+#   $leafName - is leaf or not (1, 0)
+    foreach {keyName levelName leafName} [lrange $boundVarNames 0 2] {}
+    set group [dict create]
+    foreach path $paths {
+        dict set group {*}$path "@LEAF"
+    }
+    proc _cmp {a b} {
+        if {[expr {$a > $b}]} { return 1 } \
+        elseif {[expr {$a < $b}]} { return -1 } \
+        else { return 0 }
+    }
+    proc _trackpath {track level dir} {
+        if {$track eq ""} { set track {"@DUMMY"} }
+        switch -- [_cmp [expr $level+1] [llength $track]] {
+            1  { lappend track $dir }
+            0  { lset track end $dir }
+            -1 { set track [lreplace $track $level end $dir] }
+        }
+        return $track
+    }
+    set gtrack {}; # current path when visit each node
+    proc _walk {d keyName levelName leafName body {_deep 2}} {
+    # here $level is level in tree, not in stack
+    # $_deep is level in stack
+        upvar $_deep $keyName key $levelName level
+        upvar gtrack gtrack
+        if {$leafName ne ""} { upvar $_deep $leafName leaf }
+        dict for {k v} $d {
+            set level [expr {$_deep-2}]
+            set gtrack [_trackpath $gtrack $level $k]
+            set key $gtrack
+            if {$v eq "@LEAF"} {
+                set leaf 1
+                uplevel $_deep $body
+            } else {
+            # nested
+                set leaf 0
+                uplevel $_deep $body
+                _walk $v $keyName $levelName $leafName $body [expr {$_deep+1}]
+            }
+        }
+    }
+    _walk $group $keyName $levelName $leafName $body
+}
+#+END_SRC
+
+It works like ~foreach~:
+
+#+BEGIN_SRC tcl
+forpaths {k level leaf} $someDirs {
+    puts "key: $k level: $level isLeaf: $leaf"
+}
+#+END_SRC
+
+Mandatory is only first variable - key, so it's possible to call:
+
+#+BEGIN_SRC tcl
+forpath {k l f} ...
+forpath {k l} ...
+forpath k ...
+#+END_SRC
+
+So to traverse directories' names first split them with separator string into lists!

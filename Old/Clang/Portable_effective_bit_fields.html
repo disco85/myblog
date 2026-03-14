@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Portable effective C bit fields</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="clang" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Portable effective C bit fields</h1>
+<div id="outline-container-orgd7557c9" class="outline-2">
+<h2 id="orgd7557c9">Portable effective C bit fields</h2>
+<div class="outline-text-2" id="text-orgd7557c9">
+<p>
+As you know bit's fields in C are not portable when we're talking about external world (network/different architecture/file transmission): order of the fields is unspecified, also as real wrapper struct&#x2026;
+Often bitwise operations are used instead of bitfield struct syntax but result code may be less readable opposite to original idea: bitfields. But there is simple solution to workaround weird syntax. Here you are:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">__BITSTRUCT_MASK</span>(<span style="color: #ffffff;">LEN</span>) ((1&lt;&lt;(LEN))-1)
+
+<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> BITSTRUCT_GETBITS_IMPL
+<span style="color: #a52a2a;"># define</span> <span style="color: #ff4500;">BITSTRUCT_GETBITS_IMPL</span>(<span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>) \
+    (((BS)&gt;&gt;(OFFSET)) &amp; __BITSTRUCT_MASK(LEN))
+<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> BITSTRUCT_SETBITS_IMPL
+<span style="color: #a52a2a;"># define</span> <span style="color: #ff4500;">BITSTRUCT_SETBITS_IMPL</span>(<span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>, <span style="color: #ffffff;">VALUE</span>) \
+    ((BS) &amp; ~(__BITSTRUCT_MASK(LEN)&lt;&lt;(OFFSET)) | \
+     (((VALUE) &amp; __BITSTRUCT_MASK(LEN))&lt;&lt;(OFFSET)))
+<span style="color: #a52a2a;">#endif</span>
+
+<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">BITSTRUCT</span> <span style="color: #696969;">enum</span>
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_MASK</span>(<span style="color: #ffffff;">NAME</span>) __BITSTRUCT_MASK(NAME##_LEN)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_GET</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">BS</span>) \
+  BITSTRUCT_GETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN)
+<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_SET</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">VALUE</span>) \
+  BITSTRUCT_SETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN, VALUE)
+</pre>
+</div>
+
+<p>
+So now it's possible to write something like this to describe register X:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">|15.....8|7....4|3.....0|
+| ENABLE | FLAG | COUNT |
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-cpp"><span style="color: #ff4500;">BITSTRUCT</span> <span style="color: #ffffff;">RegisterX</span> {
+        <span style="color: #575757;">// </span><span style="color: #575757;">BITFIELD(NAME, OFFSET, LENGTH)</span>
+        BITFIELD(RX_COUNT, 0, 4),
+        BITFIELD(RX_FLAG, 4, 4),
+        BITFIELD(RX_ENABLE, 8, 8)
+};
+
+<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+{
+        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">x</span> = 0x1234; <span style="color: #575757;">// </span><span style="color: #575757;">raw value of register</span>
+        <span style="color: #575757;">// </span><span style="color: #575757;">example of get/set field of bits' struct</span>
+        x = BITFIELD_SET(RX_ENABLE, x, 0x98);
+        printf(<span style="color: #696969;">"%0X"</span>, BITFIELD_GET(RX_ENABLE, x));
+        <span style="color: #696969;">return</span> (0);
+}
+</pre>
+</div>
+
+<p>
+As you can see code is readable as in usual bitfield's struct, but instead of struct <code>BITSTRUCT</code> should be used, and <code>BITFIELD()</code> descriptor instead of type <code>NAME:len</code> form. To set or to get field value, use <code>BITFIELD_SET~/~GET()</code> macros. <code>BITFIELD_MASK()</code> returns mask of field but from zero bit.
+But note the <code>*_IMPL</code> macros, using they, you can customize behavior of SET/GET implementation, for example to use some DSP core what can improve program performance dramatically! What you need is only to define own GET/SET helpers-implementators (<code>BITSTRUCT_GETBITS_IMPL~/~BITSTRUCT_SETBITS_IMPL</code>).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

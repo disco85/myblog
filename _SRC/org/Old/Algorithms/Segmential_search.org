@@ -1,0 +1,127 @@
+#+title: Segmential search
+#+description: My Blog
+#+keywords: algorithms, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms python
+#+date: [2022-07-12 Tue 15:15]
+
+* Segmential search
+
+It's something close to segments tree, but a list is used (+binary search on it) instead of a tree.
+
+It requires ''input data (points) to be sorted''.
+
+So, the idea is: instead of search a point in a list of points, combine them into segments (intervals/ranges) - we assume that there are consecutive points (like ~1,2,3,4~ - they can be combined into ~1..4~). A sequence of points like ~1, 5, 7~ are combined into segments ~1..1, 5..5, 7..7~ - not good case, so the algorithm makes sense when segments (which ~length > 1~) number is big.
+
+We find the segment contained the point with binary search. Then we find the offset of the point inside the segment (its index) - without any search, just arithmetic. Then the offset of the segment - again, just arithmetic. So, it's faster than binary search on plain points.
+
+#+BEGIN_SRC python
+import random
+import functools
+
+def swap(x, y): return (y, x)
+
+@functools.total_ordering
+class Seg:
+    '''Normalized segment'''
+    def __init__(self, a, b=None):
+        if b is None: b = a
+        if a > b: a, b = swap(a, b)
+        self.a = a
+        self.b = b
+    def __contains__(self, pt):
+        return self.a <= pt <= self.b
+    def __len__(self):
+        return self.b - self.a + 1
+    def __eq__(self, oth):
+        assert type(oth) is type(self)
+        self.a == oth.a and self.b == oth.b
+    def __lt__(self, oth):
+        assert type(oth) is type(self)
+        return self.a < oth.a
+    def __repr__(self): return f'{self.a}..{self.b}'
+    def cmp_pt(self, pt):
+        if pt < self.a: return 1
+        elif pt > self.b: return -1
+        else: return 0
+
+def segs_from_points(pts):
+    seg = None
+    d = 0
+    for pt in pts:
+        if seg is None:
+            seg = Seg(pt)
+        else:
+            d = pt - seg.b
+            if 0 > d:
+                raise ValueError('Unordered points')
+            elif 0 == d:
+                pass
+            elif 1 == d:
+                seg.b += 1
+            elif 1 < d:
+                yield seg
+                seg = Seg(pt)
+
+# Usual binary search but of the point in segments,
+# so cmp_pt() is used
+def find_seg(segs, pt):
+    start = 0
+    end = len(segs) - 1
+    while start <= end:
+        mid = (start + end) // 2
+        mid_el = segs[mid]
+        d = mid_el.cmp_pt(pt)
+        if d > 0:
+            end = mid - 1
+        elif d < 0:
+            start = mid + 1
+        else:
+            return mid
+    return -1
+
+def find(segs, pt):
+    segi = find_seg(ACCESS(segs, _cap='seg'), pt)
+    if segi >= 0:
+        seg = segs[segi]
+        print(f"Found seg: {seg}")
+        off_in_seg = pt - seg.a
+        fnd = 0
+        for i in range(segi):
+            fnd += len(segs[i])
+        fnd += off_in_seg
+        return fnd
+    else:
+        return -1
+
+def partiallyrandomdata(num, ratio=0.5):
+    res = list(range(num))
+    i = 0
+    cnt = min(num, num*ratio)
+    while i < cnt:
+        r = random.randint(num, num + cnt - 1)
+        res[r - num] = r
+        i += 1
+    res = sorted(res)
+    return (res, random.choice(res))
+
+class ACCESS(list):
+    def __init__(self, *a, **kw):
+        self.cap = kw.pop('_cap', '')
+        if self.cap: self.cap += ' '
+        super().__init__(*a, **kw)
+        self._access = 0
+    def __getitem__(self, i):
+        print(f"{self.cap}{self._access}: get {i}")
+        self._access += 1
+        return super().__getitem__(i)
+
+
+NUM = 10000
+arr, x = partiallyrandomdata(NUM, 0.5)
+segs = list(segs_from_points(arr))
+print(f"Look for {x} in {arr}")
+print(f"Segs: {segs}")
+fnd = find(segs, x)
+print(f"Looked for {x} and found {arr[fnd]} at {fnd}")
+#+END_SRC

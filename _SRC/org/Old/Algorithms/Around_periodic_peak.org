@@ -1,0 +1,27 @@
+#+title: Around periodic peak?
+#+description: My Blog
+#+keywords: python, algorithms, dsp
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms dsp
+#+date: [2020-02-06 Thu 17:41]
+
+* Around periodic peak?
+
+Does the sample is located around periodic peak? Next pseudo-code (Python) function tests does sample is located in domain around periodic peak:
+
+#+BEGIN_SRC cpp
+def isclose(a, b, lim):
+    # is b close to a OR to aliquot of a in lim
+    if a == 0:
+        return abs(b - a) <= lim
+    else:
+        n = b/a
+        if b%a > a/2:
+            n += 1
+        c = a*n # closest aliquot to b
+        m = abs(b - c)
+        return m <= lim
+#+END_SRC
+
+...returns boolean.
+It's usable to test dispersion of sample around peaks.

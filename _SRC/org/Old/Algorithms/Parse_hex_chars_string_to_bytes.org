@@ -1,0 +1,67 @@
+#+title: Parse hex chars string to bytes
+#+description: My Blog
+#+keywords: algorithms, clang
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: algorithms clang
+#+date: [2020-02-03 Mon 18:41]
+
+* Parse hex chars string to bytes
+
+Very simple task as for interview: to parse hex chars into bytes. Example:
+"123Ad" -> "\x12\x3A\x0D". This procedure can be helpfull if you want to
+transmit some encoding string (in UTF8, UTF16, mbcs, etc) between different
+processes/OS and it's probably to get broken bytes, so best solution will be
+to use such hex chars (it's ASCII [0-9a-fA-F] only).
+
+Implementation in C may use sscanf() which will be slow or does not. Here is
+an example without sscanf:
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+int parse_hex_str(const char *s, int slen, char *out) {
+#define __ord(c) \
+    ((c) >= '0' && (c) <= '9'? (c) - '0' : \
+     (c) >= 'a' && (c) <= 'f'? (c) - 'a' + 10 : \
+     (c) >= 'A' && (c) <= 'F'? (c) - 'A' + 10 : -1)
+
+    register int b, t, i;
+    for (i=0; i<slen; i++) {
+        t = __ord(s[i]);
+        if (-1 == t) return (1);
+        if (i%2) out[i/2] = (b << 4) | t;
+        else     b = t;
+    }
+    if (i%2) out[i/2] = b;
+    return (0);
+
+#undef __ord
+}
+
+/*************************************************************/
+int main() {
+    unsigned char ins[] = "1230aAF0D";
+    unsigned char out[20] = {0};
+    int res = parse_hex_str(ins, sizeof(ins) - 1, out);
+    printf("input = %s\n", ins);
+    printf("res=%d\n", res);
+    PRINTARRX(out, 10, "%02X");
+    return (0);
+}
+#+END_SRC
+
+Compilation:
+
+
+#+BEGIN_SRC console
+gcc -ggdb -std=c99 -o hex.exe hex.c
+#+END_SRC
+
+Output:
+
+#+BEGIN_SRC console
+input = 1230aAF0D
+res=0
+{ 12 30 AA F0 0D 00 00 00 00 00 }
+#+END_SRC

@@ -1,0 +1,68 @@
+#+title: Series: more general way
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:26]
+
+* Series: more general way
+
+Here is the generic algorithm of determining of the series from sequence by
+some feature ~SeriesFeature~. Examples show usage of splitting series in
+camelCase strings (in the same case).
+
+#+BEGIN_SRC python
+from abc import ABCMeta, abstractmethod
+from itertools import groupby, imap
+
+# a,b,c -> ((None, a), (a, b), (b, c)) (ie (prev, cur) pairs)
+#preiter = lambda it: izip(chain([None], it), it)
+
+class SeriesFeature(object):
+    __metaclass__ = ABCMeta
+    id = None # series id
+    i = 0 # element index
+    def __init__(self, serid):
+        self.i = -1
+        self.id = serid
+    @abstractmethod
+    def __series__(self, el, serid):
+        """Check element `el` and return new/old series id. `serid`
+        is current series id`
+        """
+    def __call__(self, el):
+        self.i += 1
+        self.id = self.__series__(el, self.id)
+        return self.id
+
+class CapitalizedSeries(SeriesFeature):
+    def __init__(self):
+        super(CapitalizedSeries, self).__init__(0)
+    def __series__(self, el, serid):
+        if self.i == 0 and el.isupper():
+            return serid
+        elif el.islower():
+            return serid
+        else:
+            return (serid + 1)%2
+
+CamelCaseSeries = CapitalizedSeries
+
+def iseries(flt, it):
+    series = (el[1] for el in groupby(it, flt()))
+    if isinstance(it, str):
+        return imap(''.join, series)
+    else:
+        return series
+
+def camelcaseto(s, func):
+    """Transform each CamelCase-string part with `func(ser)`"""
+    return imap(func, iseries(CamelCaseSeries, s))
+
+########################## test ##############################################
+print list(iseries(CapitalizedSeries, 'AaaaBbbCcAaa'))
+print list(iseries(CapitalizedSeries, 'abcDefGhi'))
+
+print ' '.join(camelcaseto("noSuchUserError", str.lower)).capitalize()
+
+#+END_SRC

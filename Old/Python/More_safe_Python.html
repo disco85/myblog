@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>More safe Python</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="safety, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">More safe Python</h1>
+<div id="outline-container-org74f8ec1" class="outline-2">
+<h2 id="org74f8ec1">More safe Python</h2>
+<div class="outline-text-2" id="text-org74f8ec1">
+<p>
+Python can be safe (if we need it) too. Another example is: let's say we want to implement
+a function <code>unique()</code>. It may looks like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">unique</span>(data):
+    <span style="color: #ffffff;">res</span>: <span style="color: #a52a2a;">list</span> = []
+    <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> data:
+        <span style="color: #696969;">if</span> res <span style="color: #696969;">and</span> x == res[-1]: <span style="color: #696969;">continue</span>
+        <span style="color: #696969;">else</span>: res.append(x)
+    <span style="color: #696969;">return</span> res
+</pre>
+</div>
+
+<p>
+Truth is that <code>data</code> should be sorted - we don't want to sort it because data items
+maybe are sorted already. So, instead to write docstring about this our requirement
+("data should be sorted") we can specify this requirement as a type, so it will prevent
+a client from passing of data which was not sorted, so the check will work at compile time:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> typing <span style="color: #696969;">import</span> *
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Sorted</span>(<span style="color: #a52a2a;">list</span>):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, items):
+        <span style="color: #a52a2a;">super</span>().__init__(<span style="color: #a52a2a;">sorted</span>(items))
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">unique</span>(data: Sorted) -&gt; <span style="color: #a52a2a;">list</span>:
+    <span style="color: #ffffff;">res</span>: <span style="color: #a52a2a;">list</span> = []
+    <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> data:
+        <span style="color: #696969;">if</span> res <span style="color: #696969;">and</span> x == res[-1]: <span style="color: #696969;">continue</span>
+        <span style="color: #696969;">else</span>: res.append(x)
+    <span style="color: #696969;">return</span> res
+
+<span style="color: #ffffff;">items</span> = 11, 20, 11, 20, 1, 20, 11, 5, 1
+<span style="color: #ffffff;">data</span> = Sorted(items)
+<span style="color: #a52a2a;">print</span>(unique(items))
+</pre>
+</div>
+
+<p>
+And if we try to pass something which has not type <code>Sorted</code> then we will get an MYPY error
+at compile time. It looks like Haskell, ah? :)
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

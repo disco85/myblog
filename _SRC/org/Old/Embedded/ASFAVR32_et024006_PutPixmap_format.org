@@ -1,0 +1,43 @@
+#+title: ASF/AVR32: et024006_PutPixmap() format
+#+description: My Blog
+#+keywords: clang, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang embedded
+#+date: [2020-02-06 Thu 18:16]
+
+* ASF/AVR32: et024006_PutPixmap() format
+
+How to use bitmap on ET024006 with ASF (Atmel Software Framework)? Format of bitmap file, used in et024006_PutPixmap(), is the R5G6B5, you can create image in the GIMP, then export to 'C source file' (select 'save as RGB 565 16 bits', and uncheck 'Use Glib types') and get something like this:
+
+#+BEGIN_SRC cpp
+/* GIMP RGBA C-Source image dump (appicon.c) */
+#define GIMP_IMAGE_WIDTH (22)
+#define GIMP_IMAGE_HEIGHT (22)
+#define GIMP_IMAGE_BYTES_PER_PIXEL (4) /* 3:RGB, 4:RGBA */
+#define GIMP_IMAGE_PIXEL_DATA ((unsigned char*) GIMP_IMAGE_pixel_data)
+static const unsigned char GIMP_IMAGE_pixel_data[22 * 22 * 4 + 1] =
+("\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"
+...
+);
+#+END_SRC
+
+I change it to:
+
+#+BEGIN_SRC cpp
+const unsigned char appmenu_icon[] =
+ ("\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"
+...
+);
+#+END_SRC
+
+and then call:
+
+#+BEGIN_SRC cpp
+et024006_PutPixmap((et024006_color_t*)appmenu_icon,
+     appmenu_icon_width,
+     0, 0, x, y,
+     appmenu_icon_width,
+     appmenu_icon_height);
+#+END_SRC
+
+~appmenu_icon_width~ and ~appmenu_icon_height~ may be #define's

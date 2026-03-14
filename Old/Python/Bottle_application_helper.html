@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bottle application helper</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Bottle application helper</h1>
+<div id="outline-container-org2d356b1" class="outline-2">
+<h2 id="org2d356b1">Bottle application helper</h2>
+<div class="outline-text-2" id="text-org2d356b1">
+<p>
+Next is the helper class for creation of the Bottle Web Framework applications:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">expose</span>(path, **kw):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">decor</span>(view):
+        view.<span style="color: #ffffff;">_route_path_</span> = path
+        view.<span style="color: #ffffff;">_kwargs_</span> = kw
+        <span style="color: #696969;">return</span> view
+    <span style="color: #696969;">return</span> decor
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">BottleBaseApp</span>(<span style="color: #a52a2a;">object</span>):
+    <span style="color: #696969;">"""</span>
+<span style="color: #696969;">    - Autosave attributes with names from __session__ attribute</span>
+<span style="color: #696969;">    - Session type is attr __session_type__ ('cookie'|'pickle'),</span>
+<span style="color: #696969;">      'cookie' is default</span>
+<span style="color: #696969;">    - Methods decorated with @expose will be auto-routed and</span>
+<span style="color: #696969;">      sessions' attrs will be flushed at the end</span>
+<span style="color: #696969;">    """</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, bottleapp):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">bottle</span> = bottleapp
+        <span style="color: #575757;"># </span><span style="color: #575757;">Prepare session manager as attr sessions</span>
+        <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.__session_type__ == <span style="color: #696969;">"pickle"</span>:
+            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">sessions</span> = PickleSession()
+        <span style="color: #696969;">else</span>:
+            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">sessions</span> = CookieSession()
+
+        <span style="color: #696969;">def</span> <span style="color: #ff4500;">router</span>(meth):
+            <span style="color: #696969;">"""Return wrapped view-method"""</span>
+            <span style="color: #575757;"># </span><span style="color: #575757;">meth is already bound to self</span>
+            <span style="color: #696969;">def</span> <span style="color: #ff4500;">wrp</span>(f=meth, *a, **kw):
+                <span style="color: #696969;">try</span>:
+                    <span style="color: #ffffff;">ret</span> = f(*a, **kw) <span style="color: #575757;"># </span><span style="color: #575757;">bound, no needs self,</span>
+                <span style="color: #696969;">finally</span>:
+                    <span style="color: #696969;">self</span>.flush_session()
+                <span style="color: #696969;">return</span> ret
+            functools.update_wrapper(wrp, meth)
+            <span style="color: #696969;">return</span> wrp
+
+        <span style="color: #575757;"># </span><span style="color: #575757;">Route all decorated methods</span>
+        <span style="color: #696969;">for</span> attrname <span style="color: #696969;">in</span> <span style="color: #a52a2a;">dir</span>(<span style="color: #696969;">self</span>):
+            <span style="color: #ffffff;">attr</span> = <span style="color: #a52a2a;">getattr</span>(<span style="color: #696969;">self</span>, attrname)
+            <span style="color: #ffffff;">path</span> = <span style="color: #a52a2a;">getattr</span>(attr, <span style="color: #696969;">"_route_path_"</span>, <span style="color: #7fffd4;">None</span>)
+            <span style="color: #ffffff;">kw</span> = <span style="color: #a52a2a;">getattr</span>(attr, <span style="color: #696969;">"_kwargs_"</span>, {})
+            <span style="color: #696969;">if</span> path:
+                <span style="color: #696969;">self</span>.bottle.route(path, callback=router(attr), **kw)
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">flush_session</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">"""Copy to session all attrs and save session"""</span>
+        <span style="color: #696969;">try</span>:
+            <span style="color: #ffffff;">ses</span> = <span style="color: #696969;">self</span>.sessions.get_session()
+            <span style="color: #696969;">for</span> a <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.__session__:
+                <span style="color: #696969;">try</span>:
+                    <span style="color: #ffffff;">v</span> = <span style="color: #a52a2a;">getattr</span>(<span style="color: #696969;">self</span>, a)
+                    <span style="color: #ffffff;">ses</span>[a] = v
+                <span style="color: #696969;">except</span>:
+                    <span style="color: #696969;">continue</span>
+            <span style="color: #696969;">self</span>.sessions.save(ses)
+        <span style="color: #696969;">except</span> <span style="color: #ff4500;">Exception</span> <span style="color: #696969;">as</span> x:
+            <span style="color: #696969;">pass</span>
+</pre>
+</div>
+
+<p>
+And now is the example how to use this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">class</span> <span style="color: #ff4500;">MyApp</span>(BottleBaseApp):
+    <span style="color: #ffffff;">__session_type__</span> = <span style="color: #696969;">"cookie"</span>
+    <span style="color: #ffffff;">__session__</span> = [<span style="color: #696969;">"tasks_ctl_res"</span>, <span style="color: #696969;">"tasks_prc"</span>, <span style="color: #696969;">"prc_conns"</span>,]
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, bottleapp):
+        <span style="color: #a52a2a;">super</span>(MyApp, <span style="color: #696969;">self</span>).__init__(bottleapp)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">tasks_ctl_res</span> = {}
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">tasks_prc</span> = []
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">prc_conns</span> = {}
+
+
+    <span style="color: #ff4500;">@expose</span>(<span style="color: #696969;">"/index"</span>)
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">index</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">return</span> <span style="color: #696969;">"Index page is empty"</span>
+
+    <span style="color: #575757;"># </span><span style="color: #575757;">... etc ...</span>
+</pre>
+</div>
+
+<p>
+I use Session implementation by Sean Reifschneider (see <a href="http://www.tummy.com/journals/entries/jafo_20110102_180050">this</a>).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

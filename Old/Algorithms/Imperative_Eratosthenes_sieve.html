@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Imperative Eratosthenes sieve</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Imperative Eratosthenes sieve</h1>
+<div id="outline-container-org1f7b364" class="outline-2">
+<h2 id="org1f7b364">Imperative Eratosthenes sieve</h2>
+<div class="outline-text-2" id="text-org1f7b364">
+<p>
+Algorithm is very-very simple and is learning at the school :)
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">erato</span>(m):
+    <span style="color: #575757;"># </span><span style="color: #575757;">list of all numbers to m: 1 - free cell, 0 - aliquot to prime</span>
+    <span style="color: #ffffff;">lst</span> = [1 <span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(m)]
+    <span style="color: #ffffff;">n</span> = 2 <span style="color: #575757;"># </span><span style="color: #575757;">starts from 2</span>
+    <span style="color: #696969;">while</span> n &lt; m: <span style="color: #575757;"># </span><span style="color: #575757;">take next prime</span>
+        <span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(n, m): <span style="color: #575757;"># </span><span style="color: #575757;">looking for free cell</span>
+            <span style="color: #696969;">if</span> lst[i]: <span style="color: #696969;">break</span> <span style="color: #575757;"># </span><span style="color: #575757;">1 - free, i.e. not aliquot to others</span>
+        <span style="color: #696969;">if</span> i == m-1: <span style="color: #696969;">return</span> <span style="color: #575757;"># </span><span style="color: #575757;">no more free, stop</span>
+        <span style="color: #ffffff;">n</span> = i <span style="color: #575757;"># </span><span style="color: #575757;">keep found free</span>
+        <span style="color: #696969;">yield</span> n <span style="color: #575757;"># </span><span style="color: #575757;">and it's prime!</span>
+        <span style="color: #ffffff;">j</span> = 2 <span style="color: #575757;"># </span><span style="color: #575757;">multiplier: 2, 3, 4, 5...</span>
+        <span style="color: #696969;">while</span> i &lt; m: <span style="color: #575757;"># </span><span style="color: #575757;">checks aliquot to found prime n</span>
+            <span style="color: #ffffff;">lst</span>[i] = 0
+            <span style="color: #ffffff;">i</span> = n*j <span style="color: #575757;"># </span><span style="color: #575757;">checks 2n, 3n, 4n, 5n, 6n, ...</span>
+            <span style="color: #ffffff;">j</span> += 1 <span style="color: #575757;"># </span><span style="color: #575757;">multipliers: 2, 3, 4, 5...</span>
+
+<span style="color: #a52a2a;">print</span> <span style="color: #a52a2a;">list</span>(erato(300))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

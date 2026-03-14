@@ -1,0 +1,47 @@
+#+title: More safe Python
+#+description: My Blog
+#+keywords: safety, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: safety python
+#+date: [2020-02-04 Tue 06:24]
+
+* More safe Python
+
+Python can be safe (if we need it) too. Another example is: let's say we want to implement
+a function ~unique()~. It may looks like:
+
+#+BEGIN_SRC python
+def unique(data):
+    res: list = []
+    for x in data:
+        if res and x == res[-1]: continue
+        else: res.append(x)
+    return res
+#+END_SRC
+
+Truth is that ~data~ should be sorted - we don't want to sort it because data items
+maybe are sorted already. So, instead to write docstring about this our requirement
+("data should be sorted") we can specify this requirement as a type, so it will prevent
+a client from passing of data which was not sorted, so the check will work at compile time:
+
+#+BEGIN_SRC python
+from typing import *
+
+class Sorted(list):
+    def __init__(self, items):
+        super().__init__(sorted(items))
+
+def unique(data: Sorted) -> list:
+    res: list = []
+    for x in data:
+        if res and x == res[-1]: continue
+        else: res.append(x)
+    return res
+
+items = 11, 20, 11, 20, 1, 20, 11, 5, 1
+data = Sorted(items)
+print(unique(items))
+#+END_SRC
+
+And if we try to pass something which has not type ~Sorted~ then we will get an MYPY error
+at compile time. It looks like Haskell, ah? :)

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Profiling Haskell in Windows</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="windows, haskell" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Profiling Haskell in Windows</h1>
+<div id="outline-container-orgb03da2e" class="outline-2">
+<h2 id="orgb03da2e">Profiling Haskell in Windows</h2>
+<div class="outline-text-2" id="text-orgb03da2e">
+<p>
+To profile your Haskell application on Windows w/ stack currently
+(due existing bug?) you must:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">C:\prj&gt; stack build --profile
+C:\prj&gt; stack exec -- prj-exe --RTS +RTS -p -RTS [other options of app]
+</pre>
+</div>
+
+<p>
+This will produce .prof file in current directory. You can add <code>-h</code> and
+<code>-hy</code> to <code>-p</code> to get info about heap/allocations. To produce .ps file use:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">C:\prj&gt; hp2ps -c your-hp-file-name
+</pre>
+</div>
+
+<p>
+Then open generated .ps file in SumatraPDF and analize that.. -)
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

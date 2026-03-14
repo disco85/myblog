@@ -1,0 +1,138 @@
+#+title: Animated plot with matplotlib
+#+description: My Blog
+#+keywords: python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python
+#+date: [2020-02-09 Sun 08:59]
+
+* Animated plot with matplotlib
+
+This is the components of auto-scrolled plots with matplotlib:
+
+#+BEGIN_SRC python
+class Plot:
+    """Base attributes of an any plot"""
+    def __init__(self,
+            fig=None, # matplotlib Figure
+            canvas=None, # matplotlib Canvas
+            tkw=None, # Tk widget
+            title="", #
+            xdata=[], # x data
+            ydata=[], # y data
+            xmin=None, # left xlim:datetime (chages in scroll with set_xlim)
+            xmax=None, # right xlim:datetime (chages in scroll with set_xlim)
+            tdelta=None, # step (period of polling of sensors, etc.):timedelta
+            ylabel="", # y label
+            lnc="red", # line color
+            lnpt="-", # line point type
+            lnw=1, # line width
+            intc="#707070", # internal rect. color
+            outc="#9E9E9E", # outter rect. color
+            ylimpad=10, # padding around y axis limit (ylim is +/- ylimpad)
+            ):
+        self.fig = fig
+        self.canvas = canvas
+        self.tkw = tkw
+        self.title = title
+        self.xdata = xdata
+        self.ydata = ydata
+        self.xmin = xmin
+        self.xmax = xmax
+        self.tdelta = tdelta
+        self.xband = self.xmax - self.xmin # width of axe 0x (timedelta)
+        self.ylabel = ylabel
+        self.lnc = lnc
+        self.lnpt = lnpt
+        self.lnw = lnw
+        self.intc = intc
+        self.outc = outc
+        self.ylimpad = ylimpad
+
+        self.ymin = 0
+        self.ymax = 0
+
+class AnimPlot(Frame):
+    """One-line plot in own frame"""
+    # TODO: blit not used
+    def __init__(self, master, app, blit=False, title="", npoints=60, ylabel="", lnc="red", lnpt="-", lnw=1, intc="#707070", outc="#9E9E9E", ylimpad=10, period=1, *a, **kw):
+        Frame.__init__(self, master, *a, **kw)
+        self.app = app
+
+        xmin = self.app.begin
+        xmax = xmin + timedelta(seconds=npoints*period) # period is secs
+        tdelta = timedelta(seconds=period)
+
+        self.p = Plot(title=title, ylabel=ylabel, lnc=lnc, lnpt=lnpt, lnw=lnw, intc=intc, outc=outc, xdata=deque(maxlen=npoints), ydata=deque(maxlen=npoints), xmin=xmin, xmax=xmax, tdelta=tdelta, ylimpad=ylimpad)
+        self.blit = blit # use double-buffering?
+        self._create_matplot()
+        self.p.tkw.pack()
+
+    def _create_matplot(self):
+        """Creates of matplotlib plot and changes
+        self.p"""
+
+        # calculate plot size in inches; dpi is the pixels count per inch
+        dpi = 75.
+        figh = self.winfo_screenheight()
+        figh = figh/dpi - 1 # 1 for menu bar
+        figh = figh/2 # two plots
+        figw = figh*2.5 # aspect
+        fig = Figure(figsize=(figw, figh), dpi=dpi)
+
+        fig.patch.set_facecolor(self.p.outc)
+        ax = fig.add_subplot(111)
+        ax.patch.set_facecolor(self.p.intc)
+        ax.set_title(self.p.title)
+        ax.grid(True)
+        ax.set_ylabel(self.p.ylabel)
+
+        ax.plot_date([], [], self.p.lnpt, color=self.p.lnc, lw=self.p.lnw)
+        ax.set_xlim(mdates.date2num(self.p.xmin), mdates.date2num(self.p.xmax))
+
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S', utils.tzinfo()))
+        ax.fmt_xdata = mdates.DateFormatter('%H:%M:%S', utils.tzinfo())
+
+        canvas = FigureCanvas(fig, master=self)
+        tkw = canvas.get_tk_widget()
+        tkw.config(relief=FLAT, bd=0, takefocus=0, highlightthickness=0)
+        self.p.fig = fig
+        self.p.canvas = canvas
+        self.p.tkw = tkw
+
+    def _redraw(self):
+        """Redraws plot with data from self.p automatically after append of the new data"""
+        ax = self.p.fig.axes[0]
+        line = ax.lines[0]
+
+        line.set_xdata(self.p.xdata)
+        line.set_ydata(self.p.ydata)
+
+        x1 = self.p.xdata[-1]
+        tm0 = mdates.num2date(x1) - self.p.xband + self.p.tdelta
+        x0 = mdates.date2num(tm0)
+        ax.set_xlim(x0, x1)
+
+        y0 = 0
+        y1 = self.p.ymax
+        ax.set_ylim(y0 - self.p.ylimpad, y1 + self.p.ylimpad)
+        self.p.canvas.draw()
+
+    def appendy(self, y):
+        tm = utils.now()
+        tm = mdates.date2num(tm)
+        self.p.xdata.append(tm)
+        self.p.ymax = max(self.p.ymax, y)
+        self.p.ydata.append(y)
+        self._redraw()
+#+END_SRC
+
+Here is an example of usage:
+
+#+BEGIN_SRC python
+aplt1 = AnimPlot(self.pltfr, app=self.app, name="tpm200plot1", lnc="red", lnw=2, title=u"Sensor PV1", ylabel=u"C", period=3)
+aplt1.pack(side=TOP, expand=YES, fill=Y)
+# ...
+def onpolling():
+    val = read_sensor()
+    aplt1.appendy(pv1)
+#+END_SRC

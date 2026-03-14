@@ -1,0 +1,25 @@
+#+title: Haskell: how to catch fail
+#+description: My Blog
+#+keywords: haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: haskell
+#+date: [2022-07-07 Thu 05:16]
+
+* Haskell: how to catch fail
+
+If something returns ~m Xyz~ in it calls ~fail~ inside it, then how to catch the ~fail~? The way is to call it but with some concrete monad, for instance under ~Maybe~ or ~Either~ - depends on the monad's constraints: ~res::Maybe Int <- itReturnsMXyz~ and now you can determine where it's ~fail~ or successful result.
+
+How to make alternatives for several ~m Xyz~? Like ~m Xyz1 | m Xyz2 | m Xyz3~?
+
+Idea is the same: just force ~m~ to be some satisfied monad, for example, ~Maybe~ (if ~Maybe~ is OK for ~m~'s constraints:
+
+#+BEGIN_SRC haskell
+catMaybes [fun x, fun y, fun z]
+#+END_SRC
+If ~fun x/y/z~ returns different types then convert them into the same one - to have homogeneous list:
+
+#+BEGIN_SRC haskell
+catMaybes [X <$> fun x, X <$> fun y, X <$> fun z]
+#+END_SRC
+
+Now they all are of a type ~X~; just an idea.

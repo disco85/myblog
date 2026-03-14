@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Small tricks in shell</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="scripting, misc" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Small tricks in shell</h1>
+<div id="outline-container-orgaaee68d" class="outline-2">
+<h2 id="orgaaee68d">Small tricks in shell</h2>
+<div class="outline-text-2" id="text-orgaaee68d">
+<p>
+!Directories tree view
+</p>
+
+<p>
+Set it to your <code>.bashrc</code> and run as <code>tree [DIR]</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #ff4500;">tree</span>() {
+find <span style="color: #696969;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: #696969;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #ffffff;">FS</span>=<span style="color: #696969;">'/'</span>
+}
+</pre>
+</div>
+
+<p>
+!Patch selected file only
+</p>
+
+<p>
+If you have big patch file with many files there, to patch only one
+(filename.py in example):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">filterdiff -i <span style="color: #696969;">'*filename.py'</span> patch.diff | patch -pN
+</pre>
+</div>
+
+<p>
+and to list all files in patch file use <code>lsdiff</code> or <code>filterdiff --list</code>.
+</p>
+
+<p>
+!Test HEAD HTTP with curl
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">curl -i -X HEAD http://...
+</pre>
+</div>
+
+<p>
+!Paging in FAR
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">view:&lt;command
+edit:&lt;command
+</pre>
+</div>
+
+<p>
+and to enable scrolling start with <code>far -w</code>.
+</p>
+
+<p>
+!Run alternate shell commands
+</p>
+
+<p>
+This script run one of available command:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+
+<span style="color: #ff4500;">trycmd</span>() {
+    <span style="color: #ffffff;">a0</span>=$<span style="color: #ffffff;">1</span>; <span style="color: #a52a2a;">shift</span>
+    <span style="color: #696969;">for</span> c<span style="color: #696969;"> in</span> $<span style="color: #ffffff;">*</span>; <span style="color: #696969;">do</span> $<span style="color: #ffffff;">c</span> $<span style="color: #ffffff;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: #696969;">break</span>; <span style="color: #696969;">done</span>
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
+trycmd list pipx pip0 pip1 pip3 pip
+</pre>
+</div>
+
+<p>
+!Frozen keyboard in PyCharm (Linux)
+</p>
+
+<p>
+Bug in forever buggy Java:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">ibus restart
+</pre>
+</div>
+
+<p>
+!Remove passphrase from SSH key
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">openssl rsa -in ~/.ssh/id_rsa -out ~/.ssh/id_rsa_new
+cp ~/.ssh/id_rsa ~/.ssh/id_rsa.backup
+rm ~/.ssh/id_rsa
+cp ~/.ssh/id_rsa_new ~/.ssh/id_rsa
+chmod 400 ~/.ssh/id_rsa
+</pre>
+</div>
+
+<p>
+!Problem with RPC/NFS mount after update CentOS 7
+</p>
+
+<p>
+After some digging I finally found that the reason for
+this is a buggy systemd unit file in RHEL/CentOS 7.
+</p>
+
+<p>
+This is a bug in <code>nfs-server.service</code> and he fix is to copy
+<code>nfs-server.service</code> to <code>/etc/systemd/system</code> and replace
+all occurrences of "rpcbind.target" with "rpcbind.service".
+</p>
+
+<p>
+See this bug for reference: <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1171603">https://bugzilla.redhat.com/show_bug.cgi?id=1171603</a>
+</p>
+
+<p>
+!To allow connecting to CentOS
+</p>
+
+<p>
+If there is trouble try to stop iptables:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">service iptables start iptables flush service iptables stop
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

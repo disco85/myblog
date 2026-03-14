@@ -1,0 +1,117 @@
+#+title: Serialization format
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:22]
+
+* Serialization format
+
+Implementation of simple marshaling of nested data structures. Supports: int,
+float, string, nested lists. Serialized data is presented as string. It's not
+difficult to serialize into binary...
+
+#+BEGIN_SRC python
+# POSTPACK -- packing the data in postfix notation (nested typed items)
+#
+# Format: item '!' type,
+#   where type may be 'i' (int), 'f' (float), 's' (string), 'l' (list),
+#   num 'l' (list with num items)
+#
+# Example: 1!i2!i!l3!i4!i!2l => [[1, 2], [3, 4]]
+#
+# To escape '!' '!' is used: 'Hello!!' => 'Hello!'
+
+from __future__ import print_function
+import string
+
+DIGITS = string.digits
+
+
+class Postpack:
+    def __init__(self, fmt={}):
+        self.fmt = {int: "%d", float: "%f", str: "%s"}
+        self.fmt.update(fmt)
+
+    def decode(self, input):
+        ''' Decodes input string into internal representation (list of items,
+        possible nested):
+
+        >>> Postpack().decode("Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l")
+        [['Hello, world!!', 2.1], [[3, 4], 5]]
+        '''
+        buf = ""        # item chars buffer
+        instr = ""      # instruction chars buffer
+        items = []      # items
+        st = "data"     # FSM state
+        for ch in input:
+            if st == "instr":
+                if ch in DIGITS:
+                    instr += ch
+                elif ch == '!':
+                    buf += ch
+                    st = "data"
+                else:
+                    if ch == 'i':
+                        items.append(int(buf))
+                    elif ch == 'f':
+                        items.append(float(buf))
+                    elif ch == 's':
+                        items.append(str(buf))
+                    elif ch == 'l':
+                        nitems = len(items)
+                        count = int(instr) if instr else nitems
+                        first = nitems - count
+                        if first < 0:
+                            raise ValueError("Wrong count: %d" % count)
+                        items[first:] = [items[first:]]
+                    else:
+                        raise ValueError("Wrong instruction: %s" % ch)
+                    st = "data"
+                    buf = ""
+            elif st == "data":
+                if ch == "!":
+                    instr = ""
+                    st = "instr"
+                else:
+                    buf += ch
+        return items
+
+
+    @staticmethod
+    def escape(s):
+        '''
+        >>> Postpack().escape('Qwe!rty!!')
+        'Qwe!!rty!!!!'
+        '''
+        return s.replace('!', '!!')
+
+    def encode(self, items):
+        ''' Encodes list of items (may be nested):
+
+        >>> Postpack(fmt={float: '%.1f'}).encode([['Hello, world!!', 2.1], [[3, 4], 5]])
+        'Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l'
+        '''
+        output = ""
+        for it in items:
+            ittype = type(it)
+            if ittype is int:
+                output += self.fmt[int] % it + "!i"
+            elif ittype is float:
+                output += self.fmt[float] % it + "!f"
+            elif ittype is str:
+                output += self.fmt[str] % self.escape(it) + "!s"
+            elif ittype is list:
+                output += self.encode(it) + "!%dl" % len(it)
+            else:
+                raise ValueError("Wrong type: %s" % ittype)
+        return output
+
+
+
+
+##############################################################################
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+#+END_SRC

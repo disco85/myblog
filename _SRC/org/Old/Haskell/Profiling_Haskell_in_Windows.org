@@ -1,0 +1,25 @@
+#+title: Profiling Haskell in Windows
+#+description: My Blog
+#+keywords: windows, haskell
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: windows haskell
+#+date: [2020-02-05 Wed 05:19]
+
+* Profiling Haskell in Windows
+
+To profile your Haskell application on Windows w/ stack currently
+(due existing bug?) you must:
+
+#+BEGIN_SRC bash
+C:\prj> stack build --profile
+C:\prj> stack exec -- prj-exe --RTS +RTS -p -RTS [other options of app]
+#+END_SRC
+
+This will produce .prof file in current directory. You can add ~-h~ and
+~-hy~ to ~-p~ to get info about heap/allocations. To produce .ps file use:
+
+#+BEGIN_SRC bash
+C:\prj> hp2ps -c your-hp-file-name
+#+END_SRC
+
+Then open generated .ps file in SumatraPDF and analize that.. -)

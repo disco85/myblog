@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tcl: listeners</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="dsp, tcl/tk" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Tcl: listeners</h1>
+<div id="outline-container-org570a814" class="outline-2">
+<h2 id="org570a814">Tcl: listeners</h2>
+<div class="outline-text-2" id="text-org570a814">
+<p>
+This is very popular model for Dataflow (and DSP) applications and no needing to introduce it. So, only listing:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-tcl"><span style="color: #a52a2a;">package</span> provide mylsn 1.0
+<span style="color: #a52a2a;">package</span> require Itcl
+
+<span style="color: #575757;"># </span><span style="color: #575757;">ListenEvent</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+itcl::class ListenEvent {
+    <span style="color: #ff4500;">public</span> variable name
+    <span style="color: #ff4500;">public</span> variable src
+    <span style="color: #ff4500;">public</span> variable data
+    <span style="color: #696969;">constructor</span> {aname asrc {adata <span style="color: #696969;">""</span>}} {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">name</span> aname
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">src</span> asrc
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">data</span> adata
+    }
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">DataListener </span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+itcl::class DataListener {
+    <span style="color: #575757;"># list of understandable providers' datatypes. Empty - all</span>
+    <span style="color: #ff4500;">public</span> variable datatypes <span style="color: #696969;">""</span>
+
+    <span style="color: #ff4500;">protected</span> variable _event {};  <span style="color: #575757;"># ListenEvent</span>
+
+    <span style="color: #575757;"># all listeners</span>
+    <span style="color: #ff4500;">public</span> common all {}
+
+    <span style="color: #696969;">constructor</span> {} { <span style="color: #a52a2a;">lappend</span> all $<span style="color: #ffffff;">this</span> }
+
+    <span style="color: #696969;">destructor</span> {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">i</span> [lsearch -exact $<span style="color: #ffffff;">all</span> $<span style="color: #ffffff;">this</span>]
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">i</span> &gt;= 0} { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">all</span> [<span style="color: #a52a2a;">lreplace</span> $<span style="color: #ffffff;">all</span> $<span style="color: #ffffff;">i</span> $<span style="color: #ffffff;">i</span>] }
+    }
+
+    <span style="color: #575757;"># FSM state: LISTEN|SESSION|OFF. Means:</span>
+    <span style="color: #575757;">#   LISTEN - ready for data from data provider</span>
+    <span style="color: #575757;">#   SESSION - already reading some data (first data packet was received)</span>
+    <span style="color: #575757;">#   OFF - reading of data is disabled</span>
+    <span style="color: #ff4500;">protected</span> variable _lstate LISTEN
+
+    <span style="color: #575757;"># values is list of values</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> ondata {values} {}
+
+    <span style="color: #575757;"># on run polling (listening session). columns is the list of columns names,</span>
+    <span style="color: #575757;"># units is the list of unit names</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onrun {columns units} {}
+
+    <span style="color: #575757;"># on stop listening session</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onstop {} {}
+
+    <span style="color: #575757;"># on add to data provider</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onadd {provider} {}
+
+    <span style="color: #575757;"># on delete from data provider</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> ondel {provider} {}
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">event</span> {ev src args} {
+        <span style="color: #575757;"># generate event (call callback) for this listener.</span>
+        <span style="color: #575757;"># ev is ListenEvent object, src is the source of event.</span>
+        <span style="color: #575757;"># ev is one of run|stop|data|on|off|add|del:</span>
+        <span style="color: #575757;">#   run - before first packet sent</span>
+        <span style="color: #575757;">#   stop - after last packet sent</span>
+        <span style="color: #575757;">#   data - packet is received</span>
+        <span style="color: #575757;">#   on - enable listening</span>
+        <span style="color: #575757;">#   off - disable listening</span>
+        <span style="color: #575757;">#   add - connect with some data provider</span>
+        <span style="color: #575757;">#   del - disconnect from some data provider</span>
+
+
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_event</span> [ListenEvent #auto $<span style="color: #ffffff;">ev</span> $<span style="color: #ffffff;">src</span> $<span style="color: #ffffff;">args</span>]
+        <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">_lstate</span> {
+            LISTEN {
+                <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">ev</span> {
+                    run  { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_lstate</span> SESSION
+                           <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> onrun {*}$<span style="color: #ffffff;">args</span> } }
+                    off  { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_lstate</span> OFF }
+                    add  { <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> onadd {*}$<span style="color: #ffffff;">args</span> } }
+                    del  { <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> ondel {*}$<span style="color: #ffffff;">args</span> } }
+                }
+            }
+
+            SESSION {
+                <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">ev</span> {
+                    stop { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_lstate</span> LISTEN
+                           <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> onstop } }
+                    data { <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> ondata {*}$<span style="color: #ffffff;">args</span> } }
+                }
+            }
+
+            OFF {
+                <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">ev</span> {
+                    on   { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_lstate</span> LISTEN }
+                    add  { <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> onadd {*}$<span style="color: #ffffff;">args</span> } }
+                    del  { <span style="color: #a52a2a;">catch</span> { $<span style="color: #ffffff;">this</span> ondel {*}$<span style="color: #ffffff;">args</span> } }
+                }
+            }
+        }
+    }
+
+    <span style="color: #575757;"># listen -on|-off</span>
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">listen</span> {what} {
+        <span style="color: #575757;"># listen -on -- turn-on listening</span>
+        <span style="color: #575757;"># listen -off -- turn-off listening</span>
+
+
+        <span style="color: #575757;"># event without src ("" - user call is event source)</span>
+        <span style="color: #696969;">switch</span> -- $<span style="color: #ffffff;">what</span> {
+            -on     { $<span style="color: #ffffff;">this</span> event on <span style="color: #696969;">""</span> }
+            -off    { $<span style="color: #ffffff;">this</span> event off <span style="color: #696969;">""</span> }
+            <span style="color: #696969;">default</span> { <span style="color: #696969;">error</span>  <span style="color: #696969;">"listen can be -on or -off only"</span> }
+        }
+        <span style="color: #696969;">return</span>
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">listened</span> {} {
+        <span style="color: #575757;"># Is listening now?</span>
+
+
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">expr</span> {$<span style="color: #ffffff;">_lstate</span> ne <span style="color: #696969;">"OFF"</span>}]
+    }
+
+    <span style="color: #575757;"># join columns and units with delimiter into new list</span>
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">join_columns_units</span> {columns units {delim <span style="color: #696969;">","</span>}} {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
+        <span style="color: #696969;">foreach</span> c $<span style="color: #ffffff;">columns</span> u $<span style="color: #ffffff;">units</span> {
+            <span style="color: #a52a2a;">lappend</span> res <span style="color: #696969;">"$c$delim$u"</span>
+        }
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">res</span>
+    }
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">DataProvider</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+itcl::class DataProvider {
+    <span style="color: #575757;"># static list of all providers</span>
+    <span style="color: #ff4500;">public</span> common all {}
+    <span style="color: #ff4500;">public</span> variable datatype <span style="color: #696969;">""</span>
+
+    <span style="color: #ff4500;">protected</span> variable _listeners
+
+    <span style="color: #696969;">constructor</span> {} { <span style="color: #a52a2a;">lappend</span> all $<span style="color: #ffffff;">this</span> }
+
+    <span style="color: #696969;">destructor</span> {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">i</span> [lsearch -exact $<span style="color: #ffffff;">all</span> $<span style="color: #ffffff;">this</span>]
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">i</span> &gt;= 0} { <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">all</span> [<span style="color: #a52a2a;">lreplace</span> $<span style="color: #ffffff;">all</span> $<span style="color: #ffffff;">i</span> $<span style="color: #ffffff;">i</span>] }
+    }
+
+    <span style="color: #575757;"># returns list (pair) of columns (list) and units - if they are</span>
+    <span style="color: #575757;"># fixed all the time (for any session)</span>
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">fixed_columns_units</span> {} {}
+
+    <span style="color: #575757;"># normalize name, need bcz user can use quilified name as</span>
+    <span style="color: #575757;"># ::a, not a.</span>
+    <span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #575757;"> namespace which -variable does not work in Itcl, so</span>
+    <span style="color: #575757;"># i cut all :, but is possible to add/del only listeners on</span>
+    <span style="color: #575757;"># top-level namespace</span>
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> _normname {name} {
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">regsub</span> -all <span style="color: #696969;">":"</span> $<span style="color: #ffffff;">name</span> <span style="color: #696969;">""</span>]
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">get_listeners</span> {} {
+        <span style="color: #575757;"># Returns names of all listeners</span>
+
+
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">array</span> names _listeners]
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">add_listener</span> {listener} {
+        <span style="color: #575757;"># Add some listener</span>
+
+
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">lsndts</span> [$<span style="color: #ffffff;">listener</span> cget -datatypes]; <span style="color: #575757;"># datatypes expected by listener</span>
+        <span style="color: #696969;">if</span> {[<span style="color: #a52a2a;">llength</span> $<span style="color: #ffffff;">lsndts</span>] &amp;&amp; !($<span style="color: #ffffff;">datatype</span> <span style="color: #696969;">in</span> $<span style="color: #ffffff;">lsndts</span>)} {
+            <span style="color: #575757;"># if listener datatypes not empty (expect some) and my datatype</span>
+            <span style="color: #575757;"># is not in it's datatypes, so I can't add this listener</span>
+            <span style="color: #696969;">error</span> <span style="color: #696969;">"Listener $listener does not understand $this provider"</span>
+        }
+
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">name</span> [_normname $<span style="color: #ffffff;">listener</span>]
+        <span style="color: #696969;">if</span> {[itcl::is object -class DataListener $<span style="color: #ffffff;">listener</span>]} {
+            <span style="color: #696969;">if</span> {[<span style="color: #a52a2a;">array</span> get _listeners $<span style="color: #ffffff;">name</span>] ne <span style="color: #696969;">""</span>} {
+                <span style="color: #696969;">error</span> <span style="color: #696969;">"Listener $name already exists"</span>
+            }
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">_listeners</span>($<span style="color: #ffffff;">name</span>) $<span style="color: #ffffff;">listener</span>
+            $<span style="color: #ffffff;">listener</span> event add $<span style="color: #ffffff;">this</span> $<span style="color: #ffffff;">this</span>
+        } <span style="color: #696969;">else</span> {
+            <span style="color: #696969;">error</span> <span style="color: #696969;">"listener should be DataListener object"</span>
+        }
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">del_listener</span> {listener {stop 1}} {
+        <span style="color: #575757;"># Deletes listener, sends before stop event if needed</span>
+
+
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">name</span> [_normname $<span style="color: #ffffff;">listener</span>]
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">listener</span> [<span style="color: #a52a2a;">lindex</span> [<span style="color: #a52a2a;">array</span> get _listeners $<span style="color: #ffffff;">name</span>] 1]
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">listener</span> ne <span style="color: #696969;">""</span>} {
+            <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">stop</span>} { $<span style="color: #ffffff;">listener</span> event stop $<span style="color: #ffffff;">this</span> }
+            <span style="color: #a52a2a;">array</span> <span style="color: #a52a2a;">unset</span> _listeners $<span style="color: #ffffff;">name</span>
+            $<span style="color: #ffffff;">listener</span> event del $<span style="color: #ffffff;">this</span> $<span style="color: #ffffff;">this</span>
+        }
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">listener</span>
+    }
+
+    <span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #575757;"> not effective</span>
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">del_all_listeners</span> {{stop 1}} {
+        <span style="color: #575757;"># Deletes all listeners, send stop event before, if needed</span>
+
+
+        <span style="color: #696969;">foreach</span> name [<span style="color: #a52a2a;">array</span> names _listeners] {
+            del_listener $<span style="color: #ffffff;">name</span> $<span style="color: #ffffff;">stop</span>
+        }
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">notify_all</span> {ev args} {
+        <span style="color: #575757;"># Notify all listeners with event ev and some args</span>
+
+
+        <span style="color: #696969;">foreach</span> {name listener} [<span style="color: #a52a2a;">array</span> get _listeners] {
+            $<span style="color: #ffffff;">listener</span> event $<span style="color: #ffffff;">ev</span> $<span style="color: #ffffff;">this</span> {*}$<span style="color: #ffffff;">args</span>
+        }
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">number</span> {} {
+        <span style="color: #575757;"># Returns number of listeners</span>
+
+
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">array</span> size _listeners]
+    }
+
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">ProxyListener - general object for process events without creating</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">a special class</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+itcl::class ProxyListener {
+    <span style="color: #ff4500;">inherit</span> DataListener DataProvider
+
+    <span style="color: #ff4500;">public</span> variable onrunproc <span style="color: #696969;">""</span>
+    <span style="color: #ff4500;">public</span> variable onstopproc <span style="color: #696969;">""</span>
+    <span style="color: #ff4500;">public</span> variable ondataproc <span style="color: #696969;">""</span>
+    <span style="color: #ff4500;">public</span> variable onaddproc <span style="color: #696969;">""</span>
+    <span style="color: #ff4500;">public</span> variable ondelproc <span style="color: #696969;">""</span>
+
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onrun {columns units} {
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">onrunproc</span> eq <span style="color: #696969;">""</span>} {
+            notify_all run $<span style="color: #ffffff;">columns</span> $<span style="color: #ffffff;">units</span>
+        } <span style="color: #696969;">else</span> {
+            $<span style="color: #ffffff;">onrunproc</span> $<span style="color: #ffffff;">columns</span> $<span style="color: #ffffff;">units</span>
+        }
+    }
+
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onstop {} {
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">onstopproc</span> eq <span style="color: #696969;">""</span>} {
+            notify_all stop
+        } <span style="color: #696969;">else</span> {
+            $<span style="color: #ffffff;">onstopproc</span>
+        }
+    }
+
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> ondata {values} {
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">ondataproc</span> eq <span style="color: #696969;">""</span>} {
+            notify_all data $<span style="color: #ffffff;">values</span>
+        } <span style="color: #696969;">else</span> {
+            $<span style="color: #ffffff;">ondataproc</span> $<span style="color: #ffffff;">values</span>
+        }
+    }
+
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> onadd {provider} {
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">onaddproc</span> eq <span style="color: #696969;">""</span>} {
+            notify_all add $<span style="color: #ffffff;">provider</span>
+        } <span style="color: #696969;">else</span> {
+            $<span style="color: #ffffff;">onaddproc</span> $<span style="color: #ffffff;">provider</span>
+        }
+    }
+
+    <span style="color: #ff4500;">protected</span> <span style="color: #696969;">method</span> ondel {provider} {
+        <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">ondelproc</span> eq <span style="color: #696969;">""</span>} {
+            notify_all del $<span style="color: #ffffff;">provider</span>
+        } <span style="color: #696969;">else</span> {
+            $<span style="color: #ffffff;">ondelproc</span> $<span style="color: #ffffff;">provider</span>
+        }
+    }
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">DebugListener - repeater</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+itcl::class DebugListener {
+    <span style="color: #ff4500;">inherit</span> ProxyListener
+
+    <span style="color: #ff4500;">public</span> variable fixed_cu <span style="color: #696969;">""</span>
+
+    <span style="color: #696969;">constructor</span> {} {
+        $<span style="color: #ffffff;">this</span> configure -datatype phys -datatypes {v s flt raw phys} <span style="color: #696969;">\</span>
+            -onrunproc [itcl::code $<span style="color: #ffffff;">this</span> onrunproc] <span style="color: #696969;">\</span>
+            -onstopproc [itcl::code $<span style="color: #ffffff;">this</span> onstopproc] <span style="color: #696969;">\</span>
+            -ondataproc [itcl::code $<span style="color: #ffffff;">this</span> ondataproc] <span style="color: #696969;">\</span>
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">fixed_columns_units</span> {} {
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">fixed_cu</span>
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">onrunproc</span> {columns units} {
+        notify_all run $<span style="color: #ffffff;">columns</span> $<span style="color: #ffffff;">units</span>
+        <span style="color: #a52a2a;">puts</span> <span style="color: #696969;">"*DEBUG_${this}* onrun: $columns, $units"</span>
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">onstopproc</span> {} {
+        notify_all stop
+        <span style="color: #a52a2a;">puts</span> <span style="color: #696969;">"*DEBUG_${this}* onstop"</span>
+    }
+
+    <span style="color: #696969;">method</span> <span style="color: #ff4500;">ondataproc</span> {values} {
+        notify_all data $<span style="color: #ffffff;">values</span>
+        <span style="color: #a52a2a;">puts</span> <span style="color: #696969;">"*DEBUG_${this}* ondata: $values"</span>
+    }
+}
+
+<span style="color: #575757;"># </span><span style="color: #575757;">procedures</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">=====================================================================</span>
+
+<span style="color: #696969;">proc</span> <span style="color: #ff4500;">debug_listen</span> {d between0 between1} {
+    <span style="color: #575757;">#DebugListener $this.#auto</span>
+    $<span style="color: #ffffff;">d</span> configure -fixed_cu [$<span style="color: #ffffff;">between0</span> fixed_columns_units]
+    listen $<span style="color: #ffffff;">between0</span>:$<span style="color: #ffffff;">d</span>
+    listen $<span style="color: #ffffff;">d</span>:$<span style="color: #ffffff;">between1</span>
+}
+
+<span style="color: #696969;">proc</span> <span style="color: #ff4500;">listen</span> args {
+    <span style="color: #575757;"># Set who listen who:</span>
+    <span style="color: #575757;">#   listen provider...: listener...</span>
+    <span style="color: #575757;"># or</span>
+    <span style="color: #575757;">#   listen prov...: all</span>
+    <span style="color: #575757;"># or</span>
+    <span style="color: #575757;">#   listen -- return list of lists {provider {listeners}}</span>
+    <span style="color: #575757;"># or</span>
+    <span style="color: #575757;">#   listen -txt -- return formatted string (for user)</span>
+    <span style="color: #575757;"># or</span>
+    <span style="color: #575757;">#   listen -p -- returns formatted string with providers and it's datatypes</span>
+    <span style="color: #575757;"># or</span>
+    <span style="color: #575757;">#   listen -l -- returns formatted string with listeners and it's datatypes</span>
+
+
+    <span style="color: #696969;">if</span> {[lsearch -exact $<span style="color: #ffffff;">args</span> <span style="color: #696969;">"-txt"</span>] != -1} {
+        <span style="color: #575757;"># if there is "-txt" option, return formatted string</span>
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
+        <span style="color: #696969;">foreach</span> prov $<span style="color: #ffffff;">DataProvider::all</span> {
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">nprov</span> [<span style="color: #a52a2a;">regsub</span> -all <span style="color: #696969;">":"</span> $<span style="color: #ffffff;">prov</span> <span style="color: #696969;">""</span>]
+            <span style="color: #a52a2a;">lappend</span> res <span style="color: #696969;">"$nprov: [join [$prov get_listeners] ,\ ]"</span>
+        }
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">join</span> $<span style="color: #ffffff;">res</span> <span style="color: #696969;">"\n"</span>]
+
+    } <span style="color: #696969;">elseif</span> {[lsearch -exact $<span style="color: #ffffff;">args</span> <span style="color: #696969;">"-p"</span>] != -1} {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
+        <span style="color: #696969;">foreach</span> prov $<span style="color: #ffffff;">DataProvider::all</span> {
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">nprov</span> [<span style="color: #a52a2a;">regsub</span> -all <span style="color: #696969;">":"</span> $<span style="color: #ffffff;">prov</span> <span style="color: #696969;">""</span>]
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">dt</span> [$<span style="color: #ffffff;">prov</span> cget -datatype]
+            <span style="color: #a52a2a;">lappend</span> res <span style="color: #696969;">"$nprov: provides '$dt'"</span>
+        }
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">join</span> $<span style="color: #ffffff;">res</span> <span style="color: #696969;">"\n"</span>]
+
+    } <span style="color: #696969;">elseif</span> {[lsearch -exact $<span style="color: #ffffff;">args</span> <span style="color: #696969;">"-l"</span>] != -1} {
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
+        <span style="color: #696969;">foreach</span> lsn $<span style="color: #ffffff;">DataListener::all</span> {
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">nlsn</span> [<span style="color: #a52a2a;">regsub</span> -all <span style="color: #696969;">":"</span> $<span style="color: #ffffff;">lsn</span> <span style="color: #696969;">""</span>]
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">dt</span> [<span style="color: #a52a2a;">join</span> [$<span style="color: #ffffff;">lsn</span> cget -datatypes] <span style="color: #696969;">"','"</span>]
+            <span style="color: #a52a2a;">lappend</span> res <span style="color: #696969;">"$nlsn: listens '$dt'"</span>
+        }
+        <span style="color: #696969;">return</span> [<span style="color: #a52a2a;">join</span> $<span style="color: #ffffff;">res</span> <span style="color: #696969;">"\n"</span>]
+
+    } <span style="color: #696969;">elseif</span> {$<span style="color: #ffffff;">args</span> eq <span style="color: #696969;">""</span>} {
+        <span style="color: #575757;"># if no args, returns listening table (all links)</span>
+        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
+        <span style="color: #696969;">foreach</span> prov $<span style="color: #ffffff;">DataProvider::all</span> {
+            <span style="color: #a52a2a;">lappend</span> res [<span style="color: #a52a2a;">list</span> $<span style="color: #ffffff;">prov</span> [$<span style="color: #ffffff;">prov</span> get_listeners]]
+        }
+        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">res</span>
+
+    } <span style="color: #696969;">else</span> {
+        <span style="color: #575757;"># normalize args (make ':' like arg, not part of another arg)</span>
+        lassign [<span style="color: #a52a2a;">split</span> [<span style="color: #a52a2a;">join</span> $<span style="color: #ffffff;">args</span> <span style="color: #696969;">" "</span>] :] providers listeners
+
+        <span style="color: #575757;"># if there is 'all' in listeners then it'll be all of them :)</span>
+        <span style="color: #696969;">if</span> {[lsearch -exact $<span style="color: #ffffff;">listeners</span> all] != -1} {
+            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">listeners</span> $<span style="color: #ffffff;">DataListener::all</span>
+        }
+
+        <span style="color: #575757;"># delete each listener from ALL known providers then attach</span>
+        <span style="color: #575757;"># to selected</span>
+        <span style="color: #696969;">foreach</span> lsn $<span style="color: #ffffff;">listeners</span> {
+            <span style="color: #696969;">foreach</span> prov $<span style="color: #ffffff;">DataProvider::all</span> { $<span style="color: #ffffff;">prov</span> del_listener $<span style="color: #ffffff;">lsn</span> 1 }
+            <span style="color: #696969;">foreach</span> prov $<span style="color: #ffffff;">providers</span> { $<span style="color: #ffffff;">prov</span> add_listener $<span style="color: #ffffff;">lsn</span> }
+        }
+    }
+}
+</pre>
+</div>
+
+<p>
+There are classes:
+</p>
+<ul class="org-ul">
+<li>ListenEvent</li>
+<li>DataListener (should be inherited)</li>
+<li>DataProvider (should be inherited)</li>
+<li>ProxyListener</li>
+<li>DebugListener</li>
+</ul>
+
+<p>
+First 3 are clear. <code>ProxyListener</code> avoids creation of class - options-callbacks are used instead. Also, it's like bridge: listens and provides. <code>DebugListener</code> is proxy too, but for debug purpose (transparent bridge with console logging). Here is a scheme:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">   .------.             .------.
+--&gt;| Obj1 |---.    .---&gt;| Obj2 |--&gt;
+   `------'   |    |    `------'
+              v    o
+             .-----.
+             | Dbg |
+             `-----'
+</pre>
+</div>
+
+<p>
+Procedure <code>listen</code> is used to link providers and listeners or to obtain all of providers/listeners in system, or to obtain current link scheme (with native or pretty text representation). <code>debug_listen</code> procedure is used to insert <code>DebugListener</code> between two nodes.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+#+title: Tags generation for ASF project
+#+description: My Blog
+#+keywords: misc, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: misc embedded
+#+date: [2020-02-06 Thu 05:09]
+
+* Tags generation for ASF project
+
+If you use Atmel Software Framework you can generate tags (with ctags|GNU Global) for your Vim/Emacs environment in such way (in Makefile):
+
+#+BEGIN_SRC makefile
+ctags = c:/Program Files/ctags.exe
+gtags = c:/global/bin/gtags.exe
+sed = c:/MinGW/msys/1.0/bin/sed.exe
+find = c:/MinGW/msys/1.0/bin/find.exe
+
+GTAGS_FILES = GTAGS GPATH GRTAGS
+# Global can not parse out of c:/prj/PRJ1/src
+TAGS_DIRS = 'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include' \
+   c:/prj/PRJ1/src/asf-3.0.1 \
+   c:/prj/PRJ1/src/PRJ1
+
+tags.files: force
+ $(find) $(TAGS_DIRS) -type f -name *.S -or -name *.h -or -name *.c|$(sed) 's/c:\/prj\/PRJ1\/src/./g' >tags.files
+
+$(GTAGS_FILES): tags.files
+ $(gtags) -f tags.files
+
+.PHONY: global_tags
+global_tags: $(GTAGS_FILES)
+
+tags: tags.files
+ $(ctags) -L tags.files
+
+.PHONY: all_tags
+all_tags: tags global_tags
+
+.PHONY: clean_tags
+clean_tags:
+ rm -f $(GTAGS_FILES) tags
+#+END_SRC
+
+I suppose in this example you use Windows, have MinGW (with find, sed utils). Project is located in c:\prj and has name PRJ1. To generate use targets: ~tags~, ~global_tags~ or ~all_tags~. tags file will be about 100 MB, Global tags files will be about 70 MB, but Global can not parse files out of source tree, so ~avr32/include~ will be missed - use ~ctags~ instead of.

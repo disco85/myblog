@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hanged LM3S9B92 board</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="embedded" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Hanged LM3S9B92 board</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org2166a69">Hanged LM3S9B92 board</a></li>
+<li><a href="#orgf97a020">Reset device by "Debug port unlock" feature (select "Tempest Class", click "Unlock" and follow instructions on message boxes)</a></li>
+<li><a href="#org9db425e">Switch to "MAC Address Mode" and programmed MAC address (it's possible to use FF-&#x2026;-FF).</a></li>
+<li><a href="#orgd26c7a6">Re-program device by original firmware (always save original firmwares!)</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2166a69" class="outline-2">
+<h2 id="org2166a69">Hanged LM3S9B92 board</h2>
+<div class="outline-text-2" id="text-org2166a69">
+<p>
+After trying FreeRTOS example for LM3S9B92 my board seems "hanged" (dead) - no response over Ethernet, no adventure game :) And I get message "Error to initializing target".
+Last was cured by several turning on/off USB connector. But no game&#x2026; :) And Finder can not find my board's IP&#x2026;
+After opening Putty on virtual COM port (created after installation of FTDI drivers - I'm talking about Windows:) with baudrate 115200 and reseting board by button on the board, I see message:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Colossal Cave Adventure
+-----------------------
+Connect to either the USB virtual COM port or
+telnet into the Ethernet port in order to play.
+
+MAC Address Not Programmed!
+</pre>
+</div>
+
+<p>
+Aha! I ran LM Flash Programmer and on "Other Utilities" tab and:
+</p>
+</div>
+</div>
+<div id="outline-container-orgf97a020" class="outline-2">
+<h2 id="orgf97a020">Reset device by "Debug port unlock" feature (select "Tempest Class", click "Unlock" and follow instructions on message boxes)</h2>
+</div>
+<div id="outline-container-org9db425e" class="outline-2">
+<h2 id="org9db425e">Switch to "MAC Address Mode" and programmed MAC address (it's possible to use FF-&#x2026;-FF).</h2>
+</div>
+<div id="outline-container-orgd26c7a6" class="outline-2">
+<h2 id="orgd26c7a6">Re-program device by original firmware (always save original firmwares!)</h2>
+<div class="outline-text-2" id="text-orgd26c7a6">
+<p>
+After this resetting device show in Putty session:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Colossal Cave Adventure
+-----------------------
+Connect to either the USB virtual COM port or
+telnet into the Ethernet port in order to play.
+
+IP: 169.254.3.0
+Netmask: 255.255.0.0
+Gateway: 0.0.0.0
+</pre>
+</div>
+
+<p>
+&#x2026;after "Wait&#x2026;" and obtaining IP address. Finder found this IP address, and colossal game is working&#x2026; over Ethernet :)
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

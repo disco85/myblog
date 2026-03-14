@@ -1,0 +1,124 @@
+#+title: Binary search
+#+description: My Blog
+#+keywords: clang, algorithms, python
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: clang algorithms python
+#+date: [2020-02-04 Tue 18:15]
+
+* Binary search
+
+Input is - ''ordered (sorted)'' array. Comparison is with middle item, if matched it then
+we found target, if middle is greater then we must check in the same way all
+items from the left side of the middle item, otherwise - on right side.
+
+#+BEGIN_SRC cpp
+#include <stdio.h>
+#include "algutils.h"
+
+template<typename T>
+int binsearch(T *arr, int len, const T& target)
+{
+    int mid, off = 0;
+    while (1) {
+        if (!len) return (-1);
+        mid = len/2;
+        if (arr[mid] == target) return (off + mid);
+        len = mid;
+        if (arr[mid] < target) {
+            off += mid + 1;
+            arr = &arr[mid+1];
+        }
+    }
+}
+
+/***********************************************************************
+                                  Main
+ ***********************************************************************/
+
+int main(void)
+{
+#define LIST(...) {__VA_ARGS__}
+#define TEST(EL, RESULT, L) do { \
+    int arr[] = L; \
+    int s = binsearch(arr, sizeofarray(arr), (EL)); \
+    printf("Binary search of %d: %d (%s)\n", (EL), s, \
+            s==(RESULT)?"true":"FALSE"); \
+} while (0)
+
+    TEST(1, 0, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(2, 1, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(14, 9, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(15, 10, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(24, 11, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(55, 12, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+    TEST(240, -1, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
+
+    return (0);
+}
+#+END_SRC
+
+
+Another implementation in Python. It determines the number of accesses to the data:
+
+#+BEGIN_SRC python
+import random
+
+
+def binsearch(lst, target):
+    start = 0
+    end = len(lst) - 1
+    while start <= end:
+        mid = (start + end) // 2
+        if lst[mid] > target:
+            end = mid - 1
+        elif lst[mid] < target:
+            start = mid + 1
+        else:
+            return mid
+
+
+#########################
+class ACCESS(list):
+    def __init__(self, *a, **kw):
+        super().__init__(*a, **kw)
+        self._access = 0
+    def __getitem__(self, i):
+        print(f"{self._access}: get {i}")
+        self._access += 1
+        return super().__getitem__(i)
+
+
+def randomdata(num):
+    i = 0
+    res = []
+    while i< num:
+        r = random.randint(0, num*10)
+        res.append(r)
+        i += 1
+    res = sorted(res)
+    return (res, random.choice(res))
+
+
+NUM = 100
+arr, x = randomdata(NUM)
+print(f"Look for {x} in {arr}")
+fnd = binsearch(ACCESS(arr), x)
+print(f"Found {arr[fnd]} at {fnd}")
+#+END_SRC
+
+Typical output:
+
+#+BEGIN_SRC
+Look for 889 in [1, 41, 47, ...       
+0: get 49                                                                                                                              
+1: get 49                                                                                                                              
+2: get 74                                                                                                                              
+3: get 74                                                                                                                              
+4: get 87                                                                                                                              
+5: get 87                                                                                                                              
+6: get 93                                                                                                                              
+7: get 90                                                                                                                              
+8: get 88                                                                                                                              
+9: get 88                                                                                                                              
+Found 889 at 88
+#+END_SRC

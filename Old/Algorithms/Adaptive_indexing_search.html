@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>"Adaptive indexing" search</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="algorithms, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">"Adaptive indexing" search</h1>
+<div id="outline-container-orgd4444c2" class="outline-2">
+<h2 id="orgd4444c2">"Adaptive indexing" search</h2>
+<div class="outline-text-2" id="text-orgd4444c2">
+<p>
+Some kind of interpolation search. We take the first item and test it. If hit - return it, otherwise - shift to the next item by a step. The step is calculated from the current item value and the previous one's value: the idea is that we try to find the delta/difference between neighbor items and to calculate the offset to the searched item. It's something like adaptive indexing, I called it in such a way.
+</p>
+
+<p>
+It works good with integers without "gaps". But if we have "gaps" - the data access numbers is bigger. It depends on how random are items. The function <code>partiallyrandomdata()</code> has a parameter <code>rate</code> which can be used to simulate less or more randomization (0 - no "gaps", 1.0 - a lot of).
+</p>
+
+<p>
+If the test fails - we move forward/backward by a step. If we hit bounds then we correct the step - we take the next item after the previous one if it's possible, otherwise - the previous of the previous (<code>_prev +/-1</code>).
+</p>
+
+<p>
+This implementation is not perfect and can be optimized. I am not 100% sure in its correctness even, but some tests show that the item was successfully found. ''Also it loops infinitely if not such item at all''.
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">import</span> random
+<span style="color: #696969;">from</span> math <span style="color: #696969;">import</span> *
+
+
+<span style="color: #575757;"># </span><span style="color: #575757;">lst - ordered/sorted list</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">intersearch</span>(lst, target):
+    <span style="color: #ffffff;">upbound</span> = <span style="color: #a52a2a;">len</span>(lst) - 1
+    <span style="color: #ffffff;">prev</span> = -1
+    <span style="color: #ffffff;">pos</span> = 0
+    <span style="color: #ffffff;">step</span> = 1
+    <span style="color: #ffffff;">_prev</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #ffffff;">d</span> = 0
+    <span style="color: #696969;">while</span> <span style="color: #7fffd4;">True</span>:
+        <span style="color: #ffffff;">pos_el</span> = lst[pos]
+        <span style="color: #696969;">if</span> pos_el == target:
+            <span style="color: #696969;">return</span> pos
+        <span style="color: #696969;">elif</span> prev != -1:
+            <span style="color: #ffffff;">d</span> = <span style="color: #a52a2a;">abs</span>(pos_el - lst[prev])
+            <span style="color: #696969;">if</span> d == 0:
+                <span style="color: #ffffff;">step</span> = 1
+            <span style="color: #696969;">else</span>:
+                <span style="color: #ffffff;">step</span> = (target - pos_el) // d
+                <span style="color: #696969;">if</span> step == 0:
+                    <span style="color: #ffffff;">step</span> = 1
+                <span style="color: #696969;">elif</span> step &lt; 0:
+                <span style="color: #575757;">#</span><span style="color: #575757;">elif (pos + step) &lt; 0:</span>
+                    <span style="color: #ffffff;">step</span> = 1
+        <span style="color: #696969;">else</span>:
+            <span style="color: #ffffff;">step</span> = 1
+        <span style="color: #575757;">###</span>
+        <span style="color: #696969;">if</span> (pos + step &gt; upbound) <span style="color: #696969;">or</span> (lst[pos + step] &gt; target):
+            <span style="color: #696969;">if</span> prev + 1 &gt; upbound:
+                <span style="color: #ffffff;">_prev</span> = prev
+                <span style="color: #ffffff;">prev</span> = pos
+                <span style="color: #ffffff;">pos</span> = _prev - 1
+            <span style="color: #696969;">else</span>:
+                <span style="color: #ffffff;">_prev</span> = prev
+                <span style="color: #ffffff;">prev</span> = pos
+                <span style="color: #ffffff;">pos</span> = _prev + 1
+        <span style="color: #696969;">else</span>:
+            <span style="color: #ffffff;">prev</span> = pos
+            <span style="color: #ffffff;">pos</span> += step
+
+
+<span style="color: #575757;">#########################</span>
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">ACCESS</span>(<span style="color: #a52a2a;">list</span>):
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, *a, **kw):
+        <span style="color: #a52a2a;">super</span>().__init__(*a, **kw)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> = 0
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__getitem__</span>(<span style="color: #696969;">self</span>, i):
+        <span style="color: #696969;">if</span> i &gt;= <span style="color: #a52a2a;">len</span>(<span style="color: #696969;">self</span>):
+            <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=OUT OF RANGE!"</span>)
+        <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">super</span>().__getitem__(i)
+        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=</span>{res}<span style="color: #696969;">"</span>)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> += 1
+        <span style="color: #696969;">return</span> res
+
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">randomdata</span>(num):
+    <span style="color: #ffffff;">i</span> = 0
+    <span style="color: #ffffff;">res</span> = []
+    <span style="color: #696969;">while</span> i &lt; num:
+        <span style="color: #ffffff;">r</span> = random.randint(0, num*10)
+        res.append(r)
+        <span style="color: #ffffff;">i</span> += 1
+    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">sorted</span>(res)
+    <span style="color: #696969;">return</span> (res, random.choice(res))
+
+
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">list</span>(<span style="color: #a52a2a;">range</span>(NUM))
+    <span style="color: #ffffff;">i</span> = 0
+    <span style="color: #ffffff;">cnt</span> = <span style="color: #a52a2a;">min</span>(num, num*ratio)
+    <span style="color: #696969;">while</span> i &lt; cnt:
+        <span style="color: #ffffff;">r</span> = random.randint(num, num+cnt-1)
+        <span style="color: #ffffff;">res</span>[r - num] = r
+        <span style="color: #ffffff;">i</span> += 1
+    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">sorted</span>(res)
+    <span style="color: #696969;">return</span> (res, random.choice(res))
+
+
+<span style="color: #ffffff;">NUM</span> = 10000
+<span style="color: #ffffff;">arr</span>, <span style="color: #ffffff;">x</span> = partiallyrandomdata(NUM, 0.5)
+<span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Look for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
+<span style="color: #696969;">try</span>:
+    <span style="color: #ffffff;">fnd</span> = intersearch(ACCESS(arr), x)
+    <span style="color: #575757;">#</span><span style="color: #575757;">fnd = intersearch(arr, x)</span>
+    <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Found </span>{arr[fnd]}<span style="color: #696969;"> at </span>{fnd}<span style="color: #696969;">"</span>)
+<span style="color: #696969;">except</span> <span style="color: #ff4500;">KeyboardInterrupt</span>:
+    <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Looked for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

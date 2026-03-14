@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Multithreading console</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="windows, python" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Multithreading console</h1>
+<div id="outline-container-org57dc00b" class="outline-2">
+<h2 id="org57dc00b">Multithreading console</h2>
+<div class="outline-text-2" id="text-org57dc00b">
+<p>
+There are several Unix programs with this feature: user can edit input line since program raise messages to console:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">Message 3
+Message 2
+Message 1
+enter name$ Alejandr_
+</pre>
+</div>
+
+<p>
+It's implementation for Windows is simple:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">Multi-thread console input() via class MTInput</span>
+<span style="color: #696969;">import</span> sys
+<span style="color: #696969;">import</span> msvcrt
+<span style="color: #696969;">import</span> string
+<span style="color: #696969;">from</span> threading <span style="color: #696969;">import</span> Lock
+
+<span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #575757;"> Needs Win32 module msvcrt! Under Linux is possible to use</span>
+<span style="color: #575757;"># </span><span style="color: #575757;">tty (but not on FAT FS system like in Linpac controllers!)</span>
+<span style="color: #ffffff;">PROMPT</span> = <span style="color: #696969;">"&gt;&gt;&gt;"</span>
+<span style="color: #696969;">def</span> <span style="color: #ff4500;">normstr</span>(s):
+    <span style="color: #696969;">"""Interpret backspaces in string s,</span>
+<span style="color: #696969;">    returns normal string</span>
+<span style="color: #696969;">    """</span>
+    <span style="color: #ffffff;">rs</span> = <span style="color: #a52a2a;">reversed</span>(s)
+    <span style="color: #ffffff;">res</span> = []
+    <span style="color: #ffffff;">skip</span> = 0
+    <span style="color: #696969;">for</span> ch <span style="color: #696969;">in</span> rs:
+        <span style="color: #696969;">if</span> <span style="color: #a52a2a;">ord</span>(ch) == 8:
+            <span style="color: #ffffff;">skip</span> += 1
+            <span style="color: #696969;">continue</span>
+        <span style="color: #696969;">elif</span> skip:
+            <span style="color: #ffffff;">skip</span> -= 1
+            <span style="color: #696969;">continue</span>
+        <span style="color: #696969;">else</span>:
+            res.append(ch)
+    <span style="color: #696969;">return</span> u<span style="color: #696969;">""</span>.join(<span style="color: #a52a2a;">reversed</span>(res))
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">MTInput</span>:
+    <span style="color: #696969;">"""Multi-thread input line. Can be used like:</span>
+
+<span style="color: #696969;">    import time</span>
+<span style="color: #696969;">    import thread</span>
+
+<span style="color: #696969;">    inputer = MTInput()</span>
+<span style="color: #696969;">    def f():</span>
+<span style="color: #696969;">    while 1:</span>
+<span style="color: #696969;">        print '</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">test.......'</span>
+<span style="color: #696969;">        inputer.update()</span>
+<span style="color: #696969;">        time.sleep(2)</span>
+<span style="color: #696969;">    thread.start_new_thread(f, ())</span>
+<span style="color: #696969;">    while 1:</span>
+<span style="color: #696969;">        inp = inputer.input()</span>
+<span style="color: #696969;">        print 'ENTERED:', inp</span>
+<span style="color: #696969;">        if inp == ".":</span>
+<span style="color: #696969;">            break</span>
+<span style="color: #696969;">        else:</span>
+<span style="color: #696969;">            # ... process ...</span>
+<span style="color: #696969;">    """</span>
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, stdout=<span style="color: #7fffd4;">None</span>, prompt=PROMPT):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_stdout</span> = stdout <span style="color: #696969;">or</span> sys.stdout
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_enc</span> = <span style="color: #a52a2a;">getattr</span>(<span style="color: #696969;">self</span>._stdout, <span style="color: #696969;">"encoding"</span>, <span style="color: #696969;">"ascii"</span>)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_prompt</span> = prompt
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_buf</span> = []
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_lock</span> = Lock()
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">update</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">with</span> <span style="color: #696969;">self</span>._lock:
+            <span style="color: #ffffff;">buf</span> = u<span style="color: #696969;">""</span>.join(<span style="color: #696969;">self</span>._buf)
+            <span style="color: #696969;">try</span>:
+                <span style="color: #ffffff;">s</span> = u<span style="color: #696969;">"%s %s"</span> % (<span style="color: #696969;">self</span>._prompt, buf)
+                <span style="color: #ffffff;">encs</span> = s.encode(<span style="color: #696969;">self</span>._enc)
+                <span style="color: #696969;">self</span>._stdout.write(encs)
+                <span style="color: #696969;">self</span>._stdout.flush()
+            <span style="color: #696969;">except</span>:
+                <span style="color: #696969;">pass</span>
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">input</span>(<span style="color: #696969;">self</span>, prompt=PROMPT):
+        <span style="color: #696969;">with</span> <span style="color: #696969;">self</span>._lock:
+            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_buf</span> = []
+            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_prompt</span> = prompt
+        <span style="color: #696969;">self</span>._stdout.write(<span style="color: #696969;">self</span>._prompt + <span style="color: #696969;">" "</span>)
+        <span style="color: #696969;">self</span>._stdout.flush()
+        <span style="color: #696969;">while</span> <span style="color: #7fffd4;">True</span>:
+            <span style="color: #ffffff;">ch</span> = msvcrt.getwche()
+            <span style="color: #696969;">if</span> ch <span style="color: #696969;">in</span> <span style="color: #696969;">"</span><span style="color: #7fffd4;">\r\n</span><span style="color: #696969;">"</span>:
+                <span style="color: #696969;">with</span> <span style="color: #696969;">self</span>._lock:
+                    <span style="color: #ffffff;">buf</span> = u<span style="color: #696969;">""</span>.join(<span style="color: #696969;">self</span>._buf)
+                    <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_buf</span> = []
+                <span style="color: #ffffff;">buf</span> = normstr(buf)
+                <span style="color: #696969;">return</span> buf
+            <span style="color: #696969;">else</span>:
+                <span style="color: #696969;">with</span> <span style="color: #696969;">self</span>._lock:
+                    <span style="color: #696969;">self</span>._buf.append(ch)
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+#+title: Creating of Intel HEX with Tcl/Tk
+#+description: My Blog
+#+keywords: tcl/tk, embedded
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: tcl/tk embedded
+#+date: [2020-02-09 Sun 08:19]
+
+* Creating of Intel HEX with Tcl/Tk
+
+[[http://en.wikipedia.org/wiki/Intel_HEX][Intel HEX format]] is the simple ASCII format usually used to program different devices (it's flash and EEPROM memories). To create such data records, I use this code:
+
+#+BEGIN_SRC cpp
+package provide ihex 1.0
+
+namespace eval ihex {
+    namespace export data EOF eraser
+    set EOF ":00000001FF"
+
+    proc verint {type value} {
+        # Verify that value is in the type range. Known types are b (byte),
+        # w (word), d (doubleword), q (quadword). If is out-of-range, then
+        # raise will be callen
+        set absvalue [::tcl::mathfunc::abs $value]
+
+        proc raise {t v} {
+            # Raise error message. t is type name, such as "word" or "quadword"
+            error [format "Value 0x%X is not a %s" $v $t]
+        }
+
+        switch -- $type {
+            b { if {$absvalue > 255} {raise byte $absvalue} }
+            w { if {$absvalue > 65536} {raise word $absvalue} }
+            d { if {$absvalue > 4294967296} {raise doubleword $absvalue} }
+            q { if {$absvalue > 18446744073709551616} {raise quadword $absvalue} }
+        }
+        return 1
+    }
+
+    proc args2bytes {args} {
+        # Converts args to list of bytes (binary form of args). See
+        # >>> args2bytes b1 w4A
+        # 01 00 4A
+        #
+        # Each arg is integer prefixed by b|w|d|q and is in hex-form.
+        set bytes [list]
+        foreach arg $args {
+            set r [scan $arg %1s%x argtype argvalue]
+            if {$r != 2} {
+                #puts "some string..."
+                continue
+            } else {
+                # verify value of argvalue (in type bounds)
+                verint $argtype $argvalue
+                # format argvalue into string
+                switch -- $argtype {
+                    b {set fmt %02X}
+                    w {set fmt %04X}
+                    d {set fmt %08X}
+                    q {set fmt %016X}
+                }
+                set sarg [format $fmt $argvalue]
+                set argbytes [regexp -all -inline .. $sarg]
+                set bytes [concat $bytes $argbytes]
+            }
+        }
+        return $bytes
+    }
+
+    proc crc {bytes} {
+        # Calculate Intel-hex CRC for list of bytes (usual numbers in hex format
+        # but without prefixes like b|w|d|q)
+        set sum 0
+        foreach b $bytes {
+            incr sum 0x$b
+        }
+        set sum [expr {(1 + ~$sum) & 0xFF}] ;# bcb
+        return $sum
+    }
+
+    proc data {address args} {
+        # Returns data record for Intel hex format. args are list of integers such
+        # b23 wAE... - byte 0x23, word 0x00AE
+        set bytes [args2bytes {*}$args]
+        set len [args2bytes [format b%X [llength $bytes]]]
+        set address [args2bytes $address]
+        set type 00
+        set cc [crc [concat {} $len $address $type $bytes]]
+
+        # Prepare output line
+        set head :$len[join $address ""]$type
+        set tail [join $bytes ""][format %02X $cc]
+        return $head$tail
+    }
+
+    proc join_eep {args} {
+        # Join eep data records (":LLAAAA00..." strings) into one data record with size <= 256.
+        # Does not check CRC of input records!
+        set MAXSZ 256 ; # DONT USE > 256!!!
+        # In the mem will be 256 "00 00 00..."
+        for {set i 0} {$i < $MAXSZ} {incr i} { lappend mem 00 }
+        set last_index 0
+        foreach rec $args {
+            set len [string range $rec 1 2]
+            set address [string range $rec 3 6]
+            set type [string range $rec 7 8]
+            if {"0x$type" != 0} { continue } ;# skip not data records
+            set bytes [string range $rec 9 end-2]
+            set bytes [regexp -all -inline .. $bytes]
+            #set ev [eval "expr {0x$address + 0x$len - 1}"]
+            set from "0x$address"; set to [expr {"0x$address" + "0x$len" - 1}]
+            set last_index [::tcl::mathfunc::max $last_index $to]
+            set replacing "lreplace \$mem $from $to $bytes"
+            set mem [eval $replacing]
+        }
+        set len [format b%X [expr {$last_index + 1}]]
+        set len [args2bytes $len]
+        set address "00 00"
+        set type 00
+        set mem [lrange $mem 0 $last_index]
+        set cc [crc [concat {} $len $address $type $mem]]
+
+        # Prepare output line
+        set head :$len[join $address ""]$type
+        set tail [join $mem ""][format %02X $cc]
+        return $head$tail
+    }
+}
+#+END_SRC
+
+Procedure ~ihex::data~ is for create one record (ASCII line) from it's arguments as: ~ihex::data b23 w0A~, where each argument is value prefixed by b (for byte), w (for word), d (for doubleword), q (for quadword). Procedure ihex::join_eep is used to "join" into one memory 256-bytes chunk several records. It's arguments are in form of ":LLAAAATTDD...DCC". Procedure args2bytes is not exported but may be usable for creation bytes dump of it's arguments (also used b, w, d, q prefixes).

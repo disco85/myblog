@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-03-14 Sat 09:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interpolation search</title>
+<meta name="description" content="My Blog" />
+<meta name="keywords" content="python, algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root { color-scheme: dark;
+        --stroke-color: yellow; }
+body { font-family: sans-serif;
+       color-scheme: dark;
+       color: #9A9996;
+       background-color: #383634; }
+a:link { color: #C0BFBC; }
+a:visited { color: #77767B; }
+code, pre { background: #434139;
+            padding: 2px;
+            font-family: monospace; }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<a href="../../index.html">Sitemap</a>
+| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Interpolation search</h1>
+<div id="outline-container-org8e28403" class="outline-2">
+<h2 id="org8e28403">Interpolation search</h2>
+<div class="outline-text-2" id="text-org8e28403">
+<p>
+A special case of this algorithm: in general, the assumption is made that the elements are not just ordered, but correspond to some increasing series, for example, to arithmetic progression with some errors. If it's truth then we can "calculate" approximated item position - it's better than binary search. But only if the series is close to the assumption (ideal) values: the larger the error, the more steps we need to take.
+</p>
+
+<p>
+Let's look at arithmetic progression:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">o . . o . . o
+a1    ax    an
+</pre>
+</div>
+
+<p>
+We have some sequence (we can easy access a,,1,, and a,,n,, - the first and last items), so we should to find the position of a,,x,, - i.e. <code>x</code>.
+</p>
+
+<p>
+\[a_n = a_1 + (n-1)d
+\newline
+a_x = a_1 + (x-1)d
+\newline
+d = \frac{a_n-a_1}{n-1}
+\newline
+d = \frac{a_x-a_1}{x-1}
+\newline
+\frac{a_n-a_1}{n-1} = \frac{a_x-a_1}{x-1}
+\]
+</p>
+
+<p>
+So, this means that the position <code>x</code>:
+</p>
+
+<p>
+\[x = \frac{(a_x-a_1)(n-1)}{a_n-a_1} + 1
+\]
+</p>
+
+<p>
+The base ideas of this search are:
+</p>
+
+<ul class="org-ul">
+<li>it search similarly to the binary search but it uses some empiric - the knowledge of the items distribution law</li>
+<li>this law helps to hit initial position which will be final position of the searching item if the sequence is ideal</li>
+<li>otherwise it will use the knowledge that items are ordered to find where to move next: to left or to right.</li>
+</ul>
+
+<p>
+To compare this kind of search with the binary search let's create some test class:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #696969;">from</span> math <span style="color: #696969;">import</span> *
+<span style="color: #696969;">import</span> random
+
+<span style="color: #696969;">class</span> <span style="color: #ff4500;">Test</span>:
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, count, maxerr):
+        <span style="color: #696969;">self</span>.reset_counters()
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">seq</span> = []
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">seqlen</span> = count
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">maxerr</span> = maxerr
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">steps_f</span> = <span style="color: #a52a2a;">open</span>(<span style="color: #696969;">'steps.csv'</span>, <span style="color: #696969;">'wt'</span>, encoding=<span style="color: #696969;">'utf-8'</span>)
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">seq_f</span> = <span style="color: #a52a2a;">open</span>(<span style="color: #696969;">'seq.csv'</span>, <span style="color: #696969;">'wt'</span>, encoding=<span style="color: #696969;">'utf-8'</span>)
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">reset_counters</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">bin</span> = 0
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">int</span> = 0
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">setup_seq</span>(<span style="color: #696969;">self</span>, err):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">seq</span> = []
+        <span style="color: #ffffff;">prev</span> = 1
+        <span style="color: #696969;">for</span> n <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(1, <span style="color: #696969;">self</span>.seqlen+1):
+            <span style="color: #ffffff;">ax</span> = prev + random.randint(1, err)
+            <span style="color: #696969;">self</span>.seq.append(ax)
+            <span style="color: #ffffff;">prev</span> = ax
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">binary_search</span>(<span style="color: #696969;">self</span>, ax):
+        <span style="color: #ffffff;">n</span> = <span style="color: #a52a2a;">len</span>(<span style="color: #696969;">self</span>.seq)
+        <span style="color: #ffffff;">L</span> = 0
+        <span style="color: #ffffff;">R</span> = n-1
+        <span style="color: #696969;">while</span> L &lt;= R:
+            <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">bin</span> += 1
+            <span style="color: #ffffff;">mid</span> = floor((L+R)/2)
+            <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.seq[mid] &lt; ax:
+                <span style="color: #ffffff;">L</span> = mid + 1
+            <span style="color: #696969;">elif</span> <span style="color: #696969;">self</span>.seq[mid] &gt; ax:
+                <span style="color: #ffffff;">R</span> = mid - 1
+            <span style="color: #696969;">else</span>:
+                <span style="color: #696969;">return</span> mid
+        <span style="color: #696969;">raise</span> <span style="color: #ff4500;">Exception</span>(<span style="color: #696969;">'%d not found in %s'</span> % (ax, <span style="color: #696969;">self</span>.seq))
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">isearch</span>(<span style="color: #696969;">self</span>, ax, a=<span style="color: #7fffd4;">None</span>):
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">int</span> += 1
+        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> <span style="color: #ffffff;">a</span>: <span style="color: #ff4500;">a</span> = <span style="color: #696969;">self</span>.seq
+        <span style="color: #ffffff;">n</span> = <span style="color: #a52a2a;">len</span>(a)
+        <span style="color: #696969;">if</span> ax &lt; a[0] <span style="color: #696969;">or</span> ax &gt; a[-1]:
+            <span style="color: #696969;">raise</span> <span style="color: #ff4500;">Exception</span>(<span style="color: #696969;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: #696969;">self</span>.seq[0], <span style="color: #696969;">self</span>.seq[-1]))
+        <span style="color: #696969;">elif</span> ax == a[0]: <span style="color: #696969;">return</span> 0
+        <span style="color: #696969;">elif</span> ax == a[-1]: <span style="color: #696969;">return</span> n - 1
+        <span style="color: #ffffff;">rat0</span> = (ax - a[0]) * (n - 1)
+        <span style="color: #ffffff;">rat1</span> = a[-1] - a[0]
+        <span style="color: #ffffff;">x</span> = (1 + rat0 // rat1) - 1 <span style="color: #575757;"># </span><span style="color: #575757;">coz indexes are zero-based</span>
+        <span style="color: #696969;">if</span> a[x] &lt; ax:
+            <span style="color: #696969;">return</span> x + 1 + <span style="color: #696969;">self</span>.isearch(ax, a[x+1:])
+        <span style="color: #696969;">elif</span> a[x] &gt; ax:
+            <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.isearch(ax, a[:x])
+        <span style="color: #696969;">else</span>:
+            <span style="color: #696969;">return</span> x
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">test</span>(<span style="color: #696969;">self</span>, err):
+        <span style="color: #696969;">self</span>.setup_seq(err)
+        <span style="color: #ffffff;">bin_counter</span> = 0
+        <span style="color: #ffffff;">int_counter</span> = 0
+        <span style="color: #696969;">for</span> ax <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.seq:
+            <span style="color: #696969;">self</span>.reset_counters()
+            <span style="color: #ffffff;">f</span> = <span style="color: #696969;">self</span>.binary_search(ax)
+            <span style="color: #696969;">if</span> ax != <span style="color: #696969;">self</span>.seq[f]:
+                <span style="color: #696969;">raise</span> <span style="color: #ff4500;">Exception</span>(<span style="color: #696969;">'Binary found wrong value!'</span>)
+            <span style="color: #ffffff;">f</span> = <span style="color: #696969;">self</span>.isearch(ax)
+            <span style="color: #696969;">if</span> ax != <span style="color: #696969;">self</span>.seq[f]:
+                <span style="color: #696969;">raise</span> <span style="color: #ff4500;">Exception</span>(<span style="color: #696969;">'Interpolation found wrong value!'</span>)
+            <span style="color: #ffffff;">bin_counter</span> += <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">bin</span>
+            <span style="color: #ffffff;">int_counter</span> += <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">int</span>
+        <span style="color: #ffffff;">bin_counter</span> = <span style="color: #a52a2a;">round</span>(bin_counter / <span style="color: #696969;">self</span>.seqlen)
+        <span style="color: #ffffff;">int_counter</span> = <span style="color: #a52a2a;">round</span>(int_counter / <span style="color: #696969;">self</span>.seqlen)
+        <span style="color: #696969;">return</span> (err, bin_counter, int_counter)
+
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">test_all</span>(<span style="color: #696969;">self</span>):
+        <span style="color: #696969;">self</span>.steps_f.write(<span style="color: #696969;">'err,bin,int</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">'</span>)
+        <span style="color: #696969;">self</span>.seq_f.write(<span style="color: #696969;">','</span>.join(<span style="color: #a52a2a;">str</span>(x) <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(<span style="color: #696969;">self</span>.seqlen)) + <span style="color: #696969;">'</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">'</span>)
+        <span style="color: #696969;">for</span> err <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(1, <span style="color: #696969;">self</span>.maxerr):
+            <span style="color: #ffffff;">r</span> = <span style="color: #696969;">self</span>.test(err)
+            <span style="color: #696969;">self</span>.seq_f.write(<span style="color: #696969;">','</span>.join(<span style="color: #a52a2a;">str</span>(x) <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.seq) + <span style="color: #696969;">'</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">'</span>)
+            <span style="color: #696969;">self</span>.steps_f.write(<span style="color: #696969;">','</span>.join(<span style="color: #a52a2a;">str</span>(x) <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> r) + <span style="color: #696969;">'</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">'</span>)
+
+
+<span style="color: #ffffff;">t</span> = Test(500, 500)
+t.test_all()
+</pre>
+</div>
+
+<p>
+We collect the results in CSV files. The content of <code>steps.csv</code> looks like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">err,bin,int
+1,8,1
+2,8,2
+3,8,2
+4,8,2
+5,8,2
+6,8,2
+7,8,2
+8,8,3
+9,8,2
+10,8,2
+11,8,2
+12,8,2
+13,8,2
+14,8,2
+15,8,2
+16,8,3
+...
+</pre>
+</div>
+
+<p>
+where the 1st column is the <code>err</code> (some delta from ideal arithmetic progression), 2nd one is the average number of the iterations for binary search and 3rd - the same for interpolation search.
+</p>
+
+<p>
+We see that interpolation search requires 1..3 steps, while binary search requires 8 steps (for 500 items with <code>err</code> 1..500).
+</p>
+
+<p>
+If we know the law of the items, we can use another empiric instead of arithmetic progression law, for example, geometric progression or something else.
+</p>
+
+<p>
+If we change the generating of the sequence to geometric progression (with error <code>err</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">...
+    <span style="color: #696969;">def</span> <span style="color: #ff4500;">setup_seq</span>(<span style="color: #696969;">self</span>, err):
+        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">seq</span> = []
+        <span style="color: #ffffff;">prev</span> = 1
+        <span style="color: #ffffff;">q</span> = 2
+        <span style="color: #696969;">for</span> n <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(1, <span style="color: #696969;">self</span>.seqlen+1):
+            <span style="color: #ffffff;">ax</span> = err + prev * q
+            <span style="color: #696969;">self</span>.seq.append(ax)
+            <span style="color: #ffffff;">prev</span> = ax
+...
+</pre>
+</div>
+
+<p>
+then average steps will look very differently:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">err,bin,int
+1, 1, 1
+2, 8, 244
+3, 8, 246
+4, 8, 247
+5, 8, 247
+6, 8, 247
+7, 8, 248
+8, 8, 248
+...
+</pre>
+</div>
+
+<p>
+and we see that binary search still does 8 steps in average, but our implementation of the interpolation search is not so effective more and does in average in 31 times more steps.
+</p>
+
+<p>
+This result means that our empiric (prediction) is not accurate enough more, so we should change it.
+</p>
+
+<p>
+If use the geometric progression as a model, so we can use it (this is the idea of the algorithm - to know the model!):
+</p>
+
+<p>
+\[b_n = b_1q^{n-1}
+\newline
+b_x = b_1q^{x-1}
+\newline
+q^{n-1}=\frac{b_n}{b_1}
+\newline
+q^{x-1}=\frac{b_x}{b_1}
+\newline
+\sqrt[n-1]{\frac{b_n}{b_1}} = \sqrt[x-1]{\frac{b_x}{b_1}}
+\newline
+(\sqrt[n-1]{\frac{b_n}{b_1}})^{x-1} = \frac{b_x}{b_1}
+\newline
+s = \sqrt[n-1]{\frac{b_n}{b_1}}
+\newline
+x - 1 = \log_s{\frac{b_x}{b_1}}
+\newline
+x = 1 + \log_s{\frac{b_x}{b_1}}
+\]
+</p>
+
+<p>
+We will implement this equation, but another expression for <code>x</code> is:
+</p>
+
+<p>
+\[x = 1 + \log_{\frac{b_n}{b_1}}(\frac{b_x}{b_1})^{n-1}
+\]
+</p>
+
+<p>
+We can use Python function: \[pow(x, 1/y) = \sqrt[y]x\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">    <span style="color: #696969;">def</span> <span style="color: #ff4500;">isearch_g</span>(<span style="color: #696969;">self</span>, ax, a=<span style="color: #7fffd4;">None</span>):
+        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">int</span> += 1
+        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> <span style="color: #ffffff;">a</span>: <span style="color: #ff4500;">a</span> = <span style="color: #696969;">self</span>.seq
+        <span style="color: #ffffff;">n</span> = <span style="color: #a52a2a;">len</span>(a)
+        <span style="color: #696969;">if</span> ax &lt; a[0] <span style="color: #696969;">or</span> ax &gt; a[-1]:
+            <span style="color: #696969;">raise</span> <span style="color: #ff4500;">Exception</span>(<span style="color: #696969;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: #696969;">self</span>.seq[0], <span style="color: #696969;">self</span>.seq[-1]))
+        <span style="color: #696969;">elif</span> ax == a[0]: <span style="color: #696969;">return</span> 0
+        <span style="color: #696969;">elif</span> ax == a[-1]: <span style="color: #696969;">return</span> n - 1
+        <span style="color: #ffffff;">s</span> = <span style="color: #a52a2a;">pow</span>(a[n-1] / a[0], 1 / (n - 1))
+        <span style="color: #ffffff;">x</span> = 1 + <span style="color: #a52a2a;">round</span>(log(ax / a[0], s))
+        <span style="color: #696969;">if</span> a[x] &lt; ax:
+            <span style="color: #696969;">return</span> x + 1 + <span style="color: #696969;">self</span>.isearch_g(ax, a[x+1:])
+        <span style="color: #696969;">elif</span> a[x] &gt; ax:
+            <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.isearch_g(ax, a[:x])
+        <span style="color: #696969;">else</span>:
+            <span style="color: #696969;">return</span> x
+</pre>
+</div>
+
+<p>
+And now we get different result:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nil">(1, 8, 2)
+(2, 8, 2)
+(3, 8, 2)
+(4, 8, 2)
+(5, 8, 2)
+(6, 8, 2)
+(7, 8, 2)
+(8, 8, 2)
+...
+</pre>
+</div>
+
+<p>
+and now our interpolation search is faster again. But we run the test with <code>Test(250, 500)</code> to avoid overflow related errors (it happens with 1st parameter = 500).
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

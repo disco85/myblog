@@ -1,0 +1,75 @@
+#+title: Simple backtracking implementation
+#+description: My Blog
+#+keywords: python, algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: python algorithms
+#+date: [2020-02-04 Tue 18:09]
+
+* Simple backtracking implementation
+
+Classical task: you have numbers ~1,5,6,7~ and operations ~(),+,-,*,/,^~. You have to build arithmetical expression which result will be ~21~ (without
+repeats!). For searching is solutions tree we'll use backtracking, for
+arithmetics - stack machine, like Forth. Search extracts element of each level
+with ~extract_e()~ from rest of variants ~cases~, all other ones will be
+searching recursively. Function ~goal()~ is the predicate, which determines do
+we need to add found path into solutions list ~found~. It has empiric: must be
+more than 1 numbers on the stack!
+
+#+BEGIN_SRC python
+from functools import *
+
+# split seq by element index, returns element and all other elements
+extract_e = lambda seq, i: (seq[i], seq[:i] + seq[i+1:])
+# all indexes of sequence
+indexes = lambda seq: range(len(seq))
+
+# backtracking
+def bt(cases, goal, found=[], level=0, path=[]):
+    if goal(path, level): found.append(path)
+    for i in indexes(cases):
+        c, rest = extract_e(cases, i)
+        bt(rest, goal, found, level+1, path + [c])
+    if 0 == level: return found
+
+# Solver - uses postfix arithm.
+class Solver:
+    VALUES, OPERATORS = (1,5,6,7), ('+', '-', '*', '/', '^')
+
+    @staticmethod
+    def _binop(stack, op_ch):
+        ops = { "+": lambda a, b: b+a, "-": lambda a, b: b-a,
+                "*": lambda a, b: b*a, "/": lambda a, b: b/a,
+                "^": lambda a, b: b**a, }
+        stack.append(ops[op_ch](stack.pop(), stack.pop()))
+
+    def eval(self, state, default=None):
+        try:
+            stack = []
+            for c in state:
+                if c in self.VALUES: stack.append(int(c))
+                else: self._binop(stack, c)
+            return stack.pop()
+        except:
+            return default
+
+    def __call__(self):
+        def goal(path, level):
+            if len(path) > 2 and all(e in self.VALUES for e in path[:2]):
+                try: return 21 == int(self.eval(path))
+                except: return
+        return bt(self.VALUES + self.OPERATORS, goal)
+
+print("Found:", Solver()())
+#+END_SRC
+
+The same BT-search may be used for sorting:
+
+#+BEGIN_SRC python
+# predicate: is seq ordered?
+ordered = lambda seq: reduce(lambda i,e: (i[0] and e>=i[1], e), seq, (1, seq[0]))[0]
+seq = [9,1,5,4]
+print("In:", seq)
+def completed(path, level): return level==len(seq) \
+    and ordered(path)
+print(bt(seq, completed))
+#+END_SRC
