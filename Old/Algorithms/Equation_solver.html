@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Equation solver</title>
@@ -35,73 +35,73 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Equation solver</h1>
-<div id="outline-container-org023beeb" class="outline-2">
-<h2 id="org023beeb">Equation solver</h2>
-<div class="outline-text-2" id="text-org023beeb">
+<div id="outline-container-org2641474" class="outline-2">
+<h2 id="org2641474">Equation solver</h2>
+<div class="outline-text-2" id="text-org2641474">
 <div class="org-src-container">
 <pre class="src src-fortran">module utils
-<span style="color: #ff4500;">implicit none</span>
+<span style="color: #005f5f;">implicit none</span>
 
   interface
-    <span style="color: #696969;">function</span> <span style="color: #ff4500;">f_if</span>(x)
-      <span style="color: #ff4500;">real</span> :: f_if, x
-    <span style="color: #696969;">end</span> <span style="color: #696969;">function</span> <span style="color: #ff4500;">f_if</span>
-  <span style="color: #696969;">end</span> interface
+    <span style="color: #531ab6;">function</span> <span style="color: #721045;">f_if</span>(x)
+      <span style="color: #005f5f;">real</span> :: f_if, x
+    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">f_if</span>
+  <span style="color: #531ab6;">end</span> interface
 
-<span style="color: #575757;">c</span><span style="color: #575757;">ontains</span>
+<span style="color: #7f0000;">c</span><span style="color: #7f0000;">ontains</span>
 
-  <span style="color: #575757;">!</span><span style="color: #575757;">Custom equation: f = ...</span>
-  <span style="color: #696969;">function</span> <span style="color: #ff4500;">f</span>(x)
-    <span style="color: #ff4500;">real</span> :: f, x
+  <span style="color: #7f0000;">!</span><span style="color: #7f0000;">Custom equation: f = ...</span>
+  <span style="color: #531ab6;">function</span> <span style="color: #721045;">f</span>(x)
+    <span style="color: #005f5f;">real</span> :: f, x
 
     f = x**3 + (1.1 * x**2) + 0.9 * x - 1.4
-  <span style="color: #696969;">end</span> <span style="color: #696969;">function</span> <span style="color: #ff4500;">f</span>
+  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">f</span>
 
-  <span style="color: #696969;">function</span> <span style="color: #ff4500;">next_x</span>(x, x_1, fn)
-    <span style="color: #ff4500;">real</span> :: next_x, x, x_1
+  <span style="color: #531ab6;">function</span> <span style="color: #721045;">next_x</span>(x, x_1, fn)
+    <span style="color: #005f5f;">real</span> :: next_x, x, x_1
     procedure(f_if), pointer :: fn
 
     next_x = x_1 - (fn(x_1) * (x - x_1))/(fn(x) - fn(x_1))
-  <span style="color: #696969;">end</span> <span style="color: #696969;">function</span> <span style="color: #ff4500;">next_x</span>
+  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">next_x</span>
 
-  <span style="color: #696969;">function</span> <span style="color: #ff4500;">solve</span>(x, x_1, fn, eps)
-    <span style="color: #ff4500;">real</span> :: solve, root, root_1, delta, eps_
-    <span style="color: #ff4500;">real</span>, intent(inout) :: x, x_1
-    <span style="color: #ff4500;">real</span>, optional :: eps
-    <span style="color: #ff4500;">integer</span> :: i = 0
+  <span style="color: #531ab6;">function</span> <span style="color: #721045;">solve</span>(x, x_1, fn, eps)
+    <span style="color: #005f5f;">real</span> :: solve, root, root_1, delta, eps_
+    <span style="color: #005f5f;">real</span>, intent(inout) :: x, x_1
+    <span style="color: #005f5f;">real</span>, optional :: eps
+    <span style="color: #005f5f;">integer</span> :: i = 0
     procedure(f_if), pointer :: fn
 
-    <span style="color: #696969;">if</span> (<span style="color: #696969;">.not.</span> present(eps)) <span style="color: #696969;">then</span>
+    <span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">.not.</span> present(eps)) <span style="color: #531ab6;">then</span>
       eps_ = 0.001
-    <span style="color: #696969;">else</span>
+    <span style="color: #531ab6;">else</span>
       eps_ = eps
-    <span style="color: #696969;">end</span> <span style="color: #696969;">if</span>
-    <span style="color: #696969;">do</span>
+    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
+    <span style="color: #531ab6;">do</span>
       root = next_x(x, x_1, fn)
-      <span style="color: #696969;">if</span> (i /= 0 ) <span style="color: #696969;">then</span>
-        delta = <span style="color: #a52a2a;">abs</span>(root - root_1)
-        <span style="color: #696969;">if</span> (delta &lt;= eps_) <span style="color: #696969;">then</span>
-          <span style="color: #696969;">exit</span>
-        <span style="color: #696969;">end</span> <span style="color: #696969;">if</span>
-      <span style="color: #696969;">end</span> <span style="color: #696969;">if</span>
+      <span style="color: #531ab6;">if</span> (i /= 0 ) <span style="color: #531ab6;">then</span>
+        delta = <span style="color: #8f0075;">abs</span>(root - root_1)
+        <span style="color: #531ab6;">if</span> (delta &lt;= eps_) <span style="color: #531ab6;">then</span>
+          <span style="color: #531ab6;">exit</span>
+        <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
+      <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
       i = i + 1
       x_1 = x
       x = root
       root_1 = root
-    <span style="color: #696969;">end</span> <span style="color: #696969;">do</span>
+    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">do</span>
     solve = root
-  <span style="color: #696969;">end</span> <span style="color: #696969;">function</span> <span style="color: #ff4500;">solve</span>
+  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">solve</span>
 
-<span style="color: #696969;">end</span> module utils
+<span style="color: #531ab6;">end</span> module utils
 
-<span style="color: #696969;">program</span> <span style="color: #ff4500;">eqsolver</span>
+<span style="color: #531ab6;">program</span> <span style="color: #721045;">eqsolver</span>
   use utils
-  <span style="color: #ff4500;">implicit none</span>
-  <span style="color: #ff4500;">real</span> :: x=1., x_1=0.
+  <span style="color: #005f5f;">implicit none</span>
+  <span style="color: #005f5f;">real</span> :: x=1., x_1=0.
   procedure(f_if), pointer :: fn =&gt; f
-  <span style="color: #575757;">!</span><span style="color: #575757;">write(*,*) next_x(1., 0., fn)</span>
-  <span style="color: #696969;">write</span>(*,*) solve(x, x_1, fn)
-<span style="color: #696969;">end</span> <span style="color: #696969;">program</span> <span style="color: #ff4500;">eqsolver</span>
+  <span style="color: #7f0000;">!</span><span style="color: #7f0000;">write(*,*) next_x(1., 0., fn)</span>
+  <span style="color: #531ab6;">write</span>(*,*) solve(x, x_1, fn)
+<span style="color: #531ab6;">end</span> <span style="color: #531ab6;">program</span> <span style="color: #721045;">eqsolver</span>
 </pre>
 </div>
 </div>

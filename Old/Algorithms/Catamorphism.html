@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Catamorphism</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Catamorphism</h1>
-<div id="outline-container-orge18c03f" class="outline-2">
-<h2 id="orge18c03f">Catamorphism</h2>
-<div class="outline-text-2" id="text-orge18c03f">
+<div id="outline-container-org073b81b" class="outline-2">
+<h2 id="org073b81b">Catamorphism</h2>
+<div class="outline-text-2" id="text-org073b81b">
 <p>
 Catamorphism is yet another good known recursive scheme which is assitiated
 with folding.
@@ -67,7 +67,7 @@ Scheme graphically looks like:
 
 
 
-<div id="org0f7ab30" class="figure">
+<div id="org7af2c1c" class="figure">
 <p><img src="../../assets/Catamorphism1.svg" alt="Catamorphism1.svg" class="org-svg" />
 </p>
 </div>
@@ -88,19 +88,19 @@ All of these are easy coded in Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">cata</span>(b, l, op):
-    <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> l: <span style="color: #696969;">return</span> b
-    <span style="color: #ffffff;">x</span>, *<span style="color: #ffffff;">xs</span> = l
-    <span style="color: #696969;">return</span> op(x, cata(b, xs, op))
+<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">cata</span>(b, l, op):
+    <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> l: <span style="color: #531ab6;">return</span> b
+    <span style="color: #005e8b;">x</span>, *<span style="color: #005e8b;">xs</span> = l
+    <span style="color: #531ab6;">return</span> op(x, cata(b, xs, op))
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">length</span>(l):
-    <span style="color: #696969;">return</span> cata(0, l, <span style="color: #696969;">lambda</span> x, n: 1 + n)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">length</span>(l):
+    <span style="color: #531ab6;">return</span> cata(0, l, <span style="color: #531ab6;">lambda</span> x, n: 1 + n)
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">mymap</span>(f, l):
-    <span style="color: #696969;">return</span> cata([], l, <span style="color: #696969;">lambda</span> a, bs: [f(a)] + bs)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">mymap</span>(f, l):
+    <span style="color: #531ab6;">return</span> cata([], l, <span style="color: #531ab6;">lambda</span> a, bs: [f(a)] + bs)
 
-<span style="color: #a52a2a;">print</span>(length([1,2,3,4]))
-<span style="color: #a52a2a;">print</span>(mymap(<span style="color: #696969;">lambda</span> x: x+10, [1,2,3]))
+<span style="color: #8f0075;">print</span>(length([1,2,3,4]))
+<span style="color: #8f0075;">print</span>(mymap(<span style="color: #531ab6;">lambda</span> x: x+10, [1,2,3]))
 </pre>
 </div>
 

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Parse hex chars string to bytes</title>
@@ -67,9 +67,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Parse hex chars string to bytes</h1>
-<div id="outline-container-orga0854b2" class="outline-2">
-<h2 id="orga0854b2">Parse hex chars string to bytes</h2>
-<div class="outline-text-2" id="text-orga0854b2">
+<div id="outline-container-orge850b7f" class="outline-2">
+<h2 id="orge850b7f">Parse hex chars string to bytes</h2>
+<div class="outline-text-2" id="text-orge850b7f">
 <p>
 Very simple task as for interview: to parse hex chars into bytes. Example:
 "123Ad" -&gt; "\x12\x3A\x0D". This procedure can be helpfull if you want to
@@ -84,37 +84,37 @@ an example without sscanf:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"algutils.h"</span>
 
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">parse_hex_str</span>(<span style="color: #696969;">const</span> <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">s</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">slen</span>, <span style="color: #ff4500;">char</span> *<span style="color: #ffffff;">out</span>) {
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">__ord</span>(<span style="color: #ffffff;">c</span>) \
-    ((c) &gt;= <span style="color: #696969;">'0'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'9'</span>? (c) - <span style="color: #696969;">'0'</span> : \
-     (c) &gt;= <span style="color: #696969;">'a'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'f'</span>? (c) - <span style="color: #696969;">'a'</span> + 10 : \
-     (c) &gt;= <span style="color: #696969;">'A'</span> &amp;&amp; (c) &lt;= <span style="color: #696969;">'F'</span>? (c) - <span style="color: #696969;">'A'</span> + 10 : -1)
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">parse_hex_str</span>(<span style="color: #531ab6;">const</span> <span style="color: #005f5f;">char</span> *<span style="color: #005e8b;">s</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">slen</span>, <span style="color: #005f5f;">char</span> *<span style="color: #005e8b;">out</span>) {
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">__ord</span>(<span style="color: #005e8b;">c</span>) \
+    ((c) &gt;= <span style="color: #3548cf;">'0'</span> &amp;&amp; (c) &lt;= <span style="color: #3548cf;">'9'</span>? (c) - <span style="color: #3548cf;">'0'</span> : \
+     (c) &gt;= <span style="color: #3548cf;">'a'</span> &amp;&amp; (c) &lt;= <span style="color: #3548cf;">'f'</span>? (c) - <span style="color: #3548cf;">'a'</span> + 10 : \
+     (c) &gt;= <span style="color: #3548cf;">'A'</span> &amp;&amp; (c) &lt;= <span style="color: #3548cf;">'F'</span>? (c) - <span style="color: #3548cf;">'A'</span> + 10 : -1)
 
-    <span style="color: #696969;">register</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">b</span>, <span style="color: #ffffff;">t</span>, <span style="color: #ffffff;">i</span>;
-    <span style="color: #696969;">for</span> (i=0; i&lt;slen; i++) {
+    <span style="color: #531ab6;">register</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">b</span>, <span style="color: #005e8b;">t</span>, <span style="color: #005e8b;">i</span>;
+    <span style="color: #531ab6;">for</span> (i=0; i&lt;slen; i++) {
         t = __ord(s[i]);
-        <span style="color: #696969;">if</span> (-1 == t) <span style="color: #696969;">return</span> (1);
-        <span style="color: #696969;">if</span> (i%2) out[i/2] = (b &lt;&lt; 4) | t;
-        <span style="color: #696969;">else</span>     b = t;
+        <span style="color: #531ab6;">if</span> (-1 == t) <span style="color: #531ab6;">return</span> (1);
+        <span style="color: #531ab6;">if</span> (i%2) out[i/2] = (b &lt;&lt; 4) | t;
+        <span style="color: #531ab6;">else</span>     b = t;
     }
-    <span style="color: #696969;">if</span> (i%2) out[i/2] = b;
-    <span style="color: #696969;">return</span> (0);
+    <span style="color: #531ab6;">if</span> (i%2) out[i/2] = b;
+    <span style="color: #531ab6;">return</span> (0);
 
-<span style="color: #a52a2a;">#undef</span> __ord
+<span style="color: #a0132f;">#undef</span> __ord
 }
 
-<span style="color: #575757;">/*************************************************************/</span>
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>() {
-    <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">ins</span>[] = <span style="color: #696969;">"1230aAF0D"</span>;
-    <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">out</span>[20] = {0};
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">res</span> = parse_hex_str(ins, <span style="color: #696969;">sizeof</span>(ins) - 1, out);
-    printf(<span style="color: #696969;">"input = %s\n"</span>, ins);
-    printf(<span style="color: #696969;">"res=%d\n"</span>, res);
-    PRINTARRX(out, 10, <span style="color: #696969;">"%02X"</span>);
-    <span style="color: #696969;">return</span> (0);
+<span style="color: #7f0000;">/*************************************************************/</span>
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>() {
+    <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">ins</span>[] = <span style="color: #3548cf;">"1230aAF0D"</span>;
+    <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">out</span>[20] = {0};
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">res</span> = parse_hex_str(ins, <span style="color: #531ab6;">sizeof</span>(ins) - 1, out);
+    printf(<span style="color: #3548cf;">"input = %s\n"</span>, ins);
+    printf(<span style="color: #3548cf;">"res=%d\n"</span>, res);
+    PRINTARRX(out, 10, <span style="color: #3548cf;">"%02X"</span>);
+    <span style="color: #531ab6;">return</span> (0);
 }
 </pre>
 </div>

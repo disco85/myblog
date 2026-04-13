@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gnome sorting</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Gnome sorting</h1>
-<div id="outline-container-org04ca84a" class="outline-2">
-<h2 id="org04ca84a">Gnome sorting</h2>
-<div class="outline-text-2" id="text-org04ca84a">
+<div id="outline-container-orga461ff0" class="outline-2">
+<h2 id="orga461ff0">Gnome sorting</h2>
+<div class="outline-text-2" id="text-orga461ff0">
 <p>
 The central idea is to walk to the line of pairs, to check them and if they are unordered then swap them. Otherwise - forward to the next pair (1 position forward, not 2, ie, from (1,2) to (2,3) in 1,2,3,4). But if we swapped the pair, we shift one pair backward and check them again. If it's impossible (we are already at the beginning), then shift forward to the pair next after tested one. The end is when no more pairs to test (tested - ok, forward - ops, we are at the end).
 </p>
@@ -68,37 +68,37 @@ Why we shift forward to 1 position, not to 1 pair? I.e. from (1,2) to (2,3) in 1
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">swap</span>(arr, i, j):
-    <span style="color: #ffffff;">tmp</span> = arr[i]
-    <span style="color: #ffffff;">arr</span>[i] = arr[j]
-    <span style="color: #ffffff;">arr</span>[j] = tmp
+<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">swap</span>(arr, i, j):
+    <span style="color: #005e8b;">tmp</span> = arr[i]
+    <span style="color: #005e8b;">arr</span>[i] = arr[j]
+    <span style="color: #005e8b;">arr</span>[j] = tmp
     
 
-<span style="color: #575757;"># </span><span style="color: #575757;">array    in focus       actions</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">-----------------------------------------------------------------------------------------</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">4 3 1 2   (4, 3)     not ok, swap, backward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">3 4 1 2   (3, 4)     ok, forward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">3 4 1 2   (4, 1)     not ok, swap, backward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">3 1 4 2   (3, 1)     not ok, swap, backward (not possible, forward to next/not tested pair)</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">1 3 4 2   (4, 2)     not ok, swap, backward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">1 3 2 4   (3, 2)     not ok, swap, backward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">1 2 3 4   (1, 2)     ok, forward</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">1 2 3 4   (3, 4)     ok. forward (not possible - end)</span>
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">gnome_sort</span>(arr):
-    <span style="color: #ffffff;">i</span> = 1
-    <span style="color: #696969;">while</span> i &lt; <span style="color: #a52a2a;">len</span>(arr):
-        <span style="color: #696969;">if</span> arr[i - 1] &gt; arr[i]:
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">array    in focus       actions</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">-----------------------------------------------------------------------------------------</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">4 3 1 2   (4, 3)     not ok, swap, backward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">3 4 1 2   (3, 4)     ok, forward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">3 4 1 2   (4, 1)     not ok, swap, backward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">3 1 4 2   (3, 1)     not ok, swap, backward (not possible, forward to next/not tested pair)</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">1 3 4 2   (4, 2)     not ok, swap, backward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">1 3 2 4   (3, 2)     not ok, swap, backward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">1 2 3 4   (1, 2)     ok, forward</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">1 2 3 4   (3, 4)     ok. forward (not possible - end)</span>
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">gnome_sort</span>(arr):
+    <span style="color: #005e8b;">i</span> = 1
+    <span style="color: #531ab6;">while</span> i &lt; <span style="color: #8f0075;">len</span>(arr):
+        <span style="color: #531ab6;">if</span> arr[i - 1] &gt; arr[i]:
             swap(arr, i - 1, i)
-            <span style="color: #696969;">if</span> i == 1:
-                <span style="color: #ffffff;">i</span> += 1
-            <span style="color: #696969;">else</span>:
-                <span style="color: #ffffff;">i</span> -= 1
-        <span style="color: #696969;">else</span>:
-            <span style="color: #ffffff;">i</span> += 1
+            <span style="color: #531ab6;">if</span> i == 1:
+                <span style="color: #005e8b;">i</span> += 1
+            <span style="color: #531ab6;">else</span>:
+                <span style="color: #005e8b;">i</span> -= 1
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #005e8b;">i</span> += 1
 
-<span style="color: #ffffff;">a</span> = [10, 2, 0, 8, 5, 7, 1, 2, 9, 6, 0, 60, 12, 34, 8, 6, 3, 1, 11]
+<span style="color: #005e8b;">a</span> = [10, 2, 0, 8, 5, 7, 1, 2, 9, 6, 0, 60, 12, 34, 8, 6, 3, 1, 11]
 gnome_sort(a)
-<span style="color: #a52a2a;">print</span>(a)
+<span style="color: #8f0075;">print</span>(a)
 </pre>
 </div>
 </div>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR: UART for debug messages</title>
@@ -35,73 +35,73 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR: UART for debug messages</h1>
-<div id="outline-container-org3c9a726" class="outline-2">
-<h2 id="org3c9a726">AVR: UART for debug messages</h2>
-<div class="outline-text-2" id="text-org3c9a726">
+<div id="outline-container-orge1913bd" class="outline-2">
+<h2 id="orge1913bd">AVR: UART for debug messages</h2>
+<div class="outline-text-2" id="text-orge1913bd">
 <p>
 If you need to print out a debug messages to UART port of AVR chip, you can use a simple way for it: switch stdout stream to UART. This is the code of the solution:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;avr/io.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;avr/io.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
 
-<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> NDEBUG
+<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> NDEBUG
 
-<span style="color: #a52a2a;">#  if</span> !<span style="color: #a52a2a;">defined</span>(F_DEBUG_UART) &amp;&amp; !<span style="color: #a52a2a;">defined</span>(F_CPU)
-<span style="color: #a52a2a;">#    error</span> <span style="color: #696969;">F_DEBUG_UART frequency or F_CPU frequency should be defined!</span>
-<span style="color: #a52a2a;">#  endif</span>
+<span style="color: #a0132f;">#  if</span> <span style="color: #a60000; font-weight: bold;">!</span><span style="color: #a0132f;">defined</span>(F_DEBUG_UART) &amp;&amp; <span style="color: #a60000; font-weight: bold;">!</span><span style="color: #a0132f;">defined</span>(F_CPU)
+<span style="color: #a0132f;">#    error</span> <span style="color: #3548cf;">F_DEBUG_UART frequency or F_CPU frequency should be defined!</span>
+<span style="color: #a0132f;">#  endif</span>
 
-<span style="color: #a52a2a;">#  if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> F_DEBUG_UART
-<span style="color: #a52a2a;">#    define</span> <span style="color: #ffffff;">F_DEBUG_UART</span> F_CPU
-<span style="color: #a52a2a;">#  endif</span>
+<span style="color: #a0132f;">#  if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> F_DEBUG_UART
+<span style="color: #a0132f;">#    define</span> <span style="color: #005e8b;">F_DEBUG_UART</span> F_CPU
+<span style="color: #a0132f;">#  endif</span>
 
-<span style="color: #a52a2a;">#  if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> DEBUG_NUART
-<span style="color: #a52a2a;">#    error</span> <span style="color: #696969;">DEBUG_NUART should be defined!</span>
-<span style="color: #a52a2a;">#  endif</span>
+<span style="color: #a0132f;">#  if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DEBUG_NUART
+<span style="color: #a0132f;">#    error</span> <span style="color: #3548cf;">DEBUG_NUART should be defined!</span>
+<span style="color: #a0132f;">#  endif</span>
 
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">__CONC3</span>(<span style="color: #ffffff;">X</span>, <span style="color: #ffffff;">Y</span>, <span style="color: #ffffff;">Z</span>) X ## Y ## Z
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">_CONC3</span>(<span style="color: #ffffff;">X</span>, <span style="color: #ffffff;">Y</span>, <span style="color: #ffffff;">Z</span>) __CONC3(X, Y, Z)
-<span style="color: #575757;">// </span><span style="color: #575757;">_CONC3(UDRE, DEBUG_NUART,) does not works</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UDRE</span> (_CONC3(UDR, E, DEBUG_NUART))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UDR</span> (_CONC3(UDR, DEBUG_NUART,))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UBRRH</span> (_CONC3(UBRR, DEBUG_NUART, H))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UBRRL</span> (_CONC3(UBRR, DEBUG_NUART, L))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRA</span> (_CONC3(UCSR, DEBUG_NUART, A))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRB</span> (_CONC3(UCSR, DEBUG_NUART, B))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSRC</span> (_CONC3(UCSR, DEBUG_NUART, C))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_RXEN</span> (_CONC3(RXEN, DEBUG_NUART,))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_TXEN</span> (_CONC3(TXEN, DEBUG_NUART,))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_UCSZ0</span> (_CONC3(UCSZ, DEBUG_NUART, 0))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ffffff;">_U2X</span> (_CONC3(U2X, DEBUG_NUART,))
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_SUPPORT</span>() \
-<span style="color: #696969;">static</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">debug_uart_putchar</span>(<span style="color: #ff4500;">char</span> c, FILE *stream); \
-<span style="color: #696969;">static</span> <span style="color: #ff4500;">FILE</span> <span style="color: #ffffff;">mystdout</span> = FDEV_SETUP_STREAM(debug_uart_putchar, <span style="color: #7fffd4;">NULL</span>, _FDEV_SETUP_WRITE); \
-<span style="color: #696969;">static</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">debug_uart_putchar</span>(<span style="color: #ff4500;">char</span> c, FILE *stream) \
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">__CONC3</span>(<span style="color: #005e8b;">X</span>, <span style="color: #005e8b;">Y</span>, <span style="color: #005e8b;">Z</span>) X ## Y ## Z
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">_CONC3</span>(<span style="color: #005e8b;">X</span>, <span style="color: #005e8b;">Y</span>, <span style="color: #005e8b;">Z</span>) __CONC3(X, Y, Z)
+<span style="color: #7f0000;">// </span><span style="color: #7f0000;">_CONC3(UDRE, DEBUG_NUART,) does not works</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UDRE</span> (_CONC3(UDR, E, DEBUG_NUART))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UDR</span> (_CONC3(UDR, DEBUG_NUART,))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UBRRH</span> (_CONC3(UBRR, DEBUG_NUART, H))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UBRRL</span> (_CONC3(UBRR, DEBUG_NUART, L))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UCSRA</span> (_CONC3(UCSR, DEBUG_NUART, A))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UCSRB</span> (_CONC3(UCSR, DEBUG_NUART, B))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UCSRC</span> (_CONC3(UCSR, DEBUG_NUART, C))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_RXEN</span> (_CONC3(RXEN, DEBUG_NUART,))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_TXEN</span> (_CONC3(TXEN, DEBUG_NUART,))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_UCSZ0</span> (_CONC3(UCSZ, DEBUG_NUART, 0))
+<span style="color: #a0132f;">#  define</span> <span style="color: #005e8b;">_U2X</span> (_CONC3(U2X, DEBUG_NUART,))
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">DEBUG_UART_SUPPORT</span>() \
+<span style="color: #531ab6;">static</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">debug_uart_putchar</span>(<span style="color: #005f5f;">char</span> c, FILE *stream); \
+<span style="color: #531ab6;">static</span> <span style="color: #005f5f;">FILE</span> <span style="color: #005e8b;">mystdout</span> = FDEV_SETUP_STREAM(debug_uart_putchar, <span style="color: #0000b0;">NULL</span>, _FDEV_SETUP_WRITE); \
+<span style="color: #531ab6;">static</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">debug_uart_putchar</span>(<span style="color: #005f5f;">char</span> c, FILE *stream) \
 { \
-        <span style="color: #696969;">while</span> (0 == (_UCSRA &amp; (1&lt;&lt;_UDRE))) ; \
+        <span style="color: #531ab6;">while</span> (0 == (_UCSRA &amp; (1&lt;&lt;_UDRE))) ; \
         _UDR = c; \
-        <span style="color: #696969;">return</span> (0); \
+        <span style="color: #531ab6;">return</span> (0); \
 }
 
-<span style="color: #575757;">/* </span><span style="color: #575757;">8 bits data, 1 stop bit, 9600 kbps, async</span><span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">INIT_DEBUG_UART</span>() <span style="color: #696969;">do</span> { \
+<span style="color: #7f0000;">/* </span><span style="color: #7f0000;">8 bits data, 1 stop bit, 9600 kbps, async</span><span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">INIT_DEBUG_UART</span>() <span style="color: #531ab6;">do</span> { \
         stdout = &amp;mystdout; \
         _UCSRC = 0x06; \
         _UCSRA = 0x00; \
-        _UCSRB = 0x18; <span style="color: #575757;">/* </span><span style="color: #575757;">receive, transmit, no interrupts</span><span style="color: #575757;"> */</span> \
-        <span style="color: #ff4500;">uint16_t</span> <span style="color: #ffffff;">ubrr</span> = (F_DEBUG_UART/16/9600-1); \
-        _UBRRL = (<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span>)ubrr; \
-        _UBRRH = (<span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">char</span>)(ubrr&gt;&gt;8); \
-} <span style="color: #696969;">while</span> (0)
+        _UCSRB = 0x18; <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">receive, transmit, no interrupts</span><span style="color: #7f0000;"> */</span> \
+        <span style="color: #005f5f;">uint16_t</span> <span style="color: #005e8b;">ubrr</span> = (F_DEBUG_UART/16/9600-1); \
+        _UBRRL = (<span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span>)ubrr; \
+        _UBRRH = (<span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span>)(ubrr&gt;&gt;8); \
+} <span style="color: #531ab6;">while</span> (0)
 
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_PRN</span>(...) printf(__VA_ARGS__)
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">DEBUG_UART_PRN</span>(...) printf(__VA_ARGS__)
 
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_SUPPORT</span>()
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">INIT_DEBUG_UART</span>()
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">DEBUG_UART_PRN</span>(...)
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">DEBUG_UART_SUPPORT</span>()
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">INIT_DEBUG_UART</span>()
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">DEBUG_UART_PRN</span>(...)
+<span style="color: #a0132f;">#endif</span>
 </pre>
 </div>
 
@@ -111,15 +111,15 @@ What you need to use it, it's only defining <code>F_DEBUG_UART</code> or <code>F
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">F_DEBUG_UART</span> 7372800
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">DEBUG_NUART</span> 0
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"debug_uart.h"</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">F_DEBUG_UART</span> 7372800
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DEBUG_NUART</span> 0
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"debug_uart.h"</span>
 DEBUG_UART_SUPPORT();
-<span style="color: #ff4500;">int</span>
-<span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+<span style="color: #005f5f;">int</span>
+<span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
 {
         INIT_DEBUG_UART();
-        DEBUG_UART_PRN(<span style="color: #696969;">"Hello world, %d\n"</span>, 99);
+        DEBUG_UART_PRN(<span style="color: #3548cf;">"Hello world, %d\n"</span>, 99);
         ... so on ...
 </pre>
 </div>

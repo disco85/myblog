@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Redirect file descriptors</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Redirect file descriptors</h1>
-<div id="outline-container-orge3d49bb" class="outline-2">
-<h2 id="orge3d49bb">Redirect file descriptors</h2>
-<div class="outline-text-2" id="text-orge3d49bb">
+<div id="outline-container-orgf43b828" class="outline-2">
+<h2 id="orgf43b828">Redirect file descriptors</h2>
+<div class="outline-text-2" id="text-orgf43b828">
 <p>
 This is a Python trick with supressing of console output. Actually implementation
 does not supresses anything, but maps (dups) "source" file descriptors to "destination"
@@ -56,38 +56,38 @@ you can "mask" its descriptors (redirect them somewhere).
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">import</span> os, sys
-<span style="color: #696969;">from</span> itertools <span style="color: #696969;">import</span> zip_longest
+<pre class="src src-python"><span style="color: #531ab6;">import</span> os, sys
+<span style="color: #531ab6;">from</span> itertools <span style="color: #531ab6;">import</span> zip_longest
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">FdRedir</span>:
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, srcfd, dstfd):
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">src</span> = srcfd
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">dst</span> = dstfd
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">null</span> = os.<span style="color: #a52a2a;">open</span>(os.devnull, os.O_RDWR)
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">dups</span> = [os.dup(f) <span style="color: #696969;">for</span> f <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.src]
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__enter__</span>(<span style="color: #696969;">self</span>):
-        <span style="color: #ffffff;">homo</span> = zip_longest(<span style="color: #696969;">self</span>.src, <span style="color: #696969;">self</span>.dst, fillvalue=<span style="color: #696969;">self</span>.null)
-        <span style="color: #696969;">for</span> t, f <span style="color: #696969;">in</span> homo:
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">FdRedir</span>:
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, srcfd, dstfd):
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">src</span> = srcfd
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">dst</span> = dstfd
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">null</span> = os.<span style="color: #8f0075;">open</span>(os.devnull, os.O_RDWR)
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">dups</span> = [os.dup(f) <span style="color: #531ab6;">for</span> f <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.src]
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__enter__</span>(<span style="color: #531ab6;">self</span>):
+        <span style="color: #005e8b;">homo</span> = zip_longest(<span style="color: #531ab6;">self</span>.src, <span style="color: #531ab6;">self</span>.dst, fillvalue=<span style="color: #531ab6;">self</span>.null)
+        <span style="color: #531ab6;">for</span> t, f <span style="color: #531ab6;">in</span> homo:
             os.dup2(f, t)
-        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__exit__</span>(<span style="color: #696969;">self</span>, xtyp, xval, xtb):
-        <span style="color: #ffffff;">iso</span> = <span style="color: #a52a2a;">zip</span>(<span style="color: #696969;">self</span>.dups, <span style="color: #696969;">self</span>.src)
-        <span style="color: #696969;">for</span> f, t <span style="color: #696969;">in</span> iso:
+        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__exit__</span>(<span style="color: #531ab6;">self</span>, xtyp, xval, xtb):
+        <span style="color: #005e8b;">iso</span> = <span style="color: #8f0075;">zip</span>(<span style="color: #531ab6;">self</span>.dups, <span style="color: #531ab6;">self</span>.src)
+        <span style="color: #531ab6;">for</span> f, t <span style="color: #531ab6;">in</span> iso:
             os.dup2(f, t)
-        <span style="color: #696969;">for</span> f <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.dups:
+        <span style="color: #531ab6;">for</span> f <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.dups:
             os.close(f)
-        os.close(<span style="color: #696969;">self</span>.null)
+        os.close(<span style="color: #531ab6;">self</span>.null)
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Example of usage</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Example of usage</span>
 
-<span style="color: #696969;">with</span> FdRedir((1, 2), ()) <span style="color: #696969;">as</span> fr:
-    <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'hidden'</span>)
-    <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'hidden'</span>, <span style="color: #a52a2a;">file</span>=sys.stderr)
-    <span style="color: #696969;">with</span> FdRedir([1], [fr.dups[0]]):
-        <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'visible tmp'</span>)
-        <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'hidden'</span>, <span style="color: #a52a2a;">file</span>=sys.stderr)
-    <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'hidden'</span>)
-<span style="color: #a52a2a;">print</span>(<span style="color: #696969;">'visible end'</span>)
+<span style="color: #531ab6;">with</span> FdRedir((1, 2), ()) <span style="color: #531ab6;">as</span> fr:
+    <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'hidden'</span>)
+    <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'hidden'</span>, <span style="color: #8f0075;">file</span>=sys.stderr)
+    <span style="color: #531ab6;">with</span> FdRedir([1], [fr.dups[0]]):
+        <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'visible tmp'</span>)
+        <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'hidden'</span>, <span style="color: #8f0075;">file</span>=sys.stderr)
+    <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'hidden'</span>)
+<span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'visible end'</span>)
 </pre>
 </div>
 

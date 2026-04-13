@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple backtracking implementation</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Simple backtracking implementation</h1>
-<div id="outline-container-org7283a8f" class="outline-2">
-<h2 id="org7283a8f">Simple backtracking implementation</h2>
-<div class="outline-text-2" id="text-org7283a8f">
+<div id="outline-container-org57f3445" class="outline-2">
+<h2 id="org57f3445">Simple backtracking implementation</h2>
+<div class="outline-text-2" id="text-org57f3445">
 <p>
 Classical task: you have numbers <code>1,5,6,7</code> and operations <code>(),+,-,*,/,^</code>. You have to build arithmetical expression which result will be <code>21</code> (without
 repeats!). For searching is solutions tree we'll use backtracking, for
@@ -49,50 +49,50 @@ more than 1 numbers on the stack!
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">from</span> functools <span style="color: #696969;">import</span> *
+<pre class="src src-python"><span style="color: #531ab6;">from</span> functools <span style="color: #531ab6;">import</span> *
 
-<span style="color: #575757;"># </span><span style="color: #575757;">split seq by element index, returns element and all other elements</span>
-<span style="color: #ffffff;">extract_e</span> = <span style="color: #696969;">lambda</span> seq, i: (seq[i], seq[:i] + seq[i+1:])
-<span style="color: #575757;"># </span><span style="color: #575757;">all indexes of sequence</span>
-<span style="color: #ffffff;">indexes</span> = <span style="color: #696969;">lambda</span> seq: <span style="color: #a52a2a;">range</span>(<span style="color: #a52a2a;">len</span>(seq))
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">split seq by element index, returns element and all other elements</span>
+<span style="color: #005e8b;">extract_e</span> = <span style="color: #531ab6;">lambda</span> seq, i: (seq[i], seq[:i] + seq[i+1:])
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">all indexes of sequence</span>
+<span style="color: #005e8b;">indexes</span> = <span style="color: #531ab6;">lambda</span> seq: <span style="color: #8f0075;">range</span>(<span style="color: #8f0075;">len</span>(seq))
 
-<span style="color: #575757;"># </span><span style="color: #575757;">backtracking</span>
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">bt</span>(cases, goal, found=[], level=0, path=[]):
-    <span style="color: #696969;">if</span> goal(path, level): found.append(path)
-    <span style="color: #696969;">for</span> i <span style="color: #696969;">in</span> indexes(cases):
-        <span style="color: #ffffff;">c</span>, <span style="color: #ffffff;">rest</span> = extract_e(cases, i)
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">backtracking</span>
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">bt</span>(cases, goal, found=[], level=0, path=[]):
+    <span style="color: #531ab6;">if</span> goal(path, level): found.append(path)
+    <span style="color: #531ab6;">for</span> i <span style="color: #531ab6;">in</span> indexes(cases):
+        <span style="color: #005e8b;">c</span>, <span style="color: #005e8b;">rest</span> = extract_e(cases, i)
         bt(rest, goal, found, level+1, path + [c])
-    <span style="color: #696969;">if</span> 0 == level: <span style="color: #696969;">return</span> found
+    <span style="color: #531ab6;">if</span> 0 == level: <span style="color: #531ab6;">return</span> found
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Solver - uses postfix arithm.</span>
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Solver</span>:
-    <span style="color: #ffffff;">VALUES</span>, <span style="color: #ffffff;">OPERATORS</span> = (1,5,6,7), (<span style="color: #696969;">'+'</span>, <span style="color: #696969;">'-'</span>, <span style="color: #696969;">'*'</span>, <span style="color: #696969;">'/'</span>, <span style="color: #696969;">'^'</span>)
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Solver - uses postfix arithm.</span>
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Solver</span>:
+    <span style="color: #005e8b;">VALUES</span>, <span style="color: #005e8b;">OPERATORS</span> = (1,5,6,7), (<span style="color: #3548cf;">'+'</span>, <span style="color: #3548cf;">'-'</span>, <span style="color: #3548cf;">'*'</span>, <span style="color: #3548cf;">'/'</span>, <span style="color: #3548cf;">'^'</span>)
 
-    @<span style="color: #a52a2a;">staticmethod</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">_binop</span>(stack, op_ch):
-        <span style="color: #ffffff;">ops</span> = { <span style="color: #696969;">"+"</span>: <span style="color: #696969;">lambda</span> a, b: b+a, <span style="color: #696969;">"-"</span>: <span style="color: #696969;">lambda</span> a, b: b-a,
-                <span style="color: #696969;">"*"</span>: <span style="color: #696969;">lambda</span> a, b: b*a, <span style="color: #696969;">"/"</span>: <span style="color: #696969;">lambda</span> a, b: b/a,
-                <span style="color: #696969;">"^"</span>: <span style="color: #696969;">lambda</span> a, b: b**a, }
+    @<span style="color: #8f0075;">staticmethod</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">_binop</span>(stack, op_ch):
+        <span style="color: #005e8b;">ops</span> = { <span style="color: #3548cf;">"+"</span>: <span style="color: #531ab6;">lambda</span> a, b: b+a, <span style="color: #3548cf;">"-"</span>: <span style="color: #531ab6;">lambda</span> a, b: b-a,
+                <span style="color: #3548cf;">"*"</span>: <span style="color: #531ab6;">lambda</span> a, b: b*a, <span style="color: #3548cf;">"/"</span>: <span style="color: #531ab6;">lambda</span> a, b: b/a,
+                <span style="color: #3548cf;">"^"</span>: <span style="color: #531ab6;">lambda</span> a, b: b**a, }
         stack.append(ops[op_ch](stack.pop(), stack.pop()))
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">eval</span>(<span style="color: #696969;">self</span>, state, default=<span style="color: #7fffd4;">None</span>):
-        <span style="color: #696969;">try</span>:
-            <span style="color: #ffffff;">stack</span> = []
-            <span style="color: #696969;">for</span> c <span style="color: #696969;">in</span> state:
-                <span style="color: #696969;">if</span> c <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.VALUES: stack.append(<span style="color: #a52a2a;">int</span>(c))
-                <span style="color: #696969;">else</span>: <span style="color: #696969;">self</span>._binop(stack, c)
-            <span style="color: #696969;">return</span> stack.pop()
-        <span style="color: #696969;">except</span>:
-            <span style="color: #696969;">return</span> default
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">eval</span>(<span style="color: #531ab6;">self</span>, state, default=<span style="color: #0000b0;">None</span>):
+        <span style="color: #531ab6;">try</span>:
+            <span style="color: #005e8b;">stack</span> = []
+            <span style="color: #531ab6;">for</span> c <span style="color: #531ab6;">in</span> state:
+                <span style="color: #531ab6;">if</span> c <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.VALUES: stack.append(<span style="color: #8f0075;">int</span>(c))
+                <span style="color: #531ab6;">else</span>: <span style="color: #531ab6;">self</span>._binop(stack, c)
+            <span style="color: #531ab6;">return</span> stack.pop()
+        <span style="color: #531ab6;">except</span>:
+            <span style="color: #531ab6;">return</span> default
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__call__</span>(<span style="color: #696969;">self</span>):
-        <span style="color: #696969;">def</span> <span style="color: #ff4500;">goal</span>(path, level):
-            <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(path) &gt; 2 <span style="color: #696969;">and</span> <span style="color: #a52a2a;">all</span>(e <span style="color: #696969;">in</span> <span style="color: #696969;">self</span>.VALUES <span style="color: #696969;">for</span> e <span style="color: #696969;">in</span> path[:2]):
-                <span style="color: #696969;">try</span>: <span style="color: #696969;">return</span> 21 == <span style="color: #a52a2a;">int</span>(<span style="color: #696969;">self</span>.<span style="color: #a52a2a;">eval</span>(path))
-                <span style="color: #696969;">except</span>: <span style="color: #696969;">return</span>
-        <span style="color: #696969;">return</span> bt(<span style="color: #696969;">self</span>.VALUES + <span style="color: #696969;">self</span>.OPERATORS, goal)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__call__</span>(<span style="color: #531ab6;">self</span>):
+        <span style="color: #531ab6;">def</span> <span style="color: #721045;">goal</span>(path, level):
+            <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(path) &gt; 2 <span style="color: #531ab6;">and</span> <span style="color: #8f0075;">all</span>(e <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.VALUES <span style="color: #531ab6;">for</span> e <span style="color: #531ab6;">in</span> path[:2]):
+                <span style="color: #531ab6;">try</span>: <span style="color: #531ab6;">return</span> 21 == <span style="color: #8f0075;">int</span>(<span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">eval</span>(path))
+                <span style="color: #531ab6;">except</span>: <span style="color: #531ab6;">return</span>
+        <span style="color: #531ab6;">return</span> bt(<span style="color: #531ab6;">self</span>.VALUES + <span style="color: #531ab6;">self</span>.OPERATORS, goal)
 
-<span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"Found:"</span>, Solver()())
+<span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"Found:"</span>, Solver()())
 </pre>
 </div>
 
@@ -101,13 +101,13 @@ The same BT-search may be used for sorting:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">predicate: is seq ordered?</span>
-<span style="color: #ffffff;">ordered</span> = <span style="color: #696969;">lambda</span> seq: <span style="color: #a52a2a;">reduce</span>(<span style="color: #696969;">lambda</span> i,e: (i[0] <span style="color: #696969;">and</span> e&gt;=i[1], e), seq, (1, seq[0]))[0]
-<span style="color: #ffffff;">seq</span> = [9,1,5,4]
-<span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"In:"</span>, seq)
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">completed</span>(path, level): <span style="color: #696969;">return</span> level==<span style="color: #a52a2a;">len</span>(seq) \
-    <span style="color: #696969;">and</span> ordered(path)
-<span style="color: #a52a2a;">print</span>(bt(seq, completed))
+<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">predicate: is seq ordered?</span>
+<span style="color: #005e8b;">ordered</span> = <span style="color: #531ab6;">lambda</span> seq: <span style="color: #8f0075;">reduce</span>(<span style="color: #531ab6;">lambda</span> i,e: (i[0] <span style="color: #531ab6;">and</span> e&gt;=i[1], e), seq, (1, seq[0]))[0]
+<span style="color: #005e8b;">seq</span> = [9,1,5,4]
+<span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"In:"</span>, seq)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">completed</span>(path, level): <span style="color: #531ab6;">return</span> level==<span style="color: #8f0075;">len</span>(seq) \
+    <span style="color: #531ab6;">and</span> ordered(path)
+<span style="color: #8f0075;">print</span>(bt(seq, completed))
 </pre>
 </div>
 </div>

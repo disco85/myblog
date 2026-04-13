@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Crossplatform software delays</title>
@@ -35,73 +35,73 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Crossplatform software delays</h1>
-<div id="outline-container-org935700b" class="outline-2">
-<h2 id="org935700b">Crossplatform software delays</h2>
-<div class="outline-text-2" id="text-org935700b">
+<div id="outline-container-orgcba2b1f" class="outline-2">
+<h2 id="orgcba2b1f">Crossplatform software delays</h2>
+<div class="outline-text-2" id="text-orgcba2b1f">
 <p>
 This is the simple macros for different delays useful on Unix and Windows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> _DELAYS_H
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">_DELAYS_H</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> _DELAYS_H
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">_DELAYS_H</span>
 
-<span style="color: #a52a2a;">#include</span> 
-<span style="color: #a52a2a;">#include</span> 
+<span style="color: #a0132f;">#include</span> 
+<span style="color: #a0132f;">#include</span> 
 
-<span style="color: #575757;">/* </span><span style="color: #575757;">Converting between seconds and CPU ticks (clock_t):</span>
-<span style="color: #575757;"> *      MS2TICKS() converts milliseconds to ticks</span>
-<span style="color: #575757;"> *      US2TICKS() converts microseconds to ticks</span>
-<span style="color: #575757;"> *      TICKS2MS() converts ticks to milliseconds</span>
-<span style="color: #575757;"> *      TICKS2US() converts ticks to microseconds</span>
-<span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">MS2TICKS</span>(<span style="color: #ffffff;">MS</span>) ((MS)*(CLOCKS_PER_SEC)/1000)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">US2TICKS</span>(<span style="color: #ffffff;">US</span>) ((US)*(CLOCKS_PER_SEC)/1000000)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">TICKS2MS</span>(<span style="color: #ffffff;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000))
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">TICKS2US</span>(<span style="color: #ffffff;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000000))
+<span style="color: #7f0000;">/* </span><span style="color: #7f0000;">Converting between seconds and CPU ticks (clock_t):</span>
+<span style="color: #7f0000;"> *      MS2TICKS() converts milliseconds to ticks</span>
+<span style="color: #7f0000;"> *      US2TICKS() converts microseconds to ticks</span>
+<span style="color: #7f0000;"> *      TICKS2MS() converts ticks to milliseconds</span>
+<span style="color: #7f0000;"> *      TICKS2US() converts ticks to microseconds</span>
+<span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">MS2TICKS</span>(<span style="color: #005e8b;">MS</span>) ((MS)*(CLOCKS_PER_SEC)/1000)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">US2TICKS</span>(<span style="color: #005e8b;">US</span>) ((US)*(CLOCKS_PER_SEC)/1000000)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">TICKS2MS</span>(<span style="color: #005e8b;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000))
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">TICKS2US</span>(<span style="color: #005e8b;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000000))
 
-<span style="color: #575757;">/*</span>
-<span style="color: #575757;"> * delay(MS)         sleeping on MS milliseconds</span>
-<span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#if</span> <span style="color: #a52a2a;">defined</span>(WIN32) || <span style="color: #a52a2a;">defined</span>(_WIN32) || <span style="color: #a52a2a;">defined</span>(__WIN32)
-<span style="color: #a52a2a;">#  include</span> 
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">delay</span>(<span style="color: #ffffff;">MS</span>) Sleep(MS)
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  if</span> <span style="color: #a52a2a;">defined</span>(HAVE_USLEEP)
-<span style="color: #a52a2a;">#    define</span> <span style="color: #ff4500;">delay</span>(<span style="color: #ffffff;">MS</span>) usleep((MS)*1000)
-<span style="color: #a52a2a;">#  elif</span> <span style="color: #a52a2a;">defined</span>(HAVE_SLEEP)
-<span style="color: #a52a2a;">#    include</span> 
-<span style="color: #a52a2a;">#    define</span> <span style="color: #ff4500;">delay</span>(<span style="color: #ffffff;">MS</span>) sleep((MS)/1000) <span style="color: #575757;">/* </span><span style="color: #575757;">granularity only ONE SECOND!</span><span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#  else</span>
-<span style="color: #a52a2a;">#    error</span> <span style="color: #696969;">Can not found any sleep_clocks() implementation ideas</span>
-<span style="color: #a52a2a;"># endif</span>
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #7f0000;">/*</span>
+<span style="color: #7f0000;"> * delay(MS)         sleeping on MS milliseconds</span>
+<span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#if</span> <span style="color: #a0132f;">defined</span>(WIN32) || <span style="color: #a0132f;">defined</span>(_WIN32) || <span style="color: #a0132f;">defined</span>(__WIN32)
+<span style="color: #a0132f;">#  include</span> 
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">delay</span>(<span style="color: #005e8b;">MS</span>) Sleep(MS)
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  if</span> <span style="color: #a0132f;">defined</span>(HAVE_USLEEP)
+<span style="color: #a0132f;">#    define</span> <span style="color: #721045;">delay</span>(<span style="color: #005e8b;">MS</span>) usleep((MS)*1000)
+<span style="color: #a0132f;">#  elif</span> <span style="color: #a0132f;">defined</span>(HAVE_SLEEP)
+<span style="color: #a0132f;">#    include</span> 
+<span style="color: #a0132f;">#    define</span> <span style="color: #721045;">delay</span>(<span style="color: #005e8b;">MS</span>) sleep((MS)/1000) <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">granularity only ONE SECOND!</span><span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#  else</span>
+<span style="color: #a0132f;">#    error</span> <span style="color: #3548cf;">Can not found any sleep_clocks() implementation ideas</span>
+<span style="color: #a0132f;"># endif</span>
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #575757;">/*</span>
-<span style="color: #575757;"> * pthread_delay(MS) sleeping thread on MS milliseconds</span>
-<span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#if</span> <span style="color: #a52a2a;">defined</span>(HAVE_PTHREAD_DELAY_NP)
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">pthread_delay</span>(<span style="color: #ffffff;">MS</span>) \
-     <span style="color: #696969;">do</span> { \
-             <span style="color: #696969;">struct</span> <span style="color: #ff4500;">timespec</span> <span style="color: #ffffff;">__timespec</span>={(MS)/1000,((MS)%1000)*1000000000}; \
+<span style="color: #7f0000;">/*</span>
+<span style="color: #7f0000;"> * pthread_delay(MS) sleeping thread on MS milliseconds</span>
+<span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#if</span> <span style="color: #a0132f;">defined</span>(HAVE_PTHREAD_DELAY_NP)
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">pthread_delay</span>(<span style="color: #005e8b;">MS</span>) \
+     <span style="color: #531ab6;">do</span> { \
+             <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">timespec</span> <span style="color: #005e8b;">__timespec</span>={(MS)/1000,((MS)%1000)*1000000000}; \
              pthread_delay_np(&amp;__timespec); \
      } \
-     <span style="color: #696969;">while</span>(0)
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">pthread_delay</span>(<span style="color: #ffffff;">MS</span>) delay(MS)
-<span style="color: #a52a2a;">#endif</span>
+     <span style="color: #531ab6;">while</span>(0)
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">pthread_delay</span>(<span style="color: #005e8b;">MS</span>) delay(MS)
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #575757;">/*</span>
-<span style="color: #575757;"> * unow(PNOW) store in var pointed by PNOW microseconds since Epoch</span>
-<span style="color: #575757;"> */</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">unow</span>(<span style="color: #ffffff;">PNOW</span>) \
+<span style="color: #7f0000;">/*</span>
+<span style="color: #7f0000;"> * unow(PNOW) store in var pointed by PNOW microseconds since Epoch</span>
+<span style="color: #7f0000;"> */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">unow</span>(<span style="color: #005e8b;">PNOW</span>) \
 { \
-        <span style="color: #696969;">struct</span> <span style="color: #ff4500;">timeval</span> <span style="color: #ffffff;">__tv</span>;  \
-        gettimeofday(&amp;__tv, <span style="color: #7fffd4;">NULL</span>); \
+        <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">timeval</span> <span style="color: #005e8b;">__tv</span>;  \
+        gettimeofday(&amp;__tv, <span style="color: #0000b0;">NULL</span>); \
         *(PNOW) = (__tv.tv_sec * 1000000) + __tv.tv_usec; \
 }
 
-<span style="color: #a52a2a;">#endif</span> <span style="color: #575757;">/*</span><span style="color: #575757;">!_DELAYS_H</span><span style="color: #575757;">*/</span>
+<span style="color: #a0132f;">#endif</span> <span style="color: #7f0000;">/*</span><span style="color: #7f0000;">!_DELAYS_H</span><span style="color: #7f0000;">*/</span>
 </pre>
 </div>
 

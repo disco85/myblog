@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl/Tk: all COM ports in Windows</title>
@@ -35,50 +35,50 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl/Tk: all COM ports in Windows</h1>
-<div id="outline-container-org2764669" class="outline-2">
-<h2 id="org2764669">Tcl/Tk: all COM ports in Windows</h2>
-<div class="outline-text-2" id="text-org2764669">
+<div id="outline-container-orge5e8c28" class="outline-2">
+<h2 id="orge5e8c28">Tcl/Tk: all COM ports in Windows</h2>
+<div class="outline-text-2" id="text-orge5e8c28">
 <p>
 If you need helper for user like combobox with available COM ports (serial devices, and they can be real COM ports or virtual like FTDI "bridges") in Tcl/Tk, use this procedures:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #575757;"># </span><span style="color: #575757;">list all ports as FTDIBUS and USB. Returns list of {PortName, FriendlyName, Auto?}</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">where Auto is flag - port for HMC6343 or not</span>
-<span style="color: #696969;">proc</span> <span style="color: #ff4500;">_ls_vports</span> {} {
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
-    <span style="color: #696969;">foreach</span> type {FTDIBUS USB} {
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">k0</span> <span style="color: #696969;">"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\$type"</span>
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">k0ch</span> [<span style="color: #a52a2a;">registry</span> keys <span style="color: #696969;">"$k0"</span> {V[iI][dD]_*}]
-        <span style="color: #696969;">foreach</span> k1 $<span style="color: #ffffff;">k0ch</span> {
-            <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">k1ch</span> [<span style="color: #a52a2a;">registry</span> keys <span style="color: #696969;">"$k0\\$k1"</span>]
-            <span style="color: #696969;">foreach</span> k2 $<span style="color: #ffffff;">k1ch</span> {
-                <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">Class</span> [<span style="color: #a52a2a;">registry</span> get <span style="color: #696969;">"$k0\\$k1\\$k2"</span> Class]
-                <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">Class</span> == <span style="color: #696969;">"Ports"</span>} {
-                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">FriendlyName</span> [<span style="color: #a52a2a;">registry</span> get <span style="color: #696969;">"$k0\\$k1\\$k2"</span> FriendlyName]
-                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">PortName</span> [<span style="color: #a52a2a;">registry</span> get <span style="color: #696969;">"$k0\\$k1\\$k2\\Device Parameters"</span> PortName]
-                    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">Auto</span> [<span style="color: #a52a2a;">expr</span> {<span style="color: #696969;">"silabser"</span> == [<span style="color: #a52a2a;">registry</span> get <span style="color: #696969;">"$k0\\$k1\\$k2"</span> <span style="color: #696969;">"Service"</span>]}]; <span style="color: #575757;">#auto-detected</span>
-                    <span style="color: #a52a2a;">lappend</span> res [<span style="color: #a52a2a;">list</span> $<span style="color: #ffffff;">PortName</span> $<span style="color: #ffffff;">FriendlyName</span> $<span style="color: #ffffff;">Auto</span>]
+<pre class="src src-tcl"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">list all ports as FTDIBUS and USB. Returns list of {PortName, FriendlyName, Auto?}</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">where Auto is flag - port for HMC6343 or not</span>
+<span style="color: #531ab6;">proc</span> <span style="color: #721045;">_ls_vports</span> {} {
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">res</span> {}
+    <span style="color: #531ab6;">foreach</span> type {FTDIBUS USB} {
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">k0</span> <span style="color: #3548cf;">"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\$type"</span>
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">k0ch</span> [<span style="color: #8f0075;">registry</span> keys <span style="color: #3548cf;">"$k0"</span> {V[iI][dD]_*}]
+        <span style="color: #531ab6;">foreach</span> k1 $<span style="color: #005e8b;">k0ch</span> {
+            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">k1ch</span> [<span style="color: #8f0075;">registry</span> keys <span style="color: #3548cf;">"$k0\\$k1"</span>]
+            <span style="color: #531ab6;">foreach</span> k2 $<span style="color: #005e8b;">k1ch</span> {
+                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">Class</span> [<span style="color: #8f0075;">registry</span> get <span style="color: #3548cf;">"$k0\\$k1\\$k2"</span> Class]
+                <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">Class</span> == <span style="color: #3548cf;">"Ports"</span>} {
+                    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">FriendlyName</span> [<span style="color: #8f0075;">registry</span> get <span style="color: #3548cf;">"$k0\\$k1\\$k2"</span> FriendlyName]
+                    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">PortName</span> [<span style="color: #8f0075;">registry</span> get <span style="color: #3548cf;">"$k0\\$k1\\$k2\\Device Parameters"</span> PortName]
+                    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">Auto</span> [<span style="color: #8f0075;">expr</span> {<span style="color: #3548cf;">"silabser"</span> == [<span style="color: #8f0075;">registry</span> get <span style="color: #3548cf;">"$k0\\$k1\\$k2"</span> <span style="color: #3548cf;">"Service"</span>]}]; <span style="color: #7f0000;">#auto-detected</span>
+                    <span style="color: #8f0075;">lappend</span> res [<span style="color: #8f0075;">list</span> $<span style="color: #005e8b;">PortName</span> $<span style="color: #005e8b;">FriendlyName</span> $<span style="color: #005e8b;">Auto</span>]
                 }
             }
         }
     }
-    <span style="color: #696969;">return</span> $<span style="color: #ffffff;">res</span>
+    <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">res</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Returns list of {PortName, "Com Port", 0} -</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">auto-detect is impossible in this mode, no friendly name also</span>
-<span style="color: #696969;">proc</span> <span style="color: #ff4500;">_ls_all</span> {} {
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">serial_base</span> <span style="color: #696969;">"HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"</span>
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">values</span> [<span style="color: #a52a2a;">registry</span> values $<span style="color: #ffffff;">serial_base</span>]
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">res</span> {}
-    <span style="color: #696969;">foreach</span> valueName $<span style="color: #ffffff;">values</span> {
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">PortName</span> [<span style="color: #a52a2a;">registry</span> get $<span style="color: #ffffff;">serial_base</span> $<span style="color: #ffffff;">valueName</span>]
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">FriendlyName</span> <span style="color: #696969;">"COM Port"</span>
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">Auto</span> 0
-        <span style="color: #a52a2a;">lappend</span> res [<span style="color: #a52a2a;">list</span> $<span style="color: #ffffff;">PortName</span> $<span style="color: #ffffff;">FriendlyName</span> $<span style="color: #ffffff;">Auto</span>]
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Returns list of {PortName, "Com Port", 0} -</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">auto-detect is impossible in this mode, no friendly name also</span>
+<span style="color: #531ab6;">proc</span> <span style="color: #721045;">_ls_all</span> {} {
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">serial_base</span> <span style="color: #3548cf;">"HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"</span>
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">values</span> [<span style="color: #8f0075;">registry</span> values $<span style="color: #005e8b;">serial_base</span>]
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">res</span> {}
+    <span style="color: #531ab6;">foreach</span> valueName $<span style="color: #005e8b;">values</span> {
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">PortName</span> [<span style="color: #8f0075;">registry</span> get $<span style="color: #005e8b;">serial_base</span> $<span style="color: #005e8b;">valueName</span>]
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">FriendlyName</span> <span style="color: #3548cf;">"COM Port"</span>
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">Auto</span> 0
+        <span style="color: #8f0075;">lappend</span> res [<span style="color: #8f0075;">list</span> $<span style="color: #005e8b;">PortName</span> $<span style="color: #005e8b;">FriendlyName</span> $<span style="color: #005e8b;">Auto</span>]
     }
-    <span style="color: #696969;">return</span> $<span style="color: #ffffff;">res</span>
+    <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">res</span>
 }
 </pre>
 </div>

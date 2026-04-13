@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Bakefile: Makefile's generator</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Bakefile: Makefile's generator</h1>
-<div id="outline-container-org50d23bc" class="outline-2">
-<h2 id="org50d23bc">Bakefile: Makefile's generator</h2>
-<div class="outline-text-2" id="text-org50d23bc">
+<div id="outline-container-org3180ccd" class="outline-2">
+<h2 id="org3180ccd">Bakefile: Makefile's generator</h2>
+<div class="outline-text-2" id="text-org3180ccd">
 <p>
 It's known problem - general way of making the project. There are many tools for this task: CMake, automake/autoconf, ant (usual for Java) and many-many other. But some of them use own build system and very few uses standard way of Makefile (i.e. generates Makefiles). This method is based on some input format which is translated to Makefile for target compiler. For example, automake/autoconf, Premake (with Lua scripting) and Bakefile (written in Python and is crossplatform, like Premake and many other). It's authors are Vaclav Slavik, Francesco Montorsi.
 </p>
@@ -76,15 +76,15 @@ It's input file looks like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-xml">&lt;<span style="color: #ff4500;">exe</span> <span style="color: #ffffff;">id</span>=<span style="color: #696969;">"test_sockets"</span>&gt;
-        &lt;<span style="color: #ff4500;">cflags</span>&gt;-fpack-struct&lt;/<span style="color: #ff4500;">cflags</span>&gt;
-        &lt;<span style="color: #ff4500;">sources</span>&gt;test_sockets.c&lt;/<span style="color: #ff4500;">sources</span>&gt;
-        &lt;<span style="color: #ff4500;">sources</span>&gt;socks.c&lt;/<span style="color: #ff4500;">sources</span>&gt;
-        &lt;<span style="color: #ff4500;">sys-lib</span>&gt;pthread&lt;/<span style="color: #ff4500;">sys-lib</span>&gt;
-        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='win32'"</span>&gt;
-            &lt;<span style="color: #ff4500;">sys-lib</span>&gt;wsock32&lt;/<span style="color: #ff4500;">sys-lib</span>&gt;
-        &lt;/<span style="color: #ff4500;">if</span>&gt;
-&lt;/<span style="color: #ff4500;">exe</span>&gt;
+<pre class="src src-xml"><span style="color: #595959;">&lt;</span><span style="color: #721045;">exe</span> <span style="color: #005e8b;">id</span>=<span style="color: #3548cf;">"test_sockets"</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">cflags</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">-fpack-struct</span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">cflags</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">sources</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">test_sockets.c</span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">sources</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">sources</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">socks.c</span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">sources</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">sys-lib</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">pthread</span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">sys-lib</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">if</span> <span style="color: #005e8b;">cond</span>=<span style="color: #3548cf;">"TOOLSET=='win32'"</span><span style="color: #595959;">&gt;</span>
+            <span style="color: #595959;">&lt;</span><span style="color: #721045;">sys-lib</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">wsock32</span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">sys-lib</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">if</span><span style="color: #595959;">&gt;</span>
+<span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">exe</span><span style="color: #595959;">&gt;</span>
 </pre>
 </div>
 
@@ -97,23 +97,23 @@ Another example of custom tag:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-xml">&lt;<span style="color: #ff4500;">include</span> <span style="color: #ffffff;">file</span>=<span style="color: #696969;">"presets/simple.bkl"</span>&gt;
-    &lt;<span style="color: #ff4500;">define-tag</span> <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"lit"</span> <span style="color: #ffffff;">rules</span>=<span style="color: #696969;">"action"</span>&gt;
-        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='unix'"</span>&gt;
-            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;pyweb.py -s $(attributes['web']).w
-            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;rst2html.py $(attributes['web']).rst $(attributes['web']).html
-        &lt;/<span style="color: #ff4500;">if</span>&gt;
-        &lt;<span style="color: #ff4500;">if</span> <span style="color: #ffffff;">cond</span>=<span style="color: #696969;">"TOOLSET=='win32'"</span>&gt;
-            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;cmd /C pyweb.py -s $(attributes['web']).w
-            &lt;<span style="color: #ff4500;">command</span>&gt;&lt;/<span style="color: #ff4500;">command</span>&gt;cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html
-        &lt;/<span style="color: #ff4500;">if</span>&gt;
-    &lt;/<span style="color: #ff4500;">define-tag</span>&gt;
+<pre class="src src-xml"><span style="color: #595959;">&lt;</span><span style="color: #721045;">include</span> <span style="color: #005e8b;">file</span>=<span style="color: #3548cf;">"presets/simple.bkl"</span><span style="color: #595959;">&gt;</span>
+    <span style="color: #595959;">&lt;</span><span style="color: #721045;">define-tag</span> <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"lit"</span> <span style="color: #005e8b;">rules</span>=<span style="color: #3548cf;">"action"</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">if</span> <span style="color: #005e8b;">cond</span>=<span style="color: #3548cf;">"TOOLSET=='unix'"</span><span style="color: #595959;">&gt;</span>
+            <span style="color: #595959;">&lt;</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">pyweb.py -s $(attributes['web']).w</span>
+<span style="color: #000000; background-color: #fbf7f0;">            </span><span style="color: #595959;">&lt;</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">rst2html.py $(attributes['web']).rst $(attributes['web']).html</span>
+<span style="color: #000000; background-color: #fbf7f0;">        </span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">if</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">if</span> <span style="color: #005e8b;">cond</span>=<span style="color: #3548cf;">"TOOLSET=='win32'"</span><span style="color: #595959;">&gt;</span>
+            <span style="color: #595959;">&lt;</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">cmd /C pyweb.py -s $(attributes['web']).w</span>
+<span style="color: #000000; background-color: #fbf7f0;">            </span><span style="color: #595959;">&lt;</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">command</span><span style="color: #595959;">&gt;</span><span style="color: #000000; background-color: #fbf7f0;">cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html</span>
+<span style="color: #000000; background-color: #fbf7f0;">        </span><span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">if</span><span style="color: #595959;">&gt;</span>
+    <span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">define-tag</span><span style="color: #595959;">&gt;</span>
 
-    &lt;<span style="color: #ff4500;">action</span> <span style="color: #ffffff;">id</span>=<span style="color: #696969;">"lit"</span>&gt;
-        &lt;<span style="color: #ff4500;">lit</span> <span style="color: #ffffff;">web</span>=<span style="color: #696969;">"maintest"</span>&gt;
-        &lt;<span style="color: #ff4500;">lit</span> <span style="color: #ffffff;">web</span>=<span style="color: #696969;">"socks"</span>&gt;
-    &lt;/<span style="color: #ff4500;">lit</span>&gt;&lt;/<span style="color: #ff4500;">lit</span>&gt;&lt;/<span style="color: #ff4500;">action</span>&gt;
-&lt;/<span style="color: #ff4500;">include</span>&gt;
+    <span style="color: #595959;">&lt;</span><span style="color: #721045;">action</span> <span style="color: #005e8b;">id</span>=<span style="color: #3548cf;">"lit"</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">lit</span> <span style="color: #005e8b;">web</span>=<span style="color: #3548cf;">"maintest"</span><span style="color: #595959;">&gt;</span>
+        <span style="color: #595959;">&lt;</span><span style="color: #721045;">lit</span> <span style="color: #005e8b;">web</span>=<span style="color: #3548cf;">"socks"</span><span style="color: #595959;">&gt;</span>
+    <span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">lit</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">lit</span><span style="color: #595959;">&gt;&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">action</span><span style="color: #595959;">&gt;</span>
+<span style="color: #595959;">&lt;</span><span style="color: #595959;">/</span><span style="color: #721045;">include</span><span style="color: #595959;">&gt;</span>
 </pre>
 </div>
 

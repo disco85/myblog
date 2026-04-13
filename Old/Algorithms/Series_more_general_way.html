@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Series: more general way</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Series: more general way</h1>
-<div id="outline-container-orgdaac80a" class="outline-2">
-<h2 id="orgdaac80a">Series: more general way</h2>
-<div class="outline-text-2" id="text-orgdaac80a">
+<div id="outline-container-orgf82865c" class="outline-2">
+<h2 id="orgf82865c">Series: more general way</h2>
+<div class="outline-text-2" id="text-orgf82865c">
 <p>
 Here is the generic algorithm of determining of the series from sequence by
 some feature <code>SeriesFeature</code>. Examples show usage of splitting series in
@@ -45,58 +45,58 @@ camelCase strings (in the same case).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">from</span> abc <span style="color: #696969;">import</span> ABCMeta, abstractmethod
-<span style="color: #696969;">from</span> itertools <span style="color: #696969;">import</span> groupby, imap
+<pre class="src src-python"><span style="color: #531ab6;">from</span> abc <span style="color: #531ab6;">import</span> ABCMeta, abstractmethod
+<span style="color: #531ab6;">from</span> itertools <span style="color: #531ab6;">import</span> groupby, imap
 
-<span style="color: #575757;"># </span><span style="color: #575757;">a,b,c -&gt; ((None, a), (a, b), (b, c)) (ie (prev, cur) pairs)</span>
-<span style="color: #575757;">#</span><span style="color: #575757;">preiter = lambda it: izip(chain([None], it), it)</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">a,b,c -&gt; ((None, a), (a, b), (b, c)) (ie (prev, cur) pairs)</span>
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">preiter = lambda it: izip(chain([None], it), it)</span>
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">SeriesFeature</span>(<span style="color: #a52a2a;">object</span>):
-    <span style="color: #ffffff;">__metaclass__</span> = ABCMeta
-    <span style="color: #a52a2a;">id</span> = <span style="color: #7fffd4;">None</span> <span style="color: #575757;"># </span><span style="color: #575757;">series id</span>
-    <span style="color: #ffffff;">i</span> = 0 <span style="color: #575757;"># </span><span style="color: #575757;">element index</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, serid):
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i</span> = -1
-        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">id</span> = serid
-    <span style="color: #ff4500;">@abstractmethod</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__series__</span>(<span style="color: #696969;">self</span>, el, serid):
-        <span style="color: #696969;">"""Check element `el` and return new/old series id. `serid`</span>
-<span style="color: #696969;">        is current series id`</span>
-<span style="color: #696969;">        """</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__call__</span>(<span style="color: #696969;">self</span>, el):
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i</span> += 1
-        <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">id</span> = <span style="color: #696969;">self</span>.__series__(el, <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">id</span>)
-        <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">id</span>
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">SeriesFeature</span>(<span style="color: #8f0075;">object</span>):
+    <span style="color: #005e8b;">__metaclass__</span> = ABCMeta
+    <span style="color: #8f0075;">id</span> = <span style="color: #0000b0;">None</span> <span style="color: #7f0000;"># </span><span style="color: #7f0000;">series id</span>
+    <span style="color: #005e8b;">i</span> = 0 <span style="color: #7f0000;"># </span><span style="color: #7f0000;">element index</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, serid):
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">i</span> = -1
+        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">id</span> = serid
+    <span style="color: #005f5f;">@abstractmethod</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__series__</span>(<span style="color: #531ab6;">self</span>, el, serid):
+        <span style="color: #2a5045;">"""Check element `el` and return new/old series id. `serid`</span>
+<span style="color: #2a5045;">        is current series id`</span>
+<span style="color: #2a5045;">        """</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__call__</span>(<span style="color: #531ab6;">self</span>, el):
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">i</span> += 1
+        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">id</span> = <span style="color: #531ab6;">self</span>.__series__(el, <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">id</span>)
+        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">id</span>
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">CapitalizedSeries</span>(SeriesFeature):
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>):
-        <span style="color: #a52a2a;">super</span>(CapitalizedSeries, <span style="color: #696969;">self</span>).__init__(0)
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__series__</span>(<span style="color: #696969;">self</span>, el, serid):
-        <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.i == 0 <span style="color: #696969;">and</span> el.isupper():
-            <span style="color: #696969;">return</span> serid
-        <span style="color: #696969;">elif</span> el.islower():
-            <span style="color: #696969;">return</span> serid
-        <span style="color: #696969;">else</span>:
-            <span style="color: #696969;">return</span> (serid + 1)%2
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">CapitalizedSeries</span>(SeriesFeature):
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>):
+        <span style="color: #8f0075;">super</span>(CapitalizedSeries, <span style="color: #531ab6;">self</span>).__init__(0)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__series__</span>(<span style="color: #531ab6;">self</span>, el, serid):
+        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.i == 0 <span style="color: #531ab6;">and</span> el.isupper():
+            <span style="color: #531ab6;">return</span> serid
+        <span style="color: #531ab6;">elif</span> el.islower():
+            <span style="color: #531ab6;">return</span> serid
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #531ab6;">return</span> (serid + 1)%2
 
-<span style="color: #ffffff;">CamelCaseSeries</span> = CapitalizedSeries
+<span style="color: #005e8b;">CamelCaseSeries</span> = CapitalizedSeries
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">iseries</span>(flt, it):
-    <span style="color: #ffffff;">series</span> = (el[1] <span style="color: #696969;">for</span> el <span style="color: #696969;">in</span> groupby(it, flt()))
-    <span style="color: #696969;">if</span> <span style="color: #a52a2a;">isinstance</span>(it, <span style="color: #a52a2a;">str</span>):
-        <span style="color: #696969;">return</span> imap(<span style="color: #696969;">''</span>.join, series)
-    <span style="color: #696969;">else</span>:
-        <span style="color: #696969;">return</span> series
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">iseries</span>(flt, it):
+    <span style="color: #005e8b;">series</span> = (el[1] <span style="color: #531ab6;">for</span> el <span style="color: #531ab6;">in</span> groupby(it, flt()))
+    <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">isinstance</span>(it, <span style="color: #8f0075;">str</span>):
+        <span style="color: #531ab6;">return</span> imap(<span style="color: #3548cf;">''</span>.join, series)
+    <span style="color: #531ab6;">else</span>:
+        <span style="color: #531ab6;">return</span> series
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">camelcaseto</span>(s, func):
-    <span style="color: #696969;">"""Transform each CamelCase-string part with `func(ser)`"""</span>
-    <span style="color: #696969;">return</span> imap(func, iseries(CamelCaseSeries, s))
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">camelcaseto</span>(s, func):
+    <span style="color: #2a5045;">"""Transform each CamelCase-string part with `func(ser)`"""</span>
+    <span style="color: #531ab6;">return</span> imap(func, iseries(CamelCaseSeries, s))
 
-<span style="color: #575757;">########################## </span><span style="color: #575757;">test ##############################################</span>
-<span style="color: #a52a2a;">print</span> <span style="color: #a52a2a;">list</span>(iseries(CapitalizedSeries, <span style="color: #696969;">'AaaaBbbCcAaa'</span>))
-<span style="color: #a52a2a;">print</span> <span style="color: #a52a2a;">list</span>(iseries(CapitalizedSeries, <span style="color: #696969;">'abcDefGhi'</span>))
+<span style="color: #7f0000;">########################## </span><span style="color: #7f0000;">test ##############################################</span>
+<span style="color: #8f0075;">print</span> <span style="color: #8f0075;">list</span>(iseries(CapitalizedSeries, <span style="color: #3548cf;">'AaaaBbbCcAaa'</span>))
+<span style="color: #8f0075;">print</span> <span style="color: #8f0075;">list</span>(iseries(CapitalizedSeries, <span style="color: #3548cf;">'abcDefGhi'</span>))
 
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">' '</span>.join(camelcaseto(<span style="color: #696969;">"noSuchUserError"</span>, <span style="color: #a52a2a;">str</span>.lower)).capitalize()
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">' '</span>.join(camelcaseto(<span style="color: #3548cf;">"noSuchUserError"</span>, <span style="color: #8f0075;">str</span>.lower)).capitalize()
 
 </pre>
 </div>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Portable effective C bit fields</title>
@@ -35,33 +35,33 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Portable effective C bit fields</h1>
-<div id="outline-container-org6061c95" class="outline-2">
-<h2 id="org6061c95">Portable effective C bit fields</h2>
-<div class="outline-text-2" id="text-org6061c95">
+<div id="outline-container-orgf900eeb" class="outline-2">
+<h2 id="orgf900eeb">Portable effective C bit fields</h2>
+<div class="outline-text-2" id="text-orgf900eeb">
 <p>
 As you know bit's fields in C are not portable when we're talking about external world (network/different architecture/file transmission): order of the fields is unspecified, also as real wrapper struct&#x2026;
 Often bitwise operations are used instead of bitfield struct syntax but result code may be less readable opposite to original idea: bitfields. But there is simple solution to workaround weird syntax. Here you are:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">__BITSTRUCT_MASK</span>(<span style="color: #ffffff;">LEN</span>) ((1&lt;&lt;(LEN))-1)
+<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #721045;">__BITSTRUCT_MASK</span>(<span style="color: #005e8b;">LEN</span>) ((1&lt;&lt;(LEN))-1)
 
-<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> BITSTRUCT_GETBITS_IMPL
-<span style="color: #a52a2a;"># define</span> <span style="color: #ff4500;">BITSTRUCT_GETBITS_IMPL</span>(<span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>) \
+<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> BITSTRUCT_GETBITS_IMPL
+<span style="color: #a0132f;"># define</span> <span style="color: #721045;">BITSTRUCT_GETBITS_IMPL</span>(<span style="color: #005e8b;">BS</span>, <span style="color: #005e8b;">OFFSET</span>, <span style="color: #005e8b;">LEN</span>) \
     (((BS)&gt;&gt;(OFFSET)) &amp; __BITSTRUCT_MASK(LEN))
-<span style="color: #a52a2a;">#endif</span>
-<span style="color: #a52a2a;">#if</span><span style="color: #a52a2a;">n</span><span style="color: #a52a2a;">def</span> BITSTRUCT_SETBITS_IMPL
-<span style="color: #a52a2a;"># define</span> <span style="color: #ff4500;">BITSTRUCT_SETBITS_IMPL</span>(<span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>, <span style="color: #ffffff;">VALUE</span>) \
+<span style="color: #a0132f;">#endif</span>
+<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> BITSTRUCT_SETBITS_IMPL
+<span style="color: #a0132f;"># define</span> <span style="color: #721045;">BITSTRUCT_SETBITS_IMPL</span>(<span style="color: #005e8b;">BS</span>, <span style="color: #005e8b;">OFFSET</span>, <span style="color: #005e8b;">LEN</span>, <span style="color: #005e8b;">VALUE</span>) \
     ((BS) &amp; ~(__BITSTRUCT_MASK(LEN)&lt;&lt;(OFFSET)) | \
      (((VALUE) &amp; __BITSTRUCT_MASK(LEN))&lt;&lt;(OFFSET)))
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">BITSTRUCT</span> <span style="color: #696969;">enum</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">OFFSET</span>, <span style="color: #ffffff;">LEN</span>) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_MASK</span>(<span style="color: #ffffff;">NAME</span>) __BITSTRUCT_MASK(NAME##_LEN)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_GET</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">BS</span>) \
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">BITSTRUCT</span> <span style="color: #531ab6;">enum</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">BITFIELD</span>(<span style="color: #005e8b;">NAME</span>, <span style="color: #005e8b;">OFFSET</span>, <span style="color: #005e8b;">LEN</span>) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">BITFIELD_MASK</span>(<span style="color: #005e8b;">NAME</span>) __BITSTRUCT_MASK(NAME##_LEN)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">BITFIELD_GET</span>(<span style="color: #005e8b;">NAME</span>, <span style="color: #005e8b;">BS</span>) \
   BITSTRUCT_GETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">BITFIELD_SET</span>(<span style="color: #ffffff;">NAME</span>, <span style="color: #ffffff;">BS</span>, <span style="color: #ffffff;">VALUE</span>) \
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">BITFIELD_SET</span>(<span style="color: #005e8b;">NAME</span>, <span style="color: #005e8b;">BS</span>, <span style="color: #005e8b;">VALUE</span>) \
   BITSTRUCT_SETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN, VALUE)
 </pre>
 </div>
@@ -77,20 +77,20 @@ So now it's possible to write something like this to describe register X:
 </div>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #ff4500;">BITSTRUCT</span> <span style="color: #ffffff;">RegisterX</span> {
-        <span style="color: #575757;">// </span><span style="color: #575757;">BITFIELD(NAME, OFFSET, LENGTH)</span>
+<pre class="src src-cpp"><span style="color: #005f5f;">BITSTRUCT</span> <span style="color: #005e8b;">RegisterX</span> {
+        <span style="color: #7f0000;">// </span><span style="color: #7f0000;">BITFIELD(NAME, OFFSET, LENGTH)</span>
         BITFIELD(RX_COUNT, 0, 4),
         BITFIELD(RX_FLAG, 4, 4),
         BITFIELD(RX_ENABLE, 8, 8)
 };
 
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
 {
-        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">x</span> = 0x1234; <span style="color: #575757;">// </span><span style="color: #575757;">raw value of register</span>
-        <span style="color: #575757;">// </span><span style="color: #575757;">example of get/set field of bits' struct</span>
+        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">x</span> = 0x1234; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">raw value of register</span>
+        <span style="color: #7f0000;">// </span><span style="color: #7f0000;">example of get/set field of bits' struct</span>
         x = BITFIELD_SET(RX_ENABLE, x, 0x98);
-        printf(<span style="color: #696969;">"%0X"</span>, BITFIELD_GET(RX_ENABLE, x));
-        <span style="color: #696969;">return</span> (0);
+        printf(<span style="color: #3548cf;">"%0X"</span>, BITFIELD_GET(RX_ENABLE, x));
+        <span style="color: #531ab6;">return</span> (0);
 }
 </pre>
 </div>

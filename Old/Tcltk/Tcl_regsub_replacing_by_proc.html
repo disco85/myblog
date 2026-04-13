@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl: regsub replacing by proc</title>
@@ -35,36 +35,36 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl: regsub replacing by proc</h1>
-<div id="outline-container-org21fd8b2" class="outline-2">
-<h2 id="org21fd8b2">Tcl: regsub replacing by proc</h2>
-<div class="outline-text-2" id="text-org21fd8b2">
+<div id="outline-container-org3a21574" class="outline-2">
+<h2 id="org3a21574">Tcl: regsub replacing by proc</h2>
+<div class="outline-text-2" id="text-org3a21574">
 <p>
 This is the procedure like <code>regsub</code> but replacement is happens with procedure - not text:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #696969;">proc</span> <span style="color: #ff4500;">regsub2</span> {re inStr by {varName <span style="color: #696969;">""</span>}} {
-<span style="color: #575757;"># </span><span style="color: #575757;">Simple version of regsub but support substitution by proc:</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">regsub2 $re $str $by, where $by can be {proc \1 \2...}</span>
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">result</span> $<span style="color: #ffffff;">inStr</span>
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">byCallStr</span> [<span style="color: #a52a2a;">regsub</span> -all {\\(\d+)} $<span style="color: #ffffff;">by</span> {$<span style="color: #ffffff;">m</span>\1}]
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">matchedVarsCount</span> [<span style="color: #a52a2a;">lindex</span> [<span style="color: #a52a2a;">regexp</span> -about $<span style="color: #ffffff;">re</span>] 0]
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">matchedVarNames</span> {all}
-    <span style="color: #696969;">for</span> {<span style="color: #a52a2a;">set</span> i 1} {$<span style="color: #ffffff;">i</span> &lt;= $<span style="color: #ffffff;">matchedVarsCount</span>} {<span style="color: #a52a2a;">incr</span> i} {
-        <span style="color: #a52a2a;">lappend</span> matchedVarNames <span style="color: #696969;">"m$i"</span>
+<pre class="src src-tcl"><span style="color: #531ab6;">proc</span> <span style="color: #721045;">regsub2</span> {re inStr by {varName <span style="color: #3548cf;">""</span>}} {
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Simple version of regsub but support substitution by proc:</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">regsub2 $re $str $by, where $by can be {proc \1 \2...}</span>
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">result</span> $<span style="color: #005e8b;">inStr</span>
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">byCallStr</span> [<span style="color: #8f0075;">regsub</span> -all {\\(\d+)} $<span style="color: #005e8b;">by</span> {$<span style="color: #005e8b;">m</span>\1}]
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">matchedVarsCount</span> [<span style="color: #8f0075;">lindex</span> [<span style="color: #8f0075;">regexp</span> -about $<span style="color: #005e8b;">re</span>] 0]
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">matchedVarNames</span> {all}
+    <span style="color: #531ab6;">for</span> {<span style="color: #8f0075;">set</span> i 1} {$<span style="color: #005e8b;">i</span> &lt;= $<span style="color: #005e8b;">matchedVarsCount</span>} {<span style="color: #8f0075;">incr</span> i} {
+        <span style="color: #8f0075;">lappend</span> matchedVarNames <span style="color: #3548cf;">"m$i"</span>
     }
-    <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">nsubs</span> 0
-    <span style="color: #696969;">foreach</span> $<span style="color: #ffffff;">matchedVarNames</span> [<span style="color: #a52a2a;">regexp</span> -all -inline $<span style="color: #ffffff;">re</span> $<span style="color: #ffffff;">result</span>] {
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">byRes</span> [<span style="color: #696969;">eval</span> $<span style="color: #ffffff;">byCallStr</span>]
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">result</span> [<span style="color: #a52a2a;">regsub</span> $<span style="color: #ffffff;">re</span> $<span style="color: #ffffff;">result</span> $<span style="color: #ffffff;">byRes</span>]
-        <span style="color: #a52a2a;">incr</span> nsubs
+    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">nsubs</span> 0
+    <span style="color: #531ab6;">foreach</span> $<span style="color: #005e8b;">matchedVarNames</span> [<span style="color: #8f0075;">regexp</span> -all -inline $<span style="color: #005e8b;">re</span> $<span style="color: #005e8b;">result</span>] {
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">byRes</span> [<span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">byCallStr</span>]
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">result</span> [<span style="color: #8f0075;">regsub</span> $<span style="color: #005e8b;">re</span> $<span style="color: #005e8b;">result</span> $<span style="color: #005e8b;">byRes</span>]
+        <span style="color: #8f0075;">incr</span> nsubs
     }
-    <span style="color: #696969;">if</span> {$<span style="color: #ffffff;">varName</span> eq <span style="color: #696969;">""</span>} {
-        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">result</span>
-    } <span style="color: #696969;">else</span> {
-        <span style="color: #ff4500;">upvar</span> 1 $<span style="color: #ffffff;">varName</span> varName_
-        <span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">varName_</span> $<span style="color: #ffffff;">result</span>
-        <span style="color: #696969;">return</span> $<span style="color: #ffffff;">nsubs</span>
+    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">varName</span> eq <span style="color: #3548cf;">""</span>} {
+        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">result</span>
+    } <span style="color: #531ab6;">else</span> {
+        <span style="color: #005f5f;">upvar</span> 1 $<span style="color: #005e8b;">varName</span> varName_
+        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">varName_</span> $<span style="color: #005e8b;">result</span>
+        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">nsubs</span>
     }
 }
 </pre>

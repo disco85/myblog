@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gravity compensation for accelerometer</title>
@@ -35,15 +35,15 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Gravity compensation for accelerometer</h1>
-<div id="outline-container-org828658a" class="outline-2">
-<h2 id="org828658a">Gravity compensation for accelerometer</h2>
-<div class="outline-text-2" id="text-org828658a">
+<div id="outline-container-org85390a1" class="outline-2">
+<h2 id="org85390a1">Gravity compensation for accelerometer</h2>
+<div class="outline-text-2" id="text-org85390a1">
 <p>
 This solution is only for normal mount of sensor package, see figure:
 </p>
 
 
-<div id="orgbecbdcf" class="figure">
+<div id="org9b9fe72" class="figure">
 <p><img src="../../assets/Gravity1.svg" alt="Gravity1.svg" class="org-svg" />
 </p>
 </div>
@@ -61,7 +61,7 @@ The figure shows normal mount of the sensor and it's axis. First let's remove gr
 </p>
 
 
-<div id="org5ae9d1b" class="figure">
+<div id="orge464b65" class="figure">
 <p><img src="../../assets/Gravity2.svg" alt="Gravity2.svg" class="org-svg" />
 </p>
 </div>
@@ -75,7 +75,7 @@ So, <code>gx = g / cos (90° - p) = g / sin p</code>. Let's define gravity compo
 </p>
 
 
-<div id="orgeddbd21" class="figure">
+<div id="org6a52a5a" class="figure">
 <p><img src="../../assets/Gravity3.svg" alt="Gravity3.svg" class="org-svg" />
 </p>
 </div>
@@ -117,15 +117,15 @@ Here is the example in C:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">DEG2RAD</span>(<span style="color: #ffffff;">D</span>) ((D)*0.01745329251994329576)
+<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #721045;">DEG2RAD</span>(<span style="color: #005e8b;">D</span>) ((D)*0.01745329251994329576)
 
-<span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">accv_t</span> {
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">v</span>[3]; <span style="color: #575757;">// </span><span style="color: #575757;">values of 3 axis of accelerometer</span>
-} <span style="color: #ff4500;">accv_t</span>;
+<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">accv_t</span> {
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">v</span>[3]; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">values of 3 axis of accelerometer</span>
+} <span style="color: #005f5f;">accv_t</span>;
 
-<span style="color: #ff4500;">accv_t</span> <span style="color: #ff4500;">corr_gravity</span>(<span style="color: #ff4500;">double</span> <span style="color: #ffffff;">ax</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">ay</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">az</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">pitch</span>, <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">roll</span>) {
-    <span style="color: #575757;">/* </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #575757;">: for normal mount!!! Other not implemented</span><span style="color: #575757;"> */</span>
-    <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">gx</span>, <span style="color: #ffffff;">gy</span>, <span style="color: #ffffff;">gz</span>, <span style="color: #ffffff;">tmp</span>;
+<span style="color: #005f5f;">accv_t</span> <span style="color: #721045;">corr_gravity</span>(<span style="color: #005f5f;">double</span> <span style="color: #005e8b;">ax</span>, <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">ay</span>, <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">az</span>, <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">pitch</span>, <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">roll</span>) {
+    <span style="color: #7f0000;">/* </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #7f0000;">: for normal mount!!! Other not implemented</span><span style="color: #7f0000;"> */</span>
+    <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">gx</span>, <span style="color: #005e8b;">gy</span>, <span style="color: #005e8b;">gz</span>, <span style="color: #005e8b;">tmp</span>;
 
     gx = sin(DEG2RAD(pitch));
     gy = sin(DEG2RAD(roll));
@@ -134,13 +134,13 @@ Here is the example in C:
 
     ax += gx;
     ay += gy;
-    <span style="color: #696969;">if</span> (fabs(pitch) &gt; 90.0 || fabs(roll) &gt; 90.0) {
+    <span style="color: #531ab6;">if</span> (fabs(pitch) &gt; 90.0 || fabs(roll) &gt; 90.0) {
         az -= gz;
     }
-    <span style="color: #696969;">else</span> {
+    <span style="color: #531ab6;">else</span> {
         az += gz;
     }
-    <span style="color: #696969;">return</span> ((accv_t){ .v = {ax, ay, az}});
+    <span style="color: #531ab6;">return</span> ((accv_t){ .v = {ax, ay, az}});
 
 }
 </pre>

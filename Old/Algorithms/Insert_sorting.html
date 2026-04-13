@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Insert sorting</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Insert sorting</h1>
-<div id="outline-container-org95fff07" class="outline-2">
-<h2 id="org95fff07">Insert sorting</h2>
-<div class="outline-text-2" id="text-org95fff07">
+<div id="outline-container-orgd3d380b" class="outline-2">
+<h2 id="orgd3d380b">Insert sorting</h2>
+<div class="outline-text-2" id="text-orgd3d380b">
 <p>
 We take 2nd item and compare it with the next. If it less than next, then
 insert it in appropriate position. Then we are taking 3d item and it's
@@ -48,42 +48,42 @@ position.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"algutils.h"</span>
 
-<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span> <span style="color: #ff4500;">T</span>&gt;
-<span style="color: #ff4500;">void</span> <span style="color: #ff4500;">inssort_insert</span>(<span style="color: #ff4500;">T</span> *<span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">T</span> <span style="color: #ffffff;">item</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">pielen</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">pos</span>)
+<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span> <span style="color: #005f5f;">T</span>&gt;
+<span style="color: #005f5f;">void</span> <span style="color: #721045;">inssort_insert</span>(<span style="color: #005f5f;">T</span> *<span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">T</span> <span style="color: #005e8b;">item</span>, <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">pielen</span>, <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">pos</span>)
 {
-    <span style="color: #696969;">for</span> (<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>=pielen-1; i&gt;pos; i--)
+    <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=pielen-1; i&gt;pos; i--)
         arr[i] = arr[i-1];
     arr[pos] = item;
 }
 
-<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span> <span style="color: #ff4500;">T</span>&gt;
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">inssort</span>(<span style="color: #ff4500;">T</span> *<span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">len</span>)
+<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span> <span style="color: #005f5f;">T</span>&gt;
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">inssort</span>(<span style="color: #005f5f;">T</span> *<span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">len</span>)
 {
-    <span style="color: #696969;">if</span> (!arr||!len) <span style="color: #696969;">return</span> (0);
-    <span style="color: #696969;">for</span> (<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">pie</span>=1; pie&lt;len; pie++) {
-        <span style="color: #696969;">for</span> (<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>=0; i&lt;=pie-1; i++) {
-            <span style="color: #696969;">if</span> (arr[pie] &lt; arr[i]) {
+    <span style="color: #531ab6;">if</span> (<span style="color: #a60000; font-weight: bold;">!</span>arr||<span style="color: #a60000; font-weight: bold;">!</span>len) <span style="color: #531ab6;">return</span> (0);
+    <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">pie</span>=1; pie&lt;len; pie++) {
+        <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=0; i&lt;=pie-1; i++) {
+            <span style="color: #531ab6;">if</span> (arr[pie] &lt; arr[i]) {
                 inssort_insert(arr, arr[pie], pie+1, i);
-                <span style="color: #696969;">break</span>;
+                <span style="color: #531ab6;">break</span>;
             }
         }
     }
-    <span style="color: #696969;">return</span> (1);
+    <span style="color: #531ab6;">return</span> (1);
 }
 
-<span style="color: #575757;">/*****************************************</span>
-<span style="color: #575757;">                   main</span>
-<span style="color: #575757;"> ***************************************</span><span style="color: #575757;">*/</span>
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+<span style="color: #7f0000;">/*****************************************</span>
+<span style="color: #7f0000;">                   main</span>
+<span style="color: #7f0000;"> ***************************************</span><span style="color: #7f0000;">*/</span>
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
 {
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">arr</span>[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
-    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">arr</span>[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
+    PRINTARR(arr, <span style="color: #3548cf;">"%d"</span>);
     inssort(arr, sizeofarray(arr));
-    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
-    <span style="color: #696969;">return</span> (0);
+    PRINTARR(arr, <span style="color: #3548cf;">"%d"</span>);
+    <span style="color: #531ab6;">return</span> (0);
 }
 </pre>
 </div>

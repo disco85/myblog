@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple logging in C (1)</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Simple logging in C (1)</h1>
-<div id="outline-container-org2ef8357" class="outline-2">
-<h2 id="org2ef8357">Simple logging in C (1)</h2>
-<div class="outline-text-2" id="text-org2ef8357">
+<div id="outline-container-org3fcb170" class="outline-2">
+<h2 id="org3fcb170">Simple logging in C (1)</h2>
+<div class="outline-text-2" id="text-org3fcb170">
 <p>
 This snippet shows way to turning-on/-off different levels of log/debug messaging in C program:
 </p>
@@ -47,30 +47,30 @@ For example, lets create log messages support with 3 levels and possibility to s
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">PRN</span>(...) printf(__VA_ARGS__)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L1</span> 1
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L2</span> 2
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">L3</span> 4
+<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRN</span>(...) printf(__VA_ARGS__)
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">L1</span> 1
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">L2</span> 2
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">L3</span> 4
 
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">PRN_L</span>(<span style="color: #ffffff;">L</span>, ...) PRN_##L(__VA_ARGS__)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRN_L</span>(<span style="color: #005e8b;">L</span>, ...) PRN_##L(__VA_ARGS__)
 
-<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L3)
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L3</span>(...) PRN(__VA_ARGS__)
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L3</span>(...)
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a0132f;">#if</span> (LEVEL) &amp; (L3)
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L3</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L3</span>(...)
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L2)
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L2</span>(...) PRN(__VA_ARGS__)
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L2</span>(...)
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a0132f;">#if</span> (LEVEL) &amp; (L2)
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L2</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L2</span>(...)
+<span style="color: #a0132f;">#endif</span>
 
-<span style="color: #a52a2a;">#if</span> (LEVEL) &amp; (L1)
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L1</span>(...) PRN(__VA_ARGS__)
-<span style="color: #a52a2a;">#else</span>
-<span style="color: #a52a2a;">#  define</span> <span style="color: #ff4500;">PRN_L1</span>(...)
-<span style="color: #a52a2a;">#endif</span>
+<span style="color: #a0132f;">#if</span> (LEVEL) &amp; (L1)
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L1</span>(...) PRN(__VA_ARGS__)
+<span style="color: #a0132f;">#else</span>
+<span style="color: #a0132f;">#  define</span> <span style="color: #721045;">PRN_L1</span>(...)
+<span style="color: #a0132f;">#endif</span>
 </pre>
 </div>
 
@@ -79,15 +79,15 @@ And somewhere in our program use it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #575757;">// </span><span style="color: #575757;">enable only messages of levels 1 and 3 (equals to 1|4==5)</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">LEVEL</span> (L1|L3)
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"logger.h"</span>
+<pre class="src src-cpp"><span style="color: #7f0000;">// </span><span style="color: #7f0000;">enable only messages of levels 1 and 3 (equals to 1|4==5)</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">LEVEL</span> (L1|L3)
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"logger.h"</span>
 
-<span style="color: #ff4500;">void</span> <span style="color: #ff4500;">main</span>() {
-    <span style="color: #575757;">// </span><span style="color: #575757;">use general macro or PRN_L1(), PRN_L2(), PRN_L3()</span>
-    PRN_L(L1, <span style="color: #696969;">"There %d\n"</span>, 1);
-    PRN_L(L2, <span style="color: #696969;">"There %d\n"</span>, 2); <span style="color: #575757;">// </span><span style="color: #575757;">no effect!</span>
-    PRN_L(L3, <span style="color: #696969;">"There %d\n"</span>, 3);
+<span style="color: #005f5f;">void</span> <span style="color: #721045;">main</span>() {
+    <span style="color: #7f0000;">// </span><span style="color: #7f0000;">use general macro or PRN_L1(), PRN_L2(), PRN_L3()</span>
+    PRN_L(L1, <span style="color: #3548cf;">"There %d\n"</span>, 1);
+    PRN_L(L2, <span style="color: #3548cf;">"There %d\n"</span>, 2); <span style="color: #7f0000;">// </span><span style="color: #7f0000;">no effect!</span>
+    PRN_L(L3, <span style="color: #3548cf;">"There %d\n"</span>, 3);
 }
 </pre>
 </div>

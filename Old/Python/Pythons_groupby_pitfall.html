@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python's groupby pitfall</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Python's groupby pitfall</h1>
-<div id="outline-container-org33145a1" class="outline-2">
-<h2 id="org33145a1">Python's groupby pitfall</h2>
-<div class="outline-text-2" id="text-org33145a1">
+<div id="outline-container-org8361000" class="outline-2">
+<h2 id="org8361000">Python's groupby pitfall</h2>
+<div class="outline-text-2" id="text-org8361000">
 <p>
 Python function <code>groupby</code> has one feature which can be cause of unexpected
 pitfall:
@@ -55,16 +55,16 @@ Example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">from</span> itertools <span style="color: #696969;">import</span> *
+<pre class="src src-python"><span style="color: #531ab6;">from</span> itertools <span style="color: #531ab6;">import</span> *
 
-<span style="color: #a52a2a;">input</span> = ((1, <span style="color: #696969;">"one"</span>), (1, <span style="color: #696969;">"one too"</span>), (1, <span style="color: #696969;">"also one"</span>),
-         (2, <span style="color: #696969;">"two"</span>), (2, <span style="color: #696969;">"another two"</span>), (2, <span style="color: #696969;">"two again"</span>)
+<span style="color: #8f0075;">input</span> = ((1, <span style="color: #3548cf;">"one"</span>), (1, <span style="color: #3548cf;">"one too"</span>), (1, <span style="color: #3548cf;">"also one"</span>),
+         (2, <span style="color: #3548cf;">"two"</span>), (2, <span style="color: #3548cf;">"another two"</span>), (2, <span style="color: #3548cf;">"two again"</span>)
 )
 
-<span style="color: #ffffff;">grp</span> = groupby(<span style="color: #a52a2a;">input</span>, <span style="color: #696969;">lambda</span> p: p[0])
-<span style="color: #575757;"># </span><span style="color: #575757;">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
-<span style="color: #ffffff;">maxg</span>, <span style="color: #ffffff;">maxi</span> = <span style="color: #a52a2a;">max</span>(grp, key=<span style="color: #696969;">lambda</span> g: g[0])
-<span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"maxg ="</span>, maxg, <span style="color: #696969;">"maxi ="</span>, <span style="color: #a52a2a;">list</span>(maxi))
+<span style="color: #005e8b;">grp</span> = groupby(<span style="color: #8f0075;">input</span>, <span style="color: #531ab6;">lambda</span> p: p[0])
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
+<span style="color: #005e8b;">maxg</span>, <span style="color: #005e8b;">maxi</span> = <span style="color: #8f0075;">max</span>(grp, key=<span style="color: #531ab6;">lambda</span> g: g[0])
+<span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"maxg ="</span>, maxg, <span style="color: #3548cf;">"maxi ="</span>, <span style="color: #8f0075;">list</span>(maxi))
 </pre>
 </div>
 
@@ -73,7 +73,7 @@ Output without (A) is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #696969;">'two again'</span>)]
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #3548cf;">'two again'</span>)]
 </pre>
 </div>
 
@@ -87,7 +87,7 @@ But with (A) is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #696969;">'two'</span>), (2, <span style="color: #696969;">'another two'</span>), (2, <span style="color: #696969;">'two again'</span>)]
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #3548cf;">'two'</span>), (2, <span style="color: #3548cf;">'another two'</span>), (2, <span style="color: #3548cf;">'two again'</span>)]
 </pre>
 </div>
 

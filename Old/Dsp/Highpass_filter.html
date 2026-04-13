@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>High-pass filter</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">High-pass filter</h1>
-<div id="outline-container-org1fbf778" class="outline-2">
-<h2 id="org1fbf778">High-pass filter</h2>
-<div class="outline-text-2" id="text-org1fbf778">
+<div id="outline-container-orgcc661d5" class="outline-2">
+<h2 id="orgcc661d5">High-pass filter</h2>
+<div class="outline-text-2" id="text-orgcc661d5">
 <p>
 Simple high-pass filter in form of IIR of 1st order. See more info <a href="http://en.wikipedia.org/wiki/High-pass_filter">here</a>.
 In my application HMC demo I poll sensor (accelerometer) and filter Ax signal:
@@ -103,20 +103,20 @@ Here is the C code (for SWIG) of this kind of filter:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #ff4500;">double</span>* <span style="color: #ff4500;">filter</span>(<span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">v</span>) {
-        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>;
-        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">vlen</span>;
+<pre class="src src-cpp"><span style="color: #005f5f;">double</span>* <span style="color: #721045;">filter</span>(<span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">v</span>) {
+        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>;
+        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">vlen</span>;
 
-        vlen = (<span style="color: #ff4500;">int</span>)v[0];
-        <span style="color: #696969;">if</span> (vlen != $self-&gt;n) {
-            <span style="color: #696969;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        vlen = (<span style="color: #005f5f;">int</span>)v[0];
+        <span style="color: #531ab6;">if</span> (vlen != $self-&gt;n) {
+            <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">NULL</span>);
         }
 
-        <span style="color: #696969;">for</span> (i=1; i &lt;= vlen; i++) {
+        <span style="color: #531ab6;">for</span> (i=1; i &lt;= vlen; i++) {
             $self-&gt;v[i] = $self-&gt;a * ($self-&gt;v[i] + v[i] - $self-&gt;x[i]);
             $self-&gt;x[i] = v[i];
         }
-        <span style="color: #696969;">return</span> ($self-&gt;v);
+        <span style="color: #531ab6;">return</span> ($self-&gt;v);
 }
 </pre>
 </div>
@@ -126,12 +126,12 @@ $self is the pointer to CHPFilter struct:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">CHPFilter</span> {
-        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">n</span>; <span style="color: #575757;">// </span><span style="color: #575757;">length of v</span>
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">a</span>; <span style="color: #575757;">// </span><span style="color: #575757;">alpha</span>
-        <span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">v</span>; <span style="color: #575757;">// </span><span style="color: #575757;">calculated values (keep prev. before filter)</span>
-        <span style="color: #ff4500;">double</span> *<span style="color: #ffffff;">x</span>; <span style="color: #575757;">// </span><span style="color: #575757;">prev. input</span>
-} <span style="color: #ff4500;">CHPFilter</span>;
+<pre class="src src-cpp"><span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">CHPFilter</span> {
+        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">n</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">length of v</span>
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">a</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">alpha</span>
+        <span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">v</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">calculated values (keep prev. before filter)</span>
+        <span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">x</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">prev. input</span>
+} <span style="color: #005f5f;">CHPFilter</span>;
 </pre>
 </div>
 </div>

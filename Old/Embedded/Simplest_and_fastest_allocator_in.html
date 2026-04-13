@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simplest (and fastest) allocator in C</title>
@@ -35,62 +35,62 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Simplest (and fastest) allocator in C</h1>
-<div id="outline-container-org48a3861" class="outline-2">
-<h2 id="org48a3861">Simplest (and fastest) allocator in C</h2>
-<div class="outline-text-2" id="text-org48a3861">
+<div id="outline-container-orge49480f" class="outline-2">
+<h2 id="orge49480f">Simplest (and fastest) allocator in C</h2>
+<div class="outline-text-2" id="text-orge49480f">
 <p>
 I need to allocate strings (in UI) with the same length in my MCU program, so I can use: 1) static local buffer in functions or use 2) common buffer. 1) cons: implicit memory "eating" 2) cons: funcs are not reenterable. I use next simple (simplest!) and fast allocator - it allocate strings with the same length. It has only to necessary functions in it's API: allocate and free. Here is the code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdint.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"bset.h"</span>
-<span style="color: #696969;">/** string count */</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GUI_TMPSTR_N</span> 3
-<span style="color: #696969;">/** max string length */</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ffffff;">GUI_TMPSTR_MAXLEN</span> 64
-<span style="color: #575757;">/// </span><span style="color: #575757;">block of temporary strings with the same length</span>
-<span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">gui_tmpstr_buf_t</span> {
-        <span style="color: #ff4500;">bset_t</span> <span style="color: #ffffff;">pool</span>;
-        <span style="color: #ff4500;">char</span> <span style="color: #ffffff;">buf</span>[GUI_TMPSTR_N][GUI_TMPSTR_MAXLEN];
-} <span style="color: #ff4500;">gui_tmpstr_buf_t</span>;
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdint.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"bset.h"</span>
+<span style="color: #2a5045;">/** string count */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">GUI_TMPSTR_N</span> 3
+<span style="color: #2a5045;">/** max string length */</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">GUI_TMPSTR_MAXLEN</span> 64
+<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">block of temporary strings with the same length</span>
+<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">gui_tmpstr_buf_t</span> {
+        <span style="color: #005f5f;">bset_t</span> <span style="color: #005e8b;">pool</span>;
+        <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">buf</span>[GUI_TMPSTR_N][GUI_TMPSTR_MAXLEN];
+} <span style="color: #005f5f;">gui_tmpstr_buf_t</span>;
 
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">GUI_TMPSTR_BUF_INITIALIZER</span>() { \
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">GUI_TMPSTR_BUF_INITIALIZER</span>() { \
         .pool = BSET_INITIALIZER(), \
         .buf = {0} \
 }
 
-<span style="color: #575757;">// </span><span style="color: #575757;">global blocks for allocation</span>
-<span style="color: #ff4500;">gui_tmpstr_buf_t</span> <span style="color: #ffffff;">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
+<span style="color: #7f0000;">// </span><span style="color: #7f0000;">global blocks for allocation</span>
+<span style="color: #005f5f;">gui_tmpstr_buf_t</span> <span style="color: #005e8b;">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
 
-<span style="color: #575757;">/// </span><span style="color: #575757;">allocate temporary string</span>
-<span style="color: #ff4500;">char</span>*
-<span style="color: #ff4500;">gui_tmpstr_alloc</span>(<span style="color: #ff4500;">void</span>) {
-        <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>;
+<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">allocate temporary string</span>
+<span style="color: #005f5f;">char</span>*
+<span style="color: #721045;">gui_tmpstr_alloc</span>(<span style="color: #005f5f;">void</span>) {
+        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>;
         BSET_FORCLR(i, &amp;_tmpstrbuf.pool) {
-                <span style="color: #696969;">if</span> (i &gt;= GUI_TMPSTR_N)
-                        <span style="color: #696969;">break</span>;
+                <span style="color: #531ab6;">if</span> (i &gt;= GUI_TMPSTR_N)
+                        <span style="color: #531ab6;">break</span>;
                 BSET_SET(i, &amp;_tmpstrbuf.pool);
-                <span style="color: #696969;">return</span> (_tmpstrbuf.buf[i]);
+                <span style="color: #531ab6;">return</span> (_tmpstrbuf.buf[i]);
         }
-        <span style="color: #696969;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">NULL</span>);
 }
 
-<span style="color: #575757;">/// </span><span style="color: #575757;">free allocated tmp. string</span>
-<span style="color: #ff4500;">void</span>
-<span style="color: #ff4500;">gui_tmpstr_free</span>(<span style="color: #ff4500;">char</span>* <span style="color: #ffffff;">ptr</span>) {
-        <span style="color: #ff4500;">intptr_t</span> <span style="color: #ffffff;">i</span> = ((<span style="color: #ff4500;">intptr_t</span>)ptr - (<span style="color: #ff4500;">intptr_t</span>)_tmpstrbuf.buf);
-        <span style="color: #696969;">if</span> (i &lt;= 0) {
-                <span style="color: #575757;">// </span><span style="color: #575757;">ptr is BEFORE base addr (buf)</span>
-                <span style="color: #696969;">return</span>;
+<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">free allocated tmp. string</span>
+<span style="color: #005f5f;">void</span>
+<span style="color: #721045;">gui_tmpstr_free</span>(<span style="color: #005f5f;">char</span>* <span style="color: #005e8b;">ptr</span>) {
+        <span style="color: #005f5f;">intptr_t</span> <span style="color: #005e8b;">i</span> = ((<span style="color: #005f5f;">intptr_t</span>)ptr - (<span style="color: #005f5f;">intptr_t</span>)_tmpstrbuf.buf);
+        <span style="color: #531ab6;">if</span> (i &lt;= 0) {
+                <span style="color: #7f0000;">// </span><span style="color: #7f0000;">ptr is BEFORE base addr (buf)</span>
+                <span style="color: #531ab6;">return</span>;
         }
-        <span style="color: #696969;">if</span> (i % GUI_TMPSTR_MAXLEN) {
-                <span style="color: #575757;">// </span><span style="color: #575757;">ptr is not align on GUI_TMPSTR_MAXLEN</span>
-                <span style="color: #696969;">return</span>;
+        <span style="color: #531ab6;">if</span> (i % GUI_TMPSTR_MAXLEN) {
+                <span style="color: #7f0000;">// </span><span style="color: #7f0000;">ptr is not align on GUI_TMPSTR_MAXLEN</span>
+                <span style="color: #531ab6;">return</span>;
         }
         i /= GUI_TMPSTR_MAXLEN;
-        <span style="color: #696969;">if</span> (BSET_ISSET(i, &amp;_tmpstrbuf.pool)) {
-                <span style="color: #575757;">// </span><span style="color: #575757;">free in pool</span>
+        <span style="color: #531ab6;">if</span> (BSET_ISSET(i, &amp;_tmpstrbuf.pool)) {
+                <span style="color: #7f0000;">// </span><span style="color: #7f0000;">free in pool</span>
                 BSET_CLR(i, &amp;_tmpstrbuf.pool);
         }
 }
@@ -114,11 +114,11 @@ Little example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #ff4500;">char</span>* <span style="color: #ffffff;">ptr</span> = gui_tmpstr_alloc();
-<span style="color: #696969;">if</span> (ptr) {
-  <span style="color: #575757;">// </span><span style="color: #575757;">USAGE of ptr</span>
+<pre class="src src-cpp"><span style="color: #005f5f;">char</span>* <span style="color: #005e8b;">ptr</span> = gui_tmpstr_alloc();
+<span style="color: #531ab6;">if</span> (ptr) {
+  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">USAGE of ptr</span>
   ...
-  <span style="color: #575757;">// </span><span style="color: #575757;">free:</span>
+  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">free:</span>
   gui_tmpstr_free(ptr);
 }
 </pre>

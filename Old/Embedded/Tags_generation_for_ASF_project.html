@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tags generation for ASF project</title>
@@ -67,43 +67,43 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Tags generation for ASF project</h1>
-<div id="outline-container-orgeab0a78" class="outline-2">
-<h2 id="orgeab0a78">Tags generation for ASF project</h2>
-<div class="outline-text-2" id="text-orgeab0a78">
+<div id="outline-container-org8808fbb" class="outline-2">
+<h2 id="org8808fbb">Tags generation for ASF project</h2>
+<div class="outline-text-2" id="text-org8808fbb">
 <p>
 If you use Atmel Software Framework you can generate tags (with ctags|GNU Global) for your Vim/Emacs environment in such way (in Makefile):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #ffffff;">ctags</span> = c:/Program Files/ctags.exe
-<span style="color: #ffffff;">gtags</span> = c:/global/bin/gtags.exe
-<span style="color: #ffffff;">sed</span> = c:/MinGW/msys/1.0/bin/sed.exe
-<span style="color: #ffffff;">find</span> = c:/MinGW/msys/1.0/bin/find.exe
+<pre class="src src-makefile"><span style="color: #005e8b;">ctags</span> = c:/Program Files/ctags.exe
+<span style="color: #005e8b;">gtags</span> = c:/global/bin/gtags.exe
+<span style="color: #005e8b;">sed</span> = c:/MinGW/msys/1.0/bin/sed.exe
+<span style="color: #005e8b;">find</span> = c:/MinGW/msys/1.0/bin/find.exe
 
-<span style="color: #ffffff;">GTAGS_FILES</span> = GTAGS GPATH GRTAGS
-<span style="color: #575757;"># </span><span style="color: #575757;">Global can not parse out of c:/prj/PRJ1/src</span>
-<span style="color: #ffffff;">TAGS_DIRS</span> = <span style="color: #696969;">'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include'</span> \
+<span style="color: #005e8b;">GTAGS_FILES</span> = GTAGS GPATH GRTAGS
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Global can not parse out of c:/prj/PRJ1/src</span>
+<span style="color: #005e8b;">TAGS_DIRS</span> = <span style="color: #3548cf;">'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include'</span> \
    c:/prj/PRJ1/src/asf-3.0.1 \
    c:/prj/PRJ1/src/PRJ1
 
-<span style="color: #ff4500;">tags.files</span>: force
- $(<span style="color: #ffffff;">find</span>) $(<span style="color: #ffffff;">TAGS_DIRS</span>) -type f -name *.S -or -name *.h -or -name *.c|$(<span style="color: #ffffff;">sed</span>) <span style="color: #696969;">'s/c:\/prj\/PRJ1\/src/./g'</span> &gt;tags.files
+<span style="color: #721045;">tags.files</span>: force
+ $(<span style="color: #005e8b;">find</span>) $(<span style="color: #005e8b;">TAGS_DIRS</span>) -type f -name *.S -or -name *.h -or -name *.c|$(<span style="color: #005e8b;">sed</span>) <span style="color: #3548cf;">'s/c:\/prj\/PRJ1\/src/./g'</span> &gt;tags.files
 
-<span style="color: #ff4500;">$(</span><span style="color: #ff4500;">GTAGS_FILES</span><span style="color: #ff4500;">)</span>: tags.files
- $(<span style="color: #ffffff;">gtags</span>) -f tags.files
+<span style="color: #721045;">$(</span><span style="color: #721045;">GTAGS_FILES</span><span style="color: #721045;">)</span>: tags.files
+ $(<span style="color: #005e8b;">gtags</span>) -f tags.files
 
-<span style="color: #ff4500;">.PHONY</span>: global_tags
-<span style="color: #ff4500;">global_tags</span>: $(<span style="color: #ffffff;">GTAGS_FILES</span>)
+<span style="color: #721045;">.PHONY</span>: global_tags
+<span style="color: #721045;">global_tags</span>: $(<span style="color: #005e8b;">GTAGS_FILES</span>)
 
-<span style="color: #ff4500;">tags</span>: tags.files
- $(<span style="color: #ffffff;">ctags</span>) -L tags.files
+<span style="color: #721045;">tags</span>: tags.files
+ $(<span style="color: #005e8b;">ctags</span>) -L tags.files
 
-<span style="color: #ff4500;">.PHONY</span>: all_tags
-<span style="color: #ff4500;">all_tags</span>: tags global_tags
+<span style="color: #721045;">.PHONY</span>: all_tags
+<span style="color: #721045;">all_tags</span>: tags global_tags
 
-<span style="color: #ff4500;">.PHONY</span>: clean_tags
-<span style="color: #ff4500;">clean_tags</span>:
- rm -f $(<span style="color: #ffffff;">GTAGS_FILES</span>) tags
+<span style="color: #721045;">.PHONY</span>: clean_tags
+<span style="color: #721045;">clean_tags</span>:
+ rm -f $(<span style="color: #005e8b;">GTAGS_FILES</span>) tags
 </pre>
 </div>
 

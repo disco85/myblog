@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python: safe resource management</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Python: safe resource management</h1>
-<div id="outline-container-orgb95c779" class="outline-2">
-<h2 id="orgb95c779">Python: safe resource management</h2>
-<div class="outline-text-2" id="text-orgb95c779">
+<div id="outline-container-orgd6d5d3a" class="outline-2">
+<h2 id="orgd6d5d3a">Python: safe resource management</h2>
+<div class="outline-text-2" id="text-orgd6d5d3a">
 <p>
 Yet another example of the type safety in Python maybe a resources management.
 We can use typing to ensure that resources were released, so no any resoucres
@@ -47,33 +47,33 @@ appropriated type after its usage. Look the example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">from</span> typing <span style="color: #696969;">import</span> *
-<span style="color: #696969;">from</span> abc <span style="color: #696969;">import</span> *
+<pre class="src src-python"><span style="color: #531ab6;">from</span> typing <span style="color: #531ab6;">import</span> *
+<span style="color: #531ab6;">from</span> abc <span style="color: #531ab6;">import</span> *
 
-<span style="color: #ffffff;">T</span> = TypeVar(<span style="color: #696969;">'T'</span>)
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Hold</span>(ABC): <span style="color: #696969;">pass</span>
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Free</span>(ABC): <span style="color: #696969;">pass</span>
+<span style="color: #005e8b;">T</span> = TypeVar(<span style="color: #3548cf;">'T'</span>)
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Hold</span>(ABC): <span style="color: #531ab6;">pass</span>
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Free</span>(ABC): <span style="color: #531ab6;">pass</span>
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Resources</span>(Generic[T]):
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, fp1:<span style="color: #a52a2a;">str</span>, fp2:<span style="color: #a52a2a;">str</span>):
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">f1</span> = <span style="color: #a52a2a;">open</span>(fp1, <span style="color: #696969;">"r"</span>)
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">f2</span> = <span style="color: #a52a2a;">open</span>(fp2, <span style="color: #696969;">"r"</span>)
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">_release</span>(<span style="color: #696969;">self</span>):
-        <span style="color: #696969;">self</span>.f1.close()
-        <span style="color: #696969;">self</span>.f2.close()
-        <span style="color: #a52a2a;">print</span>(<span style="color: #696969;">"Resources were released"</span>)
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Resources</span>(Generic[T]):
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, fp1:<span style="color: #8f0075;">str</span>, fp2:<span style="color: #8f0075;">str</span>):
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">f1</span> = <span style="color: #8f0075;">open</span>(fp1, <span style="color: #3548cf;">"r"</span>)
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">f2</span> = <span style="color: #8f0075;">open</span>(fp2, <span style="color: #3548cf;">"r"</span>)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">_release</span>(<span style="color: #531ab6;">self</span>):
+        <span style="color: #531ab6;">self</span>.f1.close()
+        <span style="color: #531ab6;">self</span>.f2.close()
+        <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"Resources were released"</span>)
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">get_resources</span>(fp1:<span style="color: #a52a2a;">str</span>, fp2:<span style="color: #a52a2a;">str</span>) -&gt; Resources[Hold]:
-    <span style="color: #696969;">return</span> Resources(fp1, fp2)
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">release_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">get_resources</span>(fp1:<span style="color: #8f0075;">str</span>, fp2:<span style="color: #8f0075;">str</span>) -&gt; Resources[Hold]:
+    <span style="color: #531ab6;">return</span> Resources(fp1, fp2)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">release_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
     r._release()
-    <span style="color: #696969;">return</span> cast(Resources[Free], r)
+    <span style="color: #531ab6;">return</span> cast(Resources[Free], r)
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">use_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
-    <span style="color: #a52a2a;">print</span>(r.f1.read(), r.f2.read())
-    <span style="color: #696969;">return</span> release_resources(r)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">use_resources</span>(r: Resources[Hold]) -&gt; Resources[Free]:
+    <span style="color: #8f0075;">print</span>(r.f1.read(), r.f2.read())
+    <span style="color: #531ab6;">return</span> release_resources(r)
 
-<span style="color: #ffffff;">r</span> = get_resources(<span style="color: #696969;">"f1.txt"</span>, <span style="color: #696969;">"f2.txt"</span>)
+<span style="color: #005e8b;">r</span> = get_resources(<span style="color: #3548cf;">"f1.txt"</span>, <span style="color: #3548cf;">"f2.txt"</span>)
 use_resources(r)
 </pre>
 </div>

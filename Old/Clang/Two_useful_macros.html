@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Two useful C macros</title>
@@ -35,16 +35,16 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Two useful C macros</h1>
-<div id="outline-container-orgfb4596d" class="outline-2">
-<h2 id="orgfb4596d">Two useful C macros</h2>
-<div class="outline-text-2" id="text-orgfb4596d">
+<div id="outline-container-orgd71d4b6" class="outline-2">
+<h2 id="orgd71d4b6">Two useful C macros</h2>
+<div class="outline-text-2" id="text-orgd71d4b6">
 <p>
 As for me, there are 2 very simple but usefull C macros for safe calling of function (or method - callback in struct member):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">SAFE_CALL</span>(<span style="color: #ffffff;">F</span>, ...) <span style="color: #696969;">do</span> { <span style="color: #696969;">if</span> ((F)) (*(F))(##__VA_ARGS__); } <span style="color: #696969;">while</span>(0)
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">MCALL</span>(<span style="color: #ffffff;">SELF</span>, <span style="color: #ffffff;">CB</span>, ...) <span style="color: #696969;">do</span> { <span style="color: #696969;">if</span>((SELF)-&gt;CB) (*(SELF)-&gt;CB)(SELF, ##__VA_ARGS__); } <span style="color: #696969;">while</span>(0)
+<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #721045;">SAFE_CALL</span>(<span style="color: #005e8b;">F</span>, ...) <span style="color: #531ab6;">do</span> { <span style="color: #531ab6;">if</span> ((F)) (*(F))(##__VA_ARGS__); } <span style="color: #531ab6;">while</span>(0)
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">MCALL</span>(<span style="color: #005e8b;">SELF</span>, <span style="color: #005e8b;">CB</span>, ...) <span style="color: #531ab6;">do</span> { <span style="color: #531ab6;">if</span>((SELF)-&gt;CB) (*(SELF)-&gt;CB)(SELF, ##__VA_ARGS__); } <span style="color: #531ab6;">while</span>(0)
 </pre>
 </div>
 
@@ -53,7 +53,7 @@ Note two '#' - this is the GNU GCC extension to avoid problem with comma in vari
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp">MCALL(my_struct_ptr, onpaint, <span style="color: #ff4500;">area_t</span>* <span style="color: #ffffff;">area</span>);
+<pre class="src src-cpp">MCALL(my_struct_ptr, onpaint, <span style="color: #005f5f;">area_t</span>* <span style="color: #005e8b;">area</span>);
 </pre>
 </div>
 </div>

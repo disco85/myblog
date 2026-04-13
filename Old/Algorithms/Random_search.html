@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Random search</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Random search</h1>
-<div id="outline-container-orgd8dc432" class="outline-2">
-<h2 id="orgd8dc432">Random search</h2>
-<div class="outline-text-2" id="text-orgd8dc432">
+<div id="outline-container-org7f4aef6" class="outline-2">
+<h2 id="org7f4aef6">Random search</h2>
+<div class="outline-text-2" id="text-org7f4aef6">
 <p>
 Random search ''does not require data to be ordered/sorted''.
 </p>
@@ -73,109 +73,109 @@ What does it mean "excluding from generating" for a range? We generate random in
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">import</span> random
+<pre class="src src-python"><span style="color: #531ab6;">import</span> random
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Rng</span>:
-    <span style="color: #696969;">'''Range'''</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, i0, i1):
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i0</span> = i0; <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i1</span> = i1
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__len__</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.i1 - <span style="color: #696969;">self</span>.i0 + 1
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__repr__</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> f<span style="color: #696969;">'</span>{<span style="color: #696969;">self</span>.i0}<span style="color: #696969;">..</span>{<span style="color: #696969;">self</span>.i1}<span style="color: #696969;">'</span>
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">isnormal</span>(<span style="color: #696969;">self</span>): <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.i0 &lt;= <span style="color: #696969;">self</span>.i1
-
-
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">exclude_pt</span>(rng, i):
-    <span style="color: #575757;"># </span><span style="color: #575757;">Exclude the point (random index) from the range</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">BCS it is missing, so it should not participate</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">in random indexes generation more.</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">The result may be a new range(s) or no more</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">new range</span>
-    <span style="color: #696969;">if</span> i == rng.i0:
-        <span style="color: #ffffff;">res</span> = [Rng(rng.i0 + 1, rng.i1)]
-        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> res[0].isnormal():
-            <span style="color: #ffffff;">res</span> = []
-    <span style="color: #696969;">elif</span> i == rng.i1:
-        <span style="color: #ffffff;">res</span> = [Rng(rng.i0, rng.i1 - 1)]
-        <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> res[0].isnormal():
-            <span style="color: #ffffff;">res</span> = []
-    <span style="color: #696969;">elif</span> rng.i0 &lt; i &lt; rng.i1:
-        <span style="color: #ffffff;">res</span> = [Rng(rng.i0, i - 1), Rng(i + 1, rng.i1)]
-    <span style="color: #696969;">else</span>:
-        <span style="color: #696969;">raise</span> <span style="color: #ff4500;">ValueError</span>(f<span style="color: #696969;">'Invalid pt </span>{i}<span style="color: #696969;"> for range </span>{rng}<span style="color: #696969;">'</span>)
-    <span style="color: #696969;">return</span> res
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Rng</span>:
+    <span style="color: #2a5045;">'''Range'''</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, i0, i1):
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">i0</span> = i0; <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">i1</span> = i1
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__len__</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.i1 - <span style="color: #531ab6;">self</span>.i0 + 1
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__repr__</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> f<span style="color: #3548cf;">'</span>{<span style="color: #531ab6;">self</span>.i0}<span style="color: #3548cf;">..</span>{<span style="color: #531ab6;">self</span>.i1}<span style="color: #3548cf;">'</span>
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">isnormal</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.i0 &lt;= <span style="color: #531ab6;">self</span>.i1
 
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">rndsearch</span>(arr, target):
-    <span style="color: #ffffff;">_tested</span> = <span style="color: #a52a2a;">set</span>()
-    <span style="color: #ffffff;">ranges</span> = [Rng(0, <span style="color: #a52a2a;">len</span>(arr) - 1)]
-    <span style="color: #696969;">while</span> <span style="color: #7fffd4;">True</span>:
-        <span style="color: #ffffff;">rngi</span> = random.randint(0, <span style="color: #a52a2a;">len</span>(ranges) - 1)
-        <span style="color: #ffffff;">rng</span> = ranges[rngi]
-        <span style="color: #ffffff;">i</span> = random.randint(rng.i0, rng.i1) <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(rng) <span style="color: #696969;">else</span> rng.i0
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">exclude_pt</span>(rng, i):
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Exclude the point (random index) from the range</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">BCS it is missing, so it should not participate</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">in random indexes generation more.</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">The result may be a new range(s) or no more</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">new range</span>
+    <span style="color: #531ab6;">if</span> i == rng.i0:
+        <span style="color: #005e8b;">res</span> = [Rng(rng.i0 + 1, rng.i1)]
+        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> res[0].isnormal():
+            <span style="color: #005e8b;">res</span> = []
+    <span style="color: #531ab6;">elif</span> i == rng.i1:
+        <span style="color: #005e8b;">res</span> = [Rng(rng.i0, rng.i1 - 1)]
+        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> res[0].isnormal():
+            <span style="color: #005e8b;">res</span> = []
+    <span style="color: #531ab6;">elif</span> rng.i0 &lt; i &lt; rng.i1:
+        <span style="color: #005e8b;">res</span> = [Rng(rng.i0, i - 1), Rng(i + 1, rng.i1)]
+    <span style="color: #531ab6;">else</span>:
+        <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">ValueError</span>(f<span style="color: #3548cf;">'Invalid pt </span>{i}<span style="color: #3548cf;"> for range </span>{rng}<span style="color: #3548cf;">'</span>)
+    <span style="color: #531ab6;">return</span> res
 
-        <span style="color: #575757;"># </span><span style="color: #575757;">Assert that no repeated tests</span>
-        <span style="color: #696969;">assert</span> i <span style="color: #696969;">not</span> <span style="color: #696969;">in</span> _tested, f<span style="color: #696969;">'</span>{i}<span style="color: #696969;"> already tested!'</span>
+
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">rndsearch</span>(arr, target):
+    <span style="color: #005e8b;">_tested</span> = <span style="color: #8f0075;">set</span>()
+    <span style="color: #005e8b;">ranges</span> = [Rng(0, <span style="color: #8f0075;">len</span>(arr) - 1)]
+    <span style="color: #531ab6;">while</span> <span style="color: #0000b0;">True</span>:
+        <span style="color: #005e8b;">rngi</span> = random.randint(0, <span style="color: #8f0075;">len</span>(ranges) - 1)
+        <span style="color: #005e8b;">rng</span> = ranges[rngi]
+        <span style="color: #005e8b;">i</span> = random.randint(rng.i0, rng.i1) <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(rng) <span style="color: #531ab6;">else</span> rng.i0
+
+        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Assert that no repeated tests</span>
+        <span style="color: #531ab6;">assert</span> i <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">in</span> _tested, f<span style="color: #3548cf;">'</span>{i}<span style="color: #3548cf;"> already tested!'</span>
         _tested.add(i)
         
-        <span style="color: #696969;">if</span> arr[i] == target:
-            <span style="color: #696969;">return</span> i
-        <span style="color: #696969;">else</span>:
-            <span style="color: #696969;">if</span> rng:
-                <span style="color: #ffffff;">new_rngs</span> = exclude_pt(rng, i)
-                <span style="color: #696969;">if</span> new_rngs:
-                    <span style="color: #ffffff;">ranges</span>[rngi] = new_rngs[0]
-                    <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(new_rngs) &gt; 1:
-                        <span style="color: #ffffff;">new_rngi</span> = rngi + 1
-                        <span style="color: #696969;">if</span> new_rngi &gt;= <span style="color: #a52a2a;">len</span>(ranges):
+        <span style="color: #531ab6;">if</span> arr[i] == target:
+            <span style="color: #531ab6;">return</span> i
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #531ab6;">if</span> rng:
+                <span style="color: #005e8b;">new_rngs</span> = exclude_pt(rng, i)
+                <span style="color: #531ab6;">if</span> new_rngs:
+                    <span style="color: #005e8b;">ranges</span>[rngi] = new_rngs[0]
+                    <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(new_rngs) &gt; 1:
+                        <span style="color: #005e8b;">new_rngi</span> = rngi + 1
+                        <span style="color: #531ab6;">if</span> new_rngi &gt;= <span style="color: #8f0075;">len</span>(ranges):
                             ranges.append(new_rngs[1])
-                        <span style="color: #696969;">else</span>:
+                        <span style="color: #531ab6;">else</span>:
                             ranges.insert(rngi + 1, new_rngs[1])
-                <span style="color: #696969;">else</span>:
-                    <span style="color: #696969;">del</span> ranges[rngi]
-            <span style="color: #696969;">else</span>:
-                <span style="color: #696969;">del</span> ranges[rngi]
-        <span style="color: #575757;"># </span><span style="color: #575757;">Did we completed?</span>
-        <span style="color: #696969;">if</span> <span style="color: #a52a2a;">len</span>(ranges) == 0:
-            <span style="color: #696969;">return</span> -1
+                <span style="color: #531ab6;">else</span>:
+                    <span style="color: #531ab6;">del</span> ranges[rngi]
+            <span style="color: #531ab6;">else</span>:
+                <span style="color: #531ab6;">del</span> ranges[rngi]
+        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Did we completed?</span>
+        <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(ranges) == 0:
+            <span style="color: #531ab6;">return</span> -1
 
 
-<span style="color: #575757;">#########################</span>
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">ACCESS</span>(<span style="color: #a52a2a;">list</span>):
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, *a, **kw):
-        <span style="color: #a52a2a;">super</span>().__init__(*a, **kw)
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> = 0
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__getitem__</span>(<span style="color: #696969;">self</span>, i):
-        <span style="color: #696969;">if</span> i &gt;= <span style="color: #a52a2a;">len</span>(<span style="color: #696969;">self</span>):
-            <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=OUT OF RANGE!"</span>)
-        <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">super</span>().__getitem__(i)
-        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{<span style="color: #696969;">self</span>._access}<span style="color: #696969;">: [</span>{i}<span style="color: #696969;">]=</span>{res}<span style="color: #696969;">"</span>)
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">_access</span> += 1
-        <span style="color: #696969;">return</span> res
+<span style="color: #7f0000;">#########################</span>
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">ACCESS</span>(<span style="color: #8f0075;">list</span>):
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, *a, **kw):
+        <span style="color: #8f0075;">super</span>().__init__(*a, **kw)
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> = 0
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__getitem__</span>(<span style="color: #531ab6;">self</span>, i):
+        <span style="color: #531ab6;">if</span> i &gt;= <span style="color: #8f0075;">len</span>(<span style="color: #531ab6;">self</span>):
+            <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: [</span>{i}<span style="color: #3548cf;">]=OUT OF RANGE!"</span>)
+        <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">super</span>().__getitem__(i)
+        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: [</span>{i}<span style="color: #3548cf;">]=</span>{res}<span style="color: #3548cf;">"</span>)
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> += 1
+        <span style="color: #531ab6;">return</span> res
 
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">list</span>(<span style="color: #a52a2a;">range</span>(num))
-    <span style="color: #ffffff;">i</span> = 0
-    <span style="color: #ffffff;">cnt</span> = <span style="color: #a52a2a;">min</span>(num, num*ratio)
-    <span style="color: #696969;">while</span> i &lt; cnt:
-        <span style="color: #ffffff;">r</span> = random.randint(num, num + cnt - 1)
-        <span style="color: #ffffff;">res</span>[r - num] = r
-        <span style="color: #ffffff;">i</span> += 1
-    <span style="color: #ffffff;">res</span> = <span style="color: #a52a2a;">sorted</span>(res)
-    <span style="color: #696969;">return</span> (res, random.choice(res))
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(<span style="color: #8f0075;">range</span>(num))
+    <span style="color: #005e8b;">i</span> = 0
+    <span style="color: #005e8b;">cnt</span> = <span style="color: #8f0075;">min</span>(num, num*ratio)
+    <span style="color: #531ab6;">while</span> i &lt; cnt:
+        <span style="color: #005e8b;">r</span> = random.randint(num, num + cnt - 1)
+        <span style="color: #005e8b;">res</span>[r - num] = r
+        <span style="color: #005e8b;">i</span> += 1
+    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
+    <span style="color: #531ab6;">return</span> (res, random.choice(res))
 
 
-<span style="color: #ffffff;">NUM</span> = 100
-<span style="color: #ffffff;">arr</span>, <span style="color: #ffffff;">x</span> = partiallyrandomdata(NUM, 1)
-<span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Look for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
-<span style="color: #696969;">try</span>:
-    <span style="color: #ffffff;">fnd</span> = rndsearch(ACCESS(arr), x)
-    <span style="color: #696969;">if</span> 0 &lt;= fnd &lt; NUM:
-        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Found </span>{x}<span style="color: #696969;"> at </span>{fnd}<span style="color: #696969;">: </span>{arr[fnd]}<span style="color: #696969;">"</span>)
-    <span style="color: #696969;">else</span>:
-        <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"</span>{x}<span style="color: #696969;"> not found"</span>)
-<span style="color: #696969;">except</span> <span style="color: #ff4500;">KeyboardInterrupt</span>:
-    <span style="color: #a52a2a;">print</span>(f<span style="color: #696969;">"Looked for </span>{x}<span style="color: #696969;"> in </span>{arr}<span style="color: #696969;">"</span>)
+<span style="color: #005e8b;">NUM</span> = 100
+<span style="color: #005e8b;">arr</span>, <span style="color: #005e8b;">x</span> = partiallyrandomdata(NUM, 1)
+<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Look for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
+<span style="color: #531ab6;">try</span>:
+    <span style="color: #005e8b;">fnd</span> = rndsearch(ACCESS(arr), x)
+    <span style="color: #531ab6;">if</span> 0 &lt;= fnd &lt; NUM:
+        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Found </span>{x}<span style="color: #3548cf;"> at </span>{fnd}<span style="color: #3548cf;">: </span>{arr[fnd]}<span style="color: #3548cf;">"</span>)
+    <span style="color: #531ab6;">else</span>:
+        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{x}<span style="color: #3548cf;"> not found"</span>)
+<span style="color: #531ab6;">except</span> <span style="color: #005f5f;">KeyboardInterrupt</span>:
+    <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Looked for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
 </pre>
 </div>
 </div>

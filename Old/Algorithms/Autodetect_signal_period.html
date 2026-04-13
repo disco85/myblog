@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Auto-detect signal period</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Auto-detect signal period</h1>
-<div id="outline-container-org874f389" class="outline-2">
-<h2 id="org874f389">Auto-detect signal period</h2>
-<div class="outline-text-2" id="text-org874f389">
+<div id="outline-container-org1605589" class="outline-2">
+<h2 id="org1605589">Auto-detect signal period</h2>
+<div class="outline-text-2" id="text-org1605589">
 <p>
 This is not so rare task as you can see (for ex., you can find one in oscilloscope's auto mode). There are several methods to do it: in frequency domain (FD) and in time domain (TD). Most famous FD method is the auto-correlation function: it's maximum let you find δτ - it will be period of signal.
 But main problem with FD methods is - it's "calculation speed". TD methods are faster. They are:
@@ -62,7 +62,7 @@ Problems are:
 </ul>
 
 
-<div id="org3d05822" class="figure">
+<div id="orgdab6ffe" class="figure">
 <p><img src="../../assets/FundamentalFrequency1.svg" alt="FundamentalFrequency1.svg" class="org-svg" />
 </p>
 </div>
@@ -89,188 +89,188 @@ Here is the Python prototype of this algorithm:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">import</span> sys
-<span style="color: #696969;">import</span> operator
-<span style="color: #696969;">import</span> math
-<span style="color: #696969;">import</span> random
+<pre class="src src-python"><span style="color: #531ab6;">import</span> sys
+<span style="color: #531ab6;">import</span> operator
+<span style="color: #531ab6;">import</span> math
+<span style="color: #531ab6;">import</span> random
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">AverageDistance</span>:
-    <span style="color: #575757;"># </span><span style="color: #575757;">max. distance (may be period)</span>
-    <span style="color: #a52a2a;">max</span> = -sys.maxint - 1
-    <span style="color: #575757;"># </span><span style="color: #575757;">enough distances number to report</span>
-    <span style="color: #ffffff;">difflim</span> = 2
-    <span style="color: #575757;"># </span><span style="color: #575757;">proximity of max. distance values (equality domain)</span>
-    <span style="color: #ffffff;">vallim</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">distance between peak</span>
-    <span style="color: #ffffff;">d</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">sum of distances between peaks (for average)</span>
-    <span style="color: #ffffff;">diff</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">number of distances between peaks (for average)</span>
-    <span style="color: #ffffff;">ndiff</span> = 0
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">AverageDistance</span>:
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">max. distance (may be period)</span>
+    <span style="color: #8f0075;">max</span> = -sys.maxint - 1
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">enough distances number to report</span>
+    <span style="color: #005e8b;">difflim</span> = 2
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">proximity of max. distance values (equality domain)</span>
+    <span style="color: #005e8b;">vallim</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">distance between peak</span>
+    <span style="color: #005e8b;">d</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">sum of distances between peaks (for average)</span>
+    <span style="color: #005e8b;">diff</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">number of distances between peaks (for average)</span>
+    <span style="color: #005e8b;">ndiff</span> = 0
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">dump</span>(<span style="color: #696969;">self</span>):
-        <span style="color: #696969;">return</span> <span style="color: #696969;">"d=%d, diff=%d, ndiff=%d"</span>%(<span style="color: #696969;">self</span>.d,<span style="color: #696969;">self</span>.diff,<span style="color: #696969;">self</span>.ndiff)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">dump</span>(<span style="color: #531ab6;">self</span>):
+        <span style="color: #531ab6;">return</span> <span style="color: #3548cf;">"d=%d, diff=%d, ndiff=%d"</span>%(<span style="color: #531ab6;">self</span>.d,<span style="color: #531ab6;">self</span>.diff,<span style="color: #531ab6;">self</span>.ndiff)
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, **kw):
-        <span style="color: #696969;">for</span> k,v <span style="color: #696969;">in</span> kw.items():
-            <span style="color: #a52a2a;">setattr</span>(<span style="color: #696969;">self</span>, k, v)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, **kw):
+        <span style="color: #531ab6;">for</span> k,v <span style="color: #531ab6;">in</span> kw.items():
+            <span style="color: #8f0075;">setattr</span>(<span style="color: #531ab6;">self</span>, k, v)
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">calc</span>(<span style="color: #696969;">self</span>, val):
-        <span style="color: #696969;">if</span> <span style="color: #a52a2a;">abs</span>(val - <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span>) &lt;= <span style="color: #696969;">self</span>.vallim:
-            <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.d == 0:
-                <span style="color: #696969;">self</span>.<span style="color: #ffffff;">diff</span> += val
-            <span style="color: #696969;">else</span>:
-                <span style="color: #696969;">self</span>.<span style="color: #ffffff;">diff</span> += <span style="color: #696969;">self</span>.d + val
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ndiff</span> += 1
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">d</span> = 0
-        <span style="color: #696969;">elif</span> val &gt; <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span>:
-            <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span> = val
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">d</span> = 0; <span style="color: #696969;">self</span>.<span style="color: #ffffff;">diff</span> = 0; <span style="color: #696969;">self</span>.<span style="color: #ffffff;">ndiff</span> = 0
-        <span style="color: #696969;">else</span>:
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">d</span> += val
-        <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.ndiff &gt; <span style="color: #696969;">self</span>.difflim:
-            <span style="color: #696969;">return</span> <span style="color: #696969;">self</span>.diff/<span style="color: #696969;">self</span>.ndiff
-        <span style="color: #696969;">else</span>:
-            <span style="color: #696969;">return</span> -1
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">calc</span>(<span style="color: #531ab6;">self</span>, val):
+        <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">abs</span>(val - <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span>) &lt;= <span style="color: #531ab6;">self</span>.vallim:
+            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.d == 0:
+                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">diff</span> += val
+            <span style="color: #531ab6;">else</span>:
+                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">diff</span> += <span style="color: #531ab6;">self</span>.d + val
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">ndiff</span> += 1
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">d</span> = 0
+        <span style="color: #531ab6;">elif</span> val &gt; <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span>:
+            <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span> = val
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">d</span> = 0; <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">diff</span> = 0; <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">ndiff</span> = 0
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">d</span> += val
+        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.ndiff &gt; <span style="color: #531ab6;">self</span>.difflim:
+            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.diff/<span style="color: #531ab6;">self</span>.ndiff
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #531ab6;">return</span> -1
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">test</span>(<span style="color: #696969;">self</span>, samples):
-        <span style="color: #696969;">for</span> smp <span style="color: #696969;">in</span> samples:
-            <span style="color: #575757;">#</span><span style="color: #575757;">print "%d:"%smp</span>
-            <span style="color: #ffffff;">x</span> = <span style="color: #696969;">self</span>.calc(smp)
-            <span style="color: #696969;">if</span> x != -1:
-                <span style="color: #696969;">return</span> x
-            <span style="color: #575757;">#</span><span style="color: #575757;">print "\t%s"%self.dump()</span>
-        <span style="color: #696969;">return</span> x
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">test</span>(<span style="color: #531ab6;">self</span>, samples):
+        <span style="color: #531ab6;">for</span> smp <span style="color: #531ab6;">in</span> samples:
+            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "%d:"%smp</span>
+            <span style="color: #005e8b;">x</span> = <span style="color: #531ab6;">self</span>.calc(smp)
+            <span style="color: #531ab6;">if</span> x != -1:
+                <span style="color: #531ab6;">return</span> x
+            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "\t%s"%self.dump()</span>
+        <span style="color: #531ab6;">return</span> x
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">DistanceBetweenPeaks_max</span>(**kw):
-    <span style="color: #696969;">return</span> DistanceBetweenPeaks(cmpfunc=operator.gt, <span style="color: #a52a2a;">max</span> = -sys.maxint-1, **kw)
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">DistanceBetweenPeaks_min</span>(**kw):
-    <span style="color: #696969;">return</span> DistanceBetweenPeaks(cmpfunc=operator.lt, <span style="color: #a52a2a;">max</span> = sys.maxint, **kw)
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">DistanceBetweenPeaks</span>:
-    <span style="color: #575757;">### </span><span style="color: #575757;">Next 2 attrs. defines max. based or min. based algorithm,</span>
-    <span style="color: #575757;">### </span><span style="color: #575757;">default is max. based:</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">comparision func</span>
-    <span style="color: #ffffff;">cmpfunc</span> = operator.gt
-    <span style="color: #575757;">#</span><span style="color: #575757;">max. sample</span>
-    <span style="color: #a52a2a;">max</span> = -sys.maxint-1
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">DistanceBetweenPeaks_max</span>(**kw):
+    <span style="color: #531ab6;">return</span> DistanceBetweenPeaks(cmpfunc=operator.gt, <span style="color: #8f0075;">max</span> = -sys.maxint-1, **kw)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">DistanceBetweenPeaks_min</span>(**kw):
+    <span style="color: #531ab6;">return</span> DistanceBetweenPeaks(cmpfunc=operator.lt, <span style="color: #8f0075;">max</span> = sys.maxint, **kw)
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">DistanceBetweenPeaks</span>:
+    <span style="color: #7f0000;">### </span><span style="color: #7f0000;">Next 2 attrs. defines max. based or min. based algorithm,</span>
+    <span style="color: #7f0000;">### </span><span style="color: #7f0000;">default is max. based:</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">comparision func</span>
+    <span style="color: #005e8b;">cmpfunc</span> = operator.gt
+    <span style="color: #7f0000;">#</span><span style="color: #7f0000;">max. sample</span>
+    <span style="color: #8f0075;">max</span> = -sys.maxint-1
 
-    <span style="color: #575757;"># </span><span style="color: #575757;">proximity of sample (near to max.)</span>
-    <span style="color: #ffffff;">vallim</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">peak value if not -1 (to distinguish monotonic growed 2 close samples)</span>
-    <span style="color: #575757;"># </span><span style="color: #575757;">it's too not scalar, but domain (vallim is used as limit)</span>
-    <span style="color: #ffffff;">peak</span> = -1
-    <span style="color: #575757;"># </span><span style="color: #575757;">distance between two peaks</span>
-    <span style="color: #ffffff;">d</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">index of max.</span>
-    <span style="color: #ffffff;">imax</span> = 0
-    <span style="color: #575757;"># </span><span style="color: #575757;">index of sample</span>
-    <span style="color: #ffffff;">i</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">proximity of sample (near to max.)</span>
+    <span style="color: #005e8b;">vallim</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">peak value if not -1 (to distinguish monotonic growed 2 close samples)</span>
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">it's too not scalar, but domain (vallim is used as limit)</span>
+    <span style="color: #005e8b;">peak</span> = -1
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">distance between two peaks</span>
+    <span style="color: #005e8b;">d</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">index of max.</span>
+    <span style="color: #005e8b;">imax</span> = 0
+    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">index of sample</span>
+    <span style="color: #005e8b;">i</span> = 0
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, **kw):
-        <span style="color: #696969;">for</span> k,v <span style="color: #696969;">in</span> kw.items():
-            <span style="color: #a52a2a;">setattr</span>(<span style="color: #696969;">self</span>, k, v)
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, **kw):
+        <span style="color: #531ab6;">for</span> k,v <span style="color: #531ab6;">in</span> kw.items():
+            <span style="color: #8f0075;">setattr</span>(<span style="color: #531ab6;">self</span>, k, v)
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">calc</span>(<span style="color: #696969;">self</span>, val):
-        <span style="color: #ffffff;">ret</span> = -1
-        <span style="color: #575757;">#</span><span style="color: #575757;">print "val:",val</span>
-        <span style="color: #575757;"># </span><span style="color: #575757;">version with cut 1,2,3,4... samples by limitation of "hole" between peaks</span>
-        <span style="color: #575757;">#</span><span style="color: #575757;">if abs(val - self.max) &lt;= self.vallim and (self.i - self.imax)&gt;1:</span>
-        <span style="color: #696969;">if</span> <span style="color: #a52a2a;">abs</span>(val - <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span>) &lt;= <span style="color: #696969;">self</span>.vallim <span style="color: #696969;">and</span> \
-                ((<span style="color: #a52a2a;">abs</span>(val - <span style="color: #696969;">self</span>.peak) &lt;= <span style="color: #696969;">self</span>.vallim) <span style="color: #696969;">if</span> <span style="color: #696969;">self</span>.peak != -1 <span style="color: #696969;">else</span> <span style="color: #7fffd4;">True</span>):
-            <span style="color: #ffffff;">ret</span> = <span style="color: #696969;">self</span>.i - <span style="color: #696969;">self</span>.imax
-            <span style="color: #696969;">if</span> ret == 0: <span style="color: #ffffff;">ret</span> = 1
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">imax</span> = <span style="color: #696969;">self</span>.i
-            <span style="color: #575757;">#</span><span style="color: #575757;">print "1:"</span>
-        <span style="color: #575757;">#</span><span style="color: #575757;">elif val &gt; self.max:</span>
-        <span style="color: #696969;">elif</span> <span style="color: #696969;">self</span>.cmpfunc(val, <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span>):
-            <span style="color: #575757;">#</span><span style="color: #575757;">print "2: val=%d max=%d"%(val,self.max)</span>
-            <span style="color: #575757;"># </span><span style="color: #575757;">not neccessary next 2 lines:</span>
-            <span style="color: #696969;">if</span> val &gt; <span style="color: #696969;">self</span>.peak <span style="color: #696969;">and</span> <span style="color: #696969;">self</span>.peak != -1:
-                <span style="color: #ffffff;">val</span> = <span style="color: #696969;">self</span>.peak
-            <span style="color: #696969;">self</span>.<span style="color: #a52a2a;">max</span> = val
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">imax</span> = <span style="color: #696969;">self</span>.i
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">d</span> = 0
-        <span style="color: #696969;">else</span>:
-            <span style="color: #696969;">self</span>.<span style="color: #ffffff;">d</span> += 1
-        <span style="color: #696969;">self</span>.<span style="color: #ffffff;">i</span> += 1
-        <span style="color: #696969;">return</span> ret
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">calc</span>(<span style="color: #531ab6;">self</span>, val):
+        <span style="color: #005e8b;">ret</span> = -1
+        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "val:",val</span>
+        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">version with cut 1,2,3,4... samples by limitation of "hole" between peaks</span>
+        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">if abs(val - self.max) &lt;= self.vallim and (self.i - self.imax)&gt;1:</span>
+        <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">abs</span>(val - <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span>) &lt;= <span style="color: #531ab6;">self</span>.vallim <span style="color: #531ab6;">and</span> \
+                ((<span style="color: #8f0075;">abs</span>(val - <span style="color: #531ab6;">self</span>.peak) &lt;= <span style="color: #531ab6;">self</span>.vallim) <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.peak != -1 <span style="color: #531ab6;">else</span> <span style="color: #0000b0;">True</span>):
+            <span style="color: #005e8b;">ret</span> = <span style="color: #531ab6;">self</span>.i - <span style="color: #531ab6;">self</span>.imax
+            <span style="color: #531ab6;">if</span> ret == 0: <span style="color: #005e8b;">ret</span> = 1
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">imax</span> = <span style="color: #531ab6;">self</span>.i
+            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "1:"</span>
+        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">elif val &gt; self.max:</span>
+        <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.cmpfunc(val, <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span>):
+            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "2: val=%d max=%d"%(val,self.max)</span>
+            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">not neccessary next 2 lines:</span>
+            <span style="color: #531ab6;">if</span> val &gt; <span style="color: #531ab6;">self</span>.peak <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.peak != -1:
+                <span style="color: #005e8b;">val</span> = <span style="color: #531ab6;">self</span>.peak
+            <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">max</span> = val
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">imax</span> = <span style="color: #531ab6;">self</span>.i
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">d</span> = 0
+        <span style="color: #531ab6;">else</span>:
+            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">d</span> += 1
+        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">i</span> += 1
+        <span style="color: #531ab6;">return</span> ret
 
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">test</span>(<span style="color: #696969;">self</span>, samples):
-        <span style="color: #696969;">for</span> smp <span style="color: #696969;">in</span> samples:
-            <span style="color: #ffffff;">x</span> = <span style="color: #696969;">self</span>.calc(smp)
-            <span style="color: #696969;">if</span> x != -1:
-                <span style="color: #a52a2a;">print</span> x
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">test</span>(<span style="color: #531ab6;">self</span>, samples):
+        <span style="color: #531ab6;">for</span> smp <span style="color: #531ab6;">in</span> samples:
+            <span style="color: #005e8b;">x</span> = <span style="color: #531ab6;">self</span>.calc(smp)
+            <span style="color: #531ab6;">if</span> x != -1:
+                <span style="color: #8f0075;">print</span> x
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">test_alg</span>(samples, dbp_kw={}, ad_kw={}):
-    <span style="color: #ffffff;">dbp_max</span> = DistanceBetweenPeaks_max(**dbp_kw)
-    <span style="color: #ffffff;">dbp_min</span> = DistanceBetweenPeaks_min(**dbp_kw)
-    <span style="color: #ffffff;">ad_max</span> = AverageDistance(**ad_kw)
-    <span style="color: #ffffff;">ad_min</span> = AverageDistance(**ad_kw)
-    <span style="color: #ffffff;">period_maxalg</span> = -1
-    <span style="color: #ffffff;">period_minalg</span> = -1
-    <span style="color: #ffffff;">result</span> = -1
-    <span style="color: #696969;">for</span> smp <span style="color: #696969;">in</span> samples:
-        <span style="color: #ffffff;">time_maxalg</span> = dbp_max.calc(smp)
-        <span style="color: #696969;">if</span> time_maxalg != -1:
-            <span style="color: #ffffff;">period_maxalg</span> = ad_max.calc(time_maxalg)
-            <span style="color: #696969;">if</span> period_maxalg &gt; result:
-                <span style="color: #ffffff;">result</span> = period_maxalg
-        <span style="color: #ffffff;">time_minalg</span> = dbp_min.calc(smp)
-        <span style="color: #696969;">if</span> time_minalg != -1:
-            <span style="color: #ffffff;">period_minalg</span> = ad_min.calc(time_minalg)
-            <span style="color: #696969;">if</span> period_minalg &gt; result:
-                <span style="color: #ffffff;">result</span> = period_minalg
-    <span style="color: #696969;">return</span> result
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">test_alg</span>(samples, dbp_kw={}, ad_kw={}):
+    <span style="color: #005e8b;">dbp_max</span> = DistanceBetweenPeaks_max(**dbp_kw)
+    <span style="color: #005e8b;">dbp_min</span> = DistanceBetweenPeaks_min(**dbp_kw)
+    <span style="color: #005e8b;">ad_max</span> = AverageDistance(**ad_kw)
+    <span style="color: #005e8b;">ad_min</span> = AverageDistance(**ad_kw)
+    <span style="color: #005e8b;">period_maxalg</span> = -1
+    <span style="color: #005e8b;">period_minalg</span> = -1
+    <span style="color: #005e8b;">result</span> = -1
+    <span style="color: #531ab6;">for</span> smp <span style="color: #531ab6;">in</span> samples:
+        <span style="color: #005e8b;">time_maxalg</span> = dbp_max.calc(smp)
+        <span style="color: #531ab6;">if</span> time_maxalg != -1:
+            <span style="color: #005e8b;">period_maxalg</span> = ad_max.calc(time_maxalg)
+            <span style="color: #531ab6;">if</span> period_maxalg &gt; result:
+                <span style="color: #005e8b;">result</span> = period_maxalg
+        <span style="color: #005e8b;">time_minalg</span> = dbp_min.calc(smp)
+        <span style="color: #531ab6;">if</span> time_minalg != -1:
+            <span style="color: #005e8b;">period_minalg</span> = ad_min.calc(time_minalg)
+            <span style="color: #531ab6;">if</span> period_minalg &gt; result:
+                <span style="color: #005e8b;">result</span> = period_minalg
+    <span style="color: #531ab6;">return</span> result
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Test samples</span>
-<span style="color: #575757;">################################################################################</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">T=7</span>
-<span style="color: #ffffff;">samples0</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Test samples</span>
+<span style="color: #7f0000;">################################################################################</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=7</span>
+<span style="color: #005e8b;">samples0</span> = (
 0, -10, -20, -10, 0, 10, 20, 0, -10, -20, -10, 0, 10, 20,
 0, -10, -20, -10, 0, 10, 20, 0, -10, -20, -10, 0, 10, 20,
 0, -10, -20, -10, 0, 10, 20, 0, -10, -20, -10, 0, 10, 20,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">samples with not same maximus, T=7</span>
-<span style="color: #ffffff;">samples1</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">samples with not same maximus, T=7</span>
+<span style="color: #005e8b;">samples1</span> = (
 0, -10, -20, -10, 0, 10, 18, 0, -10, -20, -10, 0, 10, 19,
 0, -10, -20, -10, 0, 10, 19, 0, -10, -20, -10, 0, 10, 18,
 0, -10, -20, -10, 0, 10, 19, 0, -10, -20, -10, 0, 10, 18,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">samples with not same maximus and time between them, T=7</span>
-<span style="color: #ffffff;">samples2</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">samples with not same maximus and time between them, T=7</span>
+<span style="color: #005e8b;">samples2</span> = (
 0, -10, -20, -10, 0, 10, 18, 0, -10, -20, -10, 0, 10, 19,
 0, -10, -20, -10, 0, 10, 19, 0, -10, -20, -10, 0, 10, 0, 18,
 0, -10, -20, -10, 0, 10, 18, 0, -10, -20, -10, 0, 10, 19,
 0, -10, -20, -10, 0, 0, 0, 10, 18, 0, -10, -20, -10, 0, 1, 1, 10, 19,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">T=3</span>
-<span style="color: #ffffff;">samples3</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=3</span>
+<span style="color: #005e8b;">samples3</span> = (
 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0,
 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0,
 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0, -5, 0, 0,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">T=3</span>
-<span style="color: #ffffff;">samples4</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=3</span>
+<span style="color: #005e8b;">samples4</span> = (
 -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10,
 -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10,
 -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10, -1, -1, -10,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">T=8</span>
-<span style="color: #ffffff;">samples5</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=8</span>
+<span style="color: #005e8b;">samples5</span> = (
 1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,1,
-<span style="color: #575757;"># </span><span style="color: #575757;">T=12</span>
-<span style="color: #575757;">#</span><span style="color: #575757;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
-<span style="color: #575757;">#</span><span style="color: #575757;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
-<span style="color: #575757;">#</span><span style="color: #575757;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
-<span style="color: #575757;">#</span><span style="color: #575757;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=12</span>
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">1,0,1,0,1,0,1,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,</span>
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">T=10</span>
-<span style="color: #ffffff;">samples6</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=10</span>
+<span style="color: #005e8b;">samples6</span> = (
 0,1,2,3,4,5,4,3,2,1,0,1,2,3,4,5,4,3,2,1,0,1,2,3,4,5,4,3,2,1,
 0,1,2,3,4,5,4,3,2,1,0,1,2,3,4,5,4,3,2,1,0,1,2,3,4,5,4,3,2,1,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">T=50</span>
-<span style="color: #ffffff;">samples7</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">T=50</span>
+<span style="color: #005e8b;">samples7</span> = (
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
 24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,
@@ -282,45 +282,45 @@ Here is the Python prototype of this algorithm:
 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,26,
 24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">"square", T=8</span>
-<span style="color: #ffffff;">samples8</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">"square", T=8</span>
+<span style="color: #005e8b;">samples8</span> = (
 0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,
 0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,
 0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,0,0,0,5,5,5,5,5,
 )
-<span style="color: #575757;"># </span><span style="color: #575757;">Sin: noise is 1..300. Magnitude is 1000, T=360</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">to detect DistanceBetweenPeaks.vallim = 260..300, AverageDistance.vallim=10</span>
-<span style="color: #ffffff;">samples9</span> = []
-<span style="color: #696969;">for</span> angle <span style="color: #696969;">in</span> <span style="color: #a52a2a;">range</span>(0, 5*360, 1):
-    <span style="color: #ffffff;">smp</span> = math.sin(math.radians(angle))
-    <span style="color: #ffffff;">smp</span> += random.uniform(0.001,0.5)
-    samples9.append(<span style="color: #a52a2a;">int</span>(smp*1000))
-<span style="color: #575757;"># </span><span style="color: #575757;">Long glitches, T=8</span>
-<span style="color: #ffffff;">samples10</span> = (
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Sin: noise is 1..300. Magnitude is 1000, T=360</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">to detect DistanceBetweenPeaks.vallim = 260..300, AverageDistance.vallim=10</span>
+<span style="color: #005e8b;">samples9</span> = []
+<span style="color: #531ab6;">for</span> angle <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(0, 5*360, 1):
+    <span style="color: #005e8b;">smp</span> = math.sin(math.radians(angle))
+    <span style="color: #005e8b;">smp</span> += random.uniform(0.001,0.5)
+    samples9.append(<span style="color: #8f0075;">int</span>(smp*1000))
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Long glitches, T=8</span>
+<span style="color: #005e8b;">samples10</span> = (
 0,0,0,1000,5,5,1000,5,0,0,0,5,5,1000,5,1000,0,0,0,5,5,5,5,5,0,0,0,100,5,5,5,5,
 0,0,0,5,5,5,100,5,0,0,0,100,5,5,5,5,0,0,0,5,5,5,5,100,0,0,0,5,5,5,5,100,
 0,0,0,5,5,100,5,5,0,0,0,5,5,100,5,5,0,0,0,5,5,5,100,5,0,0,0,5,5,100,5,5,
 )
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Tests</span>
-<span style="color: #575757;">################################################################################</span>
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples0:"</span>, test_alg(samples0)
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples1:"</span>, test_alg(samples1)
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples2:"</span>, test_alg(samples2, <span style="color: #a52a2a;">dict</span>(vallim=1), <span style="color: #a52a2a;">dict</span>(vallim=1))
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples3:"</span>, test_alg(samples3)
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples4:"</span>, test_alg(samples4)
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples5:"</span>, test_alg(samples5)
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples6:"</span>, test_alg(samples6, <span style="color: #a52a2a;">dict</span>(vallim=0), <span style="color: #a52a2a;">dict</span>(vallim=1))
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples7:"</span>, test_alg(samples7, <span style="color: #a52a2a;">dict</span>(vallim=1), <span style="color: #a52a2a;">dict</span>(vallim=1))
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples8:"</span>, test_alg(samples8, <span style="color: #a52a2a;">dict</span>(vallim=1), <span style="color: #a52a2a;">dict</span>(vallim=1))
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples9:"</span>, test_alg(samples9, <span style="color: #a52a2a;">dict</span>(vallim=260), <span style="color: #a52a2a;">dict</span>(vallim=100))
-<span style="color: #a52a2a;">print</span> <span style="color: #696969;">"samples10:"</span>, test_alg(samples10, <span style="color: #a52a2a;">dict</span>(vallim=1), <span style="color: #a52a2a;">dict</span>(vallim=1))
-<span style="color: #575757;">#</span><span style="color: #575757;">print "samples9:", test_alg(samples9, dict(vallim=60, peak=1000), dict(vallim=60))</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Tests</span>
+<span style="color: #7f0000;">################################################################################</span>
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples0:"</span>, test_alg(samples0)
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples1:"</span>, test_alg(samples1)
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples2:"</span>, test_alg(samples2, <span style="color: #8f0075;">dict</span>(vallim=1), <span style="color: #8f0075;">dict</span>(vallim=1))
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples3:"</span>, test_alg(samples3)
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples4:"</span>, test_alg(samples4)
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples5:"</span>, test_alg(samples5)
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples6:"</span>, test_alg(samples6, <span style="color: #8f0075;">dict</span>(vallim=0), <span style="color: #8f0075;">dict</span>(vallim=1))
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples7:"</span>, test_alg(samples7, <span style="color: #8f0075;">dict</span>(vallim=1), <span style="color: #8f0075;">dict</span>(vallim=1))
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples8:"</span>, test_alg(samples8, <span style="color: #8f0075;">dict</span>(vallim=1), <span style="color: #8f0075;">dict</span>(vallim=1))
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples9:"</span>, test_alg(samples9, <span style="color: #8f0075;">dict</span>(vallim=260), <span style="color: #8f0075;">dict</span>(vallim=100))
+<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">"samples10:"</span>, test_alg(samples10, <span style="color: #8f0075;">dict</span>(vallim=1), <span style="color: #8f0075;">dict</span>(vallim=1))
+<span style="color: #7f0000;">#</span><span style="color: #7f0000;">print "samples9:", test_alg(samples9, dict(vallim=60, peak=1000), dict(vallim=60))</span>
 
-<span style="color: #696969;">for</span> i,ss <span style="color: #696969;">in</span> <span style="color: #a52a2a;">enumerate</span>((samples0, samples1, samples2, samples3, samples4, samples5, samples6, samples7, samples8, samples9, samples10)):
-    <span style="color: #696969;">with</span> <span style="color: #a52a2a;">open</span>(<span style="color: #696969;">"data%d.dat"</span>%i, <span style="color: #696969;">"wt"</span>) <span style="color: #696969;">as</span> f:
-        <span style="color: #696969;">for</span> smp <span style="color: #696969;">in</span> ss:
-            f.write(<span style="color: #696969;">"%d</span><span style="color: #7fffd4;">\n</span><span style="color: #696969;">"</span>%smp)
+<span style="color: #531ab6;">for</span> i,ss <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">enumerate</span>((samples0, samples1, samples2, samples3, samples4, samples5, samples6, samples7, samples8, samples9, samples10)):
+    <span style="color: #531ab6;">with</span> <span style="color: #8f0075;">open</span>(<span style="color: #3548cf;">"data%d.dat"</span>%i, <span style="color: #3548cf;">"wt"</span>) <span style="color: #531ab6;">as</span> f:
+        <span style="color: #531ab6;">for</span> smp <span style="color: #531ab6;">in</span> ss:
+            f.write(<span style="color: #3548cf;">"%d</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">"</span>%smp)
 </pre>
 </div>
 

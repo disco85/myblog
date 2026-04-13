@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python2,3: re-raise exceptions</title>
@@ -35,20 +35,20 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Python2,3: re-raise exceptions</h1>
-<div id="outline-container-org50984f4" class="outline-2">
-<h2 id="org50984f4">Python2,3: re-raise exceptions</h2>
-<div class="outline-text-2" id="text-org50984f4">
+<div id="outline-container-org2bf2fe4" class="outline-2">
+<h2 id="org2bf2fe4">Python2,3: re-raise exceptions</h2>
+<div class="outline-text-2" id="text-org2bf2fe4">
 <p>
 Good practice is to keep original traceback (stack-trace) when you re-raise modified exception. In Python 2 it's simple:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">        <span style="color: #696969;">try</span>:
-            <span style="color: #696969;">return</span> buggy()
-        <span style="color: #696969;">except</span> <span style="color: #ff4500;">Exception</span> <span style="color: #696969;">as</span> x:
-            <span style="color: #ffffff;">cls</span>,<span style="color: #ffffff;">obj</span>,<span style="color: #ffffff;">tb</span> = sys.exc_info()
-            <span style="color: #575757;"># </span><span style="color: #575757;">modify obj OR create new the same class (cls), like here</span>
-            <span style="color: #696969;">raise</span> cls, SOME_ARGS, tb
+<pre class="src src-python">        <span style="color: #531ab6;">try</span>:
+            <span style="color: #531ab6;">return</span> buggy()
+        <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">Exception</span> <span style="color: #531ab6;">as</span> x:
+            <span style="color: #005e8b;">cls</span>,<span style="color: #005e8b;">obj</span>,<span style="color: #005e8b;">tb</span> = sys.exc_info()
+            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">modify obj OR create new the same class (cls), like here</span>
+            <span style="color: #531ab6;">raise</span> cls, SOME_ARGS, tb
 </pre>
 </div>
 
@@ -57,12 +57,12 @@ In Python 3 it's simple too, but now there is a special <code>BaseException</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">        <span style="color: #696969;">try</span>:
-            <span style="color: #696969;">return</span> buggy()
-        <span style="color: #696969;">except</span> <span style="color: #ff4500;">Exception</span> <span style="color: #696969;">as</span> x:
-            <span style="color: #ffffff;">cls</span>,<span style="color: #ffffff;">obj</span>,<span style="color: #ffffff;">tb</span> = sys.exc_info()
-            <span style="color: #575757;"># </span><span style="color: #575757;">modify obj OR create new the same class (cls), like here</span>
-            <span style="color: #696969;">raise</span> cls(SOME_ARGS).with_traceback(tb)
+<pre class="src src-python">        <span style="color: #531ab6;">try</span>:
+            <span style="color: #531ab6;">return</span> buggy()
+        <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">Exception</span> <span style="color: #531ab6;">as</span> x:
+            <span style="color: #005e8b;">cls</span>,<span style="color: #005e8b;">obj</span>,<span style="color: #005e8b;">tb</span> = sys.exc_info()
+            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">modify obj OR create new the same class (cls), like here</span>
+            <span style="color: #531ab6;">raise</span> cls(SOME_ARGS).with_traceback(tb)
 </pre>
 </div>
 
@@ -71,8 +71,8 @@ Now to make common code compatible with Python 2 and 3 we SHOULD save it in DIFF
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">reraise</span>(exc, msg, tb):
-    <span style="color: #696969;">raise</span> exc, msg, tb
+<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">reraise</span>(exc, msg, tb):
+    <span style="color: #531ab6;">raise</span> exc, msg, tb
 </pre>
 </div>
 
@@ -81,12 +81,12 @@ and similar in 'comp3.py' but with with<sub>traceback</sub>() usage. Now use it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">import</span> sys
-<span style="color: #ffffff;">_PY23</span> = 3 <span style="color: #696969;">if</span> sys.version_info.major &gt; 2 <span style="color: #696969;">else</span> 2
-<span style="color: #696969;">if</span> _PY23 == 2:
-    <span style="color: #696969;">from</span> comp2 <span style="color: #696969;">import</span> *
-<span style="color: #696969;">elif</span> _PY23 == 3:
-    <span style="color: #696969;">from</span> comp3 <span style="color: #696969;">import</span> *
+<pre class="src src-python"><span style="color: #531ab6;">import</span> sys
+<span style="color: #005e8b;">_PY23</span> = 3 <span style="color: #531ab6;">if</span> sys.version_info.major &gt; 2 <span style="color: #531ab6;">else</span> 2
+<span style="color: #531ab6;">if</span> _PY23 == 2:
+    <span style="color: #531ab6;">from</span> comp2 <span style="color: #531ab6;">import</span> *
+<span style="color: #531ab6;">elif</span> _PY23 == 3:
+    <span style="color: #531ab6;">from</span> comp3 <span style="color: #531ab6;">import</span> *
 </pre>
 </div>
 </div>

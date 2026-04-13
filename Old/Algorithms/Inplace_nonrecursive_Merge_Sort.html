@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>In-place non-recursive Merge Sort</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">In-place non-recursive Merge Sort</h1>
-<div id="outline-container-org152b137" class="outline-2">
-<h2 id="org152b137">In-place non-recursive Merge Sort</h2>
-<div class="outline-text-2" id="text-org152b137">
+<div id="outline-container-org67d8053" class="outline-2">
+<h2 id="org67d8053">In-place non-recursive Merge Sort</h2>
+<div class="outline-text-2" id="text-org67d8053">
 <p>
 Merge sorting is a good known algorithm, but usually is used recursive implementation with additional array. This is an another version: without recursive and without usage of additional array.
 Merge sorting idea is to sort small parts (pairs) than longer (4 items) and etc, but each next sort phase is MERGE of previous sorted parts. Merging of 2 sorted parts should saves order of items:
@@ -84,35 +84,35 @@ So, this is the code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"algutils.h"</span>
 
-<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span>&gt;
-<span style="color: #696969;">static</span> <span style="color: #696969;">inline</span> <span style="color: #ff4500;">void</span> <span style="color: #ff4500;">_merge</span>(<span style="color: #ff4500;">T</span> *<span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">left</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">mid</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">right</span>)
+<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span>&gt;
+<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">_merge</span>(<span style="color: #005f5f;">T</span> *<span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">left</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">mid</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">right</span>)
 {
-    <span style="color: #ff4500;">T</span> <span style="color: #ffffff;">tmp</span>, <span style="color: #575757;">// </span><span style="color: #575757;">tmp item needed for inserting if head position on shift</span>
-      *<span style="color: #ffffff;">larr</span>, <span style="color: #575757;">// </span><span style="color: #575757;">left subarray</span>
-      *<span style="color: #ffffff;">rarr</span>; <span style="color: #575757;">// </span><span style="color: #575757;">right subarray</span>
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">llen</span>, <span style="color: #575757;">// </span><span style="color: #575757;">length of left subarray</span>
-        <span style="color: #ffffff;">rlen</span>; <span style="color: #575757;">// </span><span style="color: #575757;">length of right subarray</span>
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">l</span>, <span style="color: #ffffff;">r</span>; <span style="color: #575757;">// </span><span style="color: #575757;">indexes of compared items in left, right subarrays</span>
+    <span style="color: #005f5f;">T</span> <span style="color: #005e8b;">tmp</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">tmp item needed for inserting if head position on shift</span>
+      *<span style="color: #005e8b;">larr</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">left subarray</span>
+      *<span style="color: #005e8b;">rarr</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">right subarray</span>
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">llen</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">length of left subarray</span>
+        <span style="color: #005e8b;">rlen</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">length of right subarray</span>
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">l</span>, <span style="color: #005e8b;">r</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">indexes of compared items in left, right subarrays</span>
 
     l = r = 0;
     larr = &amp;arr[left];
-    <span style="color: #696969;">if</span> (mid==left) {
-        <span style="color: #575757;">// </span><span style="color: #575757;">When len==2 swapping is more preferable</span>
+    <span style="color: #531ab6;">if</span> (mid==left) {
+        <span style="color: #7f0000;">// </span><span style="color: #7f0000;">When len==2 swapping is more preferable</span>
         rarr = &amp;arr[mid+1];
         llen = mid - left + 1;
         rlen = right - mid - 1;
-    } <span style="color: #696969;">else</span> {
-        <span style="color: #575757;">// </span><span style="color: #575757;">Common case</span>
+    } <span style="color: #531ab6;">else</span> {
+        <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Common case</span>
         rarr = &amp;arr[mid];
         llen = mid - left;
         rlen = right - mid;
     }
-    <span style="color: #575757;">// </span><span style="color: #575757;">Index in left subarray is limited by "right" index</span>
-    <span style="color: #696969;">while</span> ((larr+l &lt; rarr+r) &amp;&amp; r &lt; rlen) {
-        <span style="color: #696969;">if</span> (larr[l] &gt; rarr[r]) {
+    <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Index in left subarray is limited by "right" index</span>
+    <span style="color: #531ab6;">while</span> ((larr+l &lt; rarr+r) &amp;&amp; r &lt; rlen) {
+        <span style="color: #531ab6;">if</span> (larr[l] &gt; rarr[r]) {
             tmp = rarr[r];
             RSHIFT_ARR(larr+l, llen-(l-r), 1);
             larr[l] = tmp;
@@ -122,48 +122,48 @@ So, this is the code:
     }
 }
 
-<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span>&gt;
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">mergsort</span>(<span style="color: #ff4500;">T</span>* <span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">len</span>)
+<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span>&gt;
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">mergsort</span>(<span style="color: #005f5f;">T</span>* <span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">len</span>)
 {
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">lev</span>, <span style="color: #575757;">// </span><span style="color: #575757;">level of "recursion"</span>
-        <span style="color: #ffffff;">pie</span>, <span style="color: #575757;">// </span><span style="color: #575757;">number of subarray (of part)</span>
-        <span style="color: #ffffff;">pielen</span>, <span style="color: #575757;">// </span><span style="color: #575757;">subarray length: 2, 4, 8...</span>
-        <span style="color: #ffffff;">left</span>, <span style="color: #ffffff;">right</span>, <span style="color: #575757;">// </span><span style="color: #575757;">bounds (right is not included)</span>
-        <span style="color: #ffffff;">mid</span>, <span style="color: #575757;">// </span><span style="color: #575757;">middle point for splitting - is the same as left bound of subarray but on prev. level</span>
-        <span style="color: #ffffff;">lastleft</span>; <span style="color: #575757;">// </span><span style="color: #575757;">last left index</span>
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">lev</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">level of "recursion"</span>
+        <span style="color: #005e8b;">pie</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">number of subarray (of part)</span>
+        <span style="color: #005e8b;">pielen</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">subarray length: 2, 4, 8...</span>
+        <span style="color: #005e8b;">left</span>, <span style="color: #005e8b;">right</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">bounds (right is not included)</span>
+        <span style="color: #005e8b;">mid</span>, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">middle point for splitting - is the same as left bound of subarray but on prev. level</span>
+        <span style="color: #005e8b;">lastleft</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">last left index</span>
 
-    <span style="color: #696969;">if</span> (!arr||!len) <span style="color: #696969;">return</span> (0);
+    <span style="color: #531ab6;">if</span> (<span style="color: #a60000; font-weight: bold;">!</span>arr||<span style="color: #a60000; font-weight: bold;">!</span>len) <span style="color: #531ab6;">return</span> (0);
 
     lev = 0;
     pielen = 2;
-    <span style="color: #696969;">while</span> (pielen &lt; 2*len) {
+    <span style="color: #531ab6;">while</span> (pielen &lt; 2*len) {
         pie = 0;
-        <span style="color: #696969;">do</span> {
+        <span style="color: #531ab6;">do</span> {
             left = pie*pielen;
             right = left + pielen;
-            <span style="color: #696969;">if</span> (right &gt; len) right = len;
+            <span style="color: #531ab6;">if</span> (right &gt; len) right = len;
             mid = lev*2 + pielen*pie;
-            <span style="color: #696969;">if</span> (pielen &gt; len || mid &gt; len-1) mid = lastleft; <span style="color: #575757;">//</span><span style="color: #575757;">mid = len-2;</span>
+            <span style="color: #531ab6;">if</span> (pielen &gt; len || mid &gt; len-1) mid = lastleft; <span style="color: #7f0000;">//</span><span style="color: #7f0000;">mid = len-2;</span>
             _merge(arr, left, mid, right);
             pie++;
-        } <span style="color: #696969;">while</span> (right &lt; len-1);
+        } <span style="color: #531ab6;">while</span> (right &lt; len-1);
         pielen *= 2;
         lev++;
         lastleft = left;
     }
-    <span style="color: #696969;">return</span> (1);
+    <span style="color: #531ab6;">return</span> (1);
 }
 
 
-<span style="color: #575757;">/*****************************************</span>
-<span style="color: #575757;">                   main</span>
-<span style="color: #575757;"> ***************************************</span><span style="color: #575757;">*/</span>
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+<span style="color: #7f0000;">/*****************************************</span>
+<span style="color: #7f0000;">                   main</span>
+<span style="color: #7f0000;"> ***************************************</span><span style="color: #7f0000;">*/</span>
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
 {
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">arr1</span>[] = {10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121};
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">arr1</span>[] = {10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121};
     mergsort(arr1, sizeofarray(arr1));
-    PRINTARR(arr1, <span style="color: #696969;">"%d"</span>);
-    <span style="color: #696969;">return</span> (0);
+    PRINTARR(arr1, <span style="color: #3548cf;">"%d"</span>);
+    <span style="color: #531ab6;">return</span> (0);
 }
 </pre>
 </div>
@@ -173,16 +173,16 @@ Macros RSHIFT<sub>ARR</sub>() is trivial:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #575757;">/// </span><span style="color: #575757;">Shift array @a ARR of length @a LEN by @a N positions to right</span>
-<span style="color: #a52a2a;">#define</span> <span style="color: #ff4500;">RSHIFT_ARR</span>(<span style="color: #ffffff;">ARR</span>, <span style="color: #ffffff;">LEN</span>, <span style="color: #ffffff;">N</span>) <span style="color: #696969;">do</span> { \
-    <span style="color: #696969;">register</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">_rshift_arr_i_</span>; \
-    <span style="color: #696969;">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
+<pre class="src src-cpp"><span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Shift array @a ARR of length @a LEN by @a N positions to right</span>
+<span style="color: #a0132f;">#define</span> <span style="color: #721045;">RSHIFT_ARR</span>(<span style="color: #005e8b;">ARR</span>, <span style="color: #005e8b;">LEN</span>, <span style="color: #005e8b;">N</span>) <span style="color: #531ab6;">do</span> { \
+    <span style="color: #531ab6;">register</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">_rshift_arr_i_</span>; \
+    <span style="color: #531ab6;">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
          _rshift_arr_i_&gt;(N)-1; \
          _rshift_arr_i_--) \
     { \
         *((ARR)+_rshift_arr_i_) = *((ARR)+(_rshift_arr_i_-(N))); \
     } \
-} <span style="color: #696969;">while</span> (0)
+} <span style="color: #531ab6;">while</span> (0)
 </pre>
 </div>
 </div>

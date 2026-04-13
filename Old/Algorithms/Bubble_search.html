@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Bubble search</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Bubble search</h1>
-<div id="outline-container-orgf59b362" class="outline-2">
-<h2 id="orgf59b362">Bubble search</h2>
-<div class="outline-text-2" id="text-orgf59b362">
+<div id="outline-container-orgea07a2e" class="outline-2">
+<h2 id="orgea07a2e">Bubble search</h2>
+<div class="outline-text-2" id="text-orgea07a2e">
 <p>
 Bubble search (with exchanging items). We compares neighboring items: if they
 needs exchanging - they have wrong order - do it. Then we do the same for next
@@ -50,38 +50,38 @@ when no more items swaps.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a52a2a;">#include</span> <span style="color: #696969;">&lt;stdio.h&gt;</span>
-<span style="color: #a52a2a;">#include</span> <span style="color: #696969;">"algutils.h"</span>
+<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
+<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"algutils.h"</span>
 
-<span style="color: #696969;">template</span>&lt;<span style="color: #696969;">typename</span> <span style="color: #ff4500;">T</span>&gt;
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">bubsort</span>(<span style="color: #ff4500;">T</span> *<span style="color: #ffffff;">arr</span>, <span style="color: #ff4500;">unsigned</span> <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">len</span>)
+<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span> <span style="color: #005f5f;">T</span>&gt;
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">bubsort</span>(<span style="color: #005f5f;">T</span> *<span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">len</span>)
 {
-    <span style="color: #696969;">if</span> (!arr||!len) <span style="color: #696969;">return</span> (0);
-    <span style="color: #ff4500;">T</span> <span style="color: #ffffff;">tmp</span>;
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">pie</span> = len, <span style="color: #ffffff;">nswaps</span>;
-    <span style="color: #696969;">do</span> {
+    <span style="color: #531ab6;">if</span> (<span style="color: #a60000; font-weight: bold;">!</span>arr||<span style="color: #a60000; font-weight: bold;">!</span>len) <span style="color: #531ab6;">return</span> (0);
+    <span style="color: #005f5f;">T</span> <span style="color: #005e8b;">tmp</span>;
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">pie</span> = len, <span style="color: #005e8b;">nswaps</span>;
+    <span style="color: #531ab6;">do</span> {
         nswaps = 0;
-        <span style="color: #696969;">for</span> (<span style="color: #ff4500;">int</span> <span style="color: #ffffff;">i</span>=0; i&lt;pie; i++) {
-            <span style="color: #696969;">if</span> (arr[i] &gt; arr[i+1]) {
+        <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=0; i&lt;pie; i++) {
+            <span style="color: #531ab6;">if</span> (arr[i] &gt; arr[i+1]) {
                 SWAP(arr[i], arr[i+1], tmp);
                 nswaps++;
             }
         }
         pie--;
-    } <span style="color: #696969;">while</span> (<span style="color: #ff4500;">pie</span> &amp;&amp; <span style="color: #ffffff;">nswaps</span>);
-    <span style="color: #696969;">return</span> (1);
+    } <span style="color: #531ab6;">while</span> (<span style="color: #005f5f;">pie</span> &amp;&amp; <span style="color: #005e8b;">nswaps</span>);
+    <span style="color: #531ab6;">return</span> (1);
 }
 
-<span style="color: #575757;">/*****************************************</span>
-<span style="color: #575757;">                   main</span>
-<span style="color: #575757;"> ***************************************</span><span style="color: #575757;">*/</span>
-<span style="color: #ff4500;">int</span> <span style="color: #ff4500;">main</span>(<span style="color: #ff4500;">void</span>)
+<span style="color: #7f0000;">/*****************************************</span>
+<span style="color: #7f0000;">                   main</span>
+<span style="color: #7f0000;"> ***************************************</span><span style="color: #7f0000;">*/</span>
+<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
 {
-    <span style="color: #ff4500;">int</span> <span style="color: #ffffff;">arr</span>[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
-    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
+    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">arr</span>[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};
+    PRINTARR(arr, <span style="color: #3548cf;">"%d"</span>);
     bubsort(arr, sizeofarray(arr));
-    PRINTARR(arr, <span style="color: #696969;">"%d"</span>);
-    <span style="color: #696969;">return</span> (0);
+    PRINTARR(arr, <span style="color: #3548cf;">"%d"</span>);
+    <span style="color: #531ab6;">return</span> (0);
 }
 </pre>
 </div>

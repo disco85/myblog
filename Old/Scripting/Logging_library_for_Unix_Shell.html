@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Logging library for Unix Shell</title>
@@ -35,268 +35,268 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Logging library for Unix Shell</h1>
-<div id="outline-container-orgfb35038" class="outline-2">
-<h2 id="orgfb35038">Logging library for Unix Shell</h2>
-<div class="outline-text-2" id="text-orgfb35038">
+<div id="outline-container-org5bf5ace" class="outline-2">
+<h2 id="org5bf5ace">Logging library for Unix Shell</h2>
+<div class="outline-text-2" id="text-org5bf5ace">
 <p>
 This library is similar to Log library for Python or Java. Here its code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+<pre class="src src-bash"><span style="color: #7f0000;">#</span><span style="color: #7f0000;">!/bin/</span><span style="color: #531ab6;">sh</span>
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Simple logging facility for Unix /bin/sh</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">========================================</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Configuration</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">-------------</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">and log record</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">* _LOGGING_FMT : uses format similar to Python logging Lib</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#       </span><span style="color: #575757;">Available fields for _LOGGING_FMT are:</span>
-<span style="color: #575757;">#         </span><span style="color: #575757;">asctime, filename, levelname, levelno, message, name, pathname,</span>
-<span style="color: #575757;">#         </span><span style="color: #575757;">process, processName, user</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Example</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">-------</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">getLogger prg1</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">getLogger prg2</span>
-<span style="color: #575757;">#     </span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">addLogHandler prg1 FileHandler /dev/stderr</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">addLogHandler prg2 ConsoleHandler</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">addLogHandler prg2 FileHandler /var/log/somefile</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">addLogHandler prg2 FileHandler /var/log/somefile_copy</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">setLogLevel prg1 DEBUG</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">prg1_debug DebugMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">prg1_error ErrorMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">echo InfoMessage|prg2_info</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">will produces on STDERR console:</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">will produces on console:</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">and in /var/log/somefile:</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;">#   </span><span style="color: #575757;">and in /var/log/somefile_copy:</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #575757;">#     </span><span style="color: #575757;">...</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Simple logging facility for Unix /bin/sh</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">========================================</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Configuration</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">-------------</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">and log record</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">* _LOGGING_FMT : uses format similar to Python logging Lib</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#       </span><span style="color: #7f0000;">Available fields for _LOGGING_FMT are:</span>
+<span style="color: #7f0000;">#         </span><span style="color: #7f0000;">asctime, filename, levelname, levelno, message, name, pathname,</span>
+<span style="color: #7f0000;">#         </span><span style="color: #7f0000;">process, processName, user</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Example</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">-------</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">getLogger prg1</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">getLogger prg2</span>
+<span style="color: #7f0000;">#     </span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">addLogHandler prg1 FileHandler /dev/stderr</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">addLogHandler prg2 ConsoleHandler</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">addLogHandler prg2 FileHandler /var/log/somefile</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">addLogHandler prg2 FileHandler /var/log/somefile_copy</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">setLogLevel prg1 DEBUG</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">prg1_debug DebugMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">prg1_error ErrorMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">echo InfoMessage|prg2_info</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">will produces on STDERR console:</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">will produces on console:</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">and in /var/log/somefile:</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">and in /var/log/somefile_copy:</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span style="color: #7f0000;">#     </span><span style="color: #7f0000;">...</span>
 
-<span style="color: #575757;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #575757;">: log levels per handlers</span>
-
-
-<span style="color: #575757;">############################## </span><span style="color: #575757;">Settings #####################################</span>
-
-<span style="color: #575757;"># </span><span style="color: #575757;">Global log record format and date format:</span>
-<span style="color: #ffffff;">_LOGGING_DATEFMT</span>=<span style="color: #696969;">"%Y-%m-%dT%H:%M:%S%z"</span>
-<span style="color: #ffffff;">_LOGGING_FMT</span>=<span style="color: #696969;">"%asctime  %levelname %message"</span>
+<span style="color: #7f0000;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #7f0000;">: log levels per handlers</span>
 
 
+<span style="color: #7f0000;">############################## </span><span style="color: #7f0000;">Settings #####################################</span>
 
-<span style="color: #575757;">################################### </span><span style="color: #575757;">Code #####################################</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Global log record format and date format:</span>
+<span style="color: #005e8b;">_LOGGING_DATEFMT</span>=<span style="color: #3548cf;">"%Y-%m-%dT%H:%M:%S%z"</span>
+<span style="color: #005e8b;">_LOGGING_FMT</span>=<span style="color: #3548cf;">"%asctime  %levelname %message"</span>
 
-<span style="color: #ffffff;">_log_SCRIPT</span>=<span style="color: #fa8072;">`readlink -f $0`</span>
 
-<span style="color: #ff4500;">_log_getLogAttr</span>() {
-  <span style="color: #ffffff;">name</span>=$<span style="color: #ffffff;">1</span>; <span style="color: #ffffff;">attr</span>=${<span style="color: #ffffff;">1</span>}_$<span style="color: #ffffff;">2</span>
-  <span style="color: #a52a2a;">eval</span> echo $<span style="color: #fa8072;">`echo $attr`</span>
+
+<span style="color: #7f0000;">################################### </span><span style="color: #7f0000;">Code #####################################</span>
+
+<span style="color: #005e8b;">_log_SCRIPT</span>=<span style="color: #8f0075;">`readlink -f $0`</span>
+
+<span style="color: #721045;">_log_getLogAttr</span>() {
+  <span style="color: #005e8b;">name</span>=$<span style="color: #005e8b;">1</span>; <span style="color: #005e8b;">attr</span>=${<span style="color: #005e8b;">1</span>}_$<span style="color: #005e8b;">2</span>
+  <span style="color: #8f0075;">eval</span> echo $<span style="color: #8f0075;">`echo $attr`</span>
 }
 
-<span style="color: #575757;">################################### </span><span style="color: #575757;">Handlers #################################</span>
+<span style="color: #7f0000;">################################### </span><span style="color: #7f0000;">Handlers #################################</span>
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: ...</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Nothing to do, all args are ignored</span>
-<span style="color: #ff4500;">_log_NullHandler</span>() {
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: ...</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Nothing to do, all args are ignored</span>
+<span style="color: #721045;">_log_NullHandler</span>() {
   :
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $name $level $msg</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Logs $msg with $level via logger(1) utility</span>
-<span style="color: #ff4500;">_log_SyslogHandler</span>() {
-  <span style="color: #a52a2a;">local</span> name level msg syslog_level
-  <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">msg</span>=<span style="color: #696969;">"$3"</span>
-  <span style="color: #ffffff;">syslog_level</span>=<span style="color: #fa8072;">`_log_syslogLevel $level`</span>
-  logger -p <span style="color: #696969;">"local0.${syslog_level}"</span> -t $<span style="color: #ffffff;">name</span> <span style="color: #696969;">"$msg"</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $name $level $msg</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Logs $msg with $level via logger(1) utility</span>
+<span style="color: #721045;">_log_SyslogHandler</span>() {
+  <span style="color: #8f0075;">local</span> name level msg syslog_level
+  <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">msg</span>=<span style="color: #3548cf;">"$3"</span>
+  <span style="color: #005e8b;">syslog_level</span>=<span style="color: #8f0075;">`_log_syslogLevel $level`</span>
+  logger -p <span style="color: #3548cf;">"local0.${syslog_level}"</span> -t $<span style="color: #005e8b;">name</span> <span style="color: #3548cf;">"$msg"</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $name $level $msg</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Logs message $msg on console</span>
-<span style="color: #ff4500;">_log_ConsoleHandler</span>() {
-  <span style="color: #a52a2a;">local</span> name level msg
-  <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">msg</span>=<span style="color: #696969;">"$3"</span>
-  <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"$msg"</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $name $level $msg</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Logs message $msg on console</span>
+<span style="color: #721045;">_log_ConsoleHandler</span>() {
+  <span style="color: #8f0075;">local</span> name level msg
+  <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">msg</span>=<span style="color: #3548cf;">"$3"</span>
+  <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"$msg"</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $subject $address $msg</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">If mail(1) exists, call it to send $msg via EMail</span>
-<span style="color: #ff4500;">_log_MailHandler</span>() {
-  <span style="color: #a52a2a;">command</span> -v mail &gt;/dev/null 2&gt;&amp;1 || <span style="color: #696969;">return</span> 1
-  <span style="color: #a52a2a;">local</span> subj addr name level msg
-  <span style="color: #ffffff;">subj</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">addr</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$3"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #696969;">"$4"</span>; <span style="color: #ffffff;">msg</span>=<span style="color: #696969;">"$5"</span>
-  <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"$msg"</span>|mail -s <span style="color: #696969;">"${subj}${level}: $name"</span> $<span style="color: #ffffff;">addr</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $subject $address $msg</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">If mail(1) exists, call it to send $msg via EMail</span>
+<span style="color: #721045;">_log_MailHandler</span>() {
+  <span style="color: #8f0075;">command</span> -v mail &gt;/dev/null 2&gt;&amp;1 || <span style="color: #531ab6;">return</span> 1
+  <span style="color: #8f0075;">local</span> subj addr name level msg
+  <span style="color: #005e8b;">subj</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">addr</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$3"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #3548cf;">"$4"</span>; <span style="color: #005e8b;">msg</span>=<span style="color: #3548cf;">"$5"</span>
+  <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"$msg"</span>|mail -s <span style="color: #3548cf;">"${subj}${level}: $name"</span> $<span style="color: #005e8b;">addr</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $filename $msg</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Append message $msg to file $filename</span>
-<span style="color: #ff4500;">_log_FileHandler</span>() {
-  <span style="color: #a52a2a;">local</span> filename name level msg
-  <span style="color: #ffffff;">filename</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #696969;">"$3"</span>; <span style="color: #ffffff;">msg</span>=<span style="color: #696969;">"$4"</span>
-  touch <span style="color: #696969;">"$filename"</span>
-  <span style="color: #a52a2a;">echo</span> <span style="color: #696969;">"$msg"</span> &gt;&gt; <span style="color: #696969;">"$filename"</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $filename $msg</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Append message $msg to file $filename</span>
+<span style="color: #721045;">_log_FileHandler</span>() {
+  <span style="color: #8f0075;">local</span> filename name level msg
+  <span style="color: #005e8b;">filename</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #3548cf;">"$3"</span>; <span style="color: #005e8b;">msg</span>=<span style="color: #3548cf;">"$4"</span>
+  touch <span style="color: #3548cf;">"$filename"</span>
+  <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"$msg"</span> &gt;&gt; <span style="color: #3548cf;">"$filename"</span>
 }
 
-<span style="color: #ff4500;">_log_syslogLevel</span>() {
-  <span style="color: #696969;">case</span> $<span style="color: #ffffff;">1</span><span style="color: #696969;"> in</span>
+<span style="color: #721045;">_log_syslogLevel</span>() {
+  <span style="color: #531ab6;">case</span> $<span style="color: #005e8b;">1</span><span style="color: #531ab6;"> in</span>
     CRITICAL)
-      <span style="color: #a52a2a;">echo</span> crit;;
+      <span style="color: #8f0075;">echo</span> crit;;
     FATAL)
-      <span style="color: #a52a2a;">echo</span> panic;;
+      <span style="color: #8f0075;">echo</span> panic;;
     ERROR)
-      <span style="color: #a52a2a;">echo</span> error;;
+      <span style="color: #8f0075;">echo</span> error;;
     WARNING)
-      <span style="color: #a52a2a;">echo</span> warning;;
+      <span style="color: #8f0075;">echo</span> warning;;
     INFO)
-      <span style="color: #a52a2a;">echo</span> info;;
+      <span style="color: #8f0075;">echo</span> info;;
     DEBUG)
-      <span style="color: #a52a2a;">echo</span> debug;;
+      <span style="color: #8f0075;">echo</span> debug;;
     *)
-      <span style="color: #a52a2a;">echo</span> notice;;
-  <span style="color: #696969;">esac</span>
+      <span style="color: #8f0075;">echo</span> notice;;
+  <span style="color: #531ab6;">esac</span>
 }
 
-<span style="color: #ff4500;">_log_levelNo</span>() {
-  <span style="color: #696969;">case</span> $<span style="color: #ffffff;">1</span><span style="color: #696969;"> in</span>
+<span style="color: #721045;">_log_levelNo</span>() {
+  <span style="color: #531ab6;">case</span> $<span style="color: #005e8b;">1</span><span style="color: #531ab6;"> in</span>
     CRITICAL|FATAL)
-      <span style="color: #a52a2a;">echo</span> 50;;
+      <span style="color: #8f0075;">echo</span> 50;;
     ERROR)
-      <span style="color: #a52a2a;">echo</span> 40;;
+      <span style="color: #8f0075;">echo</span> 40;;
     WARNING)
-      <span style="color: #a52a2a;">echo</span> 30;;
+      <span style="color: #8f0075;">echo</span> 30;;
     INFO)
-      <span style="color: #a52a2a;">echo</span> 20;;
+      <span style="color: #8f0075;">echo</span> 20;;
     DEBUG)
-      <span style="color: #a52a2a;">echo</span> 10;;
+      <span style="color: #8f0075;">echo</span> 10;;
     *)
-      <span style="color: #a52a2a;">echo</span> 0;;
-  <span style="color: #696969;">esac</span>
+      <span style="color: #8f0075;">echo</span> 0;;
+  <span style="color: #531ab6;">esac</span>
 }
 
-<span style="color: #ff4500;">_log</span>() {
-  <span style="color: #a52a2a;">local</span> name level msg handlers h closure_args skip no_closure_args levelno enabled_levelno
-  <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">msg</span>=<span style="color: #696969;">"$3"</span>
+<span style="color: #721045;">_log</span>() {
+  <span style="color: #8f0075;">local</span> name level msg handlers h closure_args skip no_closure_args levelno enabled_levelno
+  <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">msg</span>=<span style="color: #3548cf;">"$3"</span>
 
-  <span style="color: #ffffff;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $level`</span>
-  <span style="color: #ffffff;">enabled_levelno</span>=<span style="color: #fa8072;">`_log_getLogAttr $name level`</span>
-  [ $<span style="color: #ffffff;">levelno</span> -lt $<span style="color: #ffffff;">enabled_levelno</span> ] &amp;&amp; <span style="color: #696969;">return</span>
+  <span style="color: #005e8b;">levelno</span>=<span style="color: #8f0075;">`_log_levelNo $level`</span>
+  <span style="color: #005e8b;">enabled_levelno</span>=<span style="color: #8f0075;">`_log_getLogAttr $name level`</span>
+  [ $<span style="color: #005e8b;">levelno</span> -lt $<span style="color: #005e8b;">enabled_levelno</span> ] &amp;&amp; <span style="color: #531ab6;">return</span>
 
-  <span style="color: #ffffff;">handlers</span>=<span style="color: #fa8072;">`_log_getLogAttr $name handlers`</span>
-  <span style="color: #ffffff;">handlers</span>=<span style="color: #fa8072;">`echo "$handlers"|sed 's/__COMMA__/\\ /g'`</span>
-  <span style="color: #696969;">for</span> h<span style="color: #696969;"> in</span> $<span style="color: #ffffff;">handlers</span>; <span style="color: #696969;">do</span>
-    <span style="color: #a52a2a;">echo</span> $<span style="color: #ffffff;">skip</span>|grep $<span style="color: #ffffff;">h</span> &gt;/dev/null &amp;&amp; <span style="color: #696969;">continue</span>
-    <span style="color: #ffffff;">closure_args</span>=<span style="color: #fa8072;">`_log_getLogAttr $name ${h}_handler_args`</span>
-    <span style="color: #ffffff;">closure_args</span>=<span style="color: #fa8072;">`echo "$closure_args"|sed 's/__COMMA__/\\ /g'`</span>
-    <span style="color: #ffffff;">no_closure_args</span>=1
-    <span style="color: #696969;">for</span> ca<span style="color: #696969;"> in</span> $<span style="color: #ffffff;">closure_args</span>; <span style="color: #696969;">do</span>
-      <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"$h $ca $name $level \"$msg\""</span>
-      <span style="color: #ffffff;">no_closure_args</span>=0
-    <span style="color: #696969;">done</span>
-    [ $<span style="color: #ffffff;">no_closure_args</span> ] &amp;&amp; <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"$h $name $level \"$msg\""</span>
-    <span style="color: #ffffff;">skip</span>=<span style="color: #696969;">"$h $skip"</span>
-  <span style="color: #696969;">done</span>
+  <span style="color: #005e8b;">handlers</span>=<span style="color: #8f0075;">`_log_getLogAttr $name handlers`</span>
+  <span style="color: #005e8b;">handlers</span>=<span style="color: #8f0075;">`echo "$handlers"|sed 's/__COMMA__/\\ /g'`</span>
+  <span style="color: #531ab6;">for</span> h<span style="color: #531ab6;"> in</span> $<span style="color: #005e8b;">handlers</span>; <span style="color: #531ab6;">do</span>
+    <span style="color: #8f0075;">echo</span> $<span style="color: #005e8b;">skip</span>|grep $<span style="color: #005e8b;">h</span> &gt;/dev/null &amp;&amp; <span style="color: #531ab6;">continue</span>
+    <span style="color: #005e8b;">closure_args</span>=<span style="color: #8f0075;">`_log_getLogAttr $name ${h}_handler_args`</span>
+    <span style="color: #005e8b;">closure_args</span>=<span style="color: #8f0075;">`echo "$closure_args"|sed 's/__COMMA__/\\ /g'`</span>
+    <span style="color: #005e8b;">no_closure_args</span>=1
+    <span style="color: #531ab6;">for</span> ca<span style="color: #531ab6;"> in</span> $<span style="color: #005e8b;">closure_args</span>; <span style="color: #531ab6;">do</span>
+      <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"$h $ca $name $level \"$msg\""</span>
+      <span style="color: #005e8b;">no_closure_args</span>=0
+    <span style="color: #531ab6;">done</span>
+    [ $<span style="color: #005e8b;">no_closure_args</span> ] &amp;&amp; <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"$h $name $level \"$msg\""</span>
+    <span style="color: #005e8b;">skip</span>=<span style="color: #3548cf;">"$h $skip"</span>
+  <span style="color: #531ab6;">done</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $name $h [$args...]</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Adds handler $h for logger $name with possible arguments</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">(see handlers' implementations for concrete args)</span>
-<span style="color: #ff4500;">addLogHandler</span>() {
-  <span style="color: #a52a2a;">local</span> name handler oldhandlers exthandler args oldargs
-  <span style="color: #ffffff;">name</span>=$<span style="color: #ffffff;">1</span>; <span style="color: #ffffff;">exthandler</span>=<span style="color: #696969;">"$2"</span>; <span style="color: #ffffff;">handler</span>=_log_<span style="color: #696969;">"$exthandler"</span>; <span style="color: #a52a2a;">shift</span> 2; <span style="color: #ffffff;">args</span>=<span style="color: #696969;">"$*"</span>
-  <span style="color: #ffffff;">oldhandlers</span>=<span style="color: #fa8072;">`_log_getLogAttr $name handlers`</span>
-  <span style="color: #ffffff;">oldargs</span>=<span style="color: #fa8072;">`_log_getLogAttr $name ${handler}_handler_args`</span>
-  <span style="color: #575757;"># </span><span style="color: #575757;">__COMMA__ is used to separate items in lists</span>
-  <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
-  <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"${name}_${handler}_handler_args=\"$args\"__COMMA__$oldargs"</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $name $h [$args...]</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Adds handler $h for logger $name with possible arguments</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">(see handlers' implementations for concrete args)</span>
+<span style="color: #721045;">addLogHandler</span>() {
+  <span style="color: #8f0075;">local</span> name handler oldhandlers exthandler args oldargs
+  <span style="color: #005e8b;">name</span>=$<span style="color: #005e8b;">1</span>; <span style="color: #005e8b;">exthandler</span>=<span style="color: #3548cf;">"$2"</span>; <span style="color: #005e8b;">handler</span>=_log_<span style="color: #3548cf;">"$exthandler"</span>; <span style="color: #8f0075;">shift</span> 2; <span style="color: #005e8b;">args</span>=<span style="color: #3548cf;">"$*"</span>
+  <span style="color: #005e8b;">oldhandlers</span>=<span style="color: #8f0075;">`_log_getLogAttr $name handlers`</span>
+  <span style="color: #005e8b;">oldargs</span>=<span style="color: #8f0075;">`_log_getLogAttr $name ${handler}_handler_args`</span>
+  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">__COMMA__ is used to separate items in lists</span>
+  <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
+  <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"${name}_${handler}_handler_args=\"$args\"__COMMA__$oldargs"</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $name | $name $longname</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">No return and no output but setups logger for this $name. In 2nd form $longname</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">is used in message substitution</span>
-<span style="color: #ff4500;">getLogger</span>() {
-  <span style="color: #a52a2a;">local</span> asctime filename levelname levelno message name pathname process processName _lv user longname
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $name | $name $longname</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">No return and no output but setups logger for this $name. In 2nd form $longname</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">is used in message substitution</span>
+<span style="color: #721045;">getLogger</span>() {
+  <span style="color: #8f0075;">local</span> asctime filename levelname levelno message name pathname process processName _lv user longname
 
-  <span style="color: #ffffff;">asctime</span>=$<span style="color: #ffffff;">_LOGGING_DATEFMT</span>
-  <span style="color: #ffffff;">filename</span>=<span style="color: #fa8072;">`getScriptName`</span>
-  <span style="color: #ffffff;">message</span>=<span style="color: #696969;">'${1:-`tee`}'</span>
-  <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$1"</span>
-  <span style="color: #ffffff;">longname</span>=${<span style="color: #ffffff;">2</span>:-$<span style="color: #ffffff;">name</span>}
-  <span style="color: #ffffff;">pathname</span>=<span style="color: #fa8072;">`echo "$_log_SCRIPT"|sed 's/\\//\\\\\//g'`</span>
-  <span style="color: #ffffff;">process</span>=<span style="color: #696969;">'$$'</span>
-  <span style="color: #ffffff;">processName</span>=<span style="color: #fa8072;">`ps -A -opid,comm | awk -v PID=$$ '$1 == PID { print $2 }'`</span>
-  <span style="color: #ffffff;">processName</span>=<span style="color: #fa8072;">`echo "$processName"|sed 's/\\//\\\\\//g'`</span>
-  <span style="color: #ffffff;">user</span>=<span style="color: #696969;">"$USER"</span>
+  <span style="color: #005e8b;">asctime</span>=$<span style="color: #005e8b;">_LOGGING_DATEFMT</span>
+  <span style="color: #005e8b;">filename</span>=<span style="color: #8f0075;">`getScriptName`</span>
+  <span style="color: #005e8b;">message</span>=<span style="color: #3548cf;">'${1:-`tee`}'</span>
+  <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$1"</span>
+  <span style="color: #005e8b;">longname</span>=${<span style="color: #005e8b;">2</span>:-$<span style="color: #005e8b;">name</span>}
+  <span style="color: #005e8b;">pathname</span>=<span style="color: #8f0075;">`echo "$_log_SCRIPT"|sed 's/\\//\\\\\//g'`</span>
+  <span style="color: #005e8b;">process</span>=<span style="color: #3548cf;">'$$'</span>
+  <span style="color: #005e8b;">processName</span>=<span style="color: #8f0075;">`ps -A -opid,comm | awk -v PID=$$ '$1 == PID { print $2 }'`</span>
+  <span style="color: #005e8b;">processName</span>=<span style="color: #8f0075;">`echo "$processName"|sed 's/\\//\\\\\//g'`</span>
+  <span style="color: #005e8b;">user</span>=<span style="color: #3548cf;">"$USER"</span>
 
-  <span style="color: #696969;">for</span> _lv<span style="color: #696969;"> in</span> debug info warning error fatal critical; <span style="color: #696969;">do</span>
-    <span style="color: #ffffff;">levelname</span>=<span style="color: #fa8072;">`echo -n $_lv|tr '[:lower:]' '[:upper:]'`</span>
-    <span style="color: #ffffff;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $levelname`</span>
+  <span style="color: #531ab6;">for</span> _lv<span style="color: #531ab6;"> in</span> debug info warning error fatal critical; <span style="color: #531ab6;">do</span>
+    <span style="color: #005e8b;">levelname</span>=<span style="color: #8f0075;">`echo -n $_lv|tr '[:lower:]' '[:upper:]'`</span>
+    <span style="color: #005e8b;">levelno</span>=<span style="color: #8f0075;">`_log_levelNo $levelname`</span>
 
-    <span style="color: #ffffff;">fmt</span>=<span style="color: #fa8072;">`echo $_LOGGING_FMT | \</span>
-<span style="color: #fa8072;">      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \</span>
-<span style="color: #fa8072;">      sed "s/%filename/$filename/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%levelname/$levelname/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%levelno/$levelno/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%message/$message/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%pathname/$pathname/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%processName/$processName/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%process/$process/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%user/$user/g" | \</span>
-<span style="color: #fa8072;">      sed "s//$longname/g"`</span>
-    <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"${name}_${_lv} () { _log $name $levelname \"$fmt\"; }"</span>
-  <span style="color: #696969;">done</span>
-  setLogLevel $<span style="color: #ffffff;">name</span> INFO
+    <span style="color: #005e8b;">fmt</span>=<span style="color: #8f0075;">`echo $_LOGGING_FMT | \</span>
+<span style="color: #8f0075;">      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \</span>
+<span style="color: #8f0075;">      sed "s/%filename/$filename/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%levelname/$levelname/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%levelno/$levelno/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%message/$message/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%pathname/$pathname/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%processName/$processName/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%process/$process/g" | \</span>
+<span style="color: #8f0075;">      sed "s/%user/$user/g" | \</span>
+<span style="color: #8f0075;">      sed "s//$longname/g"`</span>
+    <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"${name}_${_lv} () { _log $name $levelname \"$fmt\"; }"</span>
+  <span style="color: #531ab6;">done</span>
+  setLogLevel $<span style="color: #005e8b;">name</span> INFO
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS: $name $level</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">messages which are less severe than $level will be ignored.</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Default is INFO</span>
-<span style="color: #ff4500;">setLogLevel</span>() {
-  <span style="color: #a52a2a;">local</span> name level levelno
-  <span style="color: #ffffff;">name</span>=<span style="color: #696969;">"$1"</span>; <span style="color: #ffffff;">level</span>=<span style="color: #fa8072;">`echo -n $2|tr '[:lower:]' '[:upper:]'`</span>
-  <span style="color: #ffffff;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $level`</span>
-  <span style="color: #a52a2a;">eval</span> <span style="color: #696969;">"${name}_level=$levelno"</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS: $name $level</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">messages which are less severe than $level will be ignored.</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Default is INFO</span>
+<span style="color: #721045;">setLogLevel</span>() {
+  <span style="color: #8f0075;">local</span> name level levelno
+  <span style="color: #005e8b;">name</span>=<span style="color: #3548cf;">"$1"</span>; <span style="color: #005e8b;">level</span>=<span style="color: #8f0075;">`echo -n $2|tr '[:lower:]' '[:upper:]'`</span>
+  <span style="color: #005e8b;">levelno</span>=<span style="color: #8f0075;">`_log_levelNo $level`</span>
+  <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"${name}_level=$levelno"</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">SYNOPSIS:</span>
-<span style="color: #575757;">#</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Echos name of script</span>
-<span style="color: #ff4500;">getScriptName</span>() {
-  <span style="color: #a52a2a;">echo</span> <span style="color: #fa8072;">`basename "$_log_SCRIPT"`</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">SYNOPSIS:</span>
+<span style="color: #7f0000;">#</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Echos name of script</span>
+<span style="color: #721045;">getScriptName</span>() {
+  <span style="color: #8f0075;">echo</span> <span style="color: #8f0075;">`basename "$_log_SCRIPT"`</span>
 }
 
 </pre>
@@ -307,10 +307,10 @@ Example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
-<span style="color: #a52a2a;">.</span> ./logging.sh
+<pre class="src src-bash"><span style="color: #7f0000;">#</span><span style="color: #7f0000;">!/bin/</span><span style="color: #531ab6;">sh</span>
+<span style="color: #8f0075;">.</span> ./logging.sh
 
-getLogger prg1 <span style="color: #fa8072;">`getScriptName`</span>
+getLogger prg1 <span style="color: #8f0075;">`getScriptName`</span>
 addLogHandler prg1 ConsoleHandler
 addLogHandler prg1 FileHandler ./lll1.log
 addLogHandler prg1 FileHandler ./lll2.log
@@ -318,9 +318,9 @@ setLogLevel prg1 DEBUG
 
 prg1_debug Debugggg
 prg1_error Errrrror
-<span style="color: #a52a2a;">echo</span> <span style="color: #696969;">'Message-INFO!!!!</span>
-<span style="color: #696969;">1111</span>
-<span style="color: #696969;">2222'</span>|prg1_info
+<span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">'Message-INFO!!!!</span>
+<span style="color: #3548cf;">1111</span>
+<span style="color: #3548cf;">2222'</span>|prg1_info
 
 </pre>
 </div>

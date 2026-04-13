@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>More safe Python</title>
@@ -35,21 +35,21 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">More safe Python</h1>
-<div id="outline-container-org6fbc0c8" class="outline-2">
-<h2 id="org6fbc0c8">More safe Python</h2>
-<div class="outline-text-2" id="text-org6fbc0c8">
+<div id="outline-container-org2450585" class="outline-2">
+<h2 id="org2450585">More safe Python</h2>
+<div class="outline-text-2" id="text-org2450585">
 <p>
 Python can be safe (if we need it) too. Another example is: let's say we want to implement
 a function <code>unique()</code>. It may looks like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">def</span> <span style="color: #ff4500;">unique</span>(data):
-    <span style="color: #ffffff;">res</span>: <span style="color: #a52a2a;">list</span> = []
-    <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> data:
-        <span style="color: #696969;">if</span> res <span style="color: #696969;">and</span> x == res[-1]: <span style="color: #696969;">continue</span>
-        <span style="color: #696969;">else</span>: res.append(x)
-    <span style="color: #696969;">return</span> res
+<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">unique</span>(data):
+    <span style="color: #005e8b;">res</span>: <span style="color: #8f0075;">list</span> = []
+    <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> data:
+        <span style="color: #531ab6;">if</span> res <span style="color: #531ab6;">and</span> x == res[-1]: <span style="color: #531ab6;">continue</span>
+        <span style="color: #531ab6;">else</span>: res.append(x)
+    <span style="color: #531ab6;">return</span> res
 </pre>
 </div>
 
@@ -61,22 +61,22 @@ a client from passing of data which was not sorted, so the check will work at co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #696969;">from</span> typing <span style="color: #696969;">import</span> *
+<pre class="src src-python"><span style="color: #531ab6;">from</span> typing <span style="color: #531ab6;">import</span> *
 
-<span style="color: #696969;">class</span> <span style="color: #ff4500;">Sorted</span>(<span style="color: #a52a2a;">list</span>):
-    <span style="color: #696969;">def</span> <span style="color: #ff4500;">__init__</span>(<span style="color: #696969;">self</span>, items):
-        <span style="color: #a52a2a;">super</span>().__init__(<span style="color: #a52a2a;">sorted</span>(items))
+<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Sorted</span>(<span style="color: #8f0075;">list</span>):
+    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, items):
+        <span style="color: #8f0075;">super</span>().__init__(<span style="color: #8f0075;">sorted</span>(items))
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">unique</span>(data: Sorted) -&gt; <span style="color: #a52a2a;">list</span>:
-    <span style="color: #ffffff;">res</span>: <span style="color: #a52a2a;">list</span> = []
-    <span style="color: #696969;">for</span> x <span style="color: #696969;">in</span> data:
-        <span style="color: #696969;">if</span> res <span style="color: #696969;">and</span> x == res[-1]: <span style="color: #696969;">continue</span>
-        <span style="color: #696969;">else</span>: res.append(x)
-    <span style="color: #696969;">return</span> res
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">unique</span>(data: Sorted) -&gt; <span style="color: #8f0075;">list</span>:
+    <span style="color: #005e8b;">res</span>: <span style="color: #8f0075;">list</span> = []
+    <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> data:
+        <span style="color: #531ab6;">if</span> res <span style="color: #531ab6;">and</span> x == res[-1]: <span style="color: #531ab6;">continue</span>
+        <span style="color: #531ab6;">else</span>: res.append(x)
+    <span style="color: #531ab6;">return</span> res
 
-<span style="color: #ffffff;">items</span> = 11, 20, 11, 20, 1, 20, 11, 5, 1
-<span style="color: #ffffff;">data</span> = Sorted(items)
-<span style="color: #a52a2a;">print</span>(unique(items))
+<span style="color: #005e8b;">items</span> = 11, 20, 11, 20, 1, 20, 11, 5, 1
+<span style="color: #005e8b;">data</span> = Sorted(items)
+<span style="color: #8f0075;">print</span>(unique(items))
 </pre>
 </div>
 

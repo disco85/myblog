@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Stream integration by Simpson's rule</title>
@@ -67,9 +67,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Stream integration by Simpson's rule</h1>
-<div id="outline-container-org6702259" class="outline-2">
-<h2 id="org6702259">Stream integration by Simpson's rule</h2>
-<div class="outline-text-2" id="text-org6702259">
+<div id="outline-container-org4b75cd0" class="outline-2">
+<h2 id="org4b75cd0">Stream integration by Simpson's rule</h2>
+<div class="outline-text-2" id="text-org4b75cd0">
 <p>
 About this method of numerical integration you can read here. To do it in streaming manner we should do little formal mathematics.
 </p>
@@ -138,15 +138,15 @@ Example in SWIG (some.h file):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #575757;">// </span><span style="color: #575757;">Simpsone's rule integrator</span>
-<span style="color: #696969;">typedef</span> <span style="color: #696969;">struct</span> <span style="color: #ff4500;">CSIntr</span> {
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">I</span>; <span style="color: #575757;">// </span><span style="color: #575757;">last value of integral</span>
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">y_1</span>; <span style="color: #575757;">// </span><span style="color: #575757;">y[-1]</span>
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">y_2</span>; <span style="color: #575757;">// </span><span style="color: #575757;">y[-2]</span>
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h</span>; <span style="color: #575757;">// </span><span style="color: #575757;">step of subinterval</span>
-        <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h_d</span>; <span style="color: #575757;">// </span><span style="color: #575757;">step of subinterval/3</span>
-        <span style="color: #ff4500;">long</span> <span style="color: #ff4500;">long</span> <span style="color: #ffffff;">i</span>; <span style="color: #575757;">// </span><span style="color: #575757;">iteration</span>
-} <span style="color: #ff4500;">CSIntr</span>;
+<pre class="src src-cpp"><span style="color: #7f0000;">// </span><span style="color: #7f0000;">Simpsone's rule integrator</span>
+<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">CSIntr</span> {
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">I</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">last value of integral</span>
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">y_1</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">y[-1]</span>
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">y_2</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">y[-2]</span>
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">h</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">step of subinterval</span>
+        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">h_d</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">step of subinterval/3</span>
+        <span style="color: #005f5f;">long</span> <span style="color: #005f5f;">long</span> <span style="color: #005e8b;">i</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">iteration</span>
+} <span style="color: #005f5f;">CSIntr</span>;
 </pre>
 </div>
 
@@ -155,44 +155,44 @@ Example in SWIG (some.h file):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp">%include <span style="color: #696969;">"some.h"</span>
+<pre class="src src-cpp">%include <span style="color: #3548cf;">"some.h"</span>
 %extend CSIntr {
-    <span style="color: #575757;">// </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #575757;"> how is more right to do this?</span>
-    <span style="color: #ff4500;">void</span> <span style="color: #ffffff;">reset</span>() {
+    <span style="color: #7f0000;">// </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #7f0000;"> how is more right to do this?</span>
+    <span style="color: #005f5f;">void</span> <span style="color: #005e8b;">reset</span>() {
         $self-&gt;I = 0.;
         $self-&gt;y_1 = $self-&gt;y_2 = 0.;
         $self-&gt;i = 0;
     }
 
-    <span style="color: #ff4500;">void</span> <span style="color: #ffffff;">setup</span>(<span style="color: #ff4500;">double</span> h) {
+    <span style="color: #005f5f;">void</span> <span style="color: #005e8b;">setup</span>(<span style="color: #005f5f;">double</span> h) {
         $self-&gt;h = h;
         $self-&gt;h_d = h/3.;
     }
 
-    CSIntr(<span style="color: #ff4500;">double</span> <span style="color: #ffffff;">h</span>) {
-        <span style="color: #ff4500;">CSIntr</span> *<span style="color: #ffffff;">obj</span>;
+    CSIntr(<span style="color: #005f5f;">double</span> <span style="color: #005e8b;">h</span>) {
+        <span style="color: #005f5f;">CSIntr</span> *<span style="color: #005e8b;">obj</span>;
 
-        <span style="color: #696969;">if</span> (<span style="color: #7fffd4;">NULL</span> == (obj=(<span style="color: #ff4500;">CSIntr</span>*) malloc(<span style="color: #696969;">sizeof</span> (CSIntr))))
-            <span style="color: #696969;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        <span style="color: #531ab6;">if</span> (<span style="color: #0000b0;">NULL</span> == (obj=(<span style="color: #005f5f;">CSIntr</span>*) malloc(<span style="color: #531ab6;">sizeof</span> (CSIntr))))
+            <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">NULL</span>);
         CSIntr_reset(obj);
         CSIntr_setup(obj, h);
-        <span style="color: #696969;">return</span> (obj);
+        <span style="color: #531ab6;">return</span> (obj);
     }
 
     ~CSIntr() {
-        <span style="color: #696969;">if</span> ($self) free($self);
+        <span style="color: #531ab6;">if</span> ($self) free($self);
     }
 
-    <span style="color: #ff4500;">double</span> <span style="color: #ffffff;">calculate</span>(<span style="color: #ff4500;">double</span> y) {
-        <span style="color: #696969;">if</span> ($self-&gt;i &lt;= 1)
+    <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">calculate</span>(<span style="color: #005f5f;">double</span> y) {
+        <span style="color: #531ab6;">if</span> ($self-&gt;i &lt;= 1)
             $self-&gt;I = 0;
-        <span style="color: #696969;">else</span> <span style="color: #696969;">if</span> (0 == $self-&gt;i % 2)
+        <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (0 == $self-&gt;i % 2)
             $self-&gt;I += $self-&gt;h_d * ($self-&gt;y_2 + 4. * $self-&gt;y_1 + y);
 
         $self-&gt;y_2 = $self-&gt;y_1;
         $self-&gt;y_1 = y;
         $self-&gt;i++;
-        <span style="color: #696969;">return</span> ($self-&gt;I);
+        <span style="color: #531ab6;">return</span> ($self-&gt;I);
     }
 };
 </pre>
@@ -217,7 +217,7 @@ test on linear function with <code>yi = {1, 2, 3, 4, 5}</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #a52a2a;">load</span> some
+<pre class="src src-tcl"><span style="color: #8f0075;">load</span> some
 % CSIntr cs 1
 _f85f7601_p_CSIntr
 % cs calculate 1

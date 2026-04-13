@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:20 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Small tricks in shell</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Small tricks in shell</h1>
-<div id="outline-container-org2829512" class="outline-2">
-<h2 id="org2829512">Small tricks in shell</h2>
-<div class="outline-text-2" id="text-org2829512">
+<div id="outline-container-org80ac638" class="outline-2">
+<h2 id="org80ac638">Small tricks in shell</h2>
+<div class="outline-text-2" id="text-org80ac638">
 <p>
 !Directories tree view
 </p>
@@ -47,8 +47,8 @@ Set it to your <code>.bashrc</code> and run as <code>tree [DIR]</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #ff4500;">tree</span>() {
-find <span style="color: #696969;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: #696969;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #ffffff;">FS</span>=<span style="color: #696969;">'/'</span>
+<pre class="src src-bash"><span style="color: #721045;">tree</span>() {
+find <span style="color: #3548cf;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: #3548cf;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #005e8b;">FS</span>=<span style="color: #3548cf;">'/'</span>
 }
 </pre>
 </div>
@@ -63,7 +63,7 @@ If you have big patch file with many files there, to patch only one
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">filterdiff -i <span style="color: #696969;">'*filename.py'</span> patch.diff | patch -pN
+<pre class="src src-bash">filterdiff -i <span style="color: #3548cf;">'*filename.py'</span> patch.diff | patch -pN
 </pre>
 </div>
 
@@ -103,14 +103,14 @@ This script run one of available command:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #575757;">#</span><span style="color: #575757;">!/bin/</span><span style="color: #696969;">sh</span>
+<pre class="src src-bash"><span style="color: #7f0000;">#</span><span style="color: #7f0000;">!/bin/</span><span style="color: #531ab6;">sh</span>
 
-<span style="color: #ff4500;">trycmd</span>() {
-    <span style="color: #ffffff;">a0</span>=$<span style="color: #ffffff;">1</span>; <span style="color: #a52a2a;">shift</span>
-    <span style="color: #696969;">for</span> c<span style="color: #696969;"> in</span> $<span style="color: #ffffff;">*</span>; <span style="color: #696969;">do</span> $<span style="color: #ffffff;">c</span> $<span style="color: #ffffff;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: #696969;">break</span>; <span style="color: #696969;">done</span>
+<span style="color: #721045;">trycmd</span>() {
+    <span style="color: #005e8b;">a0</span>=$<span style="color: #005e8b;">1</span>; <span style="color: #8f0075;">shift</span>
+    <span style="color: #531ab6;">for</span> c<span style="color: #531ab6;"> in</span> $<span style="color: #005e8b;">*</span>; <span style="color: #531ab6;">do</span> $<span style="color: #005e8b;">c</span> $<span style="color: #005e8b;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: #531ab6;">break</span>; <span style="color: #531ab6;">done</span>
 }
 
-<span style="color: #575757;"># </span><span style="color: #575757;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
 trycmd list pipx pip0 pip1 pip3 pip
 </pre>
 </div>

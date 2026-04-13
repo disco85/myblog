@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Eratosthenes sieve</title>
@@ -35,9 +35,9 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">Functional Eratosthenes sieve</h1>
-<div id="outline-container-orgedeaaec" class="outline-2">
-<h2 id="orgedeaaec">Functional Eratosthenes sieve</h2>
-<div class="outline-text-2" id="text-orgedeaaec">
+<div id="outline-container-orgd952462" class="outline-2">
+<h2 id="orgd952462">Functional Eratosthenes sieve</h2>
+<div class="outline-text-2" id="text-orgd952462">
 <p>
 Three implementations of subject on Python/Haskell/Ocaml
 </p>
@@ -47,39 +47,39 @@ Python version:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #575757;"># </span><span style="color: #575757;">coding: cp1251</span>
+<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">coding: cp1251</span>
 
-<span style="color: #575757;"># </span><span style="color: #575757;">Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">j=2,3,4,5,6,7... Then we are searching next unchecked, check all.</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">Each first unchecked is the prime number.</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">j=2,3,4,5,6,7... Then we are searching next unchecked, check all.</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Each first unchecked is the prime number.</span>
 
-<span style="color: #575757;">#####################################################</span>
-<span style="color: #575757;"># </span><span style="color: #575757;">&#1057; tail recursion ;)</span>
-<span style="color: #575757;">#####################################################</span>
+<span style="color: #7f0000;">#####################################################</span>
+<span style="color: #7f0000;"># </span><span style="color: #7f0000;">&#1057; tail recursion ;)</span>
+<span style="color: #7f0000;">#####################################################</span>
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">tag2</span>(lst, n, m, j=2, i=1):
-    <span style="color: #696969;">''' Returns list with 0s - i.e. checked numbers in `lst` which</span>
-<span style="color: #696969;">    are multiple of n (m - max number, j - multiplier 2, 3, 4...,</span>
-<span style="color: #696969;">    i - serial number of our number :)</span>
-<span style="color: #696969;">    '''</span>
-    <span style="color: #696969;">if</span> <span style="color: #696969;">not</span> lst: <span style="color: #696969;">return</span> []
-    <span style="color: #696969;">elif</span> i != n*j: <span style="color: #696969;">return</span> lst[0:1] + tag2(lst[1:], n, m, j, i+1)
-    <span style="color: #696969;">else</span>: <span style="color: #696969;">return</span> [0] + tag2(lst[1:], n, m, j+1, i+1)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">tag2</span>(lst, n, m, j=2, i=1):
+    <span style="color: #2a5045;">''' Returns list with 0s - i.e. checked numbers in `lst` which</span>
+<span style="color: #2a5045;">    are multiple of n (m - max number, j - multiplier 2, 3, 4...,</span>
+<span style="color: #2a5045;">    i - serial number of our number :)</span>
+<span style="color: #2a5045;">    '''</span>
+    <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> lst: <span style="color: #531ab6;">return</span> []
+    <span style="color: #531ab6;">elif</span> i != n*j: <span style="color: #531ab6;">return</span> lst[0:1] + tag2(lst[1:], n, m, j, i+1)
+    <span style="color: #531ab6;">else</span>: <span style="color: #531ab6;">return</span> [0] + tag2(lst[1:], n, m, j+1, i+1)
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">tag</span>(lst, n): <span style="color: #696969;">return</span> tag2(lst, n, <span style="color: #a52a2a;">len</span>(lst))
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">tag</span>(lst, n): <span style="color: #531ab6;">return</span> tag2(lst, n, <span style="color: #8f0075;">len</span>(lst))
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">erato2</span>(lst, m, i):
-    <span style="color: #696969;">if</span> i &gt;= m:
-        <span style="color: #696969;">return</span> []
-    <span style="color: #696969;">elif</span> lst[i]:
-        <span style="color: #696969;">if</span> i &gt;= 1: <span style="color: #ffffff;">lst</span> = tag(lst, lst[i])
-        <span style="color: #696969;">return</span> [lst[i]] + erato2(lst, m, i+1)
-    <span style="color: #696969;">else</span>:
-        <span style="color: #696969;">return</span> erato2(lst, m, i+1)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">erato2</span>(lst, m, i):
+    <span style="color: #531ab6;">if</span> i &gt;= m:
+        <span style="color: #531ab6;">return</span> []
+    <span style="color: #531ab6;">elif</span> lst[i]:
+        <span style="color: #531ab6;">if</span> i &gt;= 1: <span style="color: #005e8b;">lst</span> = tag(lst, lst[i])
+        <span style="color: #531ab6;">return</span> [lst[i]] + erato2(lst, m, i+1)
+    <span style="color: #531ab6;">else</span>:
+        <span style="color: #531ab6;">return</span> erato2(lst, m, i+1)
 
-<span style="color: #696969;">def</span> <span style="color: #ff4500;">erato</span>(lst): <span style="color: #696969;">return</span> erato2(lst, <span style="color: #a52a2a;">len</span>(lst), 0)
-<span style="color: #ffffff;">lst</span> = <span style="color: #a52a2a;">range</span>(1, 200)
-<span style="color: #a52a2a;">print</span> erato(lst)
+<span style="color: #531ab6;">def</span> <span style="color: #721045;">erato</span>(lst): <span style="color: #531ab6;">return</span> erato2(lst, <span style="color: #8f0075;">len</span>(lst), 0)
+<span style="color: #005e8b;">lst</span> = <span style="color: #8f0075;">range</span>(1, 200)
+<span style="color: #8f0075;">print</span> erato(lst)
 </pre>
 </div>
 

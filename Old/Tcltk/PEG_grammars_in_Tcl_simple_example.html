@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-03-14 Sat 21:19 -->
+<!-- 2026-04-13 Mon 14:30 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PEG grammars in Tcl - simple example</title>
@@ -35,21 +35,21 @@ code, pre { background: #000;
 </div>
 <div id="content" class="content">
 <h1 class="title">PEG grammars in Tcl - simple example</h1>
-<div id="outline-container-org4d16414" class="outline-2">
-<h2 id="org4d16414">PEG grammars in Tcl - simple example</h2>
-<div class="outline-text-2" id="text-org4d16414">
+<div id="outline-container-org01c3bc4" class="outline-2">
+<h2 id="org01c3bc4">PEG grammars in Tcl - simple example</h2>
+<div class="outline-text-2" id="text-org01c3bc4">
 <p>
 This is the very simple example how to create PEG grammar and parse some text with it in Tcllib (I used Tcllib 1.4).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #a52a2a;">package</span> require starkit
+<pre class="src src-tcl"><span style="color: #8f0075;">package</span> require starkit
 starkit::startup
-<span style="color: #a52a2a;">package</span> require pt::peg::from::peg
-<span style="color: #a52a2a;">package</span> require pt::peg::container
-<span style="color: #a52a2a;">package</span> require pt::peg::interp
+<span style="color: #8f0075;">package</span> require pt::peg::from::peg
+<span style="color: #8f0075;">package</span> require pt::peg::container
+<span style="color: #8f0075;">package</span> require pt::peg::interp
 
-<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">PEG</span> {
+<span style="color: #8f0075;">set</span> <span style="color: #005e8b;">PEG</span> {
 PEG myapp (Exp)
     IfKw       &lt;- 'i' 'f'                               ;
     ThenKw     &lt;- 't' 'h' 'e' 'n'                       ;
@@ -63,13 +63,13 @@ PEG myapp (Exp)
 END;
 }
 
-<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">CPEG</span> [pt::peg::from::peg convert $<span style="color: #ffffff;">PEG</span>]
+<span style="color: #8f0075;">set</span> <span style="color: #005e8b;">CPEG</span> [pt::peg::from::peg convert $<span style="color: #005e8b;">PEG</span>]
 pt::peg::container cont
-cont deserialize = $<span style="color: #ffffff;">CPEG</span>
-<span style="color: #a52a2a;">set</span> <span style="color: #ffffff;">src</span> <span style="color: #696969;">"if c: if o:t;"</span>
+cont deserialize = $<span style="color: #005e8b;">CPEG</span>
+<span style="color: #8f0075;">set</span> <span style="color: #005e8b;">src</span> <span style="color: #3548cf;">"if c: if o:t;"</span>
 pt::peg::interp myint
 myint use cont
-<span style="color: #a52a2a;">puts</span> [myint parset $<span style="color: #ffffff;">src</span>]
+<span style="color: #8f0075;">puts</span> [myint parset $<span style="color: #005e8b;">src</span>]
 </pre>
 </div>
 
@@ -79,7 +79,7 @@ This grammar is very simple (and non-realistic): it defines rules to parse neste
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #696969;">if</span> c: <span style="color: #696969;">if</span> o: t;
+<pre class="src src-tcl"><span style="color: #531ab6;">if</span> c: <span style="color: #531ab6;">if</span> o: t;
 </pre>
 </div>
 
@@ -88,7 +88,7 @@ or
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #696969;">if</span> CONDITION: <span style="color: #696969;">if</span> CONDITION: BLOCK;
+<pre class="src src-tcl"><span style="color: #531ab6;">if</span> CONDITION: <span style="color: #531ab6;">if</span> CONDITION: BLOCK;
 </pre>
 </div>
 
@@ -97,7 +97,7 @@ where CONDITION is 'c' or 'o', BLOCK is another EXP (expression) or 't' followed
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">c:<span style="color: #696969;">\&gt;</span>tclkitsh.exe main.tcl
+<pre class="src src-bash">c:<span style="color: #3548cf;">\&gt;</span>tclkitsh.exe main.tcl
 Exp 0 11 {If 0 11 {IfKw 0 1} {Sp 2 2} {Cond 3 3} {OSp 4 3} {OSp 5 5} {Block 6 11 {Exp 6 11 {If 6 11 {IfKw 6 7} {Sp 8 8}
 {Cond 9 9} {OSp 10 9} {OSp 11 10} {Block 11 11}}}}}
 </pre>
