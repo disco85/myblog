@@ -5,7 +5,6 @@
 #+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
 #+tags: Math Common-Lisp
 #+date: <2026-04-20 Mon 20:29>
-# use syntax theme: doric-beach !!!
 
 ** Basic idea
 
@@ -229,5 +228,25 @@ CL-USER> (hyper 10 2000 1)
 #+end_example
 
 Unfortunately, it is not tail recursive, so we will hit stack overflow even with
-small arguments.
+small arguments. However, it's possible to write this function using daat stack,
+so the limit will be the memory available to your program.
 
+Another interesting cases:
+
+#+begin_verse
+\forall n>0: H_{n}(2, 2) = 4
+\forall n>0, a>0: H_{n}(a, 1) = a
+\forall n>0, b>1: H_{n}(1, b) = 1
+#+end_verse
+
+For parameters \( a>2, b>2 \) the function \( H(n, a, b) \) grows super extremely.
+How quickly?
+
+| n | H_{n}(2,3) |
+|---+------------|
+| 1 | 2+3=5      |
+| 2 | 2*3=6      |
+| 3 | 2^3=8      |
+| 4 | 2^{2^2}=16 |
+| 5 | 2^16=65536 |
+| 6 | 2^65536=?  |
