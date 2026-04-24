@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python's groupby pitfall</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Python's groupby pitfall</h1>
-<div id="outline-container-org28f3286" class="outline-2">
-<h2 id="org28f3286">Python's groupby pitfall</h2>
-<div class="outline-text-2" id="text-org28f3286">
+<div id="outline-container-org2de51ef" class="outline-2">
+<h2 id="org2de51ef">Python's groupby pitfall</h2>
+<div class="outline-text-2" id="text-org2de51ef">
 <p>
 Python function <code>groupby</code> has one feature which can be cause of unexpected
 pitfall:
@@ -55,16 +80,16 @@ Example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">from</span> itertools <span style="color: #531ab6;">import</span> *
+<pre class="src src-python"><span style="color: brightblack;">from</span> itertools <span style="color: brightblack;">import</span> *
 
-<span style="color: #8f0075;">input</span> = ((1, <span style="color: #3548cf;">"one"</span>), (1, <span style="color: #3548cf;">"one too"</span>), (1, <span style="color: #3548cf;">"also one"</span>),
-         (2, <span style="color: #3548cf;">"two"</span>), (2, <span style="color: #3548cf;">"another two"</span>), (2, <span style="color: #3548cf;">"two again"</span>)
+<span style="color: #b3b3b3;">input</span> = ((1, <span style="color: brightblack;">"one"</span>), (1, <span style="color: brightblack;">"one too"</span>), (1, <span style="color: brightblack;">"also one"</span>),
+         (2, <span style="color: brightblack;">"two"</span>), (2, <span style="color: brightblack;">"another two"</span>), (2, <span style="color: brightblack;">"two again"</span>)
 )
 
-<span style="color: #005e8b;">grp</span> = groupby(<span style="color: #8f0075;">input</span>, <span style="color: #531ab6;">lambda</span> p: p[0])
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
-<span style="color: #005e8b;">maxg</span>, <span style="color: #005e8b;">maxi</span> = <span style="color: #8f0075;">max</span>(grp, key=<span style="color: #531ab6;">lambda</span> g: g[0])
-<span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"maxg ="</span>, maxg, <span style="color: #3548cf;">"maxi ="</span>, <span style="color: #8f0075;">list</span>(maxi))
+<span style="color: #b3b3b3;">grp</span> = groupby(<span style="color: #b3b3b3;">input</span>, <span style="color: brightblack;">lambda</span> p: p[0])
+<span style="color: #595959;"># </span><span style="color: #595959;">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
+<span style="color: #b3b3b3;">maxg</span>, <span style="color: #b3b3b3;">maxi</span> = <span style="color: #b3b3b3;">max</span>(grp, key=<span style="color: brightblack;">lambda</span> g: g[0])
+<span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">"maxg ="</span>, maxg, <span style="color: brightblack;">"maxi ="</span>, <span style="color: #b3b3b3;">list</span>(maxi))
 </pre>
 </div>
 
@@ -73,7 +98,7 @@ Output without (A) is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #3548cf;">'two again'</span>)]
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: brightblack;">'two again'</span>)]
 </pre>
 </div>
 
@@ -87,7 +112,7 @@ But with (A) is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: #3548cf;">'two'</span>), (2, <span style="color: #3548cf;">'another two'</span>), (2, <span style="color: #3548cf;">'two again'</span>)]
+<pre class="src src-bash">maxg = 2 maxi = [(2, <span style="color: brightblack;">'two'</span>), (2, <span style="color: brightblack;">'another two'</span>), (2, <span style="color: brightblack;">'two again'</span>)]
 </pre>
 </div>
 

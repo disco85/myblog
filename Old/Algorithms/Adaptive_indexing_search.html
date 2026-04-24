@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>"Adaptive indexing" search</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="algorithms, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">"Adaptive indexing" search</h1>
-<div id="outline-container-org57e35d3" class="outline-2">
-<h2 id="org57e35d3">"Adaptive indexing" search</h2>
-<div class="outline-text-2" id="text-org57e35d3">
+<div id="outline-container-orgf83dd3f" class="outline-2">
+<h2 id="orgf83dd3f">"Adaptive indexing" search</h2>
+<div class="outline-text-2" id="text-orgf83dd3f">
 <p>
 Some kind of interpolation search. We take the first item and test it. If hit - return it, otherwise - shift to the next item by a step. The step is calculated from the current item value and the previous one's value: the idea is that we try to find the delta/difference between neighbor items and to calculate the offset to the searched item. It's something like adaptive indexing, I called it in such a way.
 </p>
@@ -56,96 +81,96 @@ This implementation is not perfect and can be optimized. I am not 100% sure in i
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">import</span> random
-<span style="color: #531ab6;">from</span> math <span style="color: #531ab6;">import</span> *
+<pre class="src src-python"><span style="color: brightblack;">import</span> random
+<span style="color: brightblack;">from</span> math <span style="color: brightblack;">import</span> *
 
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">lst - ordered/sorted list</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">intersearch</span>(lst, target):
-    <span style="color: #005e8b;">upbound</span> = <span style="color: #8f0075;">len</span>(lst) - 1
-    <span style="color: #005e8b;">prev</span> = -1
-    <span style="color: #005e8b;">pos</span> = 0
-    <span style="color: #005e8b;">step</span> = 1
-    <span style="color: #005e8b;">_prev</span> = <span style="color: #0000b0;">None</span>
-    <span style="color: #005e8b;">d</span> = 0
-    <span style="color: #531ab6;">while</span> <span style="color: #0000b0;">True</span>:
-        <span style="color: #005e8b;">pos_el</span> = lst[pos]
-        <span style="color: #531ab6;">if</span> pos_el == target:
-            <span style="color: #531ab6;">return</span> pos
-        <span style="color: #531ab6;">elif</span> prev != -1:
-            <span style="color: #005e8b;">d</span> = <span style="color: #8f0075;">abs</span>(pos_el - lst[prev])
-            <span style="color: #531ab6;">if</span> d == 0:
-                <span style="color: #005e8b;">step</span> = 1
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #005e8b;">step</span> = (target - pos_el) // d
-                <span style="color: #531ab6;">if</span> step == 0:
-                    <span style="color: #005e8b;">step</span> = 1
-                <span style="color: #531ab6;">elif</span> step &lt; 0:
-                <span style="color: #7f0000;">#</span><span style="color: #7f0000;">elif (pos + step) &lt; 0:</span>
-                    <span style="color: #005e8b;">step</span> = 1
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #005e8b;">step</span> = 1
-        <span style="color: #7f0000;">###</span>
-        <span style="color: #531ab6;">if</span> (pos + step &gt; upbound) <span style="color: #531ab6;">or</span> (lst[pos + step] &gt; target):
-            <span style="color: #531ab6;">if</span> prev + 1 &gt; upbound:
-                <span style="color: #005e8b;">_prev</span> = prev
-                <span style="color: #005e8b;">prev</span> = pos
-                <span style="color: #005e8b;">pos</span> = _prev - 1
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #005e8b;">_prev</span> = prev
-                <span style="color: #005e8b;">prev</span> = pos
-                <span style="color: #005e8b;">pos</span> = _prev + 1
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #005e8b;">prev</span> = pos
-            <span style="color: #005e8b;">pos</span> += step
+<span style="color: #595959;"># </span><span style="color: #595959;">lst - ordered/sorted list</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">intersearch</span>(lst, target):
+    <span style="color: #b3b3b3;">upbound</span> = <span style="color: #b3b3b3;">len</span>(lst) - 1
+    <span style="color: #b3b3b3;">prev</span> = -1
+    <span style="color: #b3b3b3;">pos</span> = 0
+    <span style="color: #b3b3b3;">step</span> = 1
+    <span style="color: #b3b3b3;">_prev</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #b3b3b3;">d</span> = 0
+    <span style="color: brightblack;">while</span> <span style="color: #7fffd4;">True</span>:
+        <span style="color: #b3b3b3;">pos_el</span> = lst[pos]
+        <span style="color: brightblack;">if</span> pos_el == target:
+            <span style="color: brightblack;">return</span> pos
+        <span style="color: brightblack;">elif</span> prev != -1:
+            <span style="color: #b3b3b3;">d</span> = <span style="color: #b3b3b3;">abs</span>(pos_el - lst[prev])
+            <span style="color: brightblack;">if</span> d == 0:
+                <span style="color: #b3b3b3;">step</span> = 1
+            <span style="color: brightblack;">else</span>:
+                <span style="color: #b3b3b3;">step</span> = (target - pos_el) // d
+                <span style="color: brightblack;">if</span> step == 0:
+                    <span style="color: #b3b3b3;">step</span> = 1
+                <span style="color: brightblack;">elif</span> step &lt; 0:
+                <span style="color: #595959;">#</span><span style="color: #595959;">elif (pos + step) &lt; 0:</span>
+                    <span style="color: #b3b3b3;">step</span> = 1
+        <span style="color: brightblack;">else</span>:
+            <span style="color: #b3b3b3;">step</span> = 1
+        <span style="color: #595959;">###</span>
+        <span style="color: brightblack;">if</span> (pos + step &gt; upbound) <span style="color: brightblack;">or</span> (lst[pos + step] &gt; target):
+            <span style="color: brightblack;">if</span> prev + 1 &gt; upbound:
+                <span style="color: #b3b3b3;">_prev</span> = prev
+                <span style="color: #b3b3b3;">prev</span> = pos
+                <span style="color: #b3b3b3;">pos</span> = _prev - 1
+            <span style="color: brightblack;">else</span>:
+                <span style="color: #b3b3b3;">_prev</span> = prev
+                <span style="color: #b3b3b3;">prev</span> = pos
+                <span style="color: #b3b3b3;">pos</span> = _prev + 1
+        <span style="color: brightblack;">else</span>:
+            <span style="color: #b3b3b3;">prev</span> = pos
+            <span style="color: #b3b3b3;">pos</span> += step
 
 
-<span style="color: #7f0000;">#########################</span>
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">ACCESS</span>(<span style="color: #8f0075;">list</span>):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, *a, **kw):
-        <span style="color: #8f0075;">super</span>().__init__(*a, **kw)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> = 0
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__getitem__</span>(<span style="color: #531ab6;">self</span>, i):
-        <span style="color: #531ab6;">if</span> i &gt;= <span style="color: #8f0075;">len</span>(<span style="color: #531ab6;">self</span>):
-            <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: [</span>{i}<span style="color: #3548cf;">]=OUT OF RANGE!"</span>)
-        <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">super</span>().__getitem__(i)
-        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: [</span>{i}<span style="color: #3548cf;">]=</span>{res}<span style="color: #3548cf;">"</span>)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> += 1
-        <span style="color: #531ab6;">return</span> res
+<span style="color: #595959;">#########################</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">ACCESS</span>(<span style="color: #b3b3b3;">list</span>):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *a, **kw):
+        <span style="color: #b3b3b3;">super</span>().__init__(*a, **kw)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> = 0
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__getitem__</span>(<span style="color: brightblack;">self</span>, i):
+        <span style="color: brightblack;">if</span> i &gt;= <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>):
+            <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"</span>{<span style="color: brightblack;">self</span>._access}<span style="color: brightblack;">: [</span>{i}<span style="color: brightblack;">]=OUT OF RANGE!"</span>)
+        <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">super</span>().__getitem__(i)
+        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"</span>{<span style="color: brightblack;">self</span>._access}<span style="color: brightblack;">: [</span>{i}<span style="color: brightblack;">]=</span>{res}<span style="color: brightblack;">"</span>)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> += 1
+        <span style="color: brightblack;">return</span> res
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">randomdata</span>(num):
-    <span style="color: #005e8b;">i</span> = 0
-    <span style="color: #005e8b;">res</span> = []
-    <span style="color: #531ab6;">while</span> i &lt; num:
-        <span style="color: #005e8b;">r</span> = random.randint(0, num*10)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">randomdata</span>(num):
+    <span style="color: #b3b3b3;">i</span> = 0
+    <span style="color: #b3b3b3;">res</span> = []
+    <span style="color: brightblack;">while</span> i &lt; num:
+        <span style="color: #b3b3b3;">r</span> = random.randint(0, num*10)
         res.append(r)
-        <span style="color: #005e8b;">i</span> += 1
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
-    <span style="color: #531ab6;">return</span> (res, random.choice(res))
+        <span style="color: #b3b3b3;">i</span> += 1
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
+    <span style="color: brightblack;">return</span> (res, random.choice(res))
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(<span style="color: #8f0075;">range</span>(NUM))
-    <span style="color: #005e8b;">i</span> = 0
-    <span style="color: #005e8b;">cnt</span> = <span style="color: #8f0075;">min</span>(num, num*ratio)
-    <span style="color: #531ab6;">while</span> i &lt; cnt:
-        <span style="color: #005e8b;">r</span> = random.randint(num, num+cnt-1)
-        <span style="color: #005e8b;">res</span>[r - num] = r
-        <span style="color: #005e8b;">i</span> += 1
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
-    <span style="color: #531ab6;">return</span> (res, random.choice(res))
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">range</span>(NUM))
+    <span style="color: #b3b3b3;">i</span> = 0
+    <span style="color: #b3b3b3;">cnt</span> = <span style="color: #b3b3b3;">min</span>(num, num*ratio)
+    <span style="color: brightblack;">while</span> i &lt; cnt:
+        <span style="color: #b3b3b3;">r</span> = random.randint(num, num+cnt-1)
+        <span style="color: #b3b3b3;">res</span>[r - num] = r
+        <span style="color: #b3b3b3;">i</span> += 1
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
+    <span style="color: brightblack;">return</span> (res, random.choice(res))
 
 
-<span style="color: #005e8b;">NUM</span> = 10000
-<span style="color: #005e8b;">arr</span>, <span style="color: #005e8b;">x</span> = partiallyrandomdata(NUM, 0.5)
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Look for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
-<span style="color: #531ab6;">try</span>:
-    <span style="color: #005e8b;">fnd</span> = intersearch(ACCESS(arr), x)
-    <span style="color: #7f0000;">#</span><span style="color: #7f0000;">fnd = intersearch(arr, x)</span>
-    <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Found </span>{arr[fnd]}<span style="color: #3548cf;"> at </span>{fnd}<span style="color: #3548cf;">"</span>)
-<span style="color: #531ab6;">except</span> <span style="color: #005f5f;">KeyboardInterrupt</span>:
-    <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Looked for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
+<span style="color: #b3b3b3;">NUM</span> = 10000
+<span style="color: #b3b3b3;">arr</span>, <span style="color: #b3b3b3;">x</span> = partiallyrandomdata(NUM, 0.5)
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Look for </span>{x}<span style="color: brightblack;"> in </span>{arr}<span style="color: brightblack;">"</span>)
+<span style="color: brightblack;">try</span>:
+    <span style="color: #b3b3b3;">fnd</span> = intersearch(ACCESS(arr), x)
+    <span style="color: #595959;">#</span><span style="color: #595959;">fnd = intersearch(arr, x)</span>
+    <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Found </span>{arr[fnd]}<span style="color: brightblack;"> at </span>{fnd}<span style="color: brightblack;">"</span>)
+<span style="color: brightblack;">except</span> <span style="color: #cccccc;">KeyboardInterrupt</span>:
+    <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Looked for </span>{x}<span style="color: brightblack;"> in </span>{arr}<span style="color: brightblack;">"</span>)
 </pre>
 </div>
 </div>

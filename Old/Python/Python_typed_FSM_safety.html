@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python: typed FSM safety</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="safety, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Python: typed FSM safety</h1>
-<div id="outline-container-org14e2282" class="outline-2">
-<h2 id="org14e2282">Python: typed FSM safety</h2>
-<div class="outline-text-2" id="text-org14e2282">
+<div id="outline-container-org6937591" class="outline-2">
+<h2 id="org6937591">Python: typed FSM safety</h2>
+<div class="outline-text-2" id="text-org6937591">
 <p>
 One of the accusations against the OOP is state problems. They are divided
 into several sub-kinds, one of them is problem of transitions correctness,
@@ -73,8 +98,8 @@ suppose the result of the open in <code>file</code>):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">close</span>(<span style="color: #531ab6;">self</span>):
-    <span style="color: #531ab6;">assert</span> <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">file</span>, <span style="color: #3548cf;">"File was not opened"</span>
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">close</span>(<span style="color: brightblack;">self</span>):
+    <span style="color: brightblack;">assert</span> <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">file</span>, <span style="color: brightblack;">"File was not opened"</span>
     ...
 </pre>
 </div>
@@ -165,30 +190,30 @@ Actually, this solution is possible even in Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Open</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">open</span>(<span style="color: #531ab6;">self</span>, path: <span style="color: #8f0075;">str</span>) -&gt; <span style="color: #3548cf;">"Open"</span>:
-        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">file</span> = <span style="color: #8f0075;">open</span>(path, <span style="color: #3548cf;">"r"</span>)
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+<pre class="src src-python"><span style="color: brightblack;">class</span> <span style="color: #cccccc;">Open</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">open</span>(<span style="color: brightblack;">self</span>, path: <span style="color: #b3b3b3;">str</span>) -&gt; <span style="color: brightblack;">"Open"</span>:
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">file</span> = <span style="color: #b3b3b3;">open</span>(path, <span style="color: brightblack;">"r"</span>)
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Close</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">close</span>(<span style="color: #531ab6;">self</span>, state: Open) -&gt; <span style="color: #3548cf;">"Close"</span>:
-        state.<span style="color: #8f0075;">file</span>.close()
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Close</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">close</span>(<span style="color: brightblack;">self</span>, state: Open) -&gt; <span style="color: brightblack;">"Close"</span>:
+        state.<span style="color: #b3b3b3;">file</span>.close()
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Read</span>(Close):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">read</span>(<span style="color: #531ab6;">self</span>, state: Open) -&gt; <span style="color: #3548cf;">"Read"</span>:
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">buf</span> = state.<span style="color: #8f0075;">file</span>.read()
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Read</span>(Close):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">read</span>(<span style="color: brightblack;">self</span>, state: Open) -&gt; <span style="color: brightblack;">"Read"</span>:
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">buf</span> = state.<span style="color: #b3b3b3;">file</span>.read()
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Parse</span>(Close):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">parse</span>(<span style="color: #531ab6;">self</span>, state: Read) -&gt; <span style="color: #3548cf;">"Parse"</span>:
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">n</span> = <span style="color: #8f0075;">int</span>(state.buf)
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Parse</span>(Close):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">parse</span>(<span style="color: brightblack;">self</span>, state: Read) -&gt; <span style="color: brightblack;">"Parse"</span>:
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">n</span> = <span style="color: #b3b3b3;">int</span>(state.buf)
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
 
-<span style="color: #005e8b;">o</span> = Open().<span style="color: #8f0075;">open</span>(<span style="color: #3548cf;">"z"</span>)
-<span style="color: #005e8b;">r</span> = Read().read(o)
-<span style="color: #005e8b;">p</span> = Parse().parse(r)
-<span style="color: #8f0075;">print</span>(p.n)
+<span style="color: #b3b3b3;">o</span> = Open().<span style="color: #b3b3b3;">open</span>(<span style="color: brightblack;">"z"</span>)
+<span style="color: #b3b3b3;">r</span> = Read().read(o)
+<span style="color: #b3b3b3;">p</span> = Parse().parse(r)
+<span style="color: #b3b3b3;">print</span>(p.n)
 p.close(o)
 </pre>
 </div>

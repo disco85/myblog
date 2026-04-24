@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Small tricks in shell</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="scripting, misc" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Small tricks in shell</h1>
-<div id="outline-container-org6c06d00" class="outline-2">
-<h2 id="org6c06d00">Small tricks in shell</h2>
-<div class="outline-text-2" id="text-org6c06d00">
+<div id="outline-container-orgfd914fc" class="outline-2">
+<h2 id="orgfd914fc">Small tricks in shell</h2>
+<div class="outline-text-2" id="text-orgfd914fc">
 <p>
 !Directories tree view
 </p>
@@ -47,8 +72,8 @@ Set it to your <code>.bashrc</code> and run as <code>tree [DIR]</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #721045;">tree</span>() {
-find <span style="color: #3548cf;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: #3548cf;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #005e8b;">FS</span>=<span style="color: #3548cf;">'/'</span>
+<pre class="src src-bash"><span style="color: #a52a2a;">tree</span>() {
+find <span style="color: brightblack;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: brightblack;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #b3b3b3;">FS</span>=<span style="color: brightblack;">'/'</span>
 }
 </pre>
 </div>
@@ -63,7 +88,7 @@ If you have big patch file with many files there, to patch only one
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">filterdiff -i <span style="color: #3548cf;">'*filename.py'</span> patch.diff | patch -pN
+<pre class="src src-bash">filterdiff -i <span style="color: brightblack;">'*filename.py'</span> patch.diff | patch -pN
 </pre>
 </div>
 
@@ -103,14 +128,14 @@ This script run one of available command:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #7f0000;">#</span><span style="color: #7f0000;">!/bin/</span><span style="color: #531ab6;">sh</span>
+<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/bin/</span><span style="color: brightblack;">sh</span>
 
-<span style="color: #721045;">trycmd</span>() {
-    <span style="color: #005e8b;">a0</span>=$<span style="color: #005e8b;">1</span>; <span style="color: #8f0075;">shift</span>
-    <span style="color: #531ab6;">for</span> c<span style="color: #531ab6;"> in</span> $<span style="color: #005e8b;">*</span>; <span style="color: #531ab6;">do</span> $<span style="color: #005e8b;">c</span> $<span style="color: #005e8b;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: #531ab6;">break</span>; <span style="color: #531ab6;">done</span>
+<span style="color: #a52a2a;">trycmd</span>() {
+    <span style="color: #b3b3b3;">a0</span>=$<span style="color: #b3b3b3;">1</span>; <span style="color: #b3b3b3;">shift</span>
+    <span style="color: brightblack;">for</span> c<span style="color: brightblack;"> in</span> $<span style="color: #b3b3b3;">*</span>; <span style="color: brightblack;">do</span> $<span style="color: #b3b3b3;">c</span> $<span style="color: #b3b3b3;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: brightblack;">break</span>; <span style="color: brightblack;">done</span>
 }
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
 trycmd list pipx pip0 pip1 pip3 pip
 </pre>
 </div>

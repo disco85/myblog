@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Imperative Eratosthenes sieve</title>
@@ -11,56 +11,81 @@
 <meta name="keywords" content="python, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Imperative Eratosthenes sieve</h1>
-<div id="outline-container-orga1efa8c" class="outline-2">
-<h2 id="orga1efa8c">Imperative Eratosthenes sieve</h2>
-<div class="outline-text-2" id="text-orga1efa8c">
+<div id="outline-container-orgbcdc489" class="outline-2">
+<h2 id="orgbcdc489">Imperative Eratosthenes sieve</h2>
+<div class="outline-text-2" id="text-orgbcdc489">
 <p>
 Algorithm is very-very simple and is learning at the school :)
 </p>
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">erato</span>(m):
-    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">list of all numbers to m: 1 - free cell, 0 - aliquot to prime</span>
-    <span style="color: #005e8b;">lst</span> = [1 <span style="color: #531ab6;">for</span> i <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(m)]
-    <span style="color: #005e8b;">n</span> = 2 <span style="color: #7f0000;"># </span><span style="color: #7f0000;">starts from 2</span>
-    <span style="color: #531ab6;">while</span> n &lt; m: <span style="color: #7f0000;"># </span><span style="color: #7f0000;">take next prime</span>
-        <span style="color: #531ab6;">for</span> i <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(n, m): <span style="color: #7f0000;"># </span><span style="color: #7f0000;">looking for free cell</span>
-            <span style="color: #531ab6;">if</span> lst[i]: <span style="color: #531ab6;">break</span> <span style="color: #7f0000;"># </span><span style="color: #7f0000;">1 - free, i.e. not aliquot to others</span>
-        <span style="color: #531ab6;">if</span> i == m-1: <span style="color: #531ab6;">return</span> <span style="color: #7f0000;"># </span><span style="color: #7f0000;">no more free, stop</span>
-        <span style="color: #005e8b;">n</span> = i <span style="color: #7f0000;"># </span><span style="color: #7f0000;">keep found free</span>
-        <span style="color: #531ab6;">yield</span> n <span style="color: #7f0000;"># </span><span style="color: #7f0000;">and it's prime!</span>
-        <span style="color: #005e8b;">j</span> = 2 <span style="color: #7f0000;"># </span><span style="color: #7f0000;">multiplier: 2, 3, 4, 5...</span>
-        <span style="color: #531ab6;">while</span> i &lt; m: <span style="color: #7f0000;"># </span><span style="color: #7f0000;">checks aliquot to found prime n</span>
-            <span style="color: #005e8b;">lst</span>[i] = 0
-            <span style="color: #005e8b;">i</span> = n*j <span style="color: #7f0000;"># </span><span style="color: #7f0000;">checks 2n, 3n, 4n, 5n, 6n, ...</span>
-            <span style="color: #005e8b;">j</span> += 1 <span style="color: #7f0000;"># </span><span style="color: #7f0000;">multipliers: 2, 3, 4, 5...</span>
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">erato</span>(m):
+    <span style="color: #595959;"># </span><span style="color: #595959;">list of all numbers to m: 1 - free cell, 0 - aliquot to prime</span>
+    <span style="color: #b3b3b3;">lst</span> = [1 <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(m)]
+    <span style="color: #b3b3b3;">n</span> = 2 <span style="color: #595959;"># </span><span style="color: #595959;">starts from 2</span>
+    <span style="color: brightblack;">while</span> n &lt; m: <span style="color: #595959;"># </span><span style="color: #595959;">take next prime</span>
+        <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(n, m): <span style="color: #595959;"># </span><span style="color: #595959;">looking for free cell</span>
+            <span style="color: brightblack;">if</span> lst[i]: <span style="color: brightblack;">break</span> <span style="color: #595959;"># </span><span style="color: #595959;">1 - free, i.e. not aliquot to others</span>
+        <span style="color: brightblack;">if</span> i == m-1: <span style="color: brightblack;">return</span> <span style="color: #595959;"># </span><span style="color: #595959;">no more free, stop</span>
+        <span style="color: #b3b3b3;">n</span> = i <span style="color: #595959;"># </span><span style="color: #595959;">keep found free</span>
+        <span style="color: brightblack;">yield</span> n <span style="color: #595959;"># </span><span style="color: #595959;">and it's prime!</span>
+        <span style="color: #b3b3b3;">j</span> = 2 <span style="color: #595959;"># </span><span style="color: #595959;">multiplier: 2, 3, 4, 5...</span>
+        <span style="color: brightblack;">while</span> i &lt; m: <span style="color: #595959;"># </span><span style="color: #595959;">checks aliquot to found prime n</span>
+            <span style="color: #b3b3b3;">lst</span>[i] = 0
+            <span style="color: #b3b3b3;">i</span> = n*j <span style="color: #595959;"># </span><span style="color: #595959;">checks 2n, 3n, 4n, 5n, 6n, ...</span>
+            <span style="color: #b3b3b3;">j</span> += 1 <span style="color: #595959;"># </span><span style="color: #595959;">multipliers: 2, 3, 4, 5...</span>
 
-<span style="color: #8f0075;">print</span> <span style="color: #8f0075;">list</span>(erato(300))
+<span style="color: #b3b3b3;">print</span> <span style="color: #b3b3b3;">list</span>(erato(300))
 </pre>
 </div>
 </div>

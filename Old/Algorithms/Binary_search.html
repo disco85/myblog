@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Binary search</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="clang, algorithms, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Binary search</h1>
-<div id="outline-container-orgcb0c10c" class="outline-2">
-<h2 id="orgcb0c10c">Binary search</h2>
-<div class="outline-text-2" id="text-orgcb0c10c">
+<div id="outline-container-org5a46e39" class="outline-2">
+<h2 id="org5a46e39">Binary search</h2>
+<div class="outline-text-2" id="text-org5a46e39">
 <p>
 Input is - ''ordered (sorted)'' array. Comparison is with middle item, if matched it then
 we found target, if middle is greater then we must check in the same way all
@@ -45,38 +70,38 @@ items from the left side of the middle item, otherwise - on right side.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"algutils.h"</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdio.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"algutils.h"</span>
 
-<span style="color: #531ab6;">template</span>&lt;<span style="color: #531ab6;">typename</span> <span style="color: #005f5f;">T</span>&gt;
-<span style="color: #005f5f;">int</span> <span style="color: #721045;">binsearch</span>(<span style="color: #005f5f;">T</span> *<span style="color: #005e8b;">arr</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">len</span>, <span style="color: #531ab6;">const</span> <span style="color: #005f5f;">T</span>&amp; <span style="color: #005e8b;">target</span>)
+<span style="color: brightblack;">template</span>&lt;<span style="color: brightblack;">typename</span> <span style="color: #cccccc;">T</span>&gt;
+<span style="color: #cccccc;">int</span> <span style="color: #a52a2a;">binsearch</span>(<span style="color: #cccccc;">T</span> *<span style="color: #b3b3b3;">arr</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">len</span>, <span style="color: brightblack;">const</span> <span style="color: #cccccc;">T</span>&amp; <span style="color: #b3b3b3;">target</span>)
 {
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">mid</span>, <span style="color: #005e8b;">off</span> = 0;
-    <span style="color: #531ab6;">while</span> (1) {
-        <span style="color: #531ab6;">if</span> (<span style="color: #a60000; font-weight: bold;">!</span>len) <span style="color: #531ab6;">return</span> (-1);
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">mid</span>, <span style="color: #b3b3b3;">off</span> = 0;
+    <span style="color: brightblack;">while</span> (1) {
+        <span style="color: brightblack;">if</span> (!len) <span style="color: brightblack;">return</span> (-1);
         mid = len/2;
-        <span style="color: #531ab6;">if</span> (arr[mid] == target) <span style="color: #531ab6;">return</span> (off + mid);
+        <span style="color: brightblack;">if</span> (arr[mid] == target) <span style="color: brightblack;">return</span> (off + mid);
         len = mid;
-        <span style="color: #531ab6;">if</span> (arr[mid] &lt; target) {
+        <span style="color: brightblack;">if</span> (arr[mid] &lt; target) {
             off += mid + 1;
             arr = &amp;arr[mid+1];
         }
     }
 }
 
-<span style="color: #7f0000;">/***********************************************************************</span>
-<span style="color: #7f0000;">                                  Main</span>
-<span style="color: #7f0000;"> **********************************************************************</span><span style="color: #7f0000;">*/</span>
+<span style="color: #595959;">/***********************************************************************</span>
+<span style="color: #595959;">                                  Main</span>
+<span style="color: #595959;"> **********************************************************************</span><span style="color: #595959;">*/</span>
 
-<span style="color: #005f5f;">int</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>)
+<span style="color: #cccccc;">int</span> <span style="color: #a52a2a;">main</span>(<span style="color: #cccccc;">void</span>)
 {
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">LIST</span>(...) {__VA_ARGS__}
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">TEST</span>(<span style="color: #005e8b;">EL</span>, <span style="color: #005e8b;">RESULT</span>, <span style="color: #005e8b;">L</span>) <span style="color: #531ab6;">do</span> { \
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">arr</span>[] = L; \
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">s</span> = binsearch(arr, sizeofarray(arr), (EL)); \
-    printf(<span style="color: #3548cf;">"Binary search of %d: %d (%s)\n"</span>, (EL), s, \
-            s==(RESULT)?<span style="color: #3548cf;">"true"</span>:<span style="color: #3548cf;">"FALSE"</span>); \
-} <span style="color: #531ab6;">while</span> (0)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">LIST</span>(...) {__VA_ARGS__}
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">TEST</span>(<span style="color: #b3b3b3;">EL</span>, <span style="color: #b3b3b3;">RESULT</span>, <span style="color: #b3b3b3;">L</span>) <span style="color: brightblack;">do</span> { \
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">arr</span>[] = L; \
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">s</span> = binsearch(arr, sizeofarray(arr), (EL)); \
+    printf(<span style="color: brightblack;">"Binary search of %d: %d (%s)\n"</span>, (EL), s, \
+            s==(RESULT)?<span style="color: brightblack;">"true"</span>:<span style="color: brightblack;">"FALSE"</span>); \
+} <span style="color: brightblack;">while</span> (0)
 
     TEST(1, 0, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
     TEST(2, 1, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
@@ -86,7 +111,7 @@ items from the left side of the middle item, otherwise - on right side.
     TEST(55, 12, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
     TEST(240, -1, LIST(1,2,3,4,5,6,8,9,10,14,15,24,55));
 
-    <span style="color: #531ab6;">return</span> (0);
+    <span style="color: brightblack;">return</span> (0);
 }
 </pre>
 </div>
@@ -97,49 +122,49 @@ Another implementation in Python. It determines the number of accesses to the da
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">import</span> random
+<pre class="src src-python"><span style="color: brightblack;">import</span> random
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">binsearch</span>(lst, target):
-    <span style="color: #005e8b;">start</span> = 0
-    <span style="color: #005e8b;">end</span> = <span style="color: #8f0075;">len</span>(lst) - 1
-    <span style="color: #531ab6;">while</span> start &lt;= end:
-        <span style="color: #005e8b;">mid</span> = (start + end) // 2
-        <span style="color: #531ab6;">if</span> lst[mid] &gt; target:
-            <span style="color: #005e8b;">end</span> = mid - 1
-        <span style="color: #531ab6;">elif</span> lst[mid] &lt; target:
-            <span style="color: #005e8b;">start</span> = mid + 1
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> mid
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">binsearch</span>(lst, target):
+    <span style="color: #b3b3b3;">start</span> = 0
+    <span style="color: #b3b3b3;">end</span> = <span style="color: #b3b3b3;">len</span>(lst) - 1
+    <span style="color: brightblack;">while</span> start &lt;= end:
+        <span style="color: #b3b3b3;">mid</span> = (start + end) // 2
+        <span style="color: brightblack;">if</span> lst[mid] &gt; target:
+            <span style="color: #b3b3b3;">end</span> = mid - 1
+        <span style="color: brightblack;">elif</span> lst[mid] &lt; target:
+            <span style="color: #b3b3b3;">start</span> = mid + 1
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> mid
 
 
-<span style="color: #7f0000;">#########################</span>
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">ACCESS</span>(<span style="color: #8f0075;">list</span>):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, *a, **kw):
-        <span style="color: #8f0075;">super</span>().__init__(*a, **kw)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> = 0
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__getitem__</span>(<span style="color: #531ab6;">self</span>, i):
-        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: get </span>{i}<span style="color: #3548cf;">"</span>)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> += 1
-        <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">super</span>().__getitem__(i)
+<span style="color: #595959;">#########################</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">ACCESS</span>(<span style="color: #b3b3b3;">list</span>):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *a, **kw):
+        <span style="color: #b3b3b3;">super</span>().__init__(*a, **kw)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> = 0
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__getitem__</span>(<span style="color: brightblack;">self</span>, i):
+        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"</span>{<span style="color: brightblack;">self</span>._access}<span style="color: brightblack;">: get </span>{i}<span style="color: brightblack;">"</span>)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> += 1
+        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">super</span>().__getitem__(i)
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">randomdata</span>(num):
-    <span style="color: #005e8b;">i</span> = 0
-    <span style="color: #005e8b;">res</span> = []
-    <span style="color: #531ab6;">while</span> i&lt; num:
-        <span style="color: #005e8b;">r</span> = random.randint(0, num*10)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">randomdata</span>(num):
+    <span style="color: #b3b3b3;">i</span> = 0
+    <span style="color: #b3b3b3;">res</span> = []
+    <span style="color: brightblack;">while</span> i&lt; num:
+        <span style="color: #b3b3b3;">r</span> = random.randint(0, num*10)
         res.append(r)
-        <span style="color: #005e8b;">i</span> += 1
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
-    <span style="color: #531ab6;">return</span> (res, random.choice(res))
+        <span style="color: #b3b3b3;">i</span> += 1
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
+    <span style="color: brightblack;">return</span> (res, random.choice(res))
 
 
-<span style="color: #005e8b;">NUM</span> = 100
-<span style="color: #005e8b;">arr</span>, <span style="color: #005e8b;">x</span> = randomdata(NUM)
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Look for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
-<span style="color: #005e8b;">fnd</span> = binsearch(ACCESS(arr), x)
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Found </span>{arr[fnd]}<span style="color: #3548cf;"> at </span>{fnd}<span style="color: #3548cf;">"</span>)
+<span style="color: #b3b3b3;">NUM</span> = 100
+<span style="color: #b3b3b3;">arr</span>, <span style="color: #b3b3b3;">x</span> = randomdata(NUM)
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Look for </span>{x}<span style="color: brightblack;"> in </span>{arr}<span style="color: brightblack;">"</span>)
+<span style="color: #b3b3b3;">fnd</span> = binsearch(ACCESS(arr), x)
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Found </span>{arr[fnd]}<span style="color: brightblack;"> at </span>{fnd}<span style="color: brightblack;">"</span>)
 </pre>
 </div>
 

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>algutils.h macros</title>
@@ -11,83 +11,108 @@
 <meta name="keywords" content="clang, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">algutils.h macros</h1>
-<div id="outline-container-org41d642c" class="outline-2">
-<h2 id="org41d642c">algutils.h macros</h2>
-<div class="outline-text-2" id="text-org41d642c">
+<div id="outline-container-org41bcdff" class="outline-2">
+<h2 id="org41bcdff">algutils.h macros</h2>
+<div class="outline-text-2" id="text-org41bcdff">
 <p>
 Some useful macros for algorithms C/C++ (used early in related posts):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> _ALGUTILS_H_
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">_ALGUTILS_H_</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _ALGUTILS_H_
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_ALGUTILS_H_</span>
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Array numbers</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> sizeofarray
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">sizeofarray</span>(<span style="color: #005e8b;">ARR</span>) (<span style="color: #531ab6;">sizeof</span>(ARR) / <span style="color: #531ab6;">sizeof</span>(ARR[0]))
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #595959;">/// </span><span style="color: #595959;">Array numbers</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> sizeofarray
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">sizeofarray</span>(<span style="color: #b3b3b3;">ARR</span>) (<span style="color: brightblack;">sizeof</span>(ARR) / <span style="color: brightblack;">sizeof</span>(ARR[0]))
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Division with ceil rounding</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CEILDIV</span>(<span style="color: #005e8b;">X</span>,<span style="color: #005e8b;">Y</span>) (((X)%(Y))? (1 + ((X)/(Y))) : ((X)/(Y)))
+<span style="color: #595959;">/// </span><span style="color: #595959;">Division with ceil rounding</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CEILDIV</span>(<span style="color: #b3b3b3;">X</span>,<span style="color: #b3b3b3;">Y</span>) (((X)%(Y))? (1 + ((X)/(Y))) : ((X)/(Y)))
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">min, max, abs</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">MIN</span>(<span style="color: #005e8b;">X</span>, <span style="color: #005e8b;">Y</span>) ((X)&lt;(Y)?(X):(Y))
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">MAX</span>(<span style="color: #005e8b;">X</span>, <span style="color: #005e8b;">Y</span>) ((X)&gt;(Y)?(X):(Y))
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">ABS</span>(<span style="color: #005e8b;">X</span>) ((X)&lt;0?(-(X)):(X))
+<span style="color: #595959;">/// </span><span style="color: #595959;">min, max, abs</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">MIN</span>(<span style="color: #b3b3b3;">X</span>, <span style="color: #b3b3b3;">Y</span>) ((X)&lt;(Y)?(X):(Y))
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">MAX</span>(<span style="color: #b3b3b3;">X</span>, <span style="color: #b3b3b3;">Y</span>) ((X)&gt;(Y)?(X):(Y))
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">ABS</span>(<span style="color: #b3b3b3;">X</span>) ((X)&lt;0?(-(X)):(X))
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Swaps two variables via temporary var @a tmp</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">SWAP</span>(<span style="color: #005e8b;">x</span>, <span style="color: #005e8b;">y</span>, <span style="color: #005e8b;">tmp</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Swaps two variables via temporary var @a tmp</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">SWAP</span>(<span style="color: #b3b3b3;">x</span>, <span style="color: #b3b3b3;">y</span>, <span style="color: #b3b3b3;">tmp</span>) <span style="color: brightblack;">do</span> { \
     tmp = x; x = y; y = tmp; \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Print array @a ARR with length @a LEN by item format @a ELFMT</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRINTARRX</span>(<span style="color: #005e8b;">ARR</span>, <span style="color: #005e8b;">LEN</span>, <span style="color: #005e8b;">ELFMT</span>) <span style="color: #531ab6;">do</span> { \
-    printf(<span style="color: #3548cf;">"{ "</span>); \
-    <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=0; i&lt;(LEN); i++) { \
-        printf(ELFMT <span style="color: #3548cf;">" "</span>, (ARR)[i]); \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Print array @a ARR with length @a LEN by item format @a ELFMT</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRINTARRX</span>(<span style="color: #b3b3b3;">ARR</span>, <span style="color: #b3b3b3;">LEN</span>, <span style="color: #b3b3b3;">ELFMT</span>) <span style="color: brightblack;">do</span> { \
+    printf(<span style="color: brightblack;">"{ "</span>); \
+    <span style="color: brightblack;">for</span> (<span style="color: #cccccc;">unsigned</span> <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>=0; i&lt;(LEN); i++) { \
+        printf(ELFMT <span style="color: brightblack;">" "</span>, (ARR)[i]); \
     } \
-    printf(<span style="color: #3548cf;">"}\n"</span>); \
-} <span style="color: #531ab6;">while</span> (0)
+    printf(<span style="color: brightblack;">"}\n"</span>); \
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Print array @a ARR by item format @a ELFMT</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRINTARR</span>(<span style="color: #005e8b;">ARR</span>, <span style="color: #005e8b;">ELFMT</span>) PRINTARRX(ARR, sizeofarray(ARR), ELFMT)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Print array @a ARR by item format @a ELFMT</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRINTARR</span>(<span style="color: #b3b3b3;">ARR</span>, <span style="color: #b3b3b3;">ELFMT</span>) PRINTARRX(ARR, sizeofarray(ARR), ELFMT)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Shift array @a ARR of length @a LEN by @a N positions to right</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">RSHIFT_ARR</span>(<span style="color: #005e8b;">ARR</span>, <span style="color: #005e8b;">LEN</span>, <span style="color: #005e8b;">N</span>) <span style="color: #531ab6;">do</span> { \
-    <span style="color: #531ab6;">register</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">_rshift_arr_i_</span>; \
-    <span style="color: #531ab6;">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Shift array @a ARR of length @a LEN by @a N positions to right</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">RSHIFT_ARR</span>(<span style="color: #b3b3b3;">ARR</span>, <span style="color: #b3b3b3;">LEN</span>, <span style="color: #b3b3b3;">N</span>) <span style="color: brightblack;">do</span> { \
+    <span style="color: brightblack;">register</span> <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">_rshift_arr_i_</span>; \
+    <span style="color: brightblack;">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
          _rshift_arr_i_&gt;(N)-1; \
          _rshift_arr_i_--) \
     { \
         *((ARR)+_rshift_arr_i_) = *((ARR)+(_rshift_arr_i_-(N))); \
     } \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #a0132f;">#endif</span> <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">EOF</span><span style="color: #7f0000;"> */</span>
+<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/* </span><span style="color: #595959;">EOF</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 </div>

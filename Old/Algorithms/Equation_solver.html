@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Equation solver</title>
@@ -11,97 +11,122 @@
 <meta name="keywords" content="algorithms, fortran" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Equation solver</h1>
-<div id="outline-container-org565ac38" class="outline-2">
-<h2 id="org565ac38">Equation solver</h2>
-<div class="outline-text-2" id="text-org565ac38">
+<div id="outline-container-orgeb326e8" class="outline-2">
+<h2 id="orgeb326e8">Equation solver</h2>
+<div class="outline-text-2" id="text-orgeb326e8">
 <div class="org-src-container">
 <pre class="src src-fortran">module utils
-<span style="color: #005f5f;">implicit none</span>
+<span style="color: #cccccc;">implicit none</span>
 
   interface
-    <span style="color: #531ab6;">function</span> <span style="color: #721045;">f_if</span>(x)
-      <span style="color: #005f5f;">real</span> :: f_if, x
-    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">f_if</span>
-  <span style="color: #531ab6;">end</span> interface
+    <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f_if</span>(x)
+      <span style="color: #cccccc;">real</span> :: f_if, x
+    <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f_if</span>
+  <span style="color: brightblack;">end</span> interface
 
-<span style="color: #7f0000;">c</span><span style="color: #7f0000;">ontains</span>
+<span style="color: #595959;">c</span><span style="color: #595959;">ontains</span>
 
-  <span style="color: #7f0000;">!</span><span style="color: #7f0000;">Custom equation: f = ...</span>
-  <span style="color: #531ab6;">function</span> <span style="color: #721045;">f</span>(x)
-    <span style="color: #005f5f;">real</span> :: f, x
+  <span style="color: #595959;">!</span><span style="color: #595959;">Custom equation: f = ...</span>
+  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f</span>(x)
+    <span style="color: #cccccc;">real</span> :: f, x
 
     f = x**3 + (1.1 * x**2) + 0.9 * x - 1.4
-  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">f</span>
+  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f</span>
 
-  <span style="color: #531ab6;">function</span> <span style="color: #721045;">next_x</span>(x, x_1, fn)
-    <span style="color: #005f5f;">real</span> :: next_x, x, x_1
+  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">next_x</span>(x, x_1, fn)
+    <span style="color: #cccccc;">real</span> :: next_x, x, x_1
     procedure(f_if), pointer :: fn
 
     next_x = x_1 - (fn(x_1) * (x - x_1))/(fn(x) - fn(x_1))
-  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">next_x</span>
+  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">next_x</span>
 
-  <span style="color: #531ab6;">function</span> <span style="color: #721045;">solve</span>(x, x_1, fn, eps)
-    <span style="color: #005f5f;">real</span> :: solve, root, root_1, delta, eps_
-    <span style="color: #005f5f;">real</span>, intent(inout) :: x, x_1
-    <span style="color: #005f5f;">real</span>, optional :: eps
-    <span style="color: #005f5f;">integer</span> :: i = 0
+  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">solve</span>(x, x_1, fn, eps)
+    <span style="color: #cccccc;">real</span> :: solve, root, root_1, delta, eps_
+    <span style="color: #cccccc;">real</span>, intent(inout) :: x, x_1
+    <span style="color: #cccccc;">real</span>, optional :: eps
+    <span style="color: #cccccc;">integer</span> :: i = 0
     procedure(f_if), pointer :: fn
 
-    <span style="color: #531ab6;">if</span> (<span style="color: #531ab6;">.not.</span> present(eps)) <span style="color: #531ab6;">then</span>
+    <span style="color: brightblack;">if</span> (<span style="color: brightblack;">.not.</span> present(eps)) <span style="color: brightblack;">then</span>
       eps_ = 0.001
-    <span style="color: #531ab6;">else</span>
+    <span style="color: brightblack;">else</span>
       eps_ = eps
-    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
-    <span style="color: #531ab6;">do</span>
+    <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
+    <span style="color: brightblack;">do</span>
       root = next_x(x, x_1, fn)
-      <span style="color: #531ab6;">if</span> (i /= 0 ) <span style="color: #531ab6;">then</span>
-        delta = <span style="color: #8f0075;">abs</span>(root - root_1)
-        <span style="color: #531ab6;">if</span> (delta &lt;= eps_) <span style="color: #531ab6;">then</span>
-          <span style="color: #531ab6;">exit</span>
-        <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
-      <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">if</span>
+      <span style="color: brightblack;">if</span> (i /= 0 ) <span style="color: brightblack;">then</span>
+        delta = <span style="color: #b3b3b3;">abs</span>(root - root_1)
+        <span style="color: brightblack;">if</span> (delta &lt;= eps_) <span style="color: brightblack;">then</span>
+          <span style="color: brightblack;">exit</span>
+        <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
+      <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
       i = i + 1
       x_1 = x
       x = root
       root_1 = root
-    <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">do</span>
+    <span style="color: brightblack;">end</span> <span style="color: brightblack;">do</span>
     solve = root
-  <span style="color: #531ab6;">end</span> <span style="color: #531ab6;">function</span> <span style="color: #721045;">solve</span>
+  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">solve</span>
 
-<span style="color: #531ab6;">end</span> module utils
+<span style="color: brightblack;">end</span> module utils
 
-<span style="color: #531ab6;">program</span> <span style="color: #721045;">eqsolver</span>
+<span style="color: brightblack;">program</span> <span style="color: #a52a2a;">eqsolver</span>
   use utils
-  <span style="color: #005f5f;">implicit none</span>
-  <span style="color: #005f5f;">real</span> :: x=1., x_1=0.
+  <span style="color: #cccccc;">implicit none</span>
+  <span style="color: #cccccc;">real</span> :: x=1., x_1=0.
   procedure(f_if), pointer :: fn =&gt; f
-  <span style="color: #7f0000;">!</span><span style="color: #7f0000;">write(*,*) next_x(1., 0., fn)</span>
-  <span style="color: #531ab6;">write</span>(*,*) solve(x, x_1, fn)
-<span style="color: #531ab6;">end</span> <span style="color: #531ab6;">program</span> <span style="color: #721045;">eqsolver</span>
+  <span style="color: #595959;">!</span><span style="color: #595959;">write(*,*) next_x(1., 0., fn)</span>
+  <span style="color: brightblack;">write</span>(*,*) solve(x, x_1, fn)
+<span style="color: brightblack;">end</span> <span style="color: brightblack;">program</span> <span style="color: #a52a2a;">eqsolver</span>
 </pre>
 </div>
 </div>

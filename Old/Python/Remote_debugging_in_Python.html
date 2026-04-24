@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Remote debugging in Python</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="misc, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Remote debugging in Python</h1>
-<div id="outline-container-orgc7a7922" class="outline-2">
-<h2 id="orgc7a7922">Remote debugging in Python</h2>
-<div class="outline-text-2" id="text-orgc7a7922">
+<div id="outline-container-org24fafb6" class="outline-2">
+<h2 id="org24fafb6">Remote debugging in Python</h2>
+<div class="outline-text-2" id="text-org24fafb6">
 <p>
 Allows debugging of child subprocesses, author of script is Bertrand Janin.
 (Yes, I know that some IDE has own way: PyCharm for example, but this is
@@ -49,7 +74,7 @@ Next script must be put into Libs of Python install dir, then in app type somewh
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">import</span> rpdb
+<pre class="src src-python"><span style="color: brightblack;">import</span> rpdb
 rpdb.set_trace()
 </pre>
 </div>
@@ -60,175 +85,175 @@ And run telnet to 127.0.0.1:4444 and get (pdb) console in telnet window.
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #2a5045;">"""Remote Python Debugger (pdb wrapper)."""</span>
+<pre class="src src-python"><span style="color: brightblack;">"""Remote Python Debugger (pdb wrapper)."""</span>
 
-<span style="color: #005e8b;">__author__</span> = <span style="color: #3548cf;">"Bertrand Janin <a href="mailto:b%40janin.com">&lt;b@janin.com&gt;</a>"</span>
-<span style="color: #005e8b;">__version__</span> = <span style="color: #3548cf;">"0.1.6"</span>
+<span style="color: #b3b3b3;">__author__</span> = <span style="color: brightblack;">"Bertrand Janin <a href="mailto:b%40janin.com">&lt;b@janin.com&gt;</a>"</span>
+<span style="color: #b3b3b3;">__version__</span> = <span style="color: brightblack;">"0.1.6"</span>
 
-<span style="color: #531ab6;">import</span> pdb
-<span style="color: #531ab6;">import</span> socket
-<span style="color: #531ab6;">import</span> threading
-<span style="color: #531ab6;">import</span> signal
-<span style="color: #531ab6;">import</span> sys
-<span style="color: #531ab6;">import</span> traceback
-<span style="color: #531ab6;">from</span> functools <span style="color: #531ab6;">import</span> partial
+<span style="color: brightblack;">import</span> pdb
+<span style="color: brightblack;">import</span> socket
+<span style="color: brightblack;">import</span> threading
+<span style="color: brightblack;">import</span> signal
+<span style="color: brightblack;">import</span> sys
+<span style="color: brightblack;">import</span> traceback
+<span style="color: brightblack;">from</span> functools <span style="color: brightblack;">import</span> partial
 
-<span style="color: #005e8b;">DEFAULT_ADDR</span> = <span style="color: #3548cf;">"127.0.0.1"</span>
-<span style="color: #005e8b;">DEFAULT_PORT</span> = 4444
-
-
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">FileObjectWrapper</span>(<span style="color: #8f0075;">object</span>):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, fileobject, stdio):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_obj</span> = fileobject
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_io</span> = stdio
-
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__getattr__</span>(<span style="color: #531ab6;">self</span>, attr):
-        <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">hasattr</span>(<span style="color: #531ab6;">self</span>._obj, attr):
-            <span style="color: #005e8b;">attr</span> = <span style="color: #8f0075;">getattr</span>(<span style="color: #531ab6;">self</span>._obj, attr)
-        <span style="color: #531ab6;">elif</span> <span style="color: #8f0075;">hasattr</span>(<span style="color: #531ab6;">self</span>._io, attr):
-            <span style="color: #005e8b;">attr</span> = <span style="color: #8f0075;">getattr</span>(<span style="color: #531ab6;">self</span>._io, attr)
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">AttributeError</span>(<span style="color: #3548cf;">"Attribute %s is not found"</span> % attr)
-        <span style="color: #531ab6;">return</span> attr
+<span style="color: #b3b3b3;">DEFAULT_ADDR</span> = <span style="color: brightblack;">"127.0.0.1"</span>
+<span style="color: #b3b3b3;">DEFAULT_PORT</span> = 4444
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Rpdb</span>(pdb.Pdb):
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">FileObjectWrapper</span>(<span style="color: #b3b3b3;">object</span>):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, fileobject, stdio):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_obj</span> = fileobject
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_io</span> = stdio
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, addr=DEFAULT_ADDR, port=DEFAULT_PORT):
-        <span style="color: #2a5045;">"""Initialize the socket and initialize pdb."""</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__getattr__</span>(<span style="color: brightblack;">self</span>, attr):
+        <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">hasattr</span>(<span style="color: brightblack;">self</span>._obj, attr):
+            <span style="color: #b3b3b3;">attr</span> = <span style="color: #b3b3b3;">getattr</span>(<span style="color: brightblack;">self</span>._obj, attr)
+        <span style="color: brightblack;">elif</span> <span style="color: #b3b3b3;">hasattr</span>(<span style="color: brightblack;">self</span>._io, attr):
+            <span style="color: #b3b3b3;">attr</span> = <span style="color: #b3b3b3;">getattr</span>(<span style="color: brightblack;">self</span>._io, attr)
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">AttributeError</span>(<span style="color: brightblack;">"Attribute %s is not found"</span> % attr)
+        <span style="color: brightblack;">return</span> attr
 
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Backup stdin and stdout before replacing them by the socket handle</span>
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">old_stdout</span> = sys.stdout
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">old_stdin</span> = sys.stdin
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">port</span> = port
 
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Open a 'reusable' socket to let the webapp reload on the same port</span>
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">skt</span> = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        <span style="color: #531ab6;">self</span>.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span style="color: #0000b0;">True</span>)
-        <span style="color: #531ab6;">self</span>.skt.bind((addr, port))
-        <span style="color: #531ab6;">self</span>.skt.listen(1)
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Rpdb</span>(pdb.Pdb):
 
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Writes to stdout are forbidden in mod_wsgi environments</span>
-        <span style="color: #531ab6;">try</span>:
-            sys.stderr.write(<span style="color: #3548cf;">"pdb is running on %s:%d</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">"</span>
-                             % <span style="color: #531ab6;">self</span>.skt.getsockname())
-        <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">IOError</span>:
-            <span style="color: #531ab6;">pass</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, addr=DEFAULT_ADDR, port=DEFAULT_PORT):
+        <span style="color: brightblack;">"""Initialize the socket and initialize pdb."""</span>
 
-        (<span style="color: #005e8b;">clientsocket</span>, <span style="color: #005e8b;">address</span>) = <span style="color: #531ab6;">self</span>.skt.accept()
-        <span style="color: #005e8b;">handle</span> = clientsocket.makefile(<span style="color: #3548cf;">'rw'</span>)
-        pdb.Pdb.__init__(<span style="color: #531ab6;">self</span>, completekey=<span style="color: #3548cf;">'tab'</span>,
-                         stdin=FileObjectWrapper(handle, <span style="color: #531ab6;">self</span>.old_stdin),
-                         stdout=FileObjectWrapper(handle, <span style="color: #531ab6;">self</span>.old_stdin))
-        sys.<span style="color: #005e8b;">stdout</span> = sys.<span style="color: #005e8b;">stdin</span> = handle
+        <span style="color: #595959;"># </span><span style="color: #595959;">Backup stdin and stdout before replacing them by the socket handle</span>
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">old_stdout</span> = sys.stdout
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">old_stdin</span> = sys.stdin
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">port</span> = port
+
+        <span style="color: #595959;"># </span><span style="color: #595959;">Open a 'reusable' socket to let the webapp reload on the same port</span>
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">skt</span> = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        <span style="color: brightblack;">self</span>.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span style="color: #7fffd4;">True</span>)
+        <span style="color: brightblack;">self</span>.skt.bind((addr, port))
+        <span style="color: brightblack;">self</span>.skt.listen(1)
+
+        <span style="color: #595959;"># </span><span style="color: #595959;">Writes to stdout are forbidden in mod_wsgi environments</span>
+        <span style="color: brightblack;">try</span>:
+            sys.stderr.write(<span style="color: brightblack;">"pdb is running on %s:%d</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">"</span>
+                             % <span style="color: brightblack;">self</span>.skt.getsockname())
+        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">IOError</span>:
+            <span style="color: brightblack;">pass</span>
+
+        (<span style="color: #b3b3b3;">clientsocket</span>, <span style="color: #b3b3b3;">address</span>) = <span style="color: brightblack;">self</span>.skt.accept()
+        <span style="color: #b3b3b3;">handle</span> = clientsocket.makefile(<span style="color: brightblack;">'rw'</span>)
+        pdb.Pdb.__init__(<span style="color: brightblack;">self</span>, completekey=<span style="color: brightblack;">'tab'</span>,
+                         stdin=FileObjectWrapper(handle, <span style="color: brightblack;">self</span>.old_stdin),
+                         stdout=FileObjectWrapper(handle, <span style="color: brightblack;">self</span>.old_stdin))
+        sys.<span style="color: #b3b3b3;">stdout</span> = sys.<span style="color: #b3b3b3;">stdin</span> = handle
         OCCUPIED.claim(port, sys.stdout)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">shutdown</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #2a5045;">"""Revert stdin and stdout, close the socket."""</span>
-        sys.<span style="color: #005e8b;">stdout</span> = <span style="color: #531ab6;">self</span>.old_stdout
-        sys.<span style="color: #005e8b;">stdin</span> = <span style="color: #531ab6;">self</span>.old_stdin
-        OCCUPIED.unclaim(<span style="color: #531ab6;">self</span>.port)
-        <span style="color: #531ab6;">self</span>.skt.close()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">shutdown</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">"""Revert stdin and stdout, close the socket."""</span>
+        sys.<span style="color: #b3b3b3;">stdout</span> = <span style="color: brightblack;">self</span>.old_stdout
+        sys.<span style="color: #b3b3b3;">stdin</span> = <span style="color: brightblack;">self</span>.old_stdin
+        OCCUPIED.unclaim(<span style="color: brightblack;">self</span>.port)
+        <span style="color: brightblack;">self</span>.skt.close()
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">do_continue</span>(<span style="color: #531ab6;">self</span>, arg):
-        <span style="color: #2a5045;">"""Clean-up and do underlying continue."""</span>
-        <span style="color: #531ab6;">try</span>:
-            <span style="color: #531ab6;">return</span> pdb.Pdb.do_continue(<span style="color: #531ab6;">self</span>, arg)
-        <span style="color: #531ab6;">finally</span>:
-            <span style="color: #531ab6;">self</span>.shutdown()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_continue</span>(<span style="color: brightblack;">self</span>, arg):
+        <span style="color: brightblack;">"""Clean-up and do underlying continue."""</span>
+        <span style="color: brightblack;">try</span>:
+            <span style="color: brightblack;">return</span> pdb.Pdb.do_continue(<span style="color: brightblack;">self</span>, arg)
+        <span style="color: brightblack;">finally</span>:
+            <span style="color: brightblack;">self</span>.shutdown()
 
-    <span style="color: #005e8b;">do_c</span> = <span style="color: #005e8b;">do_cont</span> = do_continue
+    <span style="color: #b3b3b3;">do_c</span> = <span style="color: #b3b3b3;">do_cont</span> = do_continue
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">do_quit</span>(<span style="color: #531ab6;">self</span>, arg):
-        <span style="color: #2a5045;">"""Clean-up and do underlying quit."""</span>
-        <span style="color: #531ab6;">try</span>:
-            <span style="color: #531ab6;">return</span> pdb.Pdb.do_quit(<span style="color: #531ab6;">self</span>, arg)
-        <span style="color: #531ab6;">finally</span>:
-            <span style="color: #531ab6;">self</span>.shutdown()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_quit</span>(<span style="color: brightblack;">self</span>, arg):
+        <span style="color: brightblack;">"""Clean-up and do underlying quit."""</span>
+        <span style="color: brightblack;">try</span>:
+            <span style="color: brightblack;">return</span> pdb.Pdb.do_quit(<span style="color: brightblack;">self</span>, arg)
+        <span style="color: brightblack;">finally</span>:
+            <span style="color: brightblack;">self</span>.shutdown()
 
-    <span style="color: #005e8b;">do_q</span> = <span style="color: #005e8b;">do_exit</span> = do_quit
+    <span style="color: #b3b3b3;">do_q</span> = <span style="color: #b3b3b3;">do_exit</span> = do_quit
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">do_EOF</span>(<span style="color: #531ab6;">self</span>, arg):
-        <span style="color: #2a5045;">"""Clean-up and do underlying EOF."""</span>
-        <span style="color: #531ab6;">try</span>:
-            <span style="color: #531ab6;">return</span> pdb.Pdb.do_EOF(<span style="color: #531ab6;">self</span>, arg)
-        <span style="color: #531ab6;">finally</span>:
-            <span style="color: #531ab6;">self</span>.shutdown()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_EOF</span>(<span style="color: brightblack;">self</span>, arg):
+        <span style="color: brightblack;">"""Clean-up and do underlying EOF."""</span>
+        <span style="color: brightblack;">try</span>:
+            <span style="color: brightblack;">return</span> pdb.Pdb.do_EOF(<span style="color: brightblack;">self</span>, arg)
+        <span style="color: brightblack;">finally</span>:
+            <span style="color: brightblack;">self</span>.shutdown()
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">set_trace</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT, frame=<span style="color: #0000b0;">None</span>):
-    <span style="color: #2a5045;">"""Wrapper function to keep the same import x; x.set_trace() interface.</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">set_trace</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT, frame=<span style="color: #7fffd4;">None</span>):
+    <span style="color: brightblack;">"""Wrapper function to keep the same import x; x.set_trace() interface.</span>
 
-<span style="color: #2a5045;">    We catch all the possible exceptions from pdb and cleanup.</span>
+<span style="color: brightblack;">    We catch all the possible exceptions from pdb and cleanup.</span>
 
-<span style="color: #2a5045;">    """</span>
-    <span style="color: #531ab6;">try</span>:
-        <span style="color: #005e8b;">debugger</span> = Rpdb(addr=addr, port=port)
-    <span style="color: #531ab6;">except</span> socket.error:
-        <span style="color: #531ab6;">if</span> OCCUPIED.is_claimed(port, sys.stdout):
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">rpdb is already on this port - good enough, let it go on:</span>
-            sys.stdout.write(<span style="color: #3548cf;">"(Recurrent rpdb invocation ignored)</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">"</span>)
-            <span style="color: #531ab6;">return</span>
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Port occupied by something else.</span>
-            <span style="color: #531ab6;">raise</span>
-    <span style="color: #531ab6;">try</span>:
-        debugger.set_trace(frame <span style="color: #531ab6;">or</span> sys._getframe().f_back)
-    <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">Exception</span>:
+<span style="color: brightblack;">    """</span>
+    <span style="color: brightblack;">try</span>:
+        <span style="color: #b3b3b3;">debugger</span> = Rpdb(addr=addr, port=port)
+    <span style="color: brightblack;">except</span> socket.error:
+        <span style="color: brightblack;">if</span> OCCUPIED.is_claimed(port, sys.stdout):
+            <span style="color: #595959;"># </span><span style="color: #595959;">rpdb is already on this port - good enough, let it go on:</span>
+            sys.stdout.write(<span style="color: brightblack;">"(Recurrent rpdb invocation ignored)</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">"</span>)
+            <span style="color: brightblack;">return</span>
+        <span style="color: brightblack;">else</span>:
+            <span style="color: #595959;"># </span><span style="color: #595959;">Port occupied by something else.</span>
+            <span style="color: brightblack;">raise</span>
+    <span style="color: brightblack;">try</span>:
+        debugger.set_trace(frame <span style="color: brightblack;">or</span> sys._getframe().f_back)
+    <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span>:
         traceback.print_exc()
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">_trap_handler</span>(addr, port, signum, frame):
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_trap_handler</span>(addr, port, signum, frame):
     set_trace(addr, port, frame=frame)
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">handle_trap</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT):
-    <span style="color: #2a5045;">"""Register rpdb as the SIGTRAP signal handler"""</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">handle_trap</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT):
+    <span style="color: brightblack;">"""Register rpdb as the SIGTRAP signal handler"""</span>
     signal.signal(signal.SIGTRAP, partial(_trap_handler, addr, port))
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">post_mortem</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT):
-    <span style="color: #005e8b;">debugger</span> = Rpdb(addr=addr, port=port)
-    <span style="color: #8f0075;">type</span>, <span style="color: #005e8b;">value</span>, <span style="color: #005e8b;">tb</span> = sys.exc_info()
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">post_mortem</span>(addr=DEFAULT_ADDR, port=DEFAULT_PORT):
+    <span style="color: #b3b3b3;">debugger</span> = Rpdb(addr=addr, port=port)
+    <span style="color: #b3b3b3;">type</span>, <span style="color: #b3b3b3;">value</span>, <span style="color: #b3b3b3;">tb</span> = sys.exc_info()
     traceback.print_exc()
     debugger.reset()
-    debugger.interaction(<span style="color: #0000b0;">None</span>, tb)
+    debugger.interaction(<span style="color: #7fffd4;">None</span>, tb)
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">OccupiedPorts</span>(<span style="color: #8f0075;">object</span>):
-    <span style="color: #2a5045;">"""Maintain rpdb port versus stdin/out file handles.</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">OccupiedPorts</span>(<span style="color: #b3b3b3;">object</span>):
+    <span style="color: brightblack;">"""Maintain rpdb port versus stdin/out file handles.</span>
 
-<span style="color: #2a5045;">    Provides the means to determine whether or not a collision binding to a</span>
-<span style="color: #2a5045;">    particular port is with an already operating rpdb session.</span>
+<span style="color: brightblack;">    Provides the means to determine whether or not a collision binding to a</span>
+<span style="color: brightblack;">    particular port is with an already operating rpdb session.</span>
 
-<span style="color: #2a5045;">    Determination is according to whether a file handle is equal to what is</span>
-<span style="color: #2a5045;">    registered against the specified port.</span>
-<span style="color: #2a5045;">    """</span>
+<span style="color: brightblack;">    Determination is according to whether a file handle is equal to what is</span>
+<span style="color: brightblack;">    registered against the specified port.</span>
+<span style="color: brightblack;">    """</span>
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">lock</span> = threading.RLock()
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">claims</span> = {}
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lock</span> = threading.RLock()
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">claims</span> = {}
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">claim</span>(<span style="color: #531ab6;">self</span>, port, handle):
-        <span style="color: #531ab6;">self</span>.lock.acquire(<span style="color: #0000b0;">True</span>)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">claims</span>[port] = <span style="color: #8f0075;">id</span>(handle)
-        <span style="color: #531ab6;">self</span>.lock.release()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">claim</span>(<span style="color: brightblack;">self</span>, port, handle):
+        <span style="color: brightblack;">self</span>.lock.acquire(<span style="color: #7fffd4;">True</span>)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">claims</span>[port] = <span style="color: #b3b3b3;">id</span>(handle)
+        <span style="color: brightblack;">self</span>.lock.release()
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">is_claimed</span>(<span style="color: #531ab6;">self</span>, port, handle):
-        <span style="color: #531ab6;">self</span>.lock.acquire(<span style="color: #0000b0;">True</span>)
-        <span style="color: #005e8b;">got</span> = (<span style="color: #531ab6;">self</span>.claims.get(port) == <span style="color: #8f0075;">id</span>(handle))
-        <span style="color: #531ab6;">self</span>.lock.release()
-        <span style="color: #531ab6;">return</span> got
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_claimed</span>(<span style="color: brightblack;">self</span>, port, handle):
+        <span style="color: brightblack;">self</span>.lock.acquire(<span style="color: #7fffd4;">True</span>)
+        <span style="color: #b3b3b3;">got</span> = (<span style="color: brightblack;">self</span>.claims.get(port) == <span style="color: #b3b3b3;">id</span>(handle))
+        <span style="color: brightblack;">self</span>.lock.release()
+        <span style="color: brightblack;">return</span> got
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">unclaim</span>(<span style="color: #531ab6;">self</span>, port):
-        <span style="color: #531ab6;">self</span>.lock.acquire(<span style="color: #0000b0;">True</span>)
-        <span style="color: #531ab6;">del</span> <span style="color: #531ab6;">self</span>.claims[port]
-        <span style="color: #531ab6;">self</span>.lock.release()
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">unclaim</span>(<span style="color: brightblack;">self</span>, port):
+        <span style="color: brightblack;">self</span>.lock.acquire(<span style="color: #7fffd4;">True</span>)
+        <span style="color: brightblack;">del</span> <span style="color: brightblack;">self</span>.claims[port]
+        <span style="color: brightblack;">self</span>.lock.release()
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">{port: sys.stdout} pairs to track recursive rpdb invocation on same port.</span>
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">This scheme doesn't interfere with recursive invocations on separate ports -</span>
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">useful, eg, for concurrently debugging separate threads.</span>
-<span style="color: #005e8b;">OCCUPIED</span> = OccupiedPorts()
+<span style="color: #595959;"># </span><span style="color: #595959;">{port: sys.stdout} pairs to track recursive rpdb invocation on same port.</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">This scheme doesn't interfere with recursive invocations on separate ports -</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">useful, eg, for concurrently debugging separate threads.</span>
+<span style="color: #b3b3b3;">OCCUPIED</span> = OccupiedPorts()
 
 </pre>
 </div>

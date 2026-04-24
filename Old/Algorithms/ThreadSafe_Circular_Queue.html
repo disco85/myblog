@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Thread-Safe Circular Queue</title>
@@ -11,80 +11,105 @@
 <meta name="keywords" content="clang, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Thread-Safe Circular Queue</h1>
-<div id="outline-container-orge9111e5" class="outline-2">
-<h2 id="orge9111e5">Thread-Safe Circular Queue</h2>
-<div class="outline-text-2" id="text-orge9111e5">
+<div id="outline-container-org1a83bc1" class="outline-2">
+<h2 id="org1a83bc1">Thread-Safe Circular Queue</h2>
+<div class="outline-text-2" id="text-org1a83bc1">
 <p>
 Often in data processing applications are needed circular queue implemented in thread-safe way. This is the such implementation without any mutex, locks and so on:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #2a5045;">/**</span>
-<span style="color: #2a5045;"> * </span><span style="color: #7c318f;">@file</span><span style="color: #2a5045;"> cqueue.h</span>
-<span style="color: #2a5045;"> * </span><span style="color: #7c318f;">@defgroup</span><span style="color: #2a5045;"> cqueue Circular queue support</span>
-<span style="color: #2a5045;"> * @{</span>
-<span style="color: #2a5045;"> * </span><span style="color: #7c318f;">@brief</span><span style="color: #2a5045;"> Fast circular queue support</span>
-<span style="color: #2a5045;"> */</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> _CQUEUE_H
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">_CQUEUE_H</span>
+<pre class="src src-cpp"><span style="color: brightblack;">/**</span>
+<span style="color: brightblack;"> * </span><span style="color: #7fffd4;">@file</span><span style="color: brightblack;"> cqueue.h</span>
+<span style="color: brightblack;"> * </span><span style="color: #7fffd4;">@defgroup</span><span style="color: brightblack;"> cqueue Circular queue support</span>
+<span style="color: brightblack;"> * @{</span>
+<span style="color: brightblack;"> * </span><span style="color: #7fffd4;">@brief</span><span style="color: brightblack;"> Fast circular queue support</span>
+<span style="color: brightblack;"> */</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _CQUEUE_H
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_CQUEUE_H</span>
 
-<span style="color: #2a5045;">/** It's possible to use another (wrapper) structure or structure with another</span>
-<span style="color: #2a5045;">name for cqueue implementation. CQUEUE_STRUCT_IMPL should be defined as name</span>
-<span style="color: #2a5045;">of such structure in this case before to include cqueue.h. This structure</span>
-<span style="color: #2a5045;">must have members:</span>
-<span style="color: #2a5045;"> - unsigned integer "size"</span>
-<span style="color: #2a5045;"> - integer "rpos"</span>
-<span style="color: #2a5045;"> - integer "wpos"</span>
-<span style="color: #2a5045;"> - integer "rwrap"</span>
-<span style="color: #2a5045;"> - integer "wwrap"</span>
-<span style="color: #2a5045;"> - any other custom fields</span>
-<span style="color: #2a5045;">*/</span>
-<span style="color: #a0132f;">#ifdef</span> CQUEUE_STRUCT_IMPL
-<span style="color: #531ab6;">typedef</span> <span style="color: #005f5f;">CQUEUE_STRUCT_IMPL</span> <span style="color: #005f5f;">cqueue_t</span>;
-<span style="color: #a0132f;">#else</span>
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Circular queue</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">cqueue_t</span> {
-    <span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Capacity of queue</span>
-    <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">size</span>;
-    <span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Reader position</span>
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">rpos</span>;
-    <span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Writer position</span>
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">wpos</span>;
-    <span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Reader wrapping flag</span>
-    <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">rwrap</span>;
-    <span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Writer wrapping flag</span>
-    <span style="color: #005f5f;">unsigned</span> <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">wwrap</span>;
-} <span style="color: #005f5f;">cqueue_t</span>;
+<span style="color: brightblack;">/** It's possible to use another (wrapper) structure or structure with another</span>
+<span style="color: brightblack;">name for cqueue implementation. CQUEUE_STRUCT_IMPL should be defined as name</span>
+<span style="color: brightblack;">of such structure in this case before to include cqueue.h. This structure</span>
+<span style="color: brightblack;">must have members:</span>
+<span style="color: brightblack;"> - unsigned integer "size"</span>
+<span style="color: brightblack;"> - integer "rpos"</span>
+<span style="color: brightblack;"> - integer "wpos"</span>
+<span style="color: brightblack;"> - integer "rwrap"</span>
+<span style="color: brightblack;"> - integer "wwrap"</span>
+<span style="color: brightblack;"> - any other custom fields</span>
+<span style="color: brightblack;">*/</span>
+<span style="color: #b3b3b3;">#ifdef</span> CQUEUE_STRUCT_IMPL
+<span style="color: brightblack;">typedef</span> <span style="color: #cccccc;">CQUEUE_STRUCT_IMPL</span> <span style="color: #cccccc;">cqueue_t</span>;
+<span style="color: #b3b3b3;">#else</span>
+<span style="color: #595959;">/// </span><span style="color: #595959;">Circular queue</span>
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">cqueue_t</span> {
+    <span style="color: #595959;">/// </span><span style="color: #595959;">Capacity of queue</span>
+    <span style="color: #cccccc;">unsigned</span> <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">size</span>;
+    <span style="color: #595959;">/// </span><span style="color: #595959;">Reader position</span>
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">rpos</span>;
+    <span style="color: #595959;">/// </span><span style="color: #595959;">Writer position</span>
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">wpos</span>;
+    <span style="color: #595959;">/// </span><span style="color: #595959;">Reader wrapping flag</span>
+    <span style="color: #cccccc;">unsigned</span> <span style="color: #cccccc;">char</span> <span style="color: #b3b3b3;">rwrap</span>;
+    <span style="color: #595959;">/// </span><span style="color: #595959;">Writer wrapping flag</span>
+    <span style="color: #cccccc;">unsigned</span> <span style="color: #cccccc;">char</span> <span style="color: #b3b3b3;">wwrap</span>;
+} <span style="color: #cccccc;">cqueue_t</span>;
 
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #2a5045;">/** Initializer for circular queue structure instance. Additional args are</span>
-<span style="color: #2a5045;">needs if separate implementation struct is used */</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_INITIALIZER</span>(<span style="color: #005e8b;">SIZE</span>, ...) { \
+<span style="color: brightblack;">/** Initializer for circular queue structure instance. Additional args are</span>
+<span style="color: brightblack;">needs if separate implementation struct is used */</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_INITIALIZER</span>(<span style="color: #b3b3b3;">SIZE</span>, ...) { \
     .size = (SIZE), \
     .rpos = 0, \
     .wpos = 0, \
@@ -92,63 +117,63 @@ Often in data processing applications are needed circular queue implemented in t
     .rwrap = 0, \
     __VA_ARGS__ }
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Init. function for queue structure instance</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_INIT</span>(<span style="color: #005e8b;">Q</span>, <span style="color: #005e8b;">SIZE</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Init. function for queue structure instance</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_INIT</span>(<span style="color: #b3b3b3;">Q</span>, <span style="color: #b3b3b3;">SIZE</span>) <span style="color: brightblack;">do</span> { \
     (Q)-&gt;size = (SIZE); \
     (Q)-&gt;rpos = (Q)-&gt;wpos = 0; \
     (Q)-&gt;wwrap = (Q)-&gt;rwrap = 0; \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Reset circular queue into initial state</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_RESET</span>(<span style="color: #005e8b;">Q</span>) CQUEUE_INIT(Q, (Q)-&gt;size)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Reset circular queue into initial state</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_RESET</span>(<span style="color: #b3b3b3;">Q</span>) CQUEUE_INIT(Q, (Q)-&gt;size)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">General position incrementing</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_INCR</span>(<span style="color: #005e8b;">Q</span>, <span style="color: #005e8b;">PPOS</span>, <span style="color: #005e8b;">PWRAP</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">General position incrementing</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_INCR</span>(<span style="color: #b3b3b3;">Q</span>, <span style="color: #b3b3b3;">PPOS</span>, <span style="color: #b3b3b3;">PWRAP</span>) <span style="color: brightblack;">do</span> { \
     *(PPOS) = *(PPOS) +1; \
-    <span style="color: #531ab6;">if</span> (*(PPOS) == (Q)-&gt;size) { \
+    <span style="color: brightblack;">if</span> (*(PPOS) == (Q)-&gt;size) { \
         *(PWRAP) ^= 1; \
         *(PPOS) = 0; \
     } \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Reader position (for user-side)</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_RPOS</span>(<span style="color: #005e8b;">Q</span>) ((Q)-&gt;rpos)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Reader position (for user-side)</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_RPOS</span>(<span style="color: #b3b3b3;">Q</span>) ((Q)-&gt;rpos)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Writer position (for user-side)</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_WPOS</span>(<span style="color: #005e8b;">Q</span>) ((Q)-&gt;wpos)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Writer position (for user-side)</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_WPOS</span>(<span style="color: #b3b3b3;">Q</span>) ((Q)-&gt;wpos)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Reader position incrementing</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_INCR_R</span>(<span style="color: #005e8b;">Q</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Reader position incrementing</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_INCR_R</span>(<span style="color: #b3b3b3;">Q</span>) <span style="color: brightblack;">do</span> { \
     CQUEUE_INCR(Q, &amp;((Q)-&gt;rpos), &amp;((Q)-&gt;rwrap)); \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Writer position incrementing</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_INCR_W</span>(<span style="color: #005e8b;">Q</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Writer position incrementing</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_INCR_W</span>(<span style="color: #b3b3b3;">Q</span>) <span style="color: brightblack;">do</span> { \
     CQUEUE_INCR(Q, &amp;((Q)-&gt;wpos), &amp;((Q)-&gt;wwrap)); \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Test of circular queue fullness</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_IS_FULL</span>(<span style="color: #005e8b;">Q</span>) \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Test of circular queue fullness</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_IS_FULL</span>(<span style="color: #b3b3b3;">Q</span>) \
     ((Q)-&gt;wpos == (Q)-&gt;rpos &amp;&amp; (Q)-&gt;rwrap != (Q)-&gt;wwrap)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Test of circular queue emptiness</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_IS_EMPTY</span>(<span style="color: #005e8b;">Q</span>) \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Test of circular queue emptiness</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_IS_EMPTY</span>(<span style="color: #b3b3b3;">Q</span>) \
     ((Q)-&gt;wpos == (Q)-&gt;rpos &amp;&amp; (Q)-&gt;rwrap == (Q)-&gt;wwrap)
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Number of free slots in circular queue</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_NFREE</span>(<span style="color: #005e8b;">Q</span>) \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Number of free slots in circular queue</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_NFREE</span>(<span style="color: #b3b3b3;">Q</span>) \
     ((Q)-&gt;rwrap == (Q)-&gt;wwrap ? \
      ((Q)-&gt;size - (Q)-&gt;wpos + (Q)-&gt;rpos) : \
      ((Q)-&gt;rpos - (Q)-&gt;wpos))
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Number of used slots in circular queue</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">CQUEUE_LEN</span>(<span style="color: #005e8b;">Q</span>) \
+<span style="color: #595959;">/// </span><span style="color: #595959;">Number of used slots in circular queue</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CQUEUE_LEN</span>(<span style="color: #b3b3b3;">Q</span>) \
     ((Q)-&gt;rwrap != (Q)-&gt;wwrap ? \
      ((Q)-&gt;size - (Q)-&gt;rpos + (Q)-&gt;wpos) : \
      ((Q)-&gt;wpos - (Q)-&gt;rpos))
 
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">@}</span>
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #595959;">/// </span><span style="color: #595959;">@}</span>
 </pre>
 </div>
 

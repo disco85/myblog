@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Docstrings in Tcl (and IncrTcl)</title>
@@ -11,219 +11,244 @@
 <meta name="keywords" content="tcl/tk" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Docstrings in Tcl (and IncrTcl)</h1>
-<div id="outline-container-orgba031f2" class="outline-2">
-<h2 id="orgba031f2">Docstrings in Tcl (and IncrTcl)</h2>
-<div class="outline-text-2" id="text-orgba031f2">
+<div id="outline-container-org492aca5" class="outline-2">
+<h2 id="org492aca5">Docstrings in Tcl (and IncrTcl)</h2>
+<div class="outline-text-2" id="text-org492aca5">
 <p>
 Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to include documentation into implementation (reverse LP). But in Tcl are can be usable to generate help of commands for user. Here is the listing of one (it support procs and Itcl methods):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #8f0075;">package</span> provide mydoc 1.0
+<pre class="src src-tcl"><span style="color: #b3b3b3;">package</span> provide mydoc 1.0
 
-<span style="color: #8f0075;">namespace</span> <span style="color: #721045;">eval</span> mydoc {
-    <span style="color: #8f0075;">namespace</span> <span style="color: #721045;">export</span> doc
+<span style="color: #b3b3b3;">namespace</span> <span style="color: #a52a2a;">eval</span> mydoc {
+    <span style="color: #b3b3b3;">namespace</span> <span style="color: #a52a2a;">export</span> doc
 }
 
-<span style="color: #8f0075;">set</span> <span style="color: #005e8b;">_NOHELPMSG</span> <span style="color: #3548cf;">"No help."</span>
+<span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">_NOHELPMSG</span> <span style="color: brightblack;">"No help."</span>
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">::mydoc::_docstring</span> {<span style="color: #531ab6;">body</span>} {
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">string</span> trim $<span style="color: #005e8b;">body</span>]
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">docstring</span> <span style="color: #3548cf;">""</span>
-    <span style="color: #7f0000;"># without 1st '^' will match any FIRST docstring block even after</span>
-    <span style="color: #7f0000;"># commands!</span>
-    <span style="color: #531ab6;">if</span> {[<span style="color: #8f0075;">regexp</span> {^#\s*([^\n]+\n)+(\n\n)} $<span style="color: #005e8b;">body</span> docstring]} {
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">docstring</span> [<span style="color: #8f0075;">regsub</span> -all {\s*#\s?} $<span style="color: #005e8b;">docstring</span> \n]
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">docstring</span> [<span style="color: #8f0075;">string</span> trim $<span style="color: #005e8b;">docstring</span>]
-        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">docstring</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">::mydoc::_docstring</span> {<span style="color: brightblack;">body</span>} {
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">string</span> trim $<span style="color: #b3b3b3;">body</span>]
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">docstring</span> <span style="color: brightblack;">""</span>
+    <span style="color: #595959;"># without 1st '^' will match any FIRST docstring block even after</span>
+    <span style="color: #595959;"># commands!</span>
+    <span style="color: brightblack;">if</span> {[<span style="color: #b3b3b3;">regexp</span> {^#\s*([^\n]+\n)+(\n\n)} $<span style="color: #b3b3b3;">body</span> docstring]} {
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">docstring</span> [<span style="color: #b3b3b3;">regsub</span> -all {\s*#\s?} $<span style="color: #b3b3b3;">docstring</span> \n]
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">docstring</span> [<span style="color: #b3b3b3;">string</span> trim $<span style="color: #b3b3b3;">docstring</span>]
+        <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">docstring</span>
     }
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">::mydoc::doc</span> args {
-    <span style="color: #7f0000;"># Help on command: procedure or class method. Call:</span>
-    <span style="color: #7f0000;">#   doc some_object some_method</span>
-    <span style="color: #7f0000;">#   doc some_class some_method</span>
-    <span style="color: #7f0000;">#   doc some_proc</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">::mydoc::doc</span> args {
+    <span style="color: #595959;"># Help on command: procedure or class method. Call:</span>
+    <span style="color: #595959;">#   doc some_object some_method</span>
+    <span style="color: #595959;">#   doc some_class some_method</span>
+    <span style="color: #595959;">#   doc some_proc</span>
 
 
-    <span style="color: #005f5f;">global</span> _NOHELPMSG
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">found</span> <span style="color: #3548cf;">""</span>
-    <span style="color: #531ab6;">switch</span> -- [<span style="color: #8f0075;">llength</span> $<span style="color: #005e8b;">args</span>] {
+    <span style="color: #cccccc;">global</span> _NOHELPMSG
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">found</span> <span style="color: brightblack;">""</span>
+    <span style="color: brightblack;">switch</span> -- [<span style="color: #b3b3b3;">llength</span> $<span style="color: #b3b3b3;">args</span>] {
         1 {
-            <span style="color: #7f0000;"># args: proc</span>
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">name</span> [<span style="color: #8f0075;">lindex</span> $<span style="color: #005e8b;">args</span> 0]
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> [<span style="color: #8f0075;">info</span> args $<span style="color: #005e8b;">name</span>]
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">info</span> <span style="color: #531ab6;">body</span> $<span style="color: #005e8b;">name</span>]
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">found</span> [_docstring $<span style="color: #005e8b;">body</span>]
+            <span style="color: #595959;"># args: proc</span>
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">name</span> [<span style="color: #b3b3b3;">lindex</span> $<span style="color: #b3b3b3;">args</span> 0]
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> [<span style="color: #b3b3b3;">info</span> args $<span style="color: #b3b3b3;">name</span>]
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">info</span> <span style="color: brightblack;">body</span> $<span style="color: #b3b3b3;">name</span>]
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">found</span> [_docstring $<span style="color: #b3b3b3;">body</span>]
         }
         2 {
-            <span style="color: #7f0000;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #7f0000;"> not optimal!</span>
-            <span style="color: #7f0000;"># args: object|class method</span>
-            lassign $<span style="color: #005e8b;">args</span> cls_obj meth
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">objs</span> [itcl::find objects]
-            <span style="color: #7f0000;"># cls_obj may be object OR class. What is it?</span>
-            <span style="color: #531ab6;">if</span> {-1 != [lsearch -regexp $<span style="color: #005e8b;">objs</span> :*$<span style="color: #005e8b;">cls_obj</span>]} {
-                <span style="color: #7f0000;"># this is the object</span>
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> [$<span style="color: #005e8b;">cls_obj</span> <span style="color: #8f0075;">info</span> args $<span style="color: #005e8b;">meth</span>]
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [$<span style="color: #005e8b;">cls_obj</span> <span style="color: #8f0075;">info</span> <span style="color: #531ab6;">body</span> $<span style="color: #005e8b;">meth</span>]
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">found</span> [_docstring $<span style="color: #005e8b;">body</span>]
-            } <span style="color: #531ab6;">else</span> {
-                <span style="color: #7f0000;"># this is the class</span>
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> ::$<span style="color: #005e8b;">cls_obj</span> <span style="color: #8f0075;">info</span> args $<span style="color: #005e8b;">meth</span>]
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> ::$<span style="color: #005e8b;">cls_obj</span> <span style="color: #8f0075;">info</span> <span style="color: #531ab6;">body</span> $<span style="color: #005e8b;">meth</span>]
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">found</span> [_docstring $<span style="color: #005e8b;">body</span>]
+            <span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">FIXME</span><span style="color: #595959;"> not optimal!</span>
+            <span style="color: #595959;"># args: object|class method</span>
+            lassign $<span style="color: #b3b3b3;">args</span> cls_obj meth
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">objs</span> [itcl::find objects]
+            <span style="color: #595959;"># cls_obj may be object OR class. What is it?</span>
+            <span style="color: brightblack;">if</span> {-1 != [lsearch -regexp $<span style="color: #b3b3b3;">objs</span> :*$<span style="color: #b3b3b3;">cls_obj</span>]} {
+                <span style="color: #595959;"># this is the object</span>
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> [$<span style="color: #b3b3b3;">cls_obj</span> <span style="color: #b3b3b3;">info</span> args $<span style="color: #b3b3b3;">meth</span>]
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [$<span style="color: #b3b3b3;">cls_obj</span> <span style="color: #b3b3b3;">info</span> <span style="color: brightblack;">body</span> $<span style="color: #b3b3b3;">meth</span>]
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">found</span> [_docstring $<span style="color: #b3b3b3;">body</span>]
+            } <span style="color: brightblack;">else</span> {
+                <span style="color: #595959;"># this is the class</span>
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> ::$<span style="color: #b3b3b3;">cls_obj</span> <span style="color: #b3b3b3;">info</span> args $<span style="color: #b3b3b3;">meth</span>]
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> ::$<span style="color: #b3b3b3;">cls_obj</span> <span style="color: #b3b3b3;">info</span> <span style="color: brightblack;">body</span> $<span style="color: #b3b3b3;">meth</span>]
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">found</span> [_docstring $<span style="color: #b3b3b3;">body</span>]
             }
         }
-        <span style="color: #531ab6;">default</span> { <span style="color: #531ab6;">error</span> <span style="color: #3548cf;">"wrong args: proc | object method | class method"</span> }
+        <span style="color: brightblack;">default</span> { <span style="color: brightblack;">error</span> <span style="color: brightblack;">"wrong args: proc | object method | class method"</span> }
     }
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">found</span> eq <span style="color: #3548cf;">""</span>} {
-        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">_NOHELPMSG</span>
-    } <span style="color: #531ab6;">else</span> {
-        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">found</span>
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">found</span> eq <span style="color: brightblack;">""</span>} {
+        <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">_NOHELPMSG</span>
+    } <span style="color: brightblack;">else</span> {
+        <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">found</span>
     }
 }
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">txt is the string with \n, shifter is like '\t' or '\t\t'..</span>
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">mydoc::_shift_strings</span> {txt shifter} {
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">txt</span> ne <span style="color: #3548cf;">""</span>} {
-        <span style="color: #531ab6;">return</span> <span style="color: #3548cf;">"$shifter[regsub -all \n $txt \n$shifter]"</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">txt is the string with \n, shifter is like '\t' or '\t\t'..</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">mydoc::_shift_strings</span> {txt shifter} {
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">txt</span> ne <span style="color: brightblack;">""</span>} {
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">"$shifter[regsub -all \n $txt \n$shifter]"</span>
     }
 }
 
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Generate only for documented with docstrings</span>
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">mydoc::_genrst</span> {fname} {
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">result</span> {}
-    <span style="color: #7f0000;"># Collect help on objects and it's methods</span>
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">clshelp</span> {}
-    <span style="color: #531ab6;">foreach</span> cls [itcl::find classes] {
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">her</span> [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #3548cf;">"info heritage"</span>]
+<span style="color: #595959;"># </span><span style="color: #595959;">Generate only for documented with docstrings</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">mydoc::_genrst</span> {fname} {
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">result</span> {}
+    <span style="color: #595959;"># Collect help on objects and it's methods</span>
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">clshelp</span> {}
+    <span style="color: brightblack;">foreach</span> cls [itcl::find classes] {
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">her</span> [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: brightblack;">"info heritage"</span>]
 
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">varhelp</span> {}
-        <span style="color: #531ab6;">foreach</span> v [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #8f0075;">info</span> variable] {
-            <span style="color: #8f0075;">catch</span> {
-                <span style="color: #7f0000;">#lappend varhelp [namespace eval $cls info variable $v -protection public]</span>
-                <span style="color: #531ab6;">if</span> {[<span style="color: #8f0075;">string</span> first <span style="color: #3548cf;">"::_"</span> $<span style="color: #005e8b;">v</span>] == -1} {
-                    <span style="color: #531ab6;">switch</span> -- [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #8f0075;">info</span> <span style="color: #005f5f;">variable</span> $<span style="color: #005e8b;">v</span> -protection] {
-                        <span style="color: #005f5f;">public</span> { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">vprot</span> <span style="color: #3548cf;">"public"</span> }
-                        <span style="color: #005f5f;">protected</span> { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">vprot</span> <span style="color: #3548cf;">"protected"</span> }
-                        <span style="color: #005f5f;">private</span> { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">vprot</span> <span style="color: #3548cf;">"private"</span> }
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">varhelp</span> {}
+        <span style="color: brightblack;">foreach</span> v [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: #b3b3b3;">info</span> variable] {
+            <span style="color: #b3b3b3;">catch</span> {
+                <span style="color: #595959;">#lappend varhelp [namespace eval $cls info variable $v -protection public]</span>
+                <span style="color: brightblack;">if</span> {[<span style="color: #b3b3b3;">string</span> first <span style="color: brightblack;">"::_"</span> $<span style="color: #b3b3b3;">v</span>] == -1} {
+                    <span style="color: brightblack;">switch</span> -- [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: #b3b3b3;">info</span> <span style="color: #cccccc;">variable</span> $<span style="color: #b3b3b3;">v</span> -protection] {
+                        <span style="color: #cccccc;">public</span> { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">vprot</span> <span style="color: brightblack;">"public"</span> }
+                        <span style="color: #cccccc;">protected</span> { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">vprot</span> <span style="color: brightblack;">"protected"</span> }
+                        <span style="color: #cccccc;">private</span> { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">vprot</span> <span style="color: brightblack;">"private"</span> }
                     }
-                    <span style="color: #8f0075;">lappend</span> varhelp <span style="color: #3548cf;">"- $vprot $v"</span>
+                    <span style="color: #b3b3b3;">lappend</span> varhelp <span style="color: brightblack;">"- $vprot $v"</span>
                 }
             }
         }
 
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">methelp</span> {}
-        <span style="color: #531ab6;">foreach</span> func [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #3548cf;">"info function"</span>] {
-            <span style="color: #8f0075;">catch</span> {
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">string</span> trim [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #3548cf;">"info body $func"</span>]]
-                <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">body</span> ne <span style="color: #3548cf;">""</span>} {
-                    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> [<span style="color: #8f0075;">namespace</span> <span style="color: #531ab6;">eval</span> $<span style="color: #005e8b;">cls</span> <span style="color: #3548cf;">"info args $func"</span>]
-                    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">arguments</span> eq <span style="color: #3548cf;">""</span>} { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> <span style="color: #3548cf;">"no args."</span> }
-                    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">docstring</span> [_shift_strings [_docstring $<span style="color: #005e8b;">body</span>] \t]
-                    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">docstring</span> ne <span style="color: #3548cf;">""</span>} {
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">"*${func}*: **${arguments}**"</span>
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">""</span>
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">"::"</span>
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">""</span>
-                        <span style="color: #8f0075;">lappend</span> methelp $<span style="color: #005e8b;">docstring</span>
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">""</span>
-                        <span style="color: #8f0075;">lappend</span> methelp <span style="color: #3548cf;">""</span>
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">methelp</span> {}
+        <span style="color: brightblack;">foreach</span> func [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: brightblack;">"info function"</span>] {
+            <span style="color: #b3b3b3;">catch</span> {
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">string</span> trim [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: brightblack;">"info body $func"</span>]]
+                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">body</span> ne <span style="color: brightblack;">""</span>} {
+                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> [<span style="color: #b3b3b3;">namespace</span> <span style="color: brightblack;">eval</span> $<span style="color: #b3b3b3;">cls</span> <span style="color: brightblack;">"info args $func"</span>]
+                    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">arguments</span> eq <span style="color: brightblack;">""</span>} { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> <span style="color: brightblack;">"no args."</span> }
+                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">docstring</span> [_shift_strings [_docstring $<span style="color: #b3b3b3;">body</span>] \t]
+                    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">docstring</span> ne <span style="color: brightblack;">""</span>} {
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">"*${func}*: **${arguments}**"</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">""</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">"::"</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">""</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp $<span style="color: #b3b3b3;">docstring</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">""</span>
+                        <span style="color: #b3b3b3;">lappend</span> methelp <span style="color: brightblack;">""</span>
                     }
                 }
             }
         }
-        <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">methelp</span> ne <span style="color: #3548cf;">""</span>} {
-            <span style="color: #7f0000;"># there are methods with docstrings!</span>
-            <span style="color: #531ab6;">if</span> {[<span style="color: #8f0075;">llength</span> $<span style="color: #005e8b;">her</span>] &gt; 1} {
-                <span style="color: #7f0000;"># there are base classes</span>
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">bases</span> [<span style="color: #8f0075;">lrange</span> $<span style="color: #005e8b;">her</span> 1 end]
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">her</span> <span style="color: #3548cf;">"[lindex $her 0] (*extends ${bases}*)"</span>
+        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">methelp</span> ne <span style="color: brightblack;">""</span>} {
+            <span style="color: #595959;"># there are methods with docstrings!</span>
+            <span style="color: brightblack;">if</span> {[<span style="color: #b3b3b3;">llength</span> $<span style="color: #b3b3b3;">her</span>] &gt; 1} {
+                <span style="color: #595959;"># there are base classes</span>
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">bases</span> [<span style="color: #b3b3b3;">lrange</span> $<span style="color: #b3b3b3;">her</span> 1 end]
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">her</span> <span style="color: brightblack;">"[lindex $her 0] (*extends ${bases}*)"</span>
             }
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"$her"</span>
-            <span style="color: #8f0075;">lappend</span> clshelp [<span style="color: #8f0075;">string</span> repeat <span style="color: #3548cf;">"-"</span> [<span style="color: #8f0075;">string</span> length $<span style="color: #005e8b;">her</span>]]
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">""</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"Variables"</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"~~~~~~~~~"</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">""</span>
-            <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">varhelp</span> ne <span style="color: #3548cf;">""</span>} {
-                <span style="color: #8f0075;">lappend</span> clshelp [<span style="color: #8f0075;">join</span> $<span style="color: #005e8b;">varhelp</span> <span style="color: #3548cf;">"\n"</span>]
-            } <span style="color: #531ab6;">else</span> {
-                <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"No variables."</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"$her"</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp [<span style="color: #b3b3b3;">string</span> repeat <span style="color: brightblack;">"-"</span> [<span style="color: #b3b3b3;">string</span> length $<span style="color: #b3b3b3;">her</span>]]
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">""</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"Variables"</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"~~~~~~~~~"</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">""</span>
+            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">varhelp</span> ne <span style="color: brightblack;">""</span>} {
+                <span style="color: #b3b3b3;">lappend</span> clshelp [<span style="color: #b3b3b3;">join</span> $<span style="color: #b3b3b3;">varhelp</span> <span style="color: brightblack;">"\n"</span>]
+            } <span style="color: brightblack;">else</span> {
+                <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"No variables."</span>
             }
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">""</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"Methods"</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">"~~~~~~~"</span>
-            <span style="color: #8f0075;">lappend</span> clshelp <span style="color: #3548cf;">""</span>
-            <span style="color: #8f0075;">lappend</span> clshelp {*}$<span style="color: #005e8b;">methelp</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">""</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"Methods"</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">"~~~~~~~"</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp <span style="color: brightblack;">""</span>
+            <span style="color: #b3b3b3;">lappend</span> clshelp {*}$<span style="color: #b3b3b3;">methelp</span>
         }
     }
-    <span style="color: #7f0000;"># Collect procs help</span>
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">prochelp</span> {}
-    <span style="color: #531ab6;">foreach</span> func [<span style="color: #531ab6;">uplevel</span> #0 <span style="color: #8f0075;">info</span> procs] {
-        <span style="color: #8f0075;">catch</span> {
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">string</span> trim [<span style="color: #531ab6;">uplevel</span> #0 <span style="color: #8f0075;">info</span> <span style="color: #531ab6;">body</span> $<span style="color: #005e8b;">func</span>]]
-            <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">body</span> ne <span style="color: #3548cf;">""</span>} {
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> [<span style="color: #531ab6;">uplevel</span> #0 <span style="color: #8f0075;">info</span> args $<span style="color: #005e8b;">func</span>]
-                <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">arguments</span> eq <span style="color: #3548cf;">""</span>} { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">arguments</span> <span style="color: #3548cf;">"no args."</span> }
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">docstring</span> [_shift_strings [_docstring $<span style="color: #005e8b;">body</span>] \t]
-                <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">docstring</span> ne <span style="color: #3548cf;">""</span>} {
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">"*${func}*: **${arguments}**"</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">""</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">"::"</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">""</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp $<span style="color: #005e8b;">docstring</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">""</span>
-                    <span style="color: #8f0075;">lappend</span> prochelp <span style="color: #3548cf;">""</span>
+    <span style="color: #595959;"># Collect procs help</span>
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">prochelp</span> {}
+    <span style="color: brightblack;">foreach</span> func [<span style="color: brightblack;">uplevel</span> #0 <span style="color: #b3b3b3;">info</span> procs] {
+        <span style="color: #b3b3b3;">catch</span> {
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">string</span> trim [<span style="color: brightblack;">uplevel</span> #0 <span style="color: #b3b3b3;">info</span> <span style="color: brightblack;">body</span> $<span style="color: #b3b3b3;">func</span>]]
+            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">body</span> ne <span style="color: brightblack;">""</span>} {
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> [<span style="color: brightblack;">uplevel</span> #0 <span style="color: #b3b3b3;">info</span> args $<span style="color: #b3b3b3;">func</span>]
+                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">arguments</span> eq <span style="color: brightblack;">""</span>} { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">arguments</span> <span style="color: brightblack;">"no args."</span> }
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">docstring</span> [_shift_strings [_docstring $<span style="color: #b3b3b3;">body</span>] \t]
+                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">docstring</span> ne <span style="color: brightblack;">""</span>} {
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">"*${func}*: **${arguments}**"</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">""</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">"::"</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">""</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp $<span style="color: #b3b3b3;">docstring</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">""</span>
+                    <span style="color: #b3b3b3;">lappend</span> prochelp <span style="color: brightblack;">""</span>
                 }
             }
         }
     }
 
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">clshelp</span> ne <span style="color: #3548cf;">""</span>} {
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">""</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">"Classes"</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">"======="</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">""</span>
-        <span style="color: #8f0075;">lappend</span> result {*}$<span style="color: #005e8b;">clshelp</span>
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">clshelp</span> ne <span style="color: brightblack;">""</span>} {
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">""</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">"Classes"</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">"======="</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">""</span>
+        <span style="color: #b3b3b3;">lappend</span> result {*}$<span style="color: #b3b3b3;">clshelp</span>
     }
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">prochelp</span> ne <span style="color: #3548cf;">""</span>} {
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">""</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">"Procedures"</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">"=========="</span>
-        <span style="color: #8f0075;">lappend</span> result <span style="color: #3548cf;">""</span>
-        <span style="color: #8f0075;">lappend</span> result {*}$<span style="color: #005e8b;">prochelp</span>
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">prochelp</span> ne <span style="color: brightblack;">""</span>} {
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">""</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">"Procedures"</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">"=========="</span>
+        <span style="color: #b3b3b3;">lappend</span> result <span style="color: brightblack;">""</span>
+        <span style="color: #b3b3b3;">lappend</span> result {*}$<span style="color: #b3b3b3;">prochelp</span>
     }
 
 
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">fid</span> [<span style="color: #8f0075;">open</span> $<span style="color: #005e8b;">fname</span> w]
-    <span style="color: #8f0075;">puts</span> -nonewline $<span style="color: #005e8b;">fid</span> [<span style="color: #8f0075;">join</span> $<span style="color: #005e8b;">result</span> <span style="color: #3548cf;">"\n"</span>]
-    <span style="color: #8f0075;">close</span> $<span style="color: #005e8b;">fid</span>
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">fid</span> [<span style="color: #b3b3b3;">open</span> $<span style="color: #b3b3b3;">fname</span> w]
+    <span style="color: #b3b3b3;">puts</span> -nonewline $<span style="color: #b3b3b3;">fid</span> [<span style="color: #b3b3b3;">join</span> $<span style="color: #b3b3b3;">result</span> <span style="color: brightblack;">"\n"</span>]
+    <span style="color: #b3b3b3;">close</span> $<span style="color: #b3b3b3;">fid</span>
 }
 </pre>
 </div>
@@ -233,22 +258,22 @@ This mechanism supports not only interactive help system for user (doc proc) but
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #531ab6;">proc</span> <span style="color: #721045;">fun</span> {args} {
-  <span style="color: #7f0000;"># Do something. Syntax:</span>
-  <span style="color: #7f0000;">#  -one -- first action</span>
-  <span style="color: #7f0000;">#  -two -- second action</span>
+<pre class="src src-tcl"><span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">fun</span> {args} {
+  <span style="color: #595959;"># Do something. Syntax:</span>
+  <span style="color: #595959;">#  -one -- first action</span>
+  <span style="color: #595959;">#  -two -- second action</span>
 
 
   .. code ..
 }
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">OR</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">OR</span>
 
 itcl::class C {
-  <span style="color: #531ab6;">method</span> <span style="color: #721045;">f</span> {args} {
-    <span style="color: #7f0000;"># My method. Syntax:</span>
-    <span style="color: #7f0000;">#  f one two -- do something</span>
-    <span style="color: #7f0000;">#  f three four -- do something else</span>
+  <span style="color: brightblack;">method</span> <span style="color: #a52a2a;">f</span> {args} {
+    <span style="color: #595959;"># My method. Syntax:</span>
+    <span style="color: #595959;">#  f one two -- do something</span>
+    <span style="color: #595959;">#  f three four -- do something else</span>
 
 
     .. code ..
@@ -316,21 +341,21 @@ Use tclkit.exe if you have Tk code (instead of tclkitsh.exe). Python and docutil
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">Generate hlp.rst file with references to all classes, its methods</span>
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">and procedures with docstrings (see lib/mydoc.tcl)</span>
-<span style="color: #8f0075;">package</span> require starkit
+<pre class="src src-tcl"><span style="color: #595959;"># </span><span style="color: #595959;">Generate hlp.rst file with references to all classes, its methods</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">and procedures with docstrings (see lib/mydoc.tcl)</span>
+<span style="color: #b3b3b3;">package</span> require starkit
 starkit::startup
-starkit::autoextend [<span style="color: #8f0075;">file</span> <span style="color: #8f0075;">join</span> $<span style="color: #005e8b;">starkit::topdir</span>]
-<span style="color: #8f0075;">package</span> require myutl
-<span style="color: #8f0075;">set</span> <span style="color: #005e8b;">packages</span> [<span style="color: #8f0075;">glob</span> -directory lib -tails <span style="color: #3548cf;">"*.tcl"</span>]
-<span style="color: #531ab6;">foreach</span> pkg $<span style="color: #005e8b;">packages</span> {
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">pkg</span> [<span style="color: #8f0075;">regsub</span> {.tcl$} $<span style="color: #005e8b;">pkg</span> <span style="color: #3548cf;">""</span>]
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">pkg</span> ne <span style="color: #3548cf;">"pkgIndex"</span>} {
-        <span style="color: #8f0075;">package</span> require $<span style="color: #005e8b;">pkg</span>
+starkit::autoextend [<span style="color: #b3b3b3;">file</span> <span style="color: #b3b3b3;">join</span> $<span style="color: #b3b3b3;">starkit::topdir</span>]
+<span style="color: #b3b3b3;">package</span> require myutl
+<span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">packages</span> [<span style="color: #b3b3b3;">glob</span> -directory lib -tails <span style="color: brightblack;">"*.tcl"</span>]
+<span style="color: brightblack;">foreach</span> pkg $<span style="color: #b3b3b3;">packages</span> {
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">pkg</span> [<span style="color: #b3b3b3;">regsub</span> {.tcl$} $<span style="color: #b3b3b3;">pkg</span> <span style="color: brightblack;">""</span>]
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">pkg</span> ne <span style="color: brightblack;">"pkgIndex"</span>} {
+        <span style="color: #b3b3b3;">package</span> require $<span style="color: #b3b3b3;">pkg</span>
     }
 }
 mydoc::_genrst help.rst
-<span style="color: #531ab6;">exit</span> 0
+<span style="color: brightblack;">exit</span> 0
 </pre>
 </div>
 

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Creating of Intel HEX with Tcl/Tk</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="tcl/tk, embedded" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Creating of Intel HEX with Tcl/Tk</h1>
-<div id="outline-container-orgf7818db" class="outline-2">
-<h2 id="orgf7818db">Creating of Intel HEX with Tcl/Tk</h2>
-<div class="outline-text-2" id="text-orgf7818db">
+<div id="outline-container-org1ab977e" class="outline-2">
+<h2 id="org1ab977e">Creating of Intel HEX with Tcl/Tk</h2>
+<div class="outline-text-2" id="text-org1ab977e">
 <p>
 <a href="http://en.wikipedia.org/wiki/Intel_HEX">Intel HEX format</a> is the simple ASCII format usually used to program different devices (it's flash and EEPROM memories). To create such data records, I use this code:
 </p>
@@ -45,117 +70,117 @@ code, pre { background-color: #FFEDDF;
 <div class="org-src-container">
 <pre class="src src-cpp">package provide ihex 1.0
 
-<span style="color: #531ab6;">namespace</span> <span style="color: #0000b0;">eval</span> ihex {
-    <span style="color: #531ab6;">namespace</span> <span style="color: #531ab6;">export</span> <span style="color: #0000b0;">data</span> EOF eraser
-    set EOF <span style="color: #3548cf;">":00000001FF"</span>
+<span style="color: brightblack;">namespace</span> <span style="color: #7fffd4;">eval</span> ihex {
+    <span style="color: brightblack;">namespace</span> <span style="color: brightblack;">export</span> <span style="color: #7fffd4;">data</span> EOF eraser
+    set EOF <span style="color: brightblack;">":00000001FF"</span>
 
     proc verint {type value} {
-<span style="color: #a0132f;">        # Verify</span> that value is in the type range. Known types are b (byte),
-<span style="color: #a0132f;">        # w</span> (word), d (doubleword), q (quadword). If is out-of-range, then
-<span style="color: #a0132f;">        # raise</span> will be callen
-        <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">absvalue</span> [::<span style="color: #0000b0;">tcl</span>::<span style="color: #0000b0;">mathfunc</span>::abs $value]
+<span style="color: #b3b3b3;">        # Verify</span> that value is in the type range. Known types are b (byte),
+<span style="color: #b3b3b3;">        # w</span> (word), d (doubleword), q (quadword). If is out-of-range, then
+<span style="color: #b3b3b3;">        # raise</span> will be callen
+        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">absvalue</span> [::<span style="color: #7fffd4;">tcl</span>::<span style="color: #7fffd4;">mathfunc</span>::abs $value]
 
         proc raise {t v} {
-<span style="color: #a0132f;">            # Raise</span> error message. t is type name, such as <span style="color: #3548cf;">"word"</span> <span style="color: #531ab6;">or</span> <span style="color: #3548cf;">"quadword"</span>
-            error [format <span style="color: #3548cf;">"Value 0x%X is not a %s"</span> $v $t]
+<span style="color: #b3b3b3;">            # Raise</span> error message. t is type name, such as <span style="color: brightblack;">"word"</span> <span style="color: brightblack;">or</span> <span style="color: brightblack;">"quadword"</span>
+            error [format <span style="color: brightblack;">"Value 0x%X is not a %s"</span> $v $t]
         }
 
-        <span style="color: #531ab6;">switch</span> -- $type {
-            b { <span style="color: #531ab6;">if</span> {$absvalue &gt; 255} {raise byte $absvalue} }
-            w { <span style="color: #531ab6;">if</span> {$absvalue &gt; 65536} {raise word $absvalue} }
-            d { <span style="color: #531ab6;">if</span> {$absvalue &gt; 4294967296} {raise doubleword $absvalue} }
-            q { <span style="color: #531ab6;">if</span> {$absvalue &gt; 18446744073709551616} {raise quadword $absvalue} }
+        <span style="color: brightblack;">switch</span> -- $type {
+            b { <span style="color: brightblack;">if</span> {$absvalue &gt; 255} {raise byte $absvalue} }
+            w { <span style="color: brightblack;">if</span> {$absvalue &gt; 65536} {raise word $absvalue} }
+            d { <span style="color: brightblack;">if</span> {$absvalue &gt; 4294967296} {raise doubleword $absvalue} }
+            q { <span style="color: brightblack;">if</span> {$absvalue &gt; 18446744073709551616} {raise quadword $absvalue} }
         }
-        <span style="color: #531ab6;">return</span> 1
+        <span style="color: brightblack;">return</span> 1
     }
 
-    <span style="color: #005f5f;">proc</span> <span style="color: #005e8b;">args2bytes</span> {args} {
-<span style="color: #a0132f;">        # Converts</span> args to list of bytes (binary form of args). See
+    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">args2bytes</span> {args} {
+<span style="color: #b3b3b3;">        # Converts</span> args to list of bytes (binary form of args). See
         # &gt;&gt;&gt; args2bytes b1 w4A
-<span style="color: #a0132f;">        # 01</span> 00 4A
+<span style="color: #b3b3b3;">        # 01</span> 00 4A
         #
-<span style="color: #a0132f;">        # Each</span> arg is integer prefixed by b|w|d|q <span style="color: #531ab6;">and</span> is in hex-form.
+<span style="color: #b3b3b3;">        # Each</span> arg is integer prefixed by b|w|d|q <span style="color: brightblack;">and</span> is in hex-form.
         set bytes [list]
         foreach arg $args {
             set r [scan $arg %1s%x argtype argvalue]
-            <span style="color: #531ab6;">if</span> {$r != 2} {
-<span style="color: #a0132f;">                #puts</span> <span style="color: #3548cf;">"some string..."</span>
-                <span style="color: #531ab6;">continue</span>
-            } <span style="color: #531ab6;">else</span> {
-<span style="color: #a0132f;">                # verify</span> value of argvalue (in type bounds)
+            <span style="color: brightblack;">if</span> {$r != 2} {
+<span style="color: #b3b3b3;">                #puts</span> <span style="color: brightblack;">"some string..."</span>
+                <span style="color: brightblack;">continue</span>
+            } <span style="color: brightblack;">else</span> {
+<span style="color: #b3b3b3;">                # verify</span> value of argvalue (in type bounds)
                 verint $argtype $argvalue
-<span style="color: #a0132f;">                # format</span> argvalue into string
-                <span style="color: #531ab6;">switch</span> -- $argtype {
+<span style="color: #b3b3b3;">                # format</span> argvalue into string
+                <span style="color: brightblack;">switch</span> -- $argtype {
                     b {set fmt %02X}
                     w {set fmt %04X}
                     d {set fmt %08X}
                     q {set fmt %016X}
                 }
-                <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">sarg</span> [format $fmt $argvalue]
-                set argbytes [regexp -all -<span style="color: #531ab6;">inline</span> .. $sarg]
+                <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">sarg</span> [format $fmt $argvalue]
+                set argbytes [regexp -all -<span style="color: brightblack;">inline</span> .. $sarg]
                 set bytes [concat $bytes $argbytes]
             }
         }
-        <span style="color: #531ab6;">return</span> $bytes
+        <span style="color: brightblack;">return</span> $bytes
     }
 
-    <span style="color: #005f5f;">proc</span> <span style="color: #005e8b;">crc</span> {bytes} {
-<span style="color: #a0132f;">        # Calculate</span> Intel-hex CRC <span style="color: #531ab6;">for</span> list of bytes (usual numbers in hex format
-<span style="color: #a0132f;">        # but</span> without prefixes like b|w|d|q)
+    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">crc</span> {bytes} {
+<span style="color: #b3b3b3;">        # Calculate</span> Intel-hex CRC <span style="color: brightblack;">for</span> list of bytes (usual numbers in hex format
+<span style="color: #b3b3b3;">        # but</span> without prefixes like b|w|d|q)
         set sum 0
         foreach b $bytes {
             incr sum 0x$b
         }
-        <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">sum</span> [expr {(1 + ~$sum) &amp; 0xFF}] ;# bcb
-        <span style="color: #531ab6;">return</span> $sum
+        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">sum</span> [expr {(1 + ~$sum) &amp; 0xFF}] ;# bcb
+        <span style="color: brightblack;">return</span> $sum
     }
 
-    <span style="color: #005f5f;">proc</span> <span style="color: #005e8b;">data</span> {address args} {
-<span style="color: #a0132f;">        # Returns</span> data record <span style="color: #531ab6;">for</span> Intel hex format. args are list of integers such
-<span style="color: #a0132f;">        # b23</span> wAE... - byte 0x23, word 0x00AE
-        <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">bytes</span> [args2bytes {*}$args]
+    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">data</span> {address args} {
+<span style="color: #b3b3b3;">        # Returns</span> data record <span style="color: brightblack;">for</span> Intel hex format. args are list of integers such
+<span style="color: #b3b3b3;">        # b23</span> wAE... - byte 0x23, word 0x00AE
+        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">bytes</span> [args2bytes {*}$args]
         set len [args2bytes [format b%X [llength $bytes]]]
         set address [args2bytes $address]
         set type 00
         set cc [crc [concat {} $len $address $type $bytes]]
 
-<span style="color: #a0132f;">        # Prepare</span> output line
-        set head :$len[join $address <span style="color: #3548cf;">""</span>]$type
-        set tail [join $bytes <span style="color: #3548cf;">""</span>][format %02X $cc]
-        <span style="color: #531ab6;">return</span> $head$tail
+<span style="color: #b3b3b3;">        # Prepare</span> output line
+        set head :$len[join $address <span style="color: brightblack;">""</span>]$type
+        set tail [join $bytes <span style="color: brightblack;">""</span>][format %02X $cc]
+        <span style="color: brightblack;">return</span> $head$tail
     }
 
-    <span style="color: #005f5f;">proc</span> <span style="color: #005e8b;">join_eep</span> {args} {
-<span style="color: #a0132f;">        # Join</span> eep data records (<span style="color: #3548cf;">":LLAAAA00..."</span> strings) into one data record with size &lt;= 256.
-<span style="color: #a0132f;">        # Does</span> <span style="color: #531ab6;">not</span> check CRC of input records<span style="color: #a60000; font-weight: bold;">!</span>
-        set MAXSZ 256 ; # DONT USE &gt; 256<span style="color: #a60000; font-weight: bold;">!</span>!<span style="color: #a60000; font-weight: bold;">!</span>
-<span style="color: #a0132f;">        # In</span> the mem will be 256 <span style="color: #3548cf;">"00 00 00..."</span>
-        <span style="color: #531ab6;">for</span> {set i 0} {$i &lt; $MAXSZ} {incr i} { lappend mem 00 }
+    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">join_eep</span> {args} {
+<span style="color: #b3b3b3;">        # Join</span> eep data records (<span style="color: brightblack;">":LLAAAA00..."</span> strings) into one data record with size &lt;= 256.
+<span style="color: #b3b3b3;">        # Does</span> <span style="color: brightblack;">not</span> check CRC of input records!
+        set MAXSZ 256 ; # DONT USE &gt; 256!!!
+<span style="color: #b3b3b3;">        # In</span> the mem will be 256 <span style="color: brightblack;">"00 00 00..."</span>
+        <span style="color: brightblack;">for</span> {set i 0} {$i &lt; $MAXSZ} {incr i} { lappend mem 00 }
         set last_index 0
         foreach rec $args {
-            <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">len</span> [string range $rec 1 2]
+            <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">len</span> [string range $rec 1 2]
             set address [string range $rec 3 6]
             set type [string range $rec 7 8]
-            <span style="color: #531ab6;">if</span> {<span style="color: #3548cf;">"0x$type"</span> != 0} { <span style="color: #531ab6;">continue</span> } ;# skip <span style="color: #531ab6;">not</span> data records
+            <span style="color: brightblack;">if</span> {<span style="color: brightblack;">"0x$type"</span> != 0} { <span style="color: brightblack;">continue</span> } ;# skip <span style="color: brightblack;">not</span> data records
             set bytes [string range $rec 9 end-2]
-            set bytes [regexp -all -<span style="color: #531ab6;">inline</span> .. $bytes]
-<span style="color: #a0132f;">            #set</span> ev [eval <span style="color: #3548cf;">"expr {0x$address + 0x$len - 1}"</span>]
-            set from <span style="color: #3548cf;">"0x$address"</span>; <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">to</span> [expr {<span style="color: #3548cf;">"0x$address"</span> + <span style="color: #3548cf;">"0x$len"</span> - 1}]
-            set last_index [::<span style="color: #0000b0;">tcl</span>::<span style="color: #0000b0;">mathfunc</span>::max $last_index $to]
-            set replacing <span style="color: #3548cf;">"lreplace \$mem $from $to $bytes"</span>
+            set bytes [regexp -all -<span style="color: brightblack;">inline</span> .. $bytes]
+<span style="color: #b3b3b3;">            #set</span> ev [eval <span style="color: brightblack;">"expr {0x$address + 0x$len - 1}"</span>]
+            set from <span style="color: brightblack;">"0x$address"</span>; <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">to</span> [expr {<span style="color: brightblack;">"0x$address"</span> + <span style="color: brightblack;">"0x$len"</span> - 1}]
+            set last_index [::<span style="color: #7fffd4;">tcl</span>::<span style="color: #7fffd4;">mathfunc</span>::max $last_index $to]
+            set replacing <span style="color: brightblack;">"lreplace \$mem $from $to $bytes"</span>
             set mem [eval $replacing]
         }
-        <span style="color: #005f5f;">set</span> <span style="color: #005e8b;">len</span> [format b%X [expr {$last_index + 1}]]
+        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">len</span> [format b%X [expr {$last_index + 1}]]
         set len [args2bytes $len]
-        set address <span style="color: #3548cf;">"00 00"</span>
+        set address <span style="color: brightblack;">"00 00"</span>
         set type 00
         set mem [lrange $mem 0 $last_index]
         set cc [crc [concat {} $len $address $type $mem]]
 
-<span style="color: #a0132f;">        # Prepare</span> output line
-        set head :$len[join $address <span style="color: #3548cf;">""</span>]$type
-        set tail [join $mem <span style="color: #3548cf;">""</span>][format %02X $cc]
-        <span style="color: #531ab6;">return</span> $head$tail
+<span style="color: #b3b3b3;">        # Prepare</span> output line
+        set head :$len[join $address <span style="color: brightblack;">""</span>]$type
+        set tail [join $mem <span style="color: brightblack;">""</span>][format %02X $cc]
+        <span style="color: brightblack;">return</span> $head$tail
     }
 }
 </pre>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple logging in C (2)</title>
@@ -11,47 +11,72 @@
 <meta name="keywords" content="clang" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Simple logging in C (2)</h1>
-<div id="outline-container-orgf0722a6" class="outline-2">
-<h2 id="orgf0722a6">Simple logging in C (2)</h2>
-<div class="outline-text-2" id="text-orgf0722a6">
+<div id="outline-container-org0d2d00a" class="outline-2">
+<h2 id="org0d2d00a">Simple logging in C (2)</h2>
+<div class="outline-text-2" id="text-org0d2d00a">
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> _DBG_H
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">_DBG_H</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRN</span>(...) printf(__VA_ARGS__)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">ALIAS_OF_LEVEL</span>(<span style="color: #005e8b;">L</span>) (1&lt;&lt;(L))
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _DBG_H
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_DBG_H</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdio.h&gt;</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRN</span>(...) printf(__VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">ALIAS_OF_LEVEL</span>(<span style="color: #b3b3b3;">L</span>) (1&lt;&lt;(L))
 
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> LEVEL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">LEVEL</span> 0
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> LEVEL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">LEVEL</span> 0
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRN_L</span>(<span style="color: #005e8b;">L</span>, ...) <span style="color: #531ab6;">if</span> ((LEVEL) &amp; (L)) PRN(__VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRN_L</span>(<span style="color: #b3b3b3;">L</span>, ...) <span style="color: brightblack;">if</span> ((LEVEL) &amp; (L)) PRN(__VA_ARGS__)
 
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#endif</span>
 </pre>
 </div>
 
@@ -60,19 +85,19 @@ How to use it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"dbg.h"</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"dbg.h"</span>
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">define levels names (as aliases) and it's number</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">HARDWARE_LEVEL</span> ALIAS_OF_LEVEL(1)
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">WRAPPER_LEVEL</span> ALIAS_OF_LEVEL(2)
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">APP_LEVEL</span> ALIAS_OF_LEVEL(3)
+<span style="color: #595959;">// </span><span style="color: #595959;">define levels names (as aliases) and it's number</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">HARDWARE_LEVEL</span> ALIAS_OF_LEVEL(1)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">WRAPPER_LEVEL</span> ALIAS_OF_LEVEL(2)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">APP_LEVEL</span> ALIAS_OF_LEVEL(3)
 
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">LEVEL</span> (HARDWARE_LEVEL|APP_LEVEL)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">LEVEL</span> (HARDWARE_LEVEL|APP_LEVEL)
 
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">main</span>() {
-        PRN_L(HARDWARE_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 1);
-        PRN_L(WRAPPER_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 2);
-        PRN_L(APP_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 3);
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">main</span>() {
+        PRN_L(HARDWARE_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 1);
+        PRN_L(WRAPPER_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 2);
+        PRN_L(APP_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 3);
 }
 </pre>
 </div>

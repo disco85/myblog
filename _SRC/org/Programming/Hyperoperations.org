@@ -1,0 +1,233 @@
+#+title: Hyperoperations
+#+description: Math, Common Lisp Programming
+#+keywords: Math, Common Lisp, Programming
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+tags: Math Common-Lisp
+#+date: <2026-04-20 Mon 20:29>
+# use syntax theme: doric-beach !!!
+
+** Basic idea
+
+Donald Knuth introduced a notation of Ackermann function called Knuth's arrows. These
+ideas are generalization (one common algorithm) for basic arithmetic operations like
++, *, power, ... - they are called [[https://en.wikipedia.org/wiki/Hyperoperation][hyperoperations]] and they have an order (0, 1, 2, etc):
+
+#+begin_verse
+H_0(a,b) = b + 1
+H_1(a,b) = a + b
+H_2(a,b) = a * b
+H_3(a,b) = a^b
+H_4(a,b) = \(^{b}a\)
+...etc
+#+end_verse
+
+where \( a^b \) is exponentiation, and \( ^{b}a \) is tetration (exponentiation ~b~ times),
+etc.
+
+So, +, *, power and so on can be represented as recursive function, its definition is:
+
+#+name: general-formula
+#+begin_figure
+#+begin_verse
+H_n(a,b) =
+  | n = 0          =  b + 1
+  | n = 1,  b = 0  =  a
+  | n = 2,  b = 0  =  0
+  | n >= 3, b = 0  =  1
+  | otherwise      =  H_{n-1}(a,H_n(a,b-1))
+#+end_verse
+#+end_figure
+
+_LET'S TALK ONLY ABOUT a > 0_
+
+** Properties
+
+We see that arithmetic operations follow similar scheme (remidining monoids,
+but not exactly) and they are not limited with first 3 or 4 operations, but
+they really are represented using the lower order operation, they are mutually
+recursive.
+
+This \( H_{n-1}(a,H_n(a,b-1)) \) can be read in this way:
+
+\( H_n \) operation is applying of the lower-order operator over ~b~ series of ~a~:
+
+#+begin_verse
+a_{(n)}b = a_{(n-1)}x , where x is a_{(n)}(b-1) i.e., recursive formulae
+
+or in a infix form:
+
+a * b = a + a + ... + a
+        <-- b times -->
+#+end_verse
+
+where ~*~ is some hyperoperation of an order ~N~ while ~+~ - of an order ~N - 1~.
+
+But where does this ~(b-1)~ and recursive calls with calls to a function of lower order come from?
+Look:
+
+#+begin_verse
+a + b = (a + (b-1)) + 1
+a * b = (a * (b-1)) + a
+  a^b = a^{(b-1)} * a
+  ... /etc/
+#+end_verse
+
+and if to use subscript notation for a hyperoperation, where the number is the order of
+the operation, we see the recursion and involvment of the lower order hyperoperation
+very explicitly:
+
+#+begin_verse
+a_{(n)}b = (a_{(n)}(b - 1))_{(n-1)}a
+#+end_verse
+
+This is intuitive: these operations are monoids and we define the input expression removing
+one of the members (which allows us to come to recursion) and then restore/add the removed
+member back but using the lower order operation: ~b~ in this abstraction means ~HOW MANY TIMES~:
+~a + b~ is read "add 1 to ~a~ ~b~ times". Then, ~a * b~ means "add ~a~ to ~a~ ~b~ times", so
+"~b~ times" directly hints at recursion (where ~n-th~ member is expresed throught ~n-th - 1~
+member). Restoring of the "removed" member returns it using the lower order operation because
+all operations are defined through lower order operations: sum of any numbers - through increment
+(ie, ~+1~), multiplication - through sum, etc. The idea is simple and obvious.
+
+Every hyperoperation is a [[https://en.wikipedia.org/wiki/Magma_%28algebra%29][magma]] but it seems with some kind of [[https://en.wikipedia.org/wiki/Identity_element][identity]]:
+
+#+begin_verse
+a + b = a + 1 + ... + 1    order=1
+            <--- b --->    right identity: b=0
+
+a * b = a + a + ... + a    order=2
+            <-- b-1 -->    right identity: b=1, so the number of extra elements is 0
+
+   a^b = a * a * ... * a    order=3
+            <-- b-1 -->    right identity: b=1, so the number of extra elements is 0
+#+end_verse
+
+[[https://en.wikipedia.org/wiki/Right_identity][Right identity]] since order=2 is always 1:
+
+#+begin_verse
+a_{(1)}0 = a
+a_{(2)}1 = a
+a_{(3)}1 = a
+a_{(4)}1 = a
+...
+#+end_verse
+
+Why?
+\[
+\forall n \ge 2, a: H_{n}(a,1) = a
+\]
+ie, 1 acts as a right identity (neutral element) for all hyperoperations from multiplication
+upward.
+
+*Base case* \(n=2\) :
+\[
+H_{2}(a,b) = a \cdot b
+\]
+so, the right identity ~b~ is 1:
+\[
+H_{2}(a,1) = a \cdot 1 = a.
+\]
+
+*Inductive step* :
+
+Assuming that:
+\[
+\forall a, \exists n \ge 2, H_{n}(a,1) = a
+\]
+we must show that:
+\[
+H_{n+1}(a,1) = a.
+\]
+is also true for such ~n~. From this [[general-formula][definition]] considering \( b=1 \) we see:
+\[
+H_{n+1}(a,1) = H_{n}(a,H_{n+1}(a,0))
+\]
+for \( n+1 \ge 3, b=0 \) :
+\[
+H_{n+1}(a,0) = 1
+\]
+/think about it that \( n+1=m \) and when the order ~m~ is \( >= 3\) the result for \( b=0 \) is 1/.
+
+Substituting this result (ie, *1*) back to the formulae above, we get:
+
+\[
+H_{n+1}(a,1) = H_{n}(a,1)
+\]
+
+So, we assumed \( H_{n}(a,1) = a \), we proved that \( H_{n+1}(a,1) = H_{n}(a,1) \),
+and we know that for order 2 (and even 3, tbh) the neutral element is 1, from induction
+we know now that 1 is the neutral element (right identity) for all hyperoperations of
+order higher than 1:
+
+\[
+\forall n \ge 2, H_{n}(a,1) = a
+\]
+
+It's true for any \( a \ge 1 \) - for 0 we hit \( 0^0 \).
+
+Since order 3 hyperoperations are not associative, so they are not monoids, groups. Most of
+them have not left identity, so without to narrow the domain, we cannot call them magma. Only
+the order 1 is a real group, and only order 0 is unary operation.
+
+** CL implementation
+
+This idea has different notations though, see the Wikipedia article, you can invent your own,
+for example, a number in a circle, eg, ~2⑤3~
+
+Naive implementation of first 4 hyperoperations can look as:
+
+#+begin_src lisp :results none
+(defun hyper-0 (a b) (1+ b))
+
+(defun hyper-1 (a b)
+  (if (= b 0)
+      a
+      (hyper-0 a (hyper-1 a (1- b)))))
+
+(defun hyper-2 (a b)
+  (if (= b 0)
+      0
+      (hyper-1 a (hyper-2 a (1- b)))))
+
+(defun hyper-3 (a b)
+  (if (= b 0)
+      1
+      (hyper-2 a (hyper-3 a (1- b)))))
+
+(defun hyper-4 (a b)
+  (if (= b 0)
+      1
+      (hyper-3 a (hyper-4 a (1- b)))))
+#+end_src
+
+Having the definition of ~H(n,a,b)~ operation, we can write the general function:
+
+#+begin_src lisp :results none
+(defun hyper (n a b)
+  (cond ((= n 0) (1+ b))
+        ((and (= n 1) (= b 0)) a)
+        ((and (= n 2) (= b 0)) 0)
+        ((and (>= n 3) (= b 0)) 1)
+        (t (hyper (1- n) a (hyper n a (1- b))))))
+#+end_src
+
+And the neutral elements are really:
+
+#+begin_example lisp
+CL-USER> (hyper 3 2000 1)
+2000 (11 bits, #x7D0)
+CL-USER> (hyper 2 2000 1)
+2000 (11 bits, #x7D0)
+CL-USER> (hyper 1 2000 0)
+2000 (11 bits, #x7D0)
+CL-USER> (hyper 4 2000 1)
+2000 (11 bits, #x7D0)
+;; and even:
+CL-USER> (hyper 10 2000 1)
+2000 (11 bits, #x7D0)
+#+end_example
+
+Unfortunately, it is not tail recursive, so we will hit stack overflow even with
+small arguments.
+

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Debug messages support for C, ver 2</title>
@@ -11,116 +11,141 @@
 <meta name="keywords" content="clang" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Debug messages support for C, ver 2</h1>
-<div id="outline-container-orgc1d85ff" class="outline-2">
-<h2 id="orgc1d85ff">Debug messages support for C, ver 2</h2>
-<div class="outline-text-2" id="text-orgc1d85ff">
+<div id="outline-container-orgb1aa0cc" class="outline-2">
+<h2 id="orgb1aa0cc">Debug messages support for C, ver 2</h2>
+<div class="outline-text-2" id="text-orgb1aa0cc">
 <p>
 This C module support debug/logging system with custom levels of messages. Suppressing of some level/levels are possible via <code>DBG_LEVEL</code> macro variable. Each custom level is created with <code>DBG_LEVEL_ALIAS()</code> macro. User can define own print/dump implementations via <code>DBG_PRN_IMPL~/~DBG_DUMP_IMPL</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> __DBG_H
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">__DBG_H</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> __DBG_H
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">__DBG_H</span>
 
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdint.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;inttypes.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdio.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdint.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;inttypes.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdio.h&gt;</span>
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_LEVEL_ALIAS</span>(<span style="color: #005e8b;">L</span>) (1&lt;&lt;(L))
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_LEVEL_ALIAS</span>(<span style="color: #b3b3b3;">L</span>) (1&lt;&lt;(L))
 
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_LEVEL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_LEVEL</span> 0
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_LEVEL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_LEVEL</span> 0
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_LEVEL_FMT
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_LEVEL_FMT</span> <span style="color: #3548cf;">"%s: "</span>
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_LEVEL_FMT
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_LEVEL_FMT</span> <span style="color: brightblack;">"%s: "</span>
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_DBG_PRN_IMPL_L</span>(<span style="color: #005e8b;">L</span>, <span style="color: #005e8b;">F</span>, ...) printf(F, L, __VA_ARGS__)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_DBG_PRN_IMPL</span>(<span style="color: #005e8b;">F</span>, ...) printf(F, __VA_ARGS__)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_DBG_DUMP_IMPL_L</span>(<span style="color: #005e8b;">L</span>, <span style="color: #005e8b;">p</span>, <span style="color: #005e8b;">sz</span>) <span style="color: #531ab6;">do</span> { \
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>; \
-    <span style="color: #531ab6;">for</span> (i=0; i&lt;(sz); i++) { \
-        <span style="color: #531ab6;">if</span> (0 == i%16) { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">""</span>, <span style="color: #3548cf;">"%s%s%08"</span> PRIXPTR <span style="color: #3548cf;">": %02X "</span><span style="color: #7f0000;">/*</span><span style="color: #7f0000;">"%s%s%08lX: %02X "</span><span style="color: #7f0000;">*/</span>, i?<span style="color: #3548cf;">"\n"</span>:<span style="color: #3548cf;">""</span>, \
-                    16*i/16 + (<span style="color: #005f5f;">uintptr_t</span>)p, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (0 == (i-7)%16) { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">""</span>, <span style="color: #3548cf;">"%s%02X|"</span>, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
-        } <span style="color: #531ab6;">else</span> { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">""</span>, <span style="color: #3548cf;">"%s%02X "</span>, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_DBG_PRN_IMPL_L</span>(<span style="color: #b3b3b3;">L</span>, <span style="color: #b3b3b3;">F</span>, ...) printf(F, L, __VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_DBG_PRN_IMPL</span>(<span style="color: #b3b3b3;">F</span>, ...) printf(F, __VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_DBG_DUMP_IMPL_L</span>(<span style="color: #b3b3b3;">L</span>, <span style="color: #b3b3b3;">p</span>, <span style="color: #b3b3b3;">sz</span>) <span style="color: brightblack;">do</span> { \
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>; \
+    <span style="color: brightblack;">for</span> (i=0; i&lt;(sz); i++) { \
+        <span style="color: brightblack;">if</span> (0 == i%16) { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">""</span>, <span style="color: brightblack;">"%s%s%08"</span> PRIXPTR <span style="color: brightblack;">": %02X "</span><span style="color: #595959;">/*</span><span style="color: #595959;">"%s%s%08lX: %02X "</span><span style="color: #595959;">*/</span>, i?<span style="color: brightblack;">"\n"</span>:<span style="color: brightblack;">""</span>, \
+                    16*i/16 + (<span style="color: #cccccc;">uintptr_t</span>)p, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (0 == (i-7)%16) { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">""</span>, <span style="color: brightblack;">"%s%02X|"</span>, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
+        } <span style="color: brightblack;">else</span> { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">""</span>, <span style="color: brightblack;">"%s%02X "</span>, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
         } \
     } \
-    DBG_PRN_IMPL(<span style="color: #3548cf;">""</span>, <span style="color: #3548cf;">"%s%s"</span>, <span style="color: #3548cf;">"\n"</span>); \
-} <span style="color: #531ab6;">while</span> (0)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_DBG_DUMP_IMPL</span>(<span style="color: #005e8b;">p</span>, <span style="color: #005e8b;">sz</span>) <span style="color: #531ab6;">do</span> { \
-    <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>; \
-    <span style="color: #531ab6;">for</span> (i=0; i&lt;(sz); i++) { \
-        <span style="color: #531ab6;">if</span> (0 == i%16) { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">"%s%08"</span> PRIXPTR <span style="color: #3548cf;">": %02X "</span><span style="color: #7f0000;">/*</span><span style="color: #7f0000;">"%s%08lX: %02X "</span><span style="color: #7f0000;">*/</span>, i?<span style="color: #3548cf;">"\n"</span>:<span style="color: #3548cf;">""</span>, \
-                    16*i/16 + (<span style="color: #005f5f;">uintptr_t</span>)p, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (0 == (i-7)%16) { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">"%02X|"</span>, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
-        } <span style="color: #531ab6;">else</span> { \
-            DBG_PRN_IMPL(<span style="color: #3548cf;">"%02X "</span>, (<span style="color: #005f5f;">uint8_t</span>)(p)[i]); \
+    DBG_PRN_IMPL(<span style="color: brightblack;">""</span>, <span style="color: brightblack;">"%s%s"</span>, <span style="color: brightblack;">"\n"</span>); \
+} <span style="color: brightblack;">while</span> (0)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_DBG_DUMP_IMPL</span>(<span style="color: #b3b3b3;">p</span>, <span style="color: #b3b3b3;">sz</span>) <span style="color: brightblack;">do</span> { \
+    <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>; \
+    <span style="color: brightblack;">for</span> (i=0; i&lt;(sz); i++) { \
+        <span style="color: brightblack;">if</span> (0 == i%16) { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">"%s%08"</span> PRIXPTR <span style="color: brightblack;">": %02X "</span><span style="color: #595959;">/*</span><span style="color: #595959;">"%s%08lX: %02X "</span><span style="color: #595959;">*/</span>, i?<span style="color: brightblack;">"\n"</span>:<span style="color: brightblack;">""</span>, \
+                    16*i/16 + (<span style="color: #cccccc;">uintptr_t</span>)p, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (0 == (i-7)%16) { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">"%02X|"</span>, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
+        } <span style="color: brightblack;">else</span> { \
+            DBG_PRN_IMPL(<span style="color: brightblack;">"%02X "</span>, (<span style="color: #cccccc;">uint8_t</span>)(p)[i]); \
         } \
     } \
-    DBG_PRN_IMPL(<span style="color: #3548cf;">"%s"</span>, <span style="color: #3548cf;">"\n"</span>); \
-} <span style="color: #531ab6;">while</span> (0)
+    DBG_PRN_IMPL(<span style="color: brightblack;">"%s"</span>, <span style="color: brightblack;">"\n"</span>); \
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #a0132f;">#ifdef</span> DBG_LEVEL_IS_ARG
+<span style="color: #b3b3b3;">#ifdef</span> DBG_LEVEL_IS_ARG
 
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_PRN_IMPL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_PRN_IMPL</span> _DBG_PRN_IMPL_L
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_DUMP_IMPL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_DUMP_IMPL</span> _DBG_DUMP_IMPL_L
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_PRN_IMPL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_PRN_IMPL</span> _DBG_PRN_IMPL_L
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_DUMP_IMPL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_DUMP_IMPL</span> _DBG_DUMP_IMPL_L
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_PRN</span>(<span style="color: #005e8b;">L</span>, <span style="color: #005e8b;">F</span>, ...) <span style="color: #531ab6;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(#L, <span style="color: #005f5f;">DBG_LEVEL_FMT</span> <span style="color: #005e8b;">F</span>, __VA_ARGS__)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_DUMP</span>(<span style="color: #005e8b;">L</span>, ...) <span style="color: #531ab6;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_DUMP_IMPL(#L, __VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_PRN</span>(<span style="color: #b3b3b3;">L</span>, <span style="color: #b3b3b3;">F</span>, ...) <span style="color: brightblack;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(#L, <span style="color: #cccccc;">DBG_LEVEL_FMT</span> <span style="color: #b3b3b3;">F</span>, __VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_DUMP</span>(<span style="color: #b3b3b3;">L</span>, ...) <span style="color: brightblack;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_DUMP_IMPL(#L, __VA_ARGS__)
 
-<span style="color: #a0132f;">#else</span>
+<span style="color: #b3b3b3;">#else</span>
 
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_PRN_IMPL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_PRN_IMPL</span> _DBG_PRN_IMPL
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> DBG_DUMP_IMPL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_DUMP_IMPL</span> _DBG_DUMP_IMPL
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_PRN_IMPL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_PRN_IMPL</span> _DBG_PRN_IMPL
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> DBG_DUMP_IMPL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_DUMP_IMPL</span> _DBG_DUMP_IMPL
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_PRN</span>(<span style="color: #005e8b;">L</span>, ...) <span style="color: #531ab6;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(__VA_ARGS__)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_DUMP</span>(<span style="color: #005e8b;">L</span>, ...) <span style="color: #531ab6;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_DUMP_IMPL(__VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_PRN</span>(<span style="color: #b3b3b3;">L</span>, ...) <span style="color: brightblack;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(__VA_ARGS__)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_DUMP</span>(<span style="color: #b3b3b3;">L</span>, ...) <span style="color: brightblack;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_DUMP_IMPL(__VA_ARGS__)
 
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Print without level</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">DBG_PRN_UL</span>(<span style="color: #005e8b;">L</span>, <span style="color: #005e8b;">F</span>, ...) <span style="color: #531ab6;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(<span style="color: #3548cf;">""</span>, <span style="color: #3548cf;">"%s"</span> F, __VA_ARGS__)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Print without level</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">DBG_PRN_UL</span>(<span style="color: #b3b3b3;">L</span>, <span style="color: #b3b3b3;">F</span>, ...) <span style="color: brightblack;">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(<span style="color: brightblack;">""</span>, <span style="color: brightblack;">"%s"</span> F, __VA_ARGS__)
 
-<span style="color: #a0132f;">#endif</span> <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">EOF</span><span style="color: #7f0000;"> */</span>
+<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/* </span><span style="color: #595959;">EOF</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 
@@ -129,28 +154,28 @@ Usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;string.h&gt;</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;string.h&gt;</span>
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">use level name as 1st argument of out DBG_PRN_IMPL</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_LEVEL_IS_ARG</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_LEVEL_FMT</span> <span style="color: #3548cf;">"[%s] "</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"dbg.h"</span>
+<span style="color: #595959;">// </span><span style="color: #595959;">use level name as 1st argument of out DBG_PRN_IMPL</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_LEVEL_IS_ARG</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_LEVEL_FMT</span> <span style="color: brightblack;">"[%s] "</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"dbg.h"</span>
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">define levels</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">HARDWARE_LEVEL</span>   DBG_LEVEL_ALIAS(1)
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">WRAPPER_LEVEL</span>   DBG_LEVEL_ALIAS(2)
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">APP_LEVEL</span>       DBG_LEVEL_ALIAS(3)
+<span style="color: #595959;">// </span><span style="color: #595959;">define levels</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">HARDWARE_LEVEL</span>   DBG_LEVEL_ALIAS(1)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">WRAPPER_LEVEL</span>   DBG_LEVEL_ALIAS(2)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">APP_LEVEL</span>       DBG_LEVEL_ALIAS(3)
 
-<span style="color: #a0132f;">#undef</span> DBG_LEVEL
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">DBG_LEVEL</span> (HARDWARE_LEVEL|APP_LEVEL)
+<span style="color: #b3b3b3;">#undef</span> DBG_LEVEL
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">DBG_LEVEL</span> (HARDWARE_LEVEL|APP_LEVEL)
 
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">main</span>() {
-    <span style="color: #005f5f;">char</span> <span style="color: #005e8b;">dim</span>[] = <span style="color: #3548cf;">"0123456789Hello World!"</span>;
-    DBG_PRN(HARDWARE_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 1);
-    DBG_PRN(WRAPPER_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 2);
-    DBG_PRN(APP_LEVEL, <span style="color: #3548cf;">"There %d\n"</span>, 3);
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">main</span>() {
+    <span style="color: #cccccc;">char</span> <span style="color: #b3b3b3;">dim</span>[] = <span style="color: brightblack;">"0123456789Hello World!"</span>;
+    DBG_PRN(HARDWARE_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 1);
+    DBG_PRN(WRAPPER_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 2);
+    DBG_PRN(APP_LEVEL, <span style="color: brightblack;">"There %d\n"</span>, 3);
     DBG_DUMP(APP_LEVEL, dim, strlen(dim));
-    DBG_PRN_UL(APP_LEVEL, <span style="color: #3548cf;">"%s\n"</span>, <span style="color: #3548cf;">"Done."</span>);
+    DBG_PRN_UL(APP_LEVEL, <span style="color: brightblack;">"%s\n"</span>, <span style="color: brightblack;">"Done."</span>);
 }
 </pre>
 </div>

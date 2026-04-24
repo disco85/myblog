@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>High-pass filter</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="clang, dsp" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">High-pass filter</h1>
-<div id="outline-container-orga55851f" class="outline-2">
-<h2 id="orga55851f">High-pass filter</h2>
-<div class="outline-text-2" id="text-orga55851f">
+<div id="outline-container-org6cd3034" class="outline-2">
+<h2 id="org6cd3034">High-pass filter</h2>
+<div class="outline-text-2" id="text-org6cd3034">
 <p>
 Simple high-pass filter in form of IIR of 1st order. See more info <a href="http://en.wikipedia.org/wiki/High-pass_filter">here</a>.
 In my application HMC demo I poll sensor (accelerometer) and filter Ax signal:
@@ -103,20 +128,20 @@ Here is the C code (for SWIG) of this kind of filter:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #005f5f;">double</span>* <span style="color: #721045;">filter</span>(<span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">v</span>) {
-        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>;
-        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">vlen</span>;
+<pre class="src src-cpp"><span style="color: #cccccc;">double</span>* <span style="color: #a52a2a;">filter</span>(<span style="color: #cccccc;">double</span> *<span style="color: #b3b3b3;">v</span>) {
+        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>;
+        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">vlen</span>;
 
-        vlen = (<span style="color: #005f5f;">int</span>)v[0];
-        <span style="color: #531ab6;">if</span> (vlen != $self-&gt;n) {
-            <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">NULL</span>);
+        vlen = (<span style="color: #cccccc;">int</span>)v[0];
+        <span style="color: brightblack;">if</span> (vlen != $self-&gt;n) {
+            <span style="color: brightblack;">return</span> (<span style="color: #7fffd4;">NULL</span>);
         }
 
-        <span style="color: #531ab6;">for</span> (i=1; i &lt;= vlen; i++) {
+        <span style="color: brightblack;">for</span> (i=1; i &lt;= vlen; i++) {
             $self-&gt;v[i] = $self-&gt;a * ($self-&gt;v[i] + v[i] - $self-&gt;x[i]);
             $self-&gt;x[i] = v[i];
         }
-        <span style="color: #531ab6;">return</span> ($self-&gt;v);
+        <span style="color: brightblack;">return</span> ($self-&gt;v);
 }
 </pre>
 </div>
@@ -126,12 +151,12 @@ $self is the pointer to CHPFilter struct:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">CHPFilter</span> {
-        <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">n</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">length of v</span>
-        <span style="color: #005f5f;">double</span> <span style="color: #005e8b;">a</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">alpha</span>
-        <span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">v</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">calculated values (keep prev. before filter)</span>
-        <span style="color: #005f5f;">double</span> *<span style="color: #005e8b;">x</span>; <span style="color: #7f0000;">// </span><span style="color: #7f0000;">prev. input</span>
-} <span style="color: #005f5f;">CHPFilter</span>;
+<pre class="src src-cpp"><span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">CHPFilter</span> {
+        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">n</span>; <span style="color: #595959;">// </span><span style="color: #595959;">length of v</span>
+        <span style="color: #cccccc;">double</span> <span style="color: #b3b3b3;">a</span>; <span style="color: #595959;">// </span><span style="color: #595959;">alpha</span>
+        <span style="color: #cccccc;">double</span> *<span style="color: #b3b3b3;">v</span>; <span style="color: #595959;">// </span><span style="color: #595959;">calculated values (keep prev. before filter)</span>
+        <span style="color: #cccccc;">double</span> *<span style="color: #b3b3b3;">x</span>; <span style="color: #595959;">// </span><span style="color: #595959;">prev. input</span>
+} <span style="color: #cccccc;">CHPFilter</span>;
 </pre>
 </div>
 </div>

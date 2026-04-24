@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>More safe Python</title>
@@ -11,45 +11,70 @@
 <meta name="keywords" content="safety, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">More safe Python</h1>
-<div id="outline-container-org1ea9dba" class="outline-2">
-<h2 id="org1ea9dba">More safe Python</h2>
-<div class="outline-text-2" id="text-org1ea9dba">
+<div id="outline-container-orga3bf0d3" class="outline-2">
+<h2 id="orga3bf0d3">More safe Python</h2>
+<div class="outline-text-2" id="text-orga3bf0d3">
 <p>
 Python can be safe (if we need it) too. Another example is: let's say we want to implement
 a function <code>unique()</code>. It may looks like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">unique</span>(data):
-    <span style="color: #005e8b;">res</span>: <span style="color: #8f0075;">list</span> = []
-    <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> data:
-        <span style="color: #531ab6;">if</span> res <span style="color: #531ab6;">and</span> x == res[-1]: <span style="color: #531ab6;">continue</span>
-        <span style="color: #531ab6;">else</span>: res.append(x)
-    <span style="color: #531ab6;">return</span> res
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">unique</span>(data):
+    <span style="color: #b3b3b3;">res</span>: <span style="color: #b3b3b3;">list</span> = []
+    <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> data:
+        <span style="color: brightblack;">if</span> res <span style="color: brightblack;">and</span> x == res[-1]: <span style="color: brightblack;">continue</span>
+        <span style="color: brightblack;">else</span>: res.append(x)
+    <span style="color: brightblack;">return</span> res
 </pre>
 </div>
 
@@ -61,22 +86,22 @@ a client from passing of data which was not sorted, so the check will work at co
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">from</span> typing <span style="color: #531ab6;">import</span> *
+<pre class="src src-python"><span style="color: brightblack;">from</span> typing <span style="color: brightblack;">import</span> *
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Sorted</span>(<span style="color: #8f0075;">list</span>):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, items):
-        <span style="color: #8f0075;">super</span>().__init__(<span style="color: #8f0075;">sorted</span>(items))
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Sorted</span>(<span style="color: #b3b3b3;">list</span>):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, items):
+        <span style="color: #b3b3b3;">super</span>().__init__(<span style="color: #b3b3b3;">sorted</span>(items))
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">unique</span>(data: Sorted) -&gt; <span style="color: #8f0075;">list</span>:
-    <span style="color: #005e8b;">res</span>: <span style="color: #8f0075;">list</span> = []
-    <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> data:
-        <span style="color: #531ab6;">if</span> res <span style="color: #531ab6;">and</span> x == res[-1]: <span style="color: #531ab6;">continue</span>
-        <span style="color: #531ab6;">else</span>: res.append(x)
-    <span style="color: #531ab6;">return</span> res
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">unique</span>(data: Sorted) -&gt; <span style="color: #b3b3b3;">list</span>:
+    <span style="color: #b3b3b3;">res</span>: <span style="color: #b3b3b3;">list</span> = []
+    <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> data:
+        <span style="color: brightblack;">if</span> res <span style="color: brightblack;">and</span> x == res[-1]: <span style="color: brightblack;">continue</span>
+        <span style="color: brightblack;">else</span>: res.append(x)
+    <span style="color: brightblack;">return</span> res
 
-<span style="color: #005e8b;">items</span> = 11, 20, 11, 20, 1, 20, 11, 5, 1
-<span style="color: #005e8b;">data</span> = Sorted(items)
-<span style="color: #8f0075;">print</span>(unique(items))
+<span style="color: #b3b3b3;">items</span> = 11, 20, 11, 20, 1, 20, 11, 5, 1
+<span style="color: #b3b3b3;">data</span> = Sorted(items)
+<span style="color: #b3b3b3;">print</span>(unique(items))
 </pre>
 </div>
 

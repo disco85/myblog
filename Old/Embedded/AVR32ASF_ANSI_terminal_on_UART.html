@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR32/ASF: ANSI terminal on UART</title>
@@ -11,105 +11,130 @@
 <meta name="keywords" content="embedded, clang" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR32/ASF: ANSI terminal on UART</h1>
-<div id="outline-container-orgcdfc294" class="outline-2">
-<h2 id="orgcdfc294">AVR32/ASF: ANSI terminal on UART</h2>
-<div class="outline-text-2" id="text-orgcdfc294">
+<div id="outline-container-org76c0869" class="outline-2">
+<h2 id="org76c0869">AVR32/ASF: ANSI terminal on UART</h2>
+<div class="outline-text-2" id="text-org76c0869">
 <p>
 It's good known goal - to run terminal (with some kind of shell) of one (or all) of the UARTs. This snippet shows how to process input byte from UART and to emulate ANSI terminal behavior:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #2a5045;">/**</span>
-<span style="color: #2a5045;"> * Handle input byte via USART; process it to emulate edit line behaviour.</span>
-<span style="color: #2a5045;"> * After processing, sets self-&gt;response array to 4 possible responses (until</span>
-<span style="color: #2a5045;"> * one is NULL). </span><span style="color: #7c318f;">sh_task()</span><span style="color: #2a5045;"> will send these responses via UART...</span>
-<span style="color: #2a5045;"> * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user</span>
-<span style="color: #2a5045;"> * terminal should be in ANSI TERM mode. Supported:</span>
-<span style="color: #2a5045;"> * - BS/DEL - delete prev. char</span>
-<span style="color: #2a5045;"> * - ^U - delete entire line</span>
-<span style="color: #2a5045;"> * - ^L - clear screen but keep edited line</span>
-<span style="color: #2a5045;"> * - TAB - changed to SPACE</span>
-<span style="color: #2a5045;"> * On error sends BEL ('\7')</span>
-<span style="color: #2a5045;"> */</span>
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">handle_input_byte</span>(<span style="color: #005f5f;">sh_t</span> *<span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">uint8_t</span> <span style="color: #005e8b;">ch</span>)
+<pre class="src src-cpp"><span style="color: brightblack;">/**</span>
+<span style="color: brightblack;"> * Handle input byte via USART; process it to emulate edit line behaviour.</span>
+<span style="color: brightblack;"> * After processing, sets self-&gt;response array to 4 possible responses (until</span>
+<span style="color: brightblack;"> * one is NULL). </span><span style="color: #7fffd4;">sh_task()</span><span style="color: brightblack;"> will send these responses via UART...</span>
+<span style="color: brightblack;"> * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user</span>
+<span style="color: brightblack;"> * terminal should be in ANSI TERM mode. Supported:</span>
+<span style="color: brightblack;"> * - BS/DEL - delete prev. char</span>
+<span style="color: brightblack;"> * - ^U - delete entire line</span>
+<span style="color: brightblack;"> * - ^L - clear screen but keep edited line</span>
+<span style="color: brightblack;"> * - TAB - changed to SPACE</span>
+<span style="color: brightblack;"> * On error sends BEL ('\7')</span>
+<span style="color: brightblack;"> */</span>
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">handle_input_byte</span>(<span style="color: #cccccc;">sh_t</span> *<span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">ch</span>)
 {
-    <span style="color: #531ab6;">switch</span> (ch) {
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'\r'</span>:
-            ch = <span style="color: #3548cf;">'\n'</span>;
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'\n'</span>:
+    <span style="color: brightblack;">switch</span> (ch) {
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\r'</span>:
+            ch = <span style="color: brightblack;">'\n'</span>;
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\n'</span>:
             self-&gt;inpos = 0;
             self-&gt;inbuf[0] = 0;
-            _SETRESP(self, <span style="color: #3548cf;">"\r\n"</span>, self-&gt;promptbuf, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
-        <span style="color: #531ab6;">break</span>;
+            _SETRESP(self, <span style="color: brightblack;">"\r\n"</span>, self-&gt;promptbuf, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+        <span style="color: brightblack;">break</span>;
 
-        <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">backspace, del</span><span style="color: #7f0000;"> */</span>
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'\b'</span>:
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'\x7f'</span>:
-            <span style="color: #531ab6;">if</span> (self-&gt;inpos &gt; 0) {
+        <span style="color: #595959;">/* </span><span style="color: #595959;">backspace, del</span><span style="color: #595959;"> */</span>
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\b'</span>:
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\x7f'</span>:
+            <span style="color: brightblack;">if</span> (self-&gt;inpos &gt; 0) {
                 self-&gt;inpos--;
                 self-&gt;inbuf[self-&gt;inpos] = 0;
-                _SETRESP(self, <span style="color: #3548cf;">"\b \b"</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
-            } <span style="color: #531ab6;">else</span> {
-                _SETRESP(self, <span style="color: #3548cf;">"\a"</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
+                _SETRESP(self, <span style="color: brightblack;">"\b \b"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+            } <span style="color: brightblack;">else</span> {
+                _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
             }
-        <span style="color: #531ab6;">break</span>;
+        <span style="color: brightblack;">break</span>;
 
-        <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">^U - del line</span><span style="color: #7f0000;"> */</span>
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'u'</span> &amp; 0x1f:
+        <span style="color: #595959;">/* </span><span style="color: #595959;">^U - del line</span><span style="color: #595959;"> */</span>
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'u'</span> &amp; 0x1f:
             self-&gt;inpos = 0;
             self-&gt;inbuf[self-&gt;inpos] = 0;
-            _SETRESP(self, <span style="color: #3548cf;">"\x1B[2K\r"</span>, self-&gt;promptbuf, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
-        <span style="color: #531ab6;">break</span>;
+            _SETRESP(self, <span style="color: brightblack;">"\x1B[2K\r"</span>, self-&gt;promptbuf, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+        <span style="color: brightblack;">break</span>;
 
-        <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">^L - clear screen</span><span style="color: #7f0000;"> */</span>
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'l'</span> &amp; 0x1f:
-            _SETRESP(self, <span style="color: #3548cf;">"\x1B[2J\x1B[H"</span>, self-&gt;promptbuf, self-&gt;inbuf, <span style="color: #0000b0;">NULL</span>);
-        <span style="color: #531ab6;">break</span>;
+        <span style="color: #595959;">/* </span><span style="color: #595959;">^L - clear screen</span><span style="color: #595959;"> */</span>
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'l'</span> &amp; 0x1f:
+            _SETRESP(self, <span style="color: brightblack;">"\x1B[2J\x1B[H"</span>, self-&gt;promptbuf, self-&gt;inbuf, <span style="color: #7fffd4;">NULL</span>);
+        <span style="color: brightblack;">break</span>;
 
-        <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">all other chars</span><span style="color: #7f0000;"> */</span>
-        <span style="color: #531ab6;">case</span> <span style="color: #3548cf;">'\t'</span>:
-            ch = <span style="color: #3548cf;">' '</span>;
-        <span style="color: #531ab6;">default</span>:
-            <span style="color: #531ab6;">if</span> ((ch &gt;= (<span style="color: #005f5f;">uint8_t</span>)<span style="color: #3548cf;">' '</span> &amp;&amp; ch &lt;= (<span style="color: #005f5f;">uint8_t</span>)<span style="color: #3548cf;">'\x7e'</span>)
-                            || ch &gt;= (<span style="color: #005f5f;">uint8_t</span>)<span style="color: #3548cf;">'\xa0'</span>) {
-                <span style="color: #7f0000;">// </span><span style="color: #7f0000;">printable</span>
-                <span style="color: #531ab6;">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
-                    <span style="color: #7f0000;">// </span><span style="color: #7f0000;">in bounds (-2 is for ch, -1 is for '\0')</span>
+        <span style="color: #595959;">/* </span><span style="color: #595959;">all other chars</span><span style="color: #595959;"> */</span>
+        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\t'</span>:
+            ch = <span style="color: brightblack;">' '</span>;
+        <span style="color: brightblack;">default</span>:
+            <span style="color: brightblack;">if</span> ((ch &gt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">' '</span> &amp;&amp; ch &lt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">'\x7e'</span>)
+                            || ch &gt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">'\xa0'</span>) {
+                <span style="color: #595959;">// </span><span style="color: #595959;">printable</span>
+                <span style="color: brightblack;">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
+                    <span style="color: #595959;">// </span><span style="color: #595959;">in bounds (-2 is for ch, -1 is for '\0')</span>
                     self-&gt;inbuf[self-&gt;inpos++] = ch;
                     self-&gt;inbuf[self-&gt;inpos] = 0;
-                    _SETRESP(self, self-&gt;inbuf + (self-&gt;inpos-1), <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
-                } <span style="color: #531ab6;">else</span> {
-                    _SETRESP(self, <span style="color: #3548cf;">"\a"</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
+                    _SETRESP(self, self-&gt;inbuf + (self-&gt;inpos-1), <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+                } <span style="color: brightblack;">else</span> {
+                    _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
                 }
-            } <span style="color: #531ab6;">else</span> {
-                <span style="color: #7f0000;">// </span><span style="color: #7f0000;">non-printable</span>
-                _SETRESP(self, <span style="color: #3548cf;">"\a"</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>, <span style="color: #0000b0;">NULL</span>);
+            } <span style="color: brightblack;">else</span> {
+                <span style="color: #595959;">// </span><span style="color: #595959;">non-printable</span>
+                _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
             }
-        <span style="color: #531ab6;">break</span>;
+        <span style="color: brightblack;">break</span>;
     }
 }
 </pre>

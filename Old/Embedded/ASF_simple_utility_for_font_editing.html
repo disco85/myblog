@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: simple utility for font editing</title>
@@ -11,128 +11,153 @@
 <meta name="keywords" content="tcl/tk, embedded" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">ASF: simple utility for font editing</h1>
-<div id="outline-container-org1558d29" class="outline-2">
-<h2 id="org1558d29">ASF: simple utility for font editing</h2>
-<div class="outline-text-2" id="text-org1558d29">
+<div id="outline-container-org8f56a8a" class="outline-2">
+<h2 id="org8f56a8a">ASF: simple utility for font editing</h2>
+<div class="outline-text-2" id="text-org8f56a8a">
 <p>
 Used fonts in Atmel Software Framework are simple: each glyph is described with array of bytes - each set bit is pixel, no bit - no pixel :)
 Next is the very-very simple Tcl utility to convert glyph bytes into console image of symbol and vice-verse.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">parsing and loading font</span>
-<span style="color: #7f0000;">#</span><span style="color: #7f0000;">------------------------------------------------------------------------------</span>
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">parsesymb</span> str {
-    <span style="color: #7f0000;"># Parse one symbol in notation like:</span>
-    <span style="color: #7f0000;"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"</span>
+<pre class="src src-tcl"><span style="color: #595959;"># </span><span style="color: #595959;">parsing and loading font</span>
+<span style="color: #595959;">#</span><span style="color: #595959;">------------------------------------------------------------------------------</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">parsesymb</span> str {
+    <span style="color: #595959;"># Parse one symbol in notation like:</span>
+    <span style="color: #595959;"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"</span>
 
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">bytes</span> [<span style="color: #8f0075;">regexp</span> -all -inline {0[xX][0-9a-fA-F]{2}} $<span style="color: #005e8b;">str</span>]
-    <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">bytes</span>
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">bytes</span> [<span style="color: #b3b3b3;">regexp</span> -all -inline {0[xX][0-9a-fA-F]{2}} $<span style="color: #b3b3b3;">str</span>]
+    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">bytes</span>
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">putsymbline</span> byte {
-    <span style="color: #7f0000;"># put on screen one line of a symbol</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">putsymbline</span> byte {
+    <span style="color: #595959;"># put on screen one line of a symbol</span>
 
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">mask</span> 0b10000000
-    <span style="color: #531ab6;">for</span> {<span style="color: #8f0075;">set</span> i 0} {$<span style="color: #005e8b;">i</span>&lt;8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="<span style="color: #8f0075;">expr</span>" data-blogger-escaped-i="i" data-blogger-escaped-incr="<span style="color: #8f0075;">incr</span>" data-blogger-escaped-mask="mask" data-blogger-escaped-set="<span style="color: #8f0075;">set</span>"&gt;&gt;1}]
-        <span style="color: #531ab6;">if</span> $<span style="color: #005e8b;">bit</span> {
-            <span style="color: #8f0075;">puts</span> -nonewline <span style="color: #3548cf;">"#"</span>
-        } <span style="color: #531ab6;">else</span> {
-            <span style="color: #8f0075;">puts</span> -nonewline <span style="color: #3548cf;">" "</span>
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">mask</span> 0b10000000
+    <span style="color: brightblack;">for</span> {<span style="color: #b3b3b3;">set</span> i 0} {$<span style="color: #b3b3b3;">i</span>&lt;8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="<span style="color: #b3b3b3;">expr</span>" data-blogger-escaped-i="i" data-blogger-escaped-incr="<span style="color: #b3b3b3;">incr</span>" data-blogger-escaped-mask="mask" data-blogger-escaped-set="<span style="color: #b3b3b3;">set</span>"&gt;&gt;1}]
+        <span style="color: brightblack;">if</span> $<span style="color: #b3b3b3;">bit</span> {
+            <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">"#"</span>
+        } <span style="color: brightblack;">else</span> {
+            <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">" "</span>
         }
     }
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">putsymb</span> symb_bytes {
-    <span style="color: #7f0000;"># put on screen all symbol (all it's lines)</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">putsymb</span> symb_bytes {
+    <span style="color: #595959;"># put on screen all symbol (all it's lines)</span>
 
-    <span style="color: #8f0075;">puts</span> <span style="color: #3548cf;">"+--------+"</span>
-    <span style="color: #531ab6;">foreach</span> sb $<span style="color: #005e8b;">symb_bytes</span> {
-        <span style="color: #8f0075;">puts</span> -nonewline <span style="color: #3548cf;">"|"</span>
-        putsymbline $<span style="color: #005e8b;">sb</span>
-        <span style="color: #8f0075;">puts</span> <span style="color: #3548cf;">"|"</span>
+    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"+--------+"</span>
+    <span style="color: brightblack;">foreach</span> sb $<span style="color: #b3b3b3;">symb_bytes</span> {
+        <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">"|"</span>
+        putsymbline $<span style="color: #b3b3b3;">sb</span>
+        <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"|"</span>
     }
-    <span style="color: #8f0075;">puts</span> <span style="color: #3548cf;">"+--------+"</span>
+    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"+--------+"</span>
 }
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Compile glyphs to font in C format</span>
-<span style="color: #7f0000;">#</span><span style="color: #7f0000;">-------------------------------------------------------------------------------</span>
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">compsymbline</span> line {
-    <span style="color: #7f0000;"># Compile line like "# # # # " to 0xAA</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">Compile glyphs to font in C format</span>
+<span style="color: #595959;">#</span><span style="color: #595959;">-------------------------------------------------------------------------------</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">compsymbline</span> line {
+    <span style="color: #595959;"># Compile line like "# # # # " to 0xAA</span>
 
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">bits</span> [<span style="color: #8f0075;">string</span> map { <span style="color: #3548cf;">" "</span> 0 # 1} $<span style="color: #005e8b;">line</span>]
-    <span style="color: #531ab6;">return</span> [<span style="color: #8f0075;">format</span> 0x%02X <span style="color: #3548cf;">"0b$bits"</span>]
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">bits</span> [<span style="color: #b3b3b3;">string</span> map { <span style="color: brightblack;">" "</span> 0 # 1} $<span style="color: #b3b3b3;">line</span>]
+    <span style="color: brightblack;">return</span> [<span style="color: #b3b3b3;">format</span> 0x%02X <span style="color: brightblack;">"0b$bits"</span>]
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">compsymb</span> symb_lines {
-    <span style="color: #7f0000;"># Compile lines of symbol (what out 'putsymb')</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">compsymb</span> symb_lines {
+    <span style="color: #595959;"># Compile lines of symbol (what out 'putsymb')</span>
 
-    <span style="color: #8f0075;">set</span> <span style="color: #8f0075;">read</span> 0
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">res</span> {}
-    <span style="color: #531ab6;">foreach</span> line $<span style="color: #005e8b;">symb_lines</span> {
-        <span style="color: #531ab6;">if</span> {0 == $<span style="color: #005e8b;">read</span>} {
-            <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">line</span> eq <span style="color: #3548cf;">"+--------+"</span>} {
-                <span style="color: #8f0075;">set</span> <span style="color: #8f0075;">read</span> 1
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">read</span> 0
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">res</span> {}
+    <span style="color: brightblack;">foreach</span> line $<span style="color: #b3b3b3;">symb_lines</span> {
+        <span style="color: brightblack;">if</span> {0 == $<span style="color: #b3b3b3;">read</span>} {
+            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">line</span> eq <span style="color: brightblack;">"+--------+"</span>} {
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">read</span> 1
             }
-        } <span style="color: #531ab6;">else</span> {
-            <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">line</span> eq <span style="color: #3548cf;">"+--------+"</span>} {
-                <span style="color: #531ab6;">break</span>
-            } <span style="color: #531ab6;">else</span> {
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">line</span> [<span style="color: #8f0075;">string</span> trim $<span style="color: #005e8b;">line</span> <span style="color: #3548cf;">"|"</span>]
-                <span style="color: #8f0075;">lappend</span> res [compsymbline $<span style="color: #005e8b;">line</span>]
+        } <span style="color: brightblack;">else</span> {
+            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">line</span> eq <span style="color: brightblack;">"+--------+"</span>} {
+                <span style="color: brightblack;">break</span>
+            } <span style="color: brightblack;">else</span> {
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">line</span> [<span style="color: #b3b3b3;">string</span> trim $<span style="color: #b3b3b3;">line</span> <span style="color: brightblack;">"|"</span>]
+                <span style="color: #b3b3b3;">lappend</span> res [compsymbline $<span style="color: #b3b3b3;">line</span>]
             }
         }
     }
-    <span style="color: #531ab6;">return</span> [<span style="color: #8f0075;">join</span> $<span style="color: #005e8b;">res</span> <span style="color: #3548cf;">","</span>]
+    <span style="color: brightblack;">return</span> [<span style="color: #b3b3b3;">join</span> $<span style="color: #b3b3b3;">res</span> <span style="color: brightblack;">","</span>]
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">getlines</span> {} {
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">lines</span> {}
-    <span style="color: #531ab6;">while</span> {[<span style="color: #8f0075;">gets</span> stdin line] &gt;= 0} {
-        <span style="color: #8f0075;">lappend</span> lines $<span style="color: #005e8b;">line</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">getlines</span> {} {
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">lines</span> {}
+    <span style="color: brightblack;">while</span> {[<span style="color: #b3b3b3;">gets</span> stdin line] &gt;= 0} {
+        <span style="color: #b3b3b3;">lappend</span> lines $<span style="color: #b3b3b3;">line</span>
     }
-    <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">lines</span>
+    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">lines</span>
 }
 
-<span style="color: #531ab6;">proc</span> <span style="color: #721045;">main</span> args {
-    <span style="color: #005f5f;">global</span> argc argv
-    <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">argc</span>} {
-        <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">argv0</span> [<span style="color: #8f0075;">lindex</span> $<span style="color: #005e8b;">argv</span> 0]
-        <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">argv0</span> eq <span style="color: #3548cf;">"comp"</span>} {
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">lines</span> [getlines]
-            <span style="color: #8f0075;">puts</span> [compsymb $<span style="color: #005e8b;">lines</span>]
-            <span style="color: #531ab6;">return</span>
-        } <span style="color: #531ab6;">elseif</span> {$<span style="color: #005e8b;">argv0</span> eq <span style="color: #3548cf;">"put"</span>} {
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">line</span> [<span style="color: #8f0075;">gets</span> stdin]
-            <span style="color: #8f0075;">puts</span> [putsymb [parsesymb $<span style="color: #005e8b;">line</span>]]
-            <span style="color: #531ab6;">return</span>
+<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">main</span> args {
+    <span style="color: #cccccc;">global</span> argc argv
+    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">argc</span>} {
+        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">argv0</span> [<span style="color: #b3b3b3;">lindex</span> $<span style="color: #b3b3b3;">argv</span> 0]
+        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">argv0</span> eq <span style="color: brightblack;">"comp"</span>} {
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">lines</span> [getlines]
+            <span style="color: #b3b3b3;">puts</span> [compsymb $<span style="color: #b3b3b3;">lines</span>]
+            <span style="color: brightblack;">return</span>
+        } <span style="color: brightblack;">elseif</span> {$<span style="color: #b3b3b3;">argv0</span> eq <span style="color: brightblack;">"put"</span>} {
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">line</span> [<span style="color: #b3b3b3;">gets</span> stdin]
+            <span style="color: #b3b3b3;">puts</span> [putsymb [parsesymb $<span style="color: #b3b3b3;">line</span>]]
+            <span style="color: brightblack;">return</span>
         }
     }
-    <span style="color: #8f0075;">puts</span> {<span style="color: #3548cf;">\</span>
+    <span style="color: #b3b3b3;">puts</span> {<span style="color: brightblack;">\</span>
 Syntax on Linux:
     1. cat file|PRG comp
     2. cat file|PRG put
@@ -141,8 +166,8 @@ Syntax on Windows:
     2. more file|PRG put
 
 This means:
-    1. Compile glyph image into C hex <span style="color: #8f0075;">array</span>
-    2. Put glyph hex <span style="color: #8f0075;">array</span> on the screen as glyph image
+    1. Compile glyph image into C hex <span style="color: #b3b3b3;">array</span>
+    2. Put glyph hex <span style="color: #b3b3b3;">array</span> on the screen as glyph image
 
 Glyph images and its' hex arrays are inverse}
 }
@@ -157,15 +182,15 @@ Example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">$<span style="color: #005e8b;">echo</span> 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
+<pre class="src src-bash">$<span style="color: #b3b3b3;">echo</span> 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
 +--------+
-|  <span style="color: #7f0000;">#     </span><span style="color: #7f0000;">|</span>
-| <span style="color: #7f0000;">####   </span><span style="color: #7f0000;">|</span>
-|<span style="color: #7f0000;"># </span><span style="color: #7f0000;">#     |</span>
-| <span style="color: #7f0000;">###    </span><span style="color: #7f0000;">|</span>
-|  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">#   |</span>
-|<span style="color: #7f0000;">####    </span><span style="color: #7f0000;">|</span>
-|  <span style="color: #7f0000;">#     </span><span style="color: #7f0000;">|</span>
+|  <span style="color: #595959;">#     </span><span style="color: #595959;">|</span>
+| <span style="color: #595959;">####   </span><span style="color: #595959;">|</span>
+|<span style="color: #595959;"># </span><span style="color: #595959;">#     |</span>
+| <span style="color: #595959;">###    </span><span style="color: #595959;">|</span>
+|  <span style="color: #595959;"># </span><span style="color: #595959;">#   |</span>
+|<span style="color: #595959;">####    </span><span style="color: #595959;">|</span>
+|  <span style="color: #595959;">#     </span><span style="color: #595959;">|</span>
 |        |
 +--------+
 </pre>
@@ -176,7 +201,7 @@ This is the "$" symbol. It's bytes I get from et024006dhu.c (see const unsigned 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">$<span style="color: #005e8b;">cat</span> somefile.txt|tclkitsh font.tcl comp
+<pre class="src src-bash">$<span style="color: #b3b3b3;">cat</span> somefile.txt|tclkitsh font.tcl comp
 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00
 </pre>
 </div>

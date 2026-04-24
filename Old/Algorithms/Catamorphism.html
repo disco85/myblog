@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Catamorphism</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="algorithms, haskell" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Catamorphism</h1>
-<div id="outline-container-org0a4b16c" class="outline-2">
-<h2 id="org0a4b16c">Catamorphism</h2>
-<div class="outline-text-2" id="text-org0a4b16c">
+<div id="outline-container-orgb67682d" class="outline-2">
+<h2 id="orgb67682d">Catamorphism</h2>
+<div class="outline-text-2" id="text-orgb67682d">
 <p>
 Catamorphism is yet another good known recursive scheme which is assitiated
 with folding.
@@ -67,7 +92,7 @@ Scheme graphically looks like:
 
 
 
-<div id="org53a483b" class="figure">
+<div id="org385a970" class="figure">
 <p><img src="../../assets/Catamorphism1.svg" alt="Catamorphism1.svg" class="org-svg" />
 </p>
 </div>
@@ -88,19 +113,19 @@ All of these are easy coded in Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">cata</span>(b, l, op):
-    <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> l: <span style="color: #531ab6;">return</span> b
-    <span style="color: #005e8b;">x</span>, *<span style="color: #005e8b;">xs</span> = l
-    <span style="color: #531ab6;">return</span> op(x, cata(b, xs, op))
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">cata</span>(b, l, op):
+    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> l: <span style="color: brightblack;">return</span> b
+    <span style="color: #b3b3b3;">x</span>, *<span style="color: #b3b3b3;">xs</span> = l
+    <span style="color: brightblack;">return</span> op(x, cata(b, xs, op))
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">length</span>(l):
-    <span style="color: #531ab6;">return</span> cata(0, l, <span style="color: #531ab6;">lambda</span> x, n: 1 + n)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">length</span>(l):
+    <span style="color: brightblack;">return</span> cata(0, l, <span style="color: brightblack;">lambda</span> x, n: 1 + n)
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">mymap</span>(f, l):
-    <span style="color: #531ab6;">return</span> cata([], l, <span style="color: #531ab6;">lambda</span> a, bs: [f(a)] + bs)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">mymap</span>(f, l):
+    <span style="color: brightblack;">return</span> cata([], l, <span style="color: brightblack;">lambda</span> a, bs: [f(a)] + bs)
 
-<span style="color: #8f0075;">print</span>(length([1,2,3,4]))
-<span style="color: #8f0075;">print</span>(mymap(<span style="color: #531ab6;">lambda</span> x: x+10, [1,2,3]))
+<span style="color: #b3b3b3;">print</span>(length([1,2,3,4]))
+<span style="color: #b3b3b3;">print</span>(mymap(<span style="color: brightblack;">lambda</span> x: x+10, [1,2,3]))
 </pre>
 </div>
 

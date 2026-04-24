@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: Qtouch sensors input</title>
@@ -11,26 +11,51 @@
 <meta name="keywords" content="clang, embedded" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
@@ -39,30 +64,30 @@ code, pre { background-color: #FFEDDF;
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org05ff0fd">ASF: Qtouch sensors input</a></li>
-<li><a href="#org8db48b0">fix random (false) signals (splashes or BOUNCE)</a></li>
-<li><a href="#org0502bab">detecting PRESS state</a></li>
-<li><a href="#orgd36907d">detecting long "pressing" (touching) - sticking of key.</a></li>
+<li><a href="#org11032cf">ASF: Qtouch sensors input</a></li>
+<li><a href="#orgaec735e">fix random (false) signals (splashes or BOUNCE)</a></li>
+<li><a href="#orged64372">detecting PRESS state</a></li>
+<li><a href="#org32b8fc8">detecting long "pressing" (touching) - sticking of key.</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org05ff0fd" class="outline-2">
-<h2 id="org05ff0fd">ASF: Qtouch sensors input</h2>
-<div class="outline-text-2" id="text-org05ff0fd">
+<div id="outline-container-org11032cf" class="outline-2">
+<h2 id="org11032cf">ASF: Qtouch sensors input</h2>
+<div class="outline-text-2" id="text-org11032cf">
 <p>
 There are several tasks when we try to process Qtouch input (Qtouch 60168):
 </p>
 </div>
 </div>
-<div id="outline-container-org8db48b0" class="outline-2">
-<h2 id="org8db48b0">fix random (false) signals (splashes or BOUNCE)</h2>
+<div id="outline-container-orgaec735e" class="outline-2">
+<h2 id="orgaec735e">fix random (false) signals (splashes or BOUNCE)</h2>
 </div>
-<div id="outline-container-org0502bab" class="outline-2">
-<h2 id="org0502bab">detecting PRESS state</h2>
+<div id="outline-container-orged64372" class="outline-2">
+<h2 id="orged64372">detecting PRESS state</h2>
 </div>
-<div id="outline-container-orgd36907d" class="outline-2">
-<h2 id="orgd36907d">detecting long "pressing" (touching) - sticking of key.</h2>
-<div class="outline-text-2" id="text-orgd36907d">
+<div id="outline-container-org32b8fc8" class="outline-2">
+<h2 id="org32b8fc8">detecting long "pressing" (touching) - sticking of key.</h2>
+<div class="outline-text-2" id="text-org32b8fc8">
 <ol class="org-ol">
 <li>means: really signal from Qt is not 000..0 or 111..1 but something like 000001000000&#x2026; - with error '1' in sequence of '0' (and vise verse) because of signal bouncing, so it should be 'filtered' 2) means: we should detect when touch sensor is "pressed" 3) means: when user touches screen for long time we should detect this state as 'hold key' (like you can see in old mobile phones or key sticking in Windows) and call some special routine (callback) for processing such event.</li>
 </ol>
@@ -72,82 +97,82 @@ Next code processes all of this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #7f0000;">/* </span><span style="color: #7f0000;">Input from qTouch (qt60168) with 4 buttons and one wheel</span>
-<span style="color: #7f0000;"> * - There is some feature: sticking of key (long pressing detection) will occurs</span>
-<span style="color: #7f0000;"> *   after usual key event: first key is pressed - and application open some</span>
-<span style="color: #7f0000;"> *   window, only after this may occurs long-time-detection.</span>
-<span style="color: #7f0000;"> * - test_event() test of PRESSED state, not released.</span>
-<span style="color: #7f0000;"> * - simulation of repeatition simulate seq: pressed, released, no IDLE!</span>
-<span style="color: #7f0000;"> */</span> 
+<pre class="src src-cpp"><span style="color: #595959;">/* </span><span style="color: #595959;">Input from qTouch (qt60168) with 4 buttons and one wheel</span>
+<span style="color: #595959;"> * - There is some feature: sticking of key (long pressing detection) will occurs</span>
+<span style="color: #595959;"> *   after usual key event: first key is pressed - and application open some</span>
+<span style="color: #595959;"> *   window, only after this may occurs long-time-detection.</span>
+<span style="color: #595959;"> * - test_event() test of PRESSED state, not released.</span>
+<span style="color: #595959;"> * - simulation of repeatition simulate seq: pressed, released, no IDLE!</span>
+<span style="color: #595959;"> */</span> 
 
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"input.h"</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"myutl.h"</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"input.h"</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"myutl.h"</span>
 
-<span style="color: #a0132f;">#if</span> <span style="color: #a60000; font-weight: bold;">!</span><span style="color: #a0132f;">defined</span>(FCPU)
-<span style="color: #a0132f;"># error</span> <span style="color: #3548cf;">Define FCPU to support refresh screen!</span>
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span> !<span style="color: #b3b3b3;">defined</span>(FCPU)
+<span style="color: #b3b3b3;"># error</span> <span style="color: brightblack;">Define FCPU to support refresh screen!</span>
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #005f5f;">input_t</span> <span style="color: #005e8b;">_input</span> = INPUT_INITIALIZER();
+<span style="color: #cccccc;">input_t</span> <span style="color: #b3b3b3;">_input</span> = INPUT_INITIALIZER();
 
-<span style="color: #531ab6;">static</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">_qt60168_io_init</span>(<span style="color: #005f5f;">void</span>);
-<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">_input_scan_keys</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>);
-<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">_input_update_keys_state</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>);
-<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">input_process_sticking</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_keys_t</span> <span style="color: #005e8b;">key</span>, <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">new_state</span>);
-<span style="color: #531ab6;">inline</span> <span style="color: #531ab6;">static</span> <span style="color: #005f5f;">bool</span> <span style="color: #721045;">input_fltbounce_filter</span>(<span style="color: #005f5f;">input_fltbounce_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">new_state</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">msdelay</span>);
-<span style="color: #531ab6;">inline</span> <span style="color: #531ab6;">static</span> <span style="color: #005f5f;">void</span> <span style="color: #721045;">input_stick_fsm</span>(<span style="color: #005f5f;">input_stick_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">input</span>, <span style="color: #005f5f;">input_stick_fsm_event_t</span> <span style="color: #005e8b;">ev</span>, <span style="color: #005f5f;">input_keys_t</span> <span style="color: #005e8b;">key</span>);
+<span style="color: brightblack;">static</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">_qt60168_io_init</span>(<span style="color: #cccccc;">void</span>);
+<span style="color: brightblack;">static</span> <span style="color: brightblack;">inline</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">_input_scan_keys</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>);
+<span style="color: brightblack;">static</span> <span style="color: brightblack;">inline</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">_input_update_keys_state</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>);
+<span style="color: brightblack;">static</span> <span style="color: brightblack;">inline</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">input_process_sticking</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_keys_t</span> <span style="color: #b3b3b3;">key</span>, <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">new_state</span>);
+<span style="color: brightblack;">inline</span> <span style="color: brightblack;">static</span> <span style="color: #cccccc;">bool</span> <span style="color: #a52a2a;">input_fltbounce_filter</span>(<span style="color: #cccccc;">input_fltbounce_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">new_state</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">msdelay</span>);
+<span style="color: brightblack;">inline</span> <span style="color: brightblack;">static</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">input_stick_fsm</span>(<span style="color: #cccccc;">input_stick_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">input</span>, <span style="color: #cccccc;">input_stick_fsm_event_t</span> <span style="color: #b3b3b3;">ev</span>, <span style="color: #cccccc;">input_keys_t</span> <span style="color: #b3b3b3;">key</span>);
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_STICK_STOP</span>(<span style="color: #005e8b;">S</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_STICK_STOP</span>(<span style="color: #b3b3b3;">S</span>) <span style="color: brightblack;">do</span> { \
   cpu_stop_timeout(&amp;(S)-&gt;long_to); \
   cpu_stop_timeout(&amp;(S)-&gt;short_to); \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_GET_SENSOR</span>(<span style="color: #005e8b;">INP</span>, <span style="color: #005e8b;">I</span>) (INP)-&gt;sensors[I]
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_GET_SENSOR</span>(<span style="color: #b3b3b3;">INP</span>, <span style="color: #b3b3b3;">I</span>) (INP)-&gt;sensors[I]
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">set wheel to left</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_SET_WHEEL_LEFT</span>(<span style="color: #005e8b;">INP</span>) <span style="color: #531ab6;">do</span> { \
-  <span style="color: #531ab6;">if</span> (INPUT_RIGHT == (INP)-&gt;keys[INPUT_WHEEL]) { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">set wheel to left</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_SET_WHEEL_LEFT</span>(<span style="color: #b3b3b3;">INP</span>) <span style="color: brightblack;">do</span> { \
+  <span style="color: brightblack;">if</span> (INPUT_RIGHT == (INP)-&gt;keys[INPUT_WHEEL]) { \
     (INP)-&gt;wheel = 0; \
   } \
   (INP)-&gt;keys[INPUT_WHEEL] = INPUT_LEFT; \
   (INP)-&gt;wheel++; \
-} <span style="color: #531ab6;">while</span> (0)
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">set wheel to right</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_SET_WHEEL_RIGHT</span>(<span style="color: #005e8b;">INP</span>) <span style="color: #531ab6;">do</span> { \
-  <span style="color: #531ab6;">if</span> (INPUT_LEFT == (INP)-&gt;keys[INPUT_WHEEL]) { \
+} <span style="color: brightblack;">while</span> (0)
+<span style="color: #595959;">/// </span><span style="color: #595959;">set wheel to right</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_SET_WHEEL_RIGHT</span>(<span style="color: #b3b3b3;">INP</span>) <span style="color: brightblack;">do</span> { \
+  <span style="color: brightblack;">if</span> (INPUT_LEFT == (INP)-&gt;keys[INPUT_WHEEL]) { \
     (INP)-&gt;wheel = 0; \
   } \
   (INP)-&gt;keys[INPUT_WHEEL] = INPUT_RIGHT; \
   (INP)-&gt;wheel++; \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_SET_SENSOR</span>(<span style="color: #005e8b;">INP</span>, <span style="color: #005e8b;">I</span>, <span style="color: #005e8b;">ST</span>) (INP)-&gt;sensors[I] = (ST)
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_SET_KEY</span>(<span style="color: #005e8b;">INP</span>, <span style="color: #005e8b;">I</span>, <span style="color: #005e8b;">ST</span>) (INP)-&gt;keys[I] = (ST)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_SET_SENSOR</span>(<span style="color: #b3b3b3;">INP</span>, <span style="color: #b3b3b3;">I</span>, <span style="color: #b3b3b3;">ST</span>) (INP)-&gt;sensors[I] = (ST)
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_SET_KEY</span>(<span style="color: #b3b3b3;">INP</span>, <span style="color: #b3b3b3;">I</span>, <span style="color: #b3b3b3;">ST</span>) (INP)-&gt;keys[I] = (ST)
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">apply state of bounce filter FSM</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_FLTBOUNCE_APPLY_STATE</span>(<span style="color: #005e8b;">F</span>, <span style="color: #005e8b;">NEW_STATE</span>, <span style="color: #005e8b;">MSDELAY</span>) <span style="color: #531ab6;">do</span> { \
+<span style="color: #595959;">// </span><span style="color: #595959;">apply state of bounce filter FSM</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_FLTBOUNCE_APPLY_STATE</span>(<span style="color: #b3b3b3;">F</span>, <span style="color: #b3b3b3;">NEW_STATE</span>, <span style="color: #b3b3b3;">MSDELAY</span>) <span style="color: brightblack;">do</span> { \
   (F)-&gt;state = NEW_STATE; \
   cpu_set_timeout(cpu_ms_2_cy(MSDELAY, FCPU), &amp;(F)-&gt;to); \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">is timeout in bounce filter?</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_INPUT_FLTBOUNCE_IS_TO</span>(<span style="color: #005e8b;">F</span>) cpu_is_timeout(&amp;(F)-&gt;to)
+<span style="color: #595959;">// </span><span style="color: #595959;">is timeout in bounce filter?</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_INPUT_FLTBOUNCE_IS_TO</span>(<span style="color: #b3b3b3;">F</span>) cpu_is_timeout(&amp;(F)-&gt;to)
 
-<span style="color: #531ab6;">static</span> <span style="color: #005f5f;">void</span>
-<span style="color: #721045;">_qt60168_io_init</span>(<span style="color: #005f5f;">void</span>) {
-  <span style="color: #531ab6;">static</span> <span style="color: #531ab6;">const</span> <span style="color: #005f5f;">gpio_map_t</span> <span style="color: #005e8b;">QT60168_SPI_GPIO_MAP</span> =
+<span style="color: brightblack;">static</span> <span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">_qt60168_io_init</span>(<span style="color: #cccccc;">void</span>) {
+  <span style="color: brightblack;">static</span> <span style="color: brightblack;">const</span> <span style="color: #cccccc;">gpio_map_t</span> <span style="color: #b3b3b3;">QT60168_SPI_GPIO_MAP</span> =
   {
-    {QT60168_SPI_SCK_PIN, QT60168_SPI_SCK_FUNCTION},<span style="color: #7f0000;">// </span><span style="color: #7f0000;">SPI Clock.</span>
-    {QT60168_SPI_MISO_PIN, QT60168_SPI_MISO_FUNCTION},<span style="color: #7f0000;">// </span><span style="color: #7f0000;">MISO.</span>
-    {QT60168_SPI_MOSI_PIN, QT60168_SPI_MOSI_FUNCTION},<span style="color: #7f0000;">// </span><span style="color: #7f0000;">MOSI.</span>
-    {QT60168_SPI_NPCS0_PIN, QT60168_SPI_NPCS0_FUNCTION}<span style="color: #7f0000;">// </span><span style="color: #7f0000;">Chip Select NPCS.</span>
+    {QT60168_SPI_SCK_PIN, QT60168_SPI_SCK_FUNCTION},<span style="color: #595959;">// </span><span style="color: #595959;">SPI Clock.</span>
+    {QT60168_SPI_MISO_PIN, QT60168_SPI_MISO_FUNCTION},<span style="color: #595959;">// </span><span style="color: #595959;">MISO.</span>
+    {QT60168_SPI_MOSI_PIN, QT60168_SPI_MOSI_FUNCTION},<span style="color: #595959;">// </span><span style="color: #595959;">MOSI.</span>
+    {QT60168_SPI_NPCS0_PIN, QT60168_SPI_NPCS0_FUNCTION}<span style="color: #595959;">// </span><span style="color: #595959;">Chip Select NPCS.</span>
   };
 
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">SPI options.</span>
-  <span style="color: #005f5f;">spi_options_t</span> <span style="color: #005e8b;">spiOptions</span> =
+  <span style="color: #595959;">// </span><span style="color: #595959;">SPI options.</span>
+  <span style="color: #cccccc;">spi_options_t</span> <span style="color: #b3b3b3;">spiOptions</span> =
   {
     .reg    = QT60168_SPI_NCPS,
-    .baudrate   = QT60168_SPI_MASTER_SPEED, <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Defined in conf_qt60168.h.</span>
-    .bits   = QT60168_SPI_BITS,   <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Defined in conf_qt60168.h.</span>
+    .baudrate   = QT60168_SPI_MASTER_SPEED, <span style="color: #595959;">// </span><span style="color: #595959;">Defined in conf_qt60168.h.</span>
+    .bits   = QT60168_SPI_BITS,   <span style="color: #595959;">// </span><span style="color: #595959;">Defined in conf_qt60168.h.</span>
     .spck_delay   = 0,
     .trans_delay  = 0,
     .stay_act   = 0,
@@ -155,95 +180,95 @@ Next code processes all of this:
     .modfdis  = 1
   };
 
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Assign I/Os to SPI.</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Assign I/Os to SPI.</span>
   gpio_enable_module(QT60168_SPI_GPIO_MAP,
-      <span style="color: #531ab6;">sizeof</span>(QT60168_SPI_GPIO_MAP) / <span style="color: #531ab6;">sizeof</span>(QT60168_SPI_GPIO_MAP[0]));
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Initialize as master.</span>
+      <span style="color: brightblack;">sizeof</span>(QT60168_SPI_GPIO_MAP) / <span style="color: brightblack;">sizeof</span>(QT60168_SPI_GPIO_MAP[0]));
+  <span style="color: #595959;">// </span><span style="color: #595959;">Initialize as master.</span>
   spi_initMaster(QT60168_SPI, &amp;spiOptions);
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Set selection mode: variable_ps, pcs_decode, delay.</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Set selection mode: variable_ps, pcs_decode, delay.</span>
   spi_selectionMode(QT60168_SPI, 0, 0, 0);
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Enable SPI.</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Enable SPI.</span>
   spi_enable(QT60168_SPI);
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Initialize QT60168 with SPI clock Osc0 (=FCPU).</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Initialize QT60168 with SPI clock Osc0 (=FCPU).</span>
   spi_setupChipReg(QT60168_SPI, &amp;spiOptions, FCPU);
 }
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">call after INPUT(...) initializer calling</span>
-<span style="color: #005f5f;">void</span>
-<span style="color: #721045;">input_init</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>) {
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Initialize QT60168 resources: GPIO, SPI and QT60168.</span>
+<span style="color: #595959;">/// </span><span style="color: #595959;">call after INPUT(...) initializer calling</span>
+<span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">input_init</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>) {
+  <span style="color: #595959;">// </span><span style="color: #595959;">Initialize QT60168 resources: GPIO, SPI and QT60168.</span>
   _qt60168_io_init();
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">Initialize QT60168 component.</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">Initialize QT60168 component.</span>
   qt60168_init(FCPU);
-  <span style="color: #7f0000;">// </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #7f0000;"> : need?</span>
-  <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=0; i&lt;INPUT_NUMBER_OF_KEYS; i++) {
+  <span style="color: #595959;">// </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;"> : need?</span>
+  <span style="color: brightblack;">for</span> (<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>=0; i&lt;INPUT_NUMBER_OF_KEYS; i++) {
     _INPUT_STICK_STOP(&amp;self-&gt;stick_keys[i]);
   }
 }
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">for input task!</span>
-<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span>
-<span style="color: #721045;">_input_scan_keys</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>) {
+<span style="color: #595959;">// </span><span style="color: #595959;">for input task!</span>
+<span style="color: brightblack;">static</span> <span style="color: brightblack;">inline</span> <span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">_input_scan_keys</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>) {
 
-  <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">all_keys</span> = qt60168_report_all_key();
-  <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">mask</span> = 1;
-  <span style="color: #531ab6;">for</span> (<span style="color: #005f5f;">int</span> <span style="color: #005e8b;">i</span>=0; i&lt;QT60168_TOUCH_NUMBER_OF_SENSORS; i++ ) {
-    <span style="color: #531ab6;">if</span> (all_keys &amp; (mask&lt;&lt;i)) {
-      <span style="color: #7f0000;">// </span><span style="color: #7f0000;">if pressed - set pressed</span>
-      <span style="color: #531ab6;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_PRESSED, INPUT_SENS_TIME)) {
+  <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">all_keys</span> = qt60168_report_all_key();
+  <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">mask</span> = 1;
+  <span style="color: brightblack;">for</span> (<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>=0; i&lt;QT60168_TOUCH_NUMBER_OF_SENSORS; i++ ) {
+    <span style="color: brightblack;">if</span> (all_keys &amp; (mask&lt;&lt;i)) {
+      <span style="color: #595959;">// </span><span style="color: #595959;">if pressed - set pressed</span>
+      <span style="color: brightblack;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_PRESSED, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_PRESSED);
       }
     }
-    <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, i)) {
-      <span style="color: #7f0000;">// </span><span style="color: #7f0000;">if WAS pressed but now is not - set released</span>
-      <span style="color: #531ab6;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_RELEASED, INPUT_SENS_TIME)) {
+    <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, i)) {
+      <span style="color: #595959;">// </span><span style="color: #595959;">if WAS pressed but now is not - set released</span>
+      <span style="color: brightblack;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_RELEASED, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_RELEASED);
       }
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 RELEASED"); }</span>
+      <span style="color: #595959;">//</span><span style="color: #595959;">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 RELEASED"); }</span>
     }
-    <span style="color: #531ab6;">else</span> {
-      <span style="color: #7f0000;">// </span><span style="color: #7f0000;">else (not pressed now and WASN'T pressed early) - set idle</span>
-      <span style="color: #531ab6;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_IDLE, INPUT_SENS_TIME)) {
+    <span style="color: brightblack;">else</span> {
+      <span style="color: #595959;">// </span><span style="color: #595959;">else (not pressed now and WASN'T pressed early) - set idle</span>
+      <span style="color: brightblack;">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_IDLE, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_IDLE);
       }
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 IDLE"); }</span>
+      <span style="color: #595959;">//</span><span style="color: #595959;">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 IDLE"); }</span>
     }
   }
 }
 
-<span style="color: #531ab6;">static</span> <span style="color: #531ab6;">inline</span> <span style="color: #005f5f;">void</span>
-<span style="color: #721045;">_input_update_keys_state</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>) {
+<span style="color: brightblack;">static</span> <span style="color: brightblack;">inline</span> <span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">_input_update_keys_state</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>) {
 
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">reset 'ready' flag. If some will be pressed, set to true. If</span>
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">released - not</span>
-  self-&gt;ready = <span style="color: #0000b0;">false</span>;
+  <span style="color: #595959;">// </span><span style="color: #595959;">reset 'ready' flag. If some will be pressed, set to true. If</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">released - not</span>
+  self-&gt;ready = <span style="color: #7fffd4;">false</span>;
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_UPDATE_BTKKEY</span>(<span style="color: #005e8b;">BTN</span>, <span style="color: #005e8b;">KEY</span>) <span style="color: #531ab6;">do</span> { \
-  <span style="color: #531ab6;">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, BTN)) { \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_UPDATE_BTKKEY</span>(<span style="color: #b3b3b3;">BTN</span>, <span style="color: #b3b3b3;">KEY</span>) <span style="color: brightblack;">do</span> { \
+  <span style="color: brightblack;">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, BTN)) { \
     _INPUT_SET_KEY(self, KEY, INPUT_PRESSED); \
     input_process_sticking(self, KEY, INPUT_PRESSED); \
-    self-&gt;ready = <span style="color: #0000b0;">true</span>; \
+    self-&gt;ready = <span style="color: #7fffd4;">true</span>; \
   } \
-  <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (INPUT_RELEASED == _INPUT_GET_SENSOR(self, BTN)) { \
+  <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (INPUT_RELEASED == _INPUT_GET_SENSOR(self, BTN)) { \
     _INPUT_SET_KEY(self, KEY, INPUT_RELEASED); \
     input_process_sticking(self, KEY, INPUT_RELEASED); \
   } \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
   _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_0, INPUT_F1);
   _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_1, INPUT_F2);
   _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_2, INPUT_F3);
   _UPDATE_BTKKEY(QT60168_TOUCH_SENSOR_BUTTON_3, INPUT_F4);
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_UPDATE_WHKEY</span>(<span style="color: #005e8b;">SENS0</span>, <span style="color: #005e8b;">SENS1</span>, <span style="color: #005e8b;">ACT</span>) <span style="color: #531ab6;">do</span> { \
-  <span style="color: #531ab6;">if</span> (_INPUT_GET_SENSOR(self, SENS0) == INPUT_RELEASED &amp;&amp; \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_UPDATE_WHKEY</span>(<span style="color: #b3b3b3;">SENS0</span>, <span style="color: #b3b3b3;">SENS1</span>, <span style="color: #b3b3b3;">ACT</span>) <span style="color: brightblack;">do</span> { \
+  <span style="color: brightblack;">if</span> (_INPUT_GET_SENSOR(self, SENS0) == INPUT_RELEASED &amp;&amp; \
       _INPUT_GET_SENSOR(self, SENS1) == INPUT_PRESSED) { \
     ACT(self); \
-    self-&gt;ready = <span style="color: #0000b0;">true</span>; \
+    self-&gt;ready = <span style="color: #7fffd4;">true</span>; \
   } \
-} <span style="color: #531ab6;">while</span> (0)
+} <span style="color: brightblack;">while</span> (0)
 
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">scroll to right</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">scroll to right</span>
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
       QT60168_TOUCH_SENSOR_WHEEL_1, _INPUT_SET_WHEEL_RIGHT);
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_1,
@@ -269,7 +294,7 @@ Next code processes all of this:
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
       QT60168_TOUCH_SENSOR_WHEEL_0, _INPUT_SET_WHEEL_RIGHT);
 
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">scroll to left</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">scroll to left</span>
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
       QT60168_TOUCH_SENSOR_WHEEL_11, _INPUT_SET_WHEEL_LEFT);
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
@@ -295,15 +320,15 @@ Next code processes all of this:
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_1,
       QT60168_TOUCH_SENSOR_WHEEL_0, _INPUT_SET_WHEEL_LEFT);
 
-<span style="color: #a0132f;">#undef</span> _UPDATE_BTKKEY
-<span style="color: #a0132f;">#undef</span> _UPDATE_WHKEY
+<span style="color: #b3b3b3;">#undef</span> _UPDATE_BTKKEY
+<span style="color: #b3b3b3;">#undef</span> _UPDATE_WHKEY
 }
 
-<span style="color: #005f5f;">void</span>
-<span style="color: #721045;">input_task</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>) {
+<span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">input_task</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>) {
   _input_scan_keys(self);
   _input_update_keys_state(self);
-  <span style="color: #531ab6;">if</span> (self-&gt;ready) {
+  <span style="color: brightblack;">if</span> (self-&gt;ready) {
     MCALL(&amp;self-&gt;gui_input, onready);
     input_stick_fsm(self-&gt;stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);
     input_stick_fsm(self-&gt;stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);
@@ -312,287 +337,287 @@ Next code processes all of this:
   }
 }
 
-<span style="color: #005f5f;">int</span>
-<span style="color: #721045;">input_test_event</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">gui_events_t</span> <span style="color: #005e8b;">event</span>) {
+<span style="color: #cccccc;">int</span>
+<span style="color: #a52a2a;">input_test_event</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">gui_events_t</span> <span style="color: #b3b3b3;">event</span>) {
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">_KEY_STATE</span>(<span style="color: #005e8b;">KEY</span>) \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_KEY_STATE</span>(<span style="color: #b3b3b3;">KEY</span>) \
   (self-&gt;stick_keys[KEY].fsm.state==INPUT_STICK_FSM_NO_EMUL_ST? \
    self-&gt;keys[KEY] : self-&gt;stick_keys[KEY].fsm.state)
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">FIXED: moved all FSM switching to input_task() to prevent problem with 2</span>
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">and more test_event() calling in ONE input cycle and getting different results!</span>
-  <span style="color: #005f5f;">bool</span> <span style="color: #005e8b;">ret</span>;
-  <span style="color: #531ab6;">switch</span> (event) {
-    <span style="color: #531ab6;">case</span> GUI_ESCAPE_EVENT:
+<span style="color: #595959;">// </span><span style="color: #595959;">FIXED: moved all FSM switching to input_task() to prevent problem with 2</span>
+<span style="color: #595959;">// </span><span style="color: #595959;">and more test_event() calling in ONE input cycle and getting different results!</span>
+  <span style="color: #cccccc;">bool</span> <span style="color: #b3b3b3;">ret</span>;
+  <span style="color: brightblack;">switch</span> (event) {
+    <span style="color: brightblack;">case</span> GUI_ESCAPE_EVENT:
       ret = (_KEY_STATE(INPUT_F1) == INPUT_PRESSED);
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">input_stick_fsm(self-&gt;stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);</span>
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_UP_EVENT:
+      <span style="color: #595959;">//</span><span style="color: #595959;">input_stick_fsm(self-&gt;stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);</span>
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_UP_EVENT:
       ret = (_KEY_STATE(INPUT_F2) == INPUT_PRESSED);
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">input_stick_fsm(self-&gt;stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);</span>
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_DOWN_EVENT:
+      <span style="color: #595959;">//</span><span style="color: #595959;">input_stick_fsm(self-&gt;stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);</span>
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_DOWN_EVENT:
       ret = (_KEY_STATE(INPUT_F3) == INPUT_PRESSED);
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">input_stick_fsm(self-&gt;stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);</span>
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_ENTER_EVENT:
+      <span style="color: #595959;">//</span><span style="color: #595959;">input_stick_fsm(self-&gt;stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);</span>
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_ENTER_EVENT:
       ret = (_KEY_STATE(INPUT_F4) == INPUT_PRESSED);
-      <span style="color: #7f0000;">//</span><span style="color: #7f0000;">input_stick_fsm(self-&gt;stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);</span>
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">default</span>:
+      <span style="color: #595959;">//</span><span style="color: #595959;">input_stick_fsm(self-&gt;stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);</span>
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">default</span>:
       ret = 0;
-      <span style="color: #531ab6;">break</span>;
+      <span style="color: brightblack;">break</span>;
   }
-  <span style="color: #531ab6;">return</span> (ret);
-<span style="color: #a0132f;">#undef</span> _KEY_STATE
+  <span style="color: brightblack;">return</span> (ret);
+<span style="color: #b3b3b3;">#undef</span> _KEY_STATE
 }
 
-<span style="color: #005f5f;">void</span>
-<span style="color: #721045;">input_reset_event</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">gui_events_t</span> <span style="color: #005e8b;">event</span>) {
+<span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">input_reset_event</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">gui_events_t</span> <span style="color: #b3b3b3;">event</span>) {
 
-  <span style="color: #531ab6;">switch</span> (event) {
-    <span style="color: #531ab6;">case</span> GUI_ESCAPE_EVENT:
+  <span style="color: brightblack;">switch</span> (event) {
+    <span style="color: brightblack;">case</span> GUI_ESCAPE_EVENT:
       _INPUT_SET_KEY(self, INPUT_F1, INPUT_IDLE);
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_UP_EVENT:
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_UP_EVENT:
       _INPUT_SET_KEY(self, INPUT_F2, INPUT_IDLE);
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_DOWN_EVENT:
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_DOWN_EVENT:
       _INPUT_SET_KEY(self, INPUT_F3, INPUT_IDLE);
-      <span style="color: #531ab6;">break</span>;
-    <span style="color: #531ab6;">case</span> GUI_ENTER_EVENT:
+      <span style="color: brightblack;">break</span>;
+    <span style="color: brightblack;">case</span> GUI_ENTER_EVENT:
       _INPUT_SET_KEY(self, INPUT_F4, INPUT_IDLE);
-      <span style="color: #531ab6;">break</span>;
+      <span style="color: brightblack;">break</span>;
   }
-<span style="color: #a0132f;">#undef</span> _MAKE_STICK_PAUSE
+<span style="color: #b3b3b3;">#undef</span> _MAKE_STICK_PAUSE
 }
 
-<span style="color: #531ab6;">inline</span> <span style="color: #531ab6;">static</span> <span style="color: #005f5f;">void</span>
-<span style="color: #721045;">input_process_sticking</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_keys_t</span> <span style="color: #005e8b;">key</span>, <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">new_state</span>) {
-  <span style="color: #005f5f;">input_stick_fsm_event_t</span> <span style="color: #005e8b;">fsm_ev</span>;
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">generate events for sticking fsm</span>
-  <span style="color: #531ab6;">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].long_to)) {
+<span style="color: brightblack;">inline</span> <span style="color: brightblack;">static</span> <span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">input_process_sticking</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_keys_t</span> <span style="color: #b3b3b3;">key</span>, <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">new_state</span>) {
+  <span style="color: #cccccc;">input_stick_fsm_event_t</span> <span style="color: #b3b3b3;">fsm_ev</span>;
+  <span style="color: #595959;">// </span><span style="color: #595959;">generate events for sticking fsm</span>
+  <span style="color: brightblack;">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].long_to)) {
     fsm_ev = INPUT_STICK_FSM_RAISED_LTO_EV;
-  } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].short_to)) {
+  } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].short_to)) {
     fsm_ev = INPUT_STICK_FSM_RAISED_STO_EV;
-  } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (new_state != INPUT_PRESSED) {
+  } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (new_state != INPUT_PRESSED) {
     fsm_ev = INPUT_STICK_FSM_CHG_KEYST_EV;
-  } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (new_state == INPUT_PRESSED) {
+  } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (new_state == INPUT_PRESSED) {
     fsm_ev = INPUT_STICK_FSM_SAME_KEYST_EV;
-  } <span style="color: #531ab6;">else</span>
-    <span style="color: #531ab6;">return</span>;
+  } <span style="color: brightblack;">else</span>
+    <span style="color: brightblack;">return</span>;
 
   input_stick_fsm(&amp;self-&gt;stick_keys[key], self, fsm_ev, key);
 }
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">filter new state: returns true - allowed, false - bounce (rejected)</span>
-<span style="color: #531ab6;">inline</span> <span style="color: #531ab6;">static</span> <span style="color: #005f5f;">bool</span>
-<span style="color: #721045;">input_fltbounce_filter</span>(<span style="color: #005f5f;">input_fltbounce_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">new_state</span>, <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">msdelay</span>) {
-  <span style="color: #531ab6;">if</span> (new_state == self-&gt;state) {
-    <span style="color: #531ab6;">if</span> (_INPUT_FLTBOUNCE_IS_TO(self)) {
-      <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">true</span>);
+<span style="color: #595959;">/// </span><span style="color: #595959;">filter new state: returns true - allowed, false - bounce (rejected)</span>
+<span style="color: brightblack;">inline</span> <span style="color: brightblack;">static</span> <span style="color: #cccccc;">bool</span>
+<span style="color: #a52a2a;">input_fltbounce_filter</span>(<span style="color: #cccccc;">input_fltbounce_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">new_state</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">msdelay</span>) {
+  <span style="color: brightblack;">if</span> (new_state == self-&gt;state) {
+    <span style="color: brightblack;">if</span> (_INPUT_FLTBOUNCE_IS_TO(self)) {
+      <span style="color: brightblack;">return</span> (<span style="color: #7fffd4;">true</span>);
     }
-  } <span style="color: #531ab6;">else</span> {
+  } <span style="color: brightblack;">else</span> {
     _INPUT_FLTBOUNCE_APPLY_STATE(self, new_state, msdelay);
   }
-  <span style="color: #531ab6;">return</span> (<span style="color: #0000b0;">false</span>);
+  <span style="color: brightblack;">return</span> (<span style="color: #7fffd4;">false</span>);
 }
 
-<span style="color: #531ab6;">inline</span> <span style="color: #531ab6;">static</span> <span style="color: #005f5f;">void</span>
-<span style="color: #721045;">input_stick_fsm</span>(<span style="color: #005f5f;">input_stick_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">input</span>, <span style="color: #005f5f;">input_stick_fsm_event_t</span> <span style="color: #005e8b;">ev</span>, <span style="color: #005f5f;">input_keys_t</span> <span style="color: #005e8b;">key</span>) {
+<span style="color: brightblack;">inline</span> <span style="color: brightblack;">static</span> <span style="color: #cccccc;">void</span>
+<span style="color: #a52a2a;">input_stick_fsm</span>(<span style="color: #cccccc;">input_stick_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">input</span>, <span style="color: #cccccc;">input_stick_fsm_event_t</span> <span style="color: #b3b3b3;">ev</span>, <span style="color: #cccccc;">input_keys_t</span> <span style="color: #b3b3b3;">key</span>) {
 
-  <span style="color: #531ab6;">switch</span> (self-&gt;fsm.state) {
-    <span style="color: #531ab6;">case</span> INPUT_STICK_FSM_NO_EMUL_ST:
-        <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+  <span style="color: brightblack;">switch</span> (self-&gt;fsm.state) {
+    <span style="color: brightblack;">case</span> INPUT_STICK_FSM_NO_EMUL_ST:
+        <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
           DBG_ASSERT(0);
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
           DBG_ASSERT(0);
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
           ;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
           cpu_set_timeout(cpu_ms_2_cy(INPUT_KEY_STICK_TIME, FCPU), &amp;self-&gt;long_to);
           self-&gt;fsm.state = INPUT_STICK_FSM_EMUL_PRESSED_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
           ;
         }
-      <span style="color: #531ab6;">break</span>;
+      <span style="color: brightblack;">break</span>;
 
 
-    <span style="color: #531ab6;">case</span> INPUT_STICK_FSM_EMUL_PRESSED_ST:
-        <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+    <span style="color: brightblack;">case</span> INPUT_STICK_FSM_EMUL_PRESSED_ST:
+        <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
           _INPUT_STICK_STOP(self);
           MCALL(input, onstickkey, key);
           self-&gt;fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
           DBG_ASSERT(0);
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
           _INPUT_STICK_STOP(self);
           self-&gt;fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
           ;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
           cpu_set_timeout(cpu_ms_2_cy(INPUT_REPEAT_TIME, FCPU), &amp;self-&gt;short_to);
           self-&gt;fsm.state = INPUT_STICK_FSM_EMUL_RELEASED_ST;
         }
-      <span style="color: #531ab6;">break</span>;
+      <span style="color: brightblack;">break</span>;
 
 
-    <span style="color: #531ab6;">case</span> INPUT_STICK_FSM_EMUL_RELEASED_ST:
-        <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
+    <span style="color: brightblack;">case</span> INPUT_STICK_FSM_EMUL_RELEASED_ST:
+        <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_LTO_EV) {
           _INPUT_STICK_STOP(self);
           MCALL(input, onstickkey, key);
           self-&gt;fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RAISED_STO_EV) {
           cpu_stop_timeout(&amp;self-&gt;short_to);
           self-&gt;fsm.state = INPUT_STICK_FSM_EMUL_PRESSED_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_CHG_KEYST_EV) {
           _INPUT_STICK_STOP(self);
           self-&gt;fsm.state = INPUT_STICK_FSM_NO_EMUL_ST;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_SAME_KEYST_EV) {
           ;
-        } <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
+        } <span style="color: brightblack;">else</span> <span style="color: brightblack;">if</span> (ev == INPUT_STICK_FSM_RESET_EV) {
           ;
         }
-      <span style="color: #531ab6;">break</span>;
+      <span style="color: brightblack;">break</span>;
   }
 }
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> INPUT_H_
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">INPUT_H_</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> INPUT_H_
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">INPUT_H_</span>
 
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdbool.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;board.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;gpio.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;spi.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;qt60168.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;conf_qt60168.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;cycle_counter.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"config/conf_app.h"</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">"gui.h"</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdbool.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;board.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;gpio.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;spi.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;qt60168.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;conf_qt60168.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;cycle_counter.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"config/conf_app.h"</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"gui.h"</span>
 
-<span style="color: #a0132f;">#if</span> <span style="color: #a60000; font-weight: bold;">!</span><span style="color: #a0132f;">defined</span>(FCPU)
-<span style="color: #a0132f;"># error</span> <span style="color: #3548cf;">Define FCPU to support sticking of keys!</span>
-<span style="color: #a0132f;">#endif</span>
+<span style="color: #b3b3b3;">#if</span> !<span style="color: #b3b3b3;">defined</span>(FCPU)
+<span style="color: #b3b3b3;"># error</span> <span style="color: brightblack;">Define FCPU to support sticking of keys!</span>
+<span style="color: #b3b3b3;">#endif</span>
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">config {{{</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> INPUT_KEY_STICK_TIME
-<span style="color: #a0132f;"># define</span> <span style="color: #005e8b;">INPUT_KEY_STICK_TIME</span> 2500
-<span style="color: #a0132f;"># warning</span> <span style="color: #3548cf;">Default INPUT_KEY_STICK_TIME is used: 2500 ms</span>
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> INPUT_SENS_TIME
-<span style="color: #a0132f;"># define</span> <span style="color: #005e8b;">INPUT_SENS_TIME</span> 10
-<span style="color: #a0132f;"># warning</span> <span style="color: #3548cf;">Default INPUT_SENS_TIME is used: 10 ms</span>
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #a0132f;">#if</span><span style="color: #a0132f; font-weight: bold;">n</span><span style="color: #a0132f;">def</span> INPUT_REPEAT_TIME
-<span style="color: #a0132f;"># define</span> <span style="color: #005e8b;">INPUT_REPEAT_TIME</span> 300
-<span style="color: #a0132f;"># warning</span> <span style="color: #3548cf;">Default INPUT_REPEAT_TIME is used: 300 ms</span>
-<span style="color: #a0132f;">#endif</span>
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">}}}</span>
+<span style="color: #595959;">// </span><span style="color: #595959;">config {{{</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> INPUT_KEY_STICK_TIME
+<span style="color: #b3b3b3;"># define</span> <span style="color: #b3b3b3;">INPUT_KEY_STICK_TIME</span> 2500
+<span style="color: #b3b3b3;"># warning</span> <span style="color: brightblack;">Default INPUT_KEY_STICK_TIME is used: 2500 ms</span>
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> INPUT_SENS_TIME
+<span style="color: #b3b3b3;"># define</span> <span style="color: #b3b3b3;">INPUT_SENS_TIME</span> 10
+<span style="color: #b3b3b3;"># warning</span> <span style="color: brightblack;">Default INPUT_SENS_TIME is used: 10 ms</span>
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> INPUT_REPEAT_TIME
+<span style="color: #b3b3b3;"># define</span> <span style="color: #b3b3b3;">INPUT_REPEAT_TIME</span> 300
+<span style="color: #b3b3b3;"># warning</span> <span style="color: brightblack;">Default INPUT_REPEAT_TIME is used: 300 ms</span>
+<span style="color: #b3b3b3;">#endif</span>
+<span style="color: #595959;">// </span><span style="color: #595959;">}}}</span>
 
-<span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_t</span>;
+<span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_t</span>;
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">state of key/sensor</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">input_state_t</span> {
-  <span style="color: #005e8b;">INPUT_IDLE</span>,
-  <span style="color: #005e8b;">INPUT_PRESSED</span>,
-  <span style="color: #005e8b;">INPUT_RELEASED</span>,
-  <span style="color: #005e8b;">INPUT_LEFT</span>,
-  <span style="color: #005e8b;">INPUT_RIGHT</span>
-} <span style="color: #005f5f;">input_state_t</span>;
+<span style="color: #595959;">/// </span><span style="color: #595959;">state of key/sensor</span>
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">input_state_t</span> {
+  <span style="color: #b3b3b3;">INPUT_IDLE</span>,
+  <span style="color: #b3b3b3;">INPUT_PRESSED</span>,
+  <span style="color: #b3b3b3;">INPUT_RELEASED</span>,
+  <span style="color: #b3b3b3;">INPUT_LEFT</span>,
+  <span style="color: #b3b3b3;">INPUT_RIGHT</span>
+} <span style="color: #cccccc;">input_state_t</span>;
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">keys</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">input_keys_t</span> {
-  <span style="color: #005e8b;">INPUT_F1</span>, <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">0</span><span style="color: #7f0000;"> */</span>
-  <span style="color: #005e8b;">INPUT_F2</span>,
-  <span style="color: #005e8b;">INPUT_F3</span>,
-  <span style="color: #005e8b;">INPUT_F4</span>,
-  <span style="color: #005e8b;">INPUT_WHEEL</span>,
-  <span style="color: #005e8b;">INPUT_NUMBER_OF_KEYS</span> <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; total number, should be last</span>
-} <span style="color: #005f5f;">input_keys_t</span>;
+<span style="color: #595959;">/// </span><span style="color: #595959;">keys</span>
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">input_keys_t</span> {
+  <span style="color: #b3b3b3;">INPUT_F1</span>, <span style="color: #595959;">/* </span><span style="color: #595959;">0</span><span style="color: #595959;"> */</span>
+  <span style="color: #b3b3b3;">INPUT_F2</span>,
+  <span style="color: #b3b3b3;">INPUT_F3</span>,
+  <span style="color: #b3b3b3;">INPUT_F4</span>,
+  <span style="color: #b3b3b3;">INPUT_WHEEL</span>,
+  <span style="color: #b3b3b3;">INPUT_NUMBER_OF_KEYS</span> <span style="color: #595959;">///</span><span style="color: #595959;">&lt; total number, should be last</span>
+} <span style="color: #cccccc;">input_keys_t</span>;
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">for filter key bounce (there is, yes!)</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_fltbounce_t</span> {
-  <span style="color: #005f5f;">t_cpu_time</span> <span style="color: #005e8b;">to</span>;
-  <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">state</span>;
-} <span style="color: #005f5f;">input_fltbounce_t</span>;
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">INPUT_FLTBOUNCE_INITIALIZER</span>(...) { \
+<span style="color: #595959;">/// </span><span style="color: #595959;">for filter key bounce (there is, yes!)</span>
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_fltbounce_t</span> {
+  <span style="color: #cccccc;">t_cpu_time</span> <span style="color: #b3b3b3;">to</span>;
+  <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">state</span>;
+} <span style="color: #cccccc;">input_fltbounce_t</span>;
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">INPUT_FLTBOUNCE_INITIALIZER</span>(...) { \
   .to = {0}, \
   .state = INPUT_IDLE, \
   __VA_ARGS__ }
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">for key sticking, repeat (long pressing)</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">input_stick_fsm_state_t</span> {
-  <span style="color: #005e8b;">INPUT_STICK_FSM_NO_EMUL_ST</span> = INPUT_IDLE,
-  <span style="color: #005e8b;">INPUT_STICK_FSM_EMUL_PRESSED_ST</span> = INPUT_PRESSED,
-  <span style="color: #005e8b;">INPUT_STICK_FSM_EMUL_RELEASED_ST</span> = INPUT_RELEASED
-} <span style="color: #005f5f;">input_stick_fsm_state_t</span>;
+<span style="color: #595959;">/// </span><span style="color: #595959;">for key sticking, repeat (long pressing)</span>
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">input_stick_fsm_state_t</span> {
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_NO_EMUL_ST</span> = INPUT_IDLE,
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_EMUL_PRESSED_ST</span> = INPUT_PRESSED,
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_EMUL_RELEASED_ST</span> = INPUT_RELEASED
+} <span style="color: #cccccc;">input_stick_fsm_state_t</span>;
 
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">input_stick_fsm_event_t</span> {
-  <span style="color: #005e8b;">INPUT_STICK_FSM_RAISED_LTO_EV</span>,   <span style="color: #7f0000;">// </span><span style="color: #7f0000;">0</span>
-  <span style="color: #005e8b;">INPUT_STICK_FSM_RAISED_STO_EV</span>,   <span style="color: #7f0000;">// </span><span style="color: #7f0000;">1</span>
-  <span style="color: #005e8b;">INPUT_STICK_FSM_CHG_KEYST_EV</span>,  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">2</span>
-  <span style="color: #005e8b;">INPUT_STICK_FSM_SAME_KEYST_EV</span>,   <span style="color: #7f0000;">// </span><span style="color: #7f0000;">3</span>
-  <span style="color: #005e8b;">INPUT_STICK_FSM_RESET_EV</span>   <span style="color: #7f0000;">// </span><span style="color: #7f0000;">4</span>
-} <span style="color: #005f5f;">input_stick_fsm_event_t</span>;
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">input_stick_fsm_event_t</span> {
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_RAISED_LTO_EV</span>,   <span style="color: #595959;">// </span><span style="color: #595959;">0</span>
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_RAISED_STO_EV</span>,   <span style="color: #595959;">// </span><span style="color: #595959;">1</span>
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_CHG_KEYST_EV</span>,  <span style="color: #595959;">// </span><span style="color: #595959;">2</span>
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_SAME_KEYST_EV</span>,   <span style="color: #595959;">// </span><span style="color: #595959;">3</span>
+  <span style="color: #b3b3b3;">INPUT_STICK_FSM_RESET_EV</span>   <span style="color: #595959;">// </span><span style="color: #595959;">4</span>
+} <span style="color: #cccccc;">input_stick_fsm_event_t</span>;
 
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_stick_t</span> {
-  <span style="color: #005f5f;">t_cpu_time</span> <span style="color: #005e8b;">long_to</span>, <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; long timeout</span>
-       <span style="color: #005e8b;">short_to</span>; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; short (for emulating)</span>
-  <span style="color: #531ab6;">struct</span> {
-    <span style="color: #005f5f;">input_stick_fsm_state_t</span> <span style="color: #005e8b;">state</span>; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; the same values as input_state_t!</span>
-  } <span style="color: #005e8b;">fsm</span>;
-} <span style="color: #005f5f;">input_stick_t</span>;
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_stick_t</span> {
+  <span style="color: #cccccc;">t_cpu_time</span> <span style="color: #b3b3b3;">long_to</span>, <span style="color: #595959;">///</span><span style="color: #595959;">&lt; long timeout</span>
+       <span style="color: #b3b3b3;">short_to</span>; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; short (for emulating)</span>
+  <span style="color: brightblack;">struct</span> {
+    <span style="color: #cccccc;">input_stick_fsm_state_t</span> <span style="color: #b3b3b3;">state</span>; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; the same values as input_state_t!</span>
+  } <span style="color: #b3b3b3;">fsm</span>;
+} <span style="color: #cccccc;">input_stick_t</span>;
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">INPUT_STICK_INITIALIZER</span>(...) { \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">INPUT_STICK_INITIALIZER</span>(...) { \
   .long_to = {.delay_start_cycle=0, .delay_end_cycle=0, .timer_state=CPU_TIMER_STATE_STOPPED}, \
   .short_to = {.delay_start_cycle=0, .delay_end_cycle=0, .timer_state=CPU_TIMER_STATE_STOPPED}, \
   .fsm = { .state=INPUT_STICK_FSM_NO_EMUL_ST }, \
   __VA_ARGS__ }
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">input class {{{</span>
-<span style="color: #531ab6;">typedef</span> <span style="color: #005f5f;">void</span> (*<span style="color: #005f5f;">input_onstickkey_t</span>)(<span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">input_keys_t</span> <span style="color: #005e8b;">key</span>);
-<span style="color: #531ab6;">typedef</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_t</span> {
-  <span style="color: #005f5f;">gui_input_if_t</span> <span style="color: #005e8b;">gui_input</span>;
-  <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">sensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; states of sensors</span>
-  <span style="color: #005f5f;">input_fltbounce_t</span> <span style="color: #005e8b;">fltsensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; filtered states</span>
-  <span style="color: #005f5f;">input_state_t</span> <span style="color: #005e8b;">keys</span>[INPUT_NUMBER_OF_KEYS]; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; states of keys</span>
-  <span style="color: #005f5f;">input_stick_t</span> <span style="color: #005e8b;">stick_keys</span>[INPUT_NUMBER_OF_KEYS]; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; sticking of keys</span>
-  <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">wheel</span>; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; wheel amount (counter)</span>
-  <span style="color: #005f5f;">bool</span> <span style="color: #005e8b;">ready</span>; <span style="color: #7f0000;">///</span><span style="color: #7f0000;">&lt; there is some input</span>
-  <span style="color: #005f5f;">input_onstickkey_t</span> <span style="color: #005e8b;">onstickkey</span>;
-} <span style="color: #005f5f;">input_t</span>;
+<span style="color: #595959;">/// </span><span style="color: #595959;">input class {{{</span>
+<span style="color: brightblack;">typedef</span> <span style="color: #cccccc;">void</span> (*<span style="color: #cccccc;">input_onstickkey_t</span>)(<span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">input_keys_t</span> <span style="color: #b3b3b3;">key</span>);
+<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_t</span> {
+  <span style="color: #cccccc;">gui_input_if_t</span> <span style="color: #b3b3b3;">gui_input</span>;
+  <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">sensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; states of sensors</span>
+  <span style="color: #cccccc;">input_fltbounce_t</span> <span style="color: #b3b3b3;">fltsensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; filtered states</span>
+  <span style="color: #cccccc;">input_state_t</span> <span style="color: #b3b3b3;">keys</span>[INPUT_NUMBER_OF_KEYS]; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; states of keys</span>
+  <span style="color: #cccccc;">input_stick_t</span> <span style="color: #b3b3b3;">stick_keys</span>[INPUT_NUMBER_OF_KEYS]; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; sticking of keys</span>
+  <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">wheel</span>; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; wheel amount (counter)</span>
+  <span style="color: #cccccc;">bool</span> <span style="color: #b3b3b3;">ready</span>; <span style="color: #595959;">///</span><span style="color: #595959;">&lt; there is some input</span>
+  <span style="color: #cccccc;">input_onstickkey_t</span> <span style="color: #b3b3b3;">onstickkey</span>;
+} <span style="color: #cccccc;">input_t</span>;
 
-<span style="color: #a0132f;">#define</span> <span style="color: #721045;">INPUT_INITIALIZER</span>(...) { \
+<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">INPUT_INITIALIZER</span>(...) { \
   .gui_input = GUI_INPUT_IF_INITIALIZER( \
-      .test_event = (<span style="color: #005f5f;">gui_input_if_test_event_t</span>)input_test_event, \
-      .reset_event = (<span style="color: #005f5f;">gui_input_if_reset_event_t</span>)input_reset_event \
+      .test_event = (<span style="color: #cccccc;">gui_input_if_test_event_t</span>)input_test_event, \
+      .reset_event = (<span style="color: #cccccc;">gui_input_if_reset_event_t</span>)input_reset_event \
       ), \
   .sensors = {INPUT_IDLE}, \
   .fltsensors = {INPUT_FLTBOUNCE_INITIALIZER()}, \
   .keys = {INPUT_IDLE}, \
   .stick_keys = {INPUT_STICK_INITIALIZER()}, \
   .wheel = 0, \
-  .ready = <span style="color: #0000b0;">false</span>, \
-  .onstickkey = <span style="color: #0000b0;">NULL</span>, \
+  .ready = <span style="color: #7fffd4;">false</span>, \
+  .onstickkey = <span style="color: #7fffd4;">NULL</span>, \
   __VA_ARGS__ }
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">}}}</span>
+<span style="color: #595959;">// </span><span style="color: #595959;">}}}</span>
 
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Global instance (use *INPUT* pointer)</span>
-<span style="color: #531ab6;">extern</span> <span style="color: #531ab6;">struct</span> <span style="color: #005f5f;">input_t</span> <span style="color: #005e8b;">_input</span>;
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">INPUT</span> (&amp;_input)
+<span style="color: #595959;">/// </span><span style="color: #595959;">Global instance (use *INPUT* pointer)</span>
+<span style="color: brightblack;">extern</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">input_t</span> <span style="color: #b3b3b3;">_input</span>;
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">INPUT</span> (&amp;_input)
 
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">input_init</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>);
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">input_task</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>);
-<span style="color: #7f0000;">/// </span><span style="color: #7f0000;">Check if event occurs (key pressing)</span>
-<span style="color: #005f5f;">int</span> <span style="color: #721045;">input_test_event</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">gui_events_t</span> <span style="color: #005e8b;">event</span>);
-<span style="color: #7f0000;">//</span><span style="color: #7f0000;">int input_get_event(input_t* self, gui_event_t *event);</span>
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">input_reset_event</span>(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, <span style="color: #531ab6;">enum</span> <span style="color: #005f5f;">gui_events_t</span> <span style="color: #005e8b;">event</span>);
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">input_init</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>);
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">input_task</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>);
+<span style="color: #595959;">/// </span><span style="color: #595959;">Check if event occurs (key pressing)</span>
+<span style="color: #cccccc;">int</span> <span style="color: #a52a2a;">input_test_event</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">gui_events_t</span> <span style="color: #b3b3b3;">event</span>);
+<span style="color: #595959;">//</span><span style="color: #595959;">int input_get_event(input_t* self, gui_event_t *event);</span>
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">input_reset_event</span>(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">gui_events_t</span> <span style="color: #b3b3b3;">event</span>);
 
-<span style="color: #a0132f;">#endif</span> <span style="color: #7f0000;">/* </span><span style="color: #7f0000;">INPUT_H_</span><span style="color: #7f0000;"> */</span>
+<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/* </span><span style="color: #595959;">INPUT_H_</span><span style="color: #595959;"> */</span>
 </pre>
 </div>
 
@@ -602,16 +627,16 @@ Example of the usage:
 
 <div class="org-src-container">
 <pre class="src src-cpp">...
-<span style="color: #005f5f;">void</span> onstickkey(<span style="color: #005f5f;">input_t</span>* <span style="color: #005e8b;">self</span>, input_keys_t key) {
- <span style="color: #7f0000;">// </span><span style="color: #7f0000;">do something...</span>
+<span style="color: #cccccc;">void</span> onstickkey(<span style="color: #cccccc;">input_t</span>* <span style="color: #b3b3b3;">self</span>, input_keys_t key) {
+ <span style="color: #595959;">// </span><span style="color: #595959;">do something...</span>
 }
 
-<span style="color: #005f5f;">void</span> <span style="color: #721045;">main</span>(<span style="color: #005f5f;">void</span>) {
+<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">main</span>(<span style="color: #cccccc;">void</span>) {
   ...
   input_init(INPUT);
   INPUT-&gt;onstickkey = onstickkey;
   ...
-  <span style="color: #531ab6;">while</span> (1) { <span style="color: #7f0000;">// </span><span style="color: #7f0000;">main loop with "tasks"</span>
+  <span style="color: brightblack;">while</span> (1) { <span style="color: #595959;">// </span><span style="color: #595959;">main loop with "tasks"</span>
     ...
     input_task(INPUT);
     ...
@@ -626,9 +651,9 @@ Somewhere in the program you can test pressed key:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #531ab6;">if</span> (input-&gt;test_event(input, GUI_UP_EVENT)) {
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">event UP</span>
-  <span style="color: #7f0000;">// </span><span style="color: #7f0000;">do something...</span>
+<pre class="src src-cpp"><span style="color: brightblack;">if</span> (input-&gt;test_event(input, GUI_UP_EVENT)) {
+  <span style="color: #595959;">// </span><span style="color: #595959;">event UP</span>
+  <span style="color: #595959;">// </span><span style="color: #595959;">do something...</span>
   input-&gt;reset_event(input, GUI_UP_EVENT);
 }
 </pre>

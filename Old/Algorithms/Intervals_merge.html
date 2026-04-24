@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Intervals merge</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="python, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Intervals merge</h1>
-<div id="outline-container-org5138329" class="outline-2">
-<h2 id="org5138329">Intervals merge</h2>
-<div class="outline-text-2" id="text-org5138329">
+<div id="outline-container-orga8ea8ea" class="outline-2">
+<h2 id="orga8ea8ea">Intervals merge</h2>
+<div class="outline-text-2" id="text-orga8ea8ea">
 <p>
 Two simple algorithms of interval merge, which I designed yesterday while was
 sick :)
@@ -54,7 +79,7 @@ result (we must merge them), elsewhere - keep original intervals, see picture:
 </p>
 
 
-<div id="orgbb09603" class="figure">
+<div id="orgdc119d3" class="figure">
 <p><img src="../../assets/IntervalMerges1.svg" alt="IntervalMerges1.svg" class="org-svg" />
 </p>
 </div>
@@ -64,18 +89,18 @@ Python implementation:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">predicat: `x` is contained in (x0, x1)</span>
-<span style="color: #005e8b;">c</span> = <span style="color: #531ab6;">lambda</span> x, x0, x1: x0 &lt;= x &lt;= x1
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">predicat: `x` is contained in (x0, x1)</span>
+<span style="color: #b3b3b3;">c</span> = <span style="color: brightblack;">lambda</span> x, x0, x1: x0 &lt;= x &lt;= x1
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">merge-I</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">m1</span>(i1, i2):
-    <span style="color: #005e8b;">i1</span>, <span style="color: #005e8b;">i2</span> = <span style="color: #8f0075;">map</span>(isort, (i1,i2))
-    <span style="color: #005e8b;">sx</span> = isort(i1 + i2)
-    <span style="color: #005e8b;">x1</span>, <span style="color: #005e8b;">x2</span> = i1; <span style="color: #005e8b;">x3</span>, <span style="color: #005e8b;">x4</span> = i2
-    <span style="color: #531ab6;">if</span> c(x1, x3, x4) <span style="color: #531ab6;">or</span> c(x3, x1, x2) <span style="color: #531ab6;">or</span> c(x2, x3, x4) <span style="color: #531ab6;">or</span> c(x4, x1, x2):
-        <span style="color: #531ab6;">return</span> (sx[0], sx[-1])
-    <span style="color: #531ab6;">else</span>:
-        <span style="color: #531ab6;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
+<span style="color: #595959;"># </span><span style="color: #595959;">merge-I</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">m1</span>(i1, i2):
+    <span style="color: #b3b3b3;">i1</span>, <span style="color: #b3b3b3;">i2</span> = <span style="color: #b3b3b3;">map</span>(isort, (i1,i2))
+    <span style="color: #b3b3b3;">sx</span> = isort(i1 + i2)
+    <span style="color: #b3b3b3;">x1</span>, <span style="color: #b3b3b3;">x2</span> = i1; <span style="color: #b3b3b3;">x3</span>, <span style="color: #b3b3b3;">x4</span> = i2
+    <span style="color: brightblack;">if</span> c(x1, x3, x4) <span style="color: brightblack;">or</span> c(x3, x1, x2) <span style="color: brightblack;">or</span> c(x2, x3, x4) <span style="color: brightblack;">or</span> c(x4, x1, x2):
+        <span style="color: brightblack;">return</span> (sx[0], sx[-1])
+    <span style="color: brightblack;">else</span>:
+        <span style="color: brightblack;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
 </pre>
 </div>
 
@@ -84,8 +109,8 @@ where <code>isort()</code> is sort function, which returns tuple instead of list
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">sort interval `i`</span>
-<span style="color: #005e8b;">isort</span> = <span style="color: #531ab6;">lambda</span> i: <span style="color: #8f0075;">tuple</span>(<span style="color: #8f0075;">sorted</span>(i))
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">sort interval `i`</span>
+<span style="color: #b3b3b3;">isort</span> = <span style="color: brightblack;">lambda</span> i: <span style="color: #b3b3b3;">tuple</span>(<span style="color: #b3b3b3;">sorted</span>(i))
 </pre>
 </div>
 
@@ -105,7 +130,7 @@ otherwise - merge them into one by get (first, last) of sorted points.
 </p>
 
 
-<div id="orgb22de31" class="figure">
+<div id="org0d05adf" class="figure">
 <p><img src="../../assets/IntervalMerges2.svg" alt="IntervalMerges2.svg" class="org-svg" />
 </p>
 </div>
@@ -135,18 +160,18 @@ where <code>I</code> is interval (pair of 2 <code>X</code> points).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">Tuple 0st item selector</span>
-<span style="color: #005e8b;">p1</span> = <span style="color: #531ab6;">lambda</span> p: p[0]
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">Tuple 0st item selector</span>
+<span style="color: #b3b3b3;">p1</span> = <span style="color: brightblack;">lambda</span> p: p[0]
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">merge-II</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">m2</span>(i1, i2):
-    <span style="color: #005e8b;">i1</span>, <span style="color: #005e8b;">i2</span> = <span style="color: #8f0075;">map</span>(isort, (i1,i2))
-    <span style="color: #005e8b;">sx</span> = isort(i1 + i2)
-    <span style="color: #005e8b;">si</span> = <span style="color: #8f0075;">sorted</span>((i1, i2), key=p1)
-    <span style="color: #531ab6;">if</span> si[0][1] - si[1][0] &gt;= 0:
-        <span style="color: #531ab6;">return</span> (sx[0], sx[-1])
-    <span style="color: #531ab6;">else</span>:
-        <span style="color: #531ab6;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
+<span style="color: #595959;"># </span><span style="color: #595959;">merge-II</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">m2</span>(i1, i2):
+    <span style="color: #b3b3b3;">i1</span>, <span style="color: #b3b3b3;">i2</span> = <span style="color: #b3b3b3;">map</span>(isort, (i1,i2))
+    <span style="color: #b3b3b3;">sx</span> = isort(i1 + i2)
+    <span style="color: #b3b3b3;">si</span> = <span style="color: #b3b3b3;">sorted</span>((i1, i2), key=p1)
+    <span style="color: brightblack;">if</span> si[0][1] - si[1][0] &gt;= 0:
+        <span style="color: brightblack;">return</span> (sx[0], sx[-1])
+    <span style="color: brightblack;">else</span>:
+        <span style="color: brightblack;">return</span> ((sx[0], sx[1]), (sx[2], sx[3]))
 </pre>
 </div>
 
@@ -155,11 +180,11 @@ Test it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #7f0000;"># </span><span style="color: #7f0000;">assert</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">ass</span>(a, b):
-    <span style="color: #531ab6;">if</span> a != b: <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">AssertionError</span>(<span style="color: #3548cf;">'%r != %r'</span> % (a,b))
+<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">assert</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">ass</span>(a, b):
+    <span style="color: brightblack;">if</span> a != b: <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">AssertionError</span>(<span style="color: brightblack;">'%r != %r'</span> % (a,b))
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">asserts algo. m1</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">asserts algo. m1</span>
 ass(((1,2), (10,20)), m1((1,2), (10,20)))
 ass(((1,2), (10,20)), m1((2,1), (20,10)))
 ass((1,20), m1((2,1), (2,20)))
@@ -184,7 +209,7 @@ ass((-1,20), m2((20,1), (-1,1)))
 ass(((-1,0), (1,20)), m2((20,1), (-1,0)))
 ass((1,20), m2((2,10), (20,1)))
 
-<span style="color: #8f0075;">print</span> <span style="color: #3548cf;">'ok.'</span>
+<span style="color: #b3b3b3;">print</span> <span style="color: brightblack;">'ok.'</span>
 </pre>
 </div>
 

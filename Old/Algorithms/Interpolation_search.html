@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Interpolation search</title>
@@ -11,19 +11,44 @@
 <meta name="keywords" content="python, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 <script>
   window.MathJax = {
@@ -61,15 +86,15 @@ code, pre { background-color: #FFEDDF;
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Interpolation search</h1>
-<div id="outline-container-org536d7bc" class="outline-2">
-<h2 id="org536d7bc">Interpolation search</h2>
-<div class="outline-text-2" id="text-org536d7bc">
+<div id="outline-container-org4d74535" class="outline-2">
+<h2 id="org4d74535">Interpolation search</h2>
+<div class="outline-text-2" id="text-org4d74535">
 <p>
 A special case of this algorithm: in general, the assumption is made that the elements are not just ordered, but correspond to some increasing series, for example, to arithmetic progression with some errors. If it's truth then we can "calculate" approximated item position - it's better than binary search. But only if the series is close to the assumption (ideal) values: the larger the error, the more steps we need to take.
 </p>
@@ -125,91 +150,91 @@ To compare this kind of search with the binary search let's create some test cla
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">from</span> math <span style="color: #531ab6;">import</span> *
-<span style="color: #531ab6;">import</span> random
+<pre class="src src-python"><span style="color: brightblack;">from</span> math <span style="color: brightblack;">import</span> *
+<span style="color: brightblack;">import</span> random
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Test</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, count, maxerr):
-        <span style="color: #531ab6;">self</span>.reset_counters()
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">seq</span> = []
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">seqlen</span> = count
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">maxerr</span> = maxerr
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">steps_f</span> = <span style="color: #8f0075;">open</span>(<span style="color: #3548cf;">'steps.csv'</span>, <span style="color: #3548cf;">'wt'</span>, encoding=<span style="color: #3548cf;">'utf-8'</span>)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">seq_f</span> = <span style="color: #8f0075;">open</span>(<span style="color: #3548cf;">'seq.csv'</span>, <span style="color: #3548cf;">'wt'</span>, encoding=<span style="color: #3548cf;">'utf-8'</span>)
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Test</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, count, maxerr):
+        <span style="color: brightblack;">self</span>.reset_counters()
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">seq</span> = []
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">seqlen</span> = count
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">maxerr</span> = maxerr
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">steps_f</span> = <span style="color: #b3b3b3;">open</span>(<span style="color: brightblack;">'steps.csv'</span>, <span style="color: brightblack;">'wt'</span>, encoding=<span style="color: brightblack;">'utf-8'</span>)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">seq_f</span> = <span style="color: #b3b3b3;">open</span>(<span style="color: brightblack;">'seq.csv'</span>, <span style="color: brightblack;">'wt'</span>, encoding=<span style="color: brightblack;">'utf-8'</span>)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">reset_counters</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">bin</span> = 0
-        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">int</span> = 0
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">reset_counters</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">bin</span> = 0
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">int</span> = 0
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">setup_seq</span>(<span style="color: #531ab6;">self</span>, err):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">seq</span> = []
-        <span style="color: #005e8b;">prev</span> = 1
-        <span style="color: #531ab6;">for</span> n <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(1, <span style="color: #531ab6;">self</span>.seqlen+1):
-            <span style="color: #005e8b;">ax</span> = prev + random.randint(1, err)
-            <span style="color: #531ab6;">self</span>.seq.append(ax)
-            <span style="color: #005e8b;">prev</span> = ax
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">setup_seq</span>(<span style="color: brightblack;">self</span>, err):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">seq</span> = []
+        <span style="color: #b3b3b3;">prev</span> = 1
+        <span style="color: brightblack;">for</span> n <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(1, <span style="color: brightblack;">self</span>.seqlen+1):
+            <span style="color: #b3b3b3;">ax</span> = prev + random.randint(1, err)
+            <span style="color: brightblack;">self</span>.seq.append(ax)
+            <span style="color: #b3b3b3;">prev</span> = ax
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">binary_search</span>(<span style="color: #531ab6;">self</span>, ax):
-        <span style="color: #005e8b;">n</span> = <span style="color: #8f0075;">len</span>(<span style="color: #531ab6;">self</span>.seq)
-        <span style="color: #005e8b;">L</span> = 0
-        <span style="color: #005e8b;">R</span> = n-1
-        <span style="color: #531ab6;">while</span> L &lt;= R:
-            <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">bin</span> += 1
-            <span style="color: #005e8b;">mid</span> = floor((L+R)/2)
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.seq[mid] &lt; ax:
-                <span style="color: #005e8b;">L</span> = mid + 1
-            <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.seq[mid] &gt; ax:
-                <span style="color: #005e8b;">R</span> = mid - 1
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #531ab6;">return</span> mid
-        <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">Exception</span>(<span style="color: #3548cf;">'%d not found in %s'</span> % (ax, <span style="color: #531ab6;">self</span>.seq))
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">binary_search</span>(<span style="color: brightblack;">self</span>, ax):
+        <span style="color: #b3b3b3;">n</span> = <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.seq)
+        <span style="color: #b3b3b3;">L</span> = 0
+        <span style="color: #b3b3b3;">R</span> = n-1
+        <span style="color: brightblack;">while</span> L &lt;= R:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">bin</span> += 1
+            <span style="color: #b3b3b3;">mid</span> = floor((L+R)/2)
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.seq[mid] &lt; ax:
+                <span style="color: #b3b3b3;">L</span> = mid + 1
+            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.seq[mid] &gt; ax:
+                <span style="color: #b3b3b3;">R</span> = mid - 1
+            <span style="color: brightblack;">else</span>:
+                <span style="color: brightblack;">return</span> mid
+        <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">Exception</span>(<span style="color: brightblack;">'%d not found in %s'</span> % (ax, <span style="color: brightblack;">self</span>.seq))
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">isearch</span>(<span style="color: #531ab6;">self</span>, ax, a=<span style="color: #0000b0;">None</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">int</span> += 1
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #005e8b;">a</span>: <span style="color: #005f5f;">a</span> = <span style="color: #531ab6;">self</span>.seq
-        <span style="color: #005e8b;">n</span> = <span style="color: #8f0075;">len</span>(a)
-        <span style="color: #531ab6;">if</span> ax &lt; a[0] <span style="color: #531ab6;">or</span> ax &gt; a[-1]:
-            <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">Exception</span>(<span style="color: #3548cf;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: #531ab6;">self</span>.seq[0], <span style="color: #531ab6;">self</span>.seq[-1]))
-        <span style="color: #531ab6;">elif</span> ax == a[0]: <span style="color: #531ab6;">return</span> 0
-        <span style="color: #531ab6;">elif</span> ax == a[-1]: <span style="color: #531ab6;">return</span> n - 1
-        <span style="color: #005e8b;">rat0</span> = (ax - a[0]) * (n - 1)
-        <span style="color: #005e8b;">rat1</span> = a[-1] - a[0]
-        <span style="color: #005e8b;">x</span> = (1 + rat0 // rat1) - 1 <span style="color: #7f0000;"># </span><span style="color: #7f0000;">coz indexes are zero-based</span>
-        <span style="color: #531ab6;">if</span> a[x] &lt; ax:
-            <span style="color: #531ab6;">return</span> x + 1 + <span style="color: #531ab6;">self</span>.isearch(ax, a[x+1:])
-        <span style="color: #531ab6;">elif</span> a[x] &gt; ax:
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.isearch(ax, a[:x])
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> x
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">isearch</span>(<span style="color: brightblack;">self</span>, ax, a=<span style="color: #7fffd4;">None</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">int</span> += 1
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: #b3b3b3;">a</span>: <span style="color: #cccccc;">a</span> = <span style="color: brightblack;">self</span>.seq
+        <span style="color: #b3b3b3;">n</span> = <span style="color: #b3b3b3;">len</span>(a)
+        <span style="color: brightblack;">if</span> ax &lt; a[0] <span style="color: brightblack;">or</span> ax &gt; a[-1]:
+            <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">Exception</span>(<span style="color: brightblack;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: brightblack;">self</span>.seq[0], <span style="color: brightblack;">self</span>.seq[-1]))
+        <span style="color: brightblack;">elif</span> ax == a[0]: <span style="color: brightblack;">return</span> 0
+        <span style="color: brightblack;">elif</span> ax == a[-1]: <span style="color: brightblack;">return</span> n - 1
+        <span style="color: #b3b3b3;">rat0</span> = (ax - a[0]) * (n - 1)
+        <span style="color: #b3b3b3;">rat1</span> = a[-1] - a[0]
+        <span style="color: #b3b3b3;">x</span> = (1 + rat0 // rat1) - 1 <span style="color: #595959;"># </span><span style="color: #595959;">coz indexes are zero-based</span>
+        <span style="color: brightblack;">if</span> a[x] &lt; ax:
+            <span style="color: brightblack;">return</span> x + 1 + <span style="color: brightblack;">self</span>.isearch(ax, a[x+1:])
+        <span style="color: brightblack;">elif</span> a[x] &gt; ax:
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.isearch(ax, a[:x])
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> x
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">test</span>(<span style="color: #531ab6;">self</span>, err):
-        <span style="color: #531ab6;">self</span>.setup_seq(err)
-        <span style="color: #005e8b;">bin_counter</span> = 0
-        <span style="color: #005e8b;">int_counter</span> = 0
-        <span style="color: #531ab6;">for</span> ax <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.seq:
-            <span style="color: #531ab6;">self</span>.reset_counters()
-            <span style="color: #005e8b;">f</span> = <span style="color: #531ab6;">self</span>.binary_search(ax)
-            <span style="color: #531ab6;">if</span> ax != <span style="color: #531ab6;">self</span>.seq[f]:
-                <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">Exception</span>(<span style="color: #3548cf;">'Binary found wrong value!'</span>)
-            <span style="color: #005e8b;">f</span> = <span style="color: #531ab6;">self</span>.isearch(ax)
-            <span style="color: #531ab6;">if</span> ax != <span style="color: #531ab6;">self</span>.seq[f]:
-                <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">Exception</span>(<span style="color: #3548cf;">'Interpolation found wrong value!'</span>)
-            <span style="color: #005e8b;">bin_counter</span> += <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">bin</span>
-            <span style="color: #005e8b;">int_counter</span> += <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">int</span>
-        <span style="color: #005e8b;">bin_counter</span> = <span style="color: #8f0075;">round</span>(bin_counter / <span style="color: #531ab6;">self</span>.seqlen)
-        <span style="color: #005e8b;">int_counter</span> = <span style="color: #8f0075;">round</span>(int_counter / <span style="color: #531ab6;">self</span>.seqlen)
-        <span style="color: #531ab6;">return</span> (err, bin_counter, int_counter)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">test</span>(<span style="color: brightblack;">self</span>, err):
+        <span style="color: brightblack;">self</span>.setup_seq(err)
+        <span style="color: #b3b3b3;">bin_counter</span> = 0
+        <span style="color: #b3b3b3;">int_counter</span> = 0
+        <span style="color: brightblack;">for</span> ax <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.seq:
+            <span style="color: brightblack;">self</span>.reset_counters()
+            <span style="color: #b3b3b3;">f</span> = <span style="color: brightblack;">self</span>.binary_search(ax)
+            <span style="color: brightblack;">if</span> ax != <span style="color: brightblack;">self</span>.seq[f]:
+                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">Exception</span>(<span style="color: brightblack;">'Binary found wrong value!'</span>)
+            <span style="color: #b3b3b3;">f</span> = <span style="color: brightblack;">self</span>.isearch(ax)
+            <span style="color: brightblack;">if</span> ax != <span style="color: brightblack;">self</span>.seq[f]:
+                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">Exception</span>(<span style="color: brightblack;">'Interpolation found wrong value!'</span>)
+            <span style="color: #b3b3b3;">bin_counter</span> += <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">bin</span>
+            <span style="color: #b3b3b3;">int_counter</span> += <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">int</span>
+        <span style="color: #b3b3b3;">bin_counter</span> = <span style="color: #b3b3b3;">round</span>(bin_counter / <span style="color: brightblack;">self</span>.seqlen)
+        <span style="color: #b3b3b3;">int_counter</span> = <span style="color: #b3b3b3;">round</span>(int_counter / <span style="color: brightblack;">self</span>.seqlen)
+        <span style="color: brightblack;">return</span> (err, bin_counter, int_counter)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">test_all</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">self</span>.steps_f.write(<span style="color: #3548cf;">'err,bin,int</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
-        <span style="color: #531ab6;">self</span>.seq_f.write(<span style="color: #3548cf;">','</span>.join(<span style="color: #8f0075;">str</span>(x) <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(<span style="color: #531ab6;">self</span>.seqlen)) + <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
-        <span style="color: #531ab6;">for</span> err <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(1, <span style="color: #531ab6;">self</span>.maxerr):
-            <span style="color: #005e8b;">r</span> = <span style="color: #531ab6;">self</span>.test(err)
-            <span style="color: #531ab6;">self</span>.seq_f.write(<span style="color: #3548cf;">','</span>.join(<span style="color: #8f0075;">str</span>(x) <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.seq) + <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
-            <span style="color: #531ab6;">self</span>.steps_f.write(<span style="color: #3548cf;">','</span>.join(<span style="color: #8f0075;">str</span>(x) <span style="color: #531ab6;">for</span> x <span style="color: #531ab6;">in</span> r) + <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">test_all</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">self</span>.steps_f.write(<span style="color: brightblack;">'err,bin,int</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
+        <span style="color: brightblack;">self</span>.seq_f.write(<span style="color: brightblack;">','</span>.join(<span style="color: #b3b3b3;">str</span>(x) <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(<span style="color: brightblack;">self</span>.seqlen)) + <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
+        <span style="color: brightblack;">for</span> err <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(1, <span style="color: brightblack;">self</span>.maxerr):
+            <span style="color: #b3b3b3;">r</span> = <span style="color: brightblack;">self</span>.test(err)
+            <span style="color: brightblack;">self</span>.seq_f.write(<span style="color: brightblack;">','</span>.join(<span style="color: #b3b3b3;">str</span>(x) <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.seq) + <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
+            <span style="color: brightblack;">self</span>.steps_f.write(<span style="color: brightblack;">','</span>.join(<span style="color: #b3b3b3;">str</span>(x) <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> r) + <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
 
 
-<span style="color: #005e8b;">t</span> = Test(500, 500)
+<span style="color: #b3b3b3;">t</span> = Test(500, 500)
 t.test_all()
 </pre>
 </div>
@@ -258,14 +283,14 @@ If we change the generating of the sequence to geometric progression (with error
 
 <div class="org-src-container">
 <pre class="src src-python">...
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">setup_seq</span>(<span style="color: #531ab6;">self</span>, err):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">seq</span> = []
-        <span style="color: #005e8b;">prev</span> = 1
-        <span style="color: #005e8b;">q</span> = 2
-        <span style="color: #531ab6;">for</span> n <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(1, <span style="color: #531ab6;">self</span>.seqlen+1):
-            <span style="color: #005e8b;">ax</span> = err + prev * q
-            <span style="color: #531ab6;">self</span>.seq.append(ax)
-            <span style="color: #005e8b;">prev</span> = ax
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">setup_seq</span>(<span style="color: brightblack;">self</span>, err):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">seq</span> = []
+        <span style="color: #b3b3b3;">prev</span> = 1
+        <span style="color: #b3b3b3;">q</span> = 2
+        <span style="color: brightblack;">for</span> n <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(1, <span style="color: brightblack;">self</span>.seqlen+1):
+            <span style="color: #b3b3b3;">ax</span> = err + prev * q
+            <span style="color: brightblack;">self</span>.seq.append(ax)
+            <span style="color: #b3b3b3;">prev</span> = ax
 ...
 </pre>
 </div>
@@ -335,22 +360,22 @@ We can use Python function: \[pow(x, 1/y) = \sqrt[y]x\]
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">    <span style="color: #531ab6;">def</span> <span style="color: #721045;">isearch_g</span>(<span style="color: #531ab6;">self</span>, ax, a=<span style="color: #0000b0;">None</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #8f0075;">int</span> += 1
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #005e8b;">a</span>: <span style="color: #005f5f;">a</span> = <span style="color: #531ab6;">self</span>.seq
-        <span style="color: #005e8b;">n</span> = <span style="color: #8f0075;">len</span>(a)
-        <span style="color: #531ab6;">if</span> ax &lt; a[0] <span style="color: #531ab6;">or</span> ax &gt; a[-1]:
-            <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">Exception</span>(<span style="color: #3548cf;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: #531ab6;">self</span>.seq[0], <span style="color: #531ab6;">self</span>.seq[-1]))
-        <span style="color: #531ab6;">elif</span> ax == a[0]: <span style="color: #531ab6;">return</span> 0
-        <span style="color: #531ab6;">elif</span> ax == a[-1]: <span style="color: #531ab6;">return</span> n - 1
-        <span style="color: #005e8b;">s</span> = <span style="color: #8f0075;">pow</span>(a[n-1] / a[0], 1 / (n - 1))
-        <span style="color: #005e8b;">x</span> = 1 + <span style="color: #8f0075;">round</span>(log(ax / a[0], s))
-        <span style="color: #531ab6;">if</span> a[x] &lt; ax:
-            <span style="color: #531ab6;">return</span> x + 1 + <span style="color: #531ab6;">self</span>.isearch_g(ax, a[x+1:])
-        <span style="color: #531ab6;">elif</span> a[x] &gt; ax:
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.isearch_g(ax, a[:x])
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> x
+<pre class="src src-python">    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">isearch_g</span>(<span style="color: brightblack;">self</span>, ax, a=<span style="color: #7fffd4;">None</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">int</span> += 1
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: #b3b3b3;">a</span>: <span style="color: #cccccc;">a</span> = <span style="color: brightblack;">self</span>.seq
+        <span style="color: #b3b3b3;">n</span> = <span style="color: #b3b3b3;">len</span>(a)
+        <span style="color: brightblack;">if</span> ax &lt; a[0] <span style="color: brightblack;">or</span> ax &gt; a[-1]:
+            <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">Exception</span>(<span style="color: brightblack;">'%d not found in %s (origin: %d..%d)'</span> % (ax, a, <span style="color: brightblack;">self</span>.seq[0], <span style="color: brightblack;">self</span>.seq[-1]))
+        <span style="color: brightblack;">elif</span> ax == a[0]: <span style="color: brightblack;">return</span> 0
+        <span style="color: brightblack;">elif</span> ax == a[-1]: <span style="color: brightblack;">return</span> n - 1
+        <span style="color: #b3b3b3;">s</span> = <span style="color: #b3b3b3;">pow</span>(a[n-1] / a[0], 1 / (n - 1))
+        <span style="color: #b3b3b3;">x</span> = 1 + <span style="color: #b3b3b3;">round</span>(log(ax / a[0], s))
+        <span style="color: brightblack;">if</span> a[x] &lt; ax:
+            <span style="color: brightblack;">return</span> x + 1 + <span style="color: brightblack;">self</span>.isearch_g(ax, a[x+1:])
+        <span style="color: brightblack;">elif</span> a[x] &gt; ax:
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.isearch_g(ax, a[:x])
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> x
 </pre>
 </div>
 

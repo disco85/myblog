@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-24 Fri 07:44 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hyperoperations</title>
+<meta name="description" content="Math, Common Lisp Programming" />
+<meta name="keywords" content="Math, Common Lisp, Programming" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Hyperoperations</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgf498b83">Basic idea</a></li>
+<li><a href="#orge15b0a3">Properties</a></li>
+<li><a href="#org6789e5f">CL implementation</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf498b83" class="outline-2">
+<h2 id="orgf498b83">Basic idea</h2>
+<div class="outline-text-2" id="text-orgf498b83">
+<p>
+Donald Knuth introduced a notation of Ackermann function called Knuth's arrows. These
+ideas are generalization (one common algorithm) for basic arithmetic operations like
++, *, power, ... - they are called <a href="https://en.wikipedia.org/wiki/Hyperoperation">hyperoperations</a> and they have an order (0, 1, 2, etc):
+</p>
+
+<p class="verse">
+H<sub>0</sub>(a,b) = b + 1<br />
+H<sub>1</sub>(a,b) = a + b<br />
+H<sub>2</sub>(a,b) = a * b<br />
+H<sub>3</sub>(a,b) = a<sup>b</sup><br />
+H<sub>4</sub>(a,b) = \(^{b}a\)<br />
+...etc<br />
+</p>
+
+<p>
+where \( a^b \) is exponentiation, and \( ^{b}a \) is tetration (exponentiation <code>b</code> times),
+etc.
+</p>
+
+<p>
+So, +, *, power and so on can be represented as recursive function, its definition is:
+</p>
+
+<div class="figure" id="org750b6ab">
+<p class="verse">
+H<sub>n</sub>(a,b) =<br />
+&#xa0;&#xa0;| n = 0          =  b + 1<br />
+&#xa0;&#xa0;| n = 1,  b = 0  =  a<br />
+&#xa0;&#xa0;| n = 2,  b = 0  =  0<br />
+&#xa0;&#xa0;| n &gt;= 3, b = 0  =  1<br />
+&#xa0;&#xa0;| otherwise      =  H<sub>n-1</sub>(a,H<sub>n</sub>(a,b-1))<br />
+</p>
+
+</div>
+
+<p>
+<span class="underline">LET'S TALK ONLY ABOUT a &gt; 0</span>
+</p>
+</div>
+</div>
+<div id="outline-container-orge15b0a3" class="outline-2">
+<h2 id="orge15b0a3">Properties</h2>
+<div class="outline-text-2" id="text-orge15b0a3">
+<p>
+We see that arithmetic operations follow similar scheme (remidining monoids,
+but not exactly) and they are not limited with first 3 or 4 operations, but
+they really are represented using the lower order operation, they are mutually
+recursive.
+</p>
+
+<p>
+This \( H_{n-1}(a,H_n(a,b-1)) \) can be read in this way:
+</p>
+
+<p>
+\( H_n \) operation is applying of the lower-order operator over <code>b</code> series of <code>a</code>:
+</p>
+
+<p class="verse">
+a<sub>(n)</sub>b = a<sub>(n-1)</sub>x , where x is a<sub>(n)</sub>(b-1) i.e., recursive formulae<br />
+<br />
+or in a infix form:<br />
+<br />
+a * b = a + a + ... + a<br />
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&lt;-- b times --&gt;<br />
+</p>
+
+<p>
+where <code>*</code> is some hyperoperation of an order <code>N</code> while <code>+</code> - of an order <code>N - 1</code>.
+</p>
+
+<p>
+But where does this <code>(b-1)</code> and recursive calls with calls to a function of lower order come from?
+Look:
+</p>
+
+<p class="verse">
+a + b = (a + (b-1)) + 1<br />
+a * b = (a * (b-1)) + a<br />
+&#xa0;&#xa0;a<sup>b</sup> = a<sup>(b-1)</sup> * a<br />
+&#xa0;&#xa0;... <i>etc</i><br />
+</p>
+
+<p>
+and if to use subscript notation for a hyperoperation, where the number is the order of
+the operation, we see the recursion and involvment of the lower order hyperoperation
+very explicitly:
+</p>
+
+<p class="verse">
+a<sub>(n)</sub>b = (a<sub>(n)</sub>(b - 1))<sub>(n-1)</sub>a<br />
+</p>
+
+<p>
+This is intuitive: these operations are monoids and we define the input expression removing
+one of the members (which allows us to come to recursion) and then restore/add the removed
+member back but using the lower order operation: <code>b</code> in this abstraction means <code>HOW MANY TIMES</code>:
+<code>a + b</code> is read "add 1 to <code>a</code> <code>b</code> times". Then, <code>a * b</code> means "add <code>a</code> to <code>a</code> <code>b</code> times", so
+"<code>b</code> times" directly hints at recursion (where <code>n-th</code> member is expresed throught <code>n-th - 1</code>
+member). Restoring of the "removed" member returns it using the lower order operation because
+all operations are defined through lower order operations: sum of any numbers - through increment
+(ie, <code>+1</code>), multiplication - through sum, etc. The idea is simple and obvious.
+</p>
+
+<p>
+Every hyperoperation is a <a href="https://en.wikipedia.org/wiki/Magma_%28algebra%29">magma</a> but it seems with some kind of <a href="https://en.wikipedia.org/wiki/Identity_element">identity</a>:
+</p>
+
+<p class="verse">
+a + b = a + 1 + ... + 1    order=1<br />
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&lt;--- b ---&gt;    right identity: b=0<br />
+<br />
+a * b = a + a + ... + a    order=2<br />
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&lt;-- b-1 --&gt;    right identity: b=1, so the number of extra elements is 0<br />
+<br />
+&#xa0;&#xa0;&#xa0;a<sup>b</sup> = a * a * ... * a    order=3<br />
+&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&#xa0;&lt;-- b-1 --&gt;    right identity: b=1, so the number of extra elements is 0<br />
+</p>
+
+<p>
+<a href="https://en.wikipedia.org/wiki/Right_identity">Right identity</a> since order=2 is always 1:
+</p>
+
+<p class="verse">
+a<sub>(1)</sub>0 = a<br />
+a<sub>(2)</sub>1 = a<br />
+a<sub>(3)</sub>1 = a<br />
+a<sub>(4)</sub>1 = a<br />
+...<br />
+</p>
+
+<p>
+Why?
+\[
+\forall n \ge 2, a: H_{n}(a,1) = a
+\]
+ie, 1 acts as a right identity (neutral element) for all hyperoperations from multiplication
+upward.
+</p>
+
+<p>
+<b>Base case</b> \(n=2\) :
+\[
+H_{2}(a,b) = a \cdot b
+\]
+so, the right identity <code>b</code> is 1:
+\[
+H_{2}(a,1) = a \cdot 1 = a.
+\]
+</p>
+
+<p>
+<b>Inductive step</b> :
+</p>
+
+<p>
+Assuming that:
+\[
+\forall a, \exists n \ge 2, H_{n}(a,1) = a
+\]
+we must show that:
+\[
+H_{n+1}(a,1) = a.
+\]
+is also true for such <code>n</code>. From this <a href="#org750b6ab">definition</a> considering \( b=1 \) we see:
+\[
+H_{n+1}(a,1) = H_{n}(a,H_{n+1}(a,0))
+\]
+for \( n+1 \ge 3, b=0 \) :
+\[
+H_{n+1}(a,0) = 1
+\]
+<i>think about it that \( n+1=m \) and when the order <code>m</code> is \( >= 3\) the result for \( b=0 \) is 1</i>.
+</p>
+
+<p>
+Substituting this result (ie, <b>1</b>) back to the formulae above, we get:
+</p>
+
+<p>
+\[
+H_{n+1}(a,1) = H_{n}(a,1)
+\]
+</p>
+
+<p>
+So, we assumed \( H_{n}(a,1) = a \), we proved that \( H_{n+1}(a,1) = H_{n}(a,1) \),
+and we know that for order 2 (and even 3, tbh) the neutral element is 1, from induction
+we know now that 1 is the neutral element (right identity) for all hyperoperations of
+order higher than 1:
+</p>
+
+<p>
+\[
+\forall n \ge 2, H_{n}(a,1) = a
+\]
+</p>
+
+<p>
+It's true for any \( a \ge 1 \) - for 0 we hit \( 0^0 \).
+</p>
+
+<p>
+Since order 3 hyperoperations are not associative, so they are not monoids, groups. Most of
+them have not left identity, so without to narrow the domain, we cannot call them magma. Only
+the order 1 is a real group, and only order 0 is unary operation.
+</p>
+</div>
+</div>
+<div id="outline-container-org6789e5f" class="outline-2">
+<h2 id="org6789e5f">CL implementation</h2>
+<div class="outline-text-2" id="text-org6789e5f">
+<p>
+This idea has different notations though, see the Wikipedia article, you can invent your own,
+for example, a number in a circle, eg, <code>2⑤3</code>
+</p>
+
+<p>
+Naive implementation of first 4 hyperoperations can look as:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-0</span> (a b) (1+ b))
+
+(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-1</span> (a b)
+  (<span style="color: brightblack;">if</span> (= b 0)
+      a
+      (hyper-0 a (hyper-1 a (1- b)))))
+
+(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-2</span> (a b)
+  (<span style="color: brightblack;">if</span> (= b 0)
+      0
+      (hyper-1 a (hyper-2 a (1- b)))))
+
+(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-3</span> (a b)
+  (<span style="color: brightblack;">if</span> (= b 0)
+      1
+      (hyper-2 a (hyper-3 a (1- b)))))
+
+(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-4</span> (a b)
+  (<span style="color: brightblack;">if</span> (= b 0)
+      1
+      (hyper-3 a (hyper-4 a (1- b)))))
+</pre>
+</div>
+
+<p>
+Having the definition of <code>H(n,a,b)</code> operation, we can write the general function:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper</span> (n a b)
+  (<span style="color: brightblack;">cond</span> ((= n 0) (1+ b))
+        ((and (= n 1) (= b 0)) a)
+        ((and (= n 2) (= b 0)) 0)
+        ((and (&gt;= n 3) (= b 0)) 1)
+        (t (hyper (1- n) a (hyper n a (1- b))))))
+</pre>
+</div>
+
+<p>
+And the neutral elements are really:
+</p>
+
+<pre class="example" id="org7bdeddc">
+CL-USER&gt; (hyper 3 2000 1)
+2000 (11 bits, #x7D0)
+CL-USER&gt; (hyper 2 2000 1)
+2000 (11 bits, #x7D0)
+CL-USER&gt; (hyper 1 2000 0)
+2000 (11 bits, #x7D0)
+CL-USER&gt; (hyper 4 2000 1)
+2000 (11 bits, #x7D0)
+;; and even:
+CL-USER&gt; (hyper 10 2000 1)
+2000 (11 bits, #x7D0)
+</pre>
+
+<p>
+Unfortunately, it is not tail recursive, so we will hit stack overflow even with
+small arguments.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

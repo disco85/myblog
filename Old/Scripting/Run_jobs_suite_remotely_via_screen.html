@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Run jobs suite remotely via screen</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="scripting, misc" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Run jobs suite remotely via screen</h1>
-<div id="outline-container-orgeb7a2b5" class="outline-2">
-<h2 id="orgeb7a2b5">Run jobs suite remotely via screen</h2>
-<div class="outline-text-2" id="text-orgeb7a2b5">
+<div id="outline-container-orgd86be2e" class="outline-2">
+<h2 id="orgd86be2e">Run jobs suite remotely via screen</h2>
+<div class="outline-text-2" id="text-orgd86be2e">
 <p>
 Often in needed to run some jobs remotely, for example, tests on remote test
 environment. I used different custom "daemon"-like scripts for this, monitoring
@@ -49,10 +74,10 @@ var). Its syntax is:
 
 <div class="org-src-container">
 <pre class="src src-bash">  -cls
-  -run JOB-NUMBER <span style="color: #3548cf;">'JOB-COMMAND'</span>
+  -run JOB-NUMBER <span style="color: brightblack;">'JOB-COMMAND'</span>
   -runall &lt; FILE-WITH-COMMANDS
   -submit &lt; FILE-WITH-COMMANDS
-Used env. vars: <span style="color: #3548cf;">\$</span><span style="color: #005e8b;">USER</span> (login), <span style="color: #3548cf;">\$</span><span style="color: #005e8b;">RMHOST</span> (hostname)
+Used env. vars: <span style="color: brightblack;">\$</span><span style="color: #b3b3b3;">USER</span> (login), <span style="color: brightblack;">\$</span><span style="color: #b3b3b3;">RMHOST</span> (hostname)
 </pre>
 </div>
 
@@ -90,60 +115,60 @@ That's it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #7f0000;">#</span><span style="color: #7f0000;">!/bin/</span><span style="color: #531ab6;">sh</span>
-<span style="color: #005e8b;">SCR</span>=<span style="color: #8f0075;">`basename "$0"`</span>
-<span style="color: #005e8b;">SESSION</span>=${<span style="color: #005e8b;">USER</span>}_screen
-<span style="color: #005e8b;">LOG</span>=rmjobs.log
+<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/bin/</span><span style="color: brightblack;">sh</span>
+<span style="color: #b3b3b3;">SCR</span>=<span style="color: #fa8072;">`basename "$0"`</span>
+<span style="color: #b3b3b3;">SESSION</span>=${<span style="color: #b3b3b3;">USER</span>}_screen
+<span style="color: #b3b3b3;">LOG</span>=rmjobs.log
 
-<span style="color: #721045;">_wrapjob</span>() {
-    <span style="color: #005e8b;">_wrapjob_f</span>=job-<span style="color: #8f0075;">`date +%s`</span>-$<span style="color: #005e8b;">1</span>.log
-    <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"Started $1 at `date`: $2"</span> &gt; $<span style="color: #005e8b;">_wrapjob_f</span>
-    <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">'==============================================================================='</span> &gt;&gt; $<span style="color: #005e8b;">_wrapjob_f</span>
-    <span style="color: #8f0075;">echo</span> &gt;&gt; $<span style="color: #005e8b;">_wrapjob_f</span>
-    $<span style="color: #005e8b;">2</span>|tee -a $<span style="color: #005e8b;">_wrapjob_f</span>
+<span style="color: #a52a2a;">_wrapjob</span>() {
+    <span style="color: #b3b3b3;">_wrapjob_f</span>=job-<span style="color: #fa8072;">`date +%s`</span>-$<span style="color: #b3b3b3;">1</span>.log
+    <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"Started $1 at `date`: $2"</span> &gt; $<span style="color: #b3b3b3;">_wrapjob_f</span>
+    <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">'==============================================================================='</span> &gt;&gt; $<span style="color: #b3b3b3;">_wrapjob_f</span>
+    <span style="color: #b3b3b3;">echo</span> &gt;&gt; $<span style="color: #b3b3b3;">_wrapjob_f</span>
+    $<span style="color: #b3b3b3;">2</span>|tee -a $<span style="color: #b3b3b3;">_wrapjob_f</span>
 }
 
-<span style="color: #721045;">_runjob</span>() {
-    [ $<span style="color: #005e8b;">1</span> = <span style="color: #3548cf;">"0"</span> ] &amp;&amp; {
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">add -L to both if screelog.* logs are needed</span>
-        screen -dmS $<span style="color: #005e8b;">SESSION</span> -t <span style="color: #3548cf;">"job$1"</span> sh -c <span style="color: #3548cf;">"~/$SCR -run $1 \"$2\";sh"</span>
+<span style="color: #a52a2a;">_runjob</span>() {
+    [ $<span style="color: #b3b3b3;">1</span> = <span style="color: brightblack;">"0"</span> ] &amp;&amp; {
+        <span style="color: #595959;"># </span><span style="color: #595959;">add -L to both if screelog.* logs are needed</span>
+        screen -dmS $<span style="color: #b3b3b3;">SESSION</span> -t <span style="color: brightblack;">"job$1"</span> sh -c <span style="color: brightblack;">"~/$SCR -run $1 \"$2\";sh"</span>
     } || {
-        screen -S $<span style="color: #005e8b;">SESSION</span> -p 0 -X screen -t <span style="color: #3548cf;">"job$1"</span> sh -c <span style="color: #3548cf;">"~/$SCR -run $1 \"$2\";sh"</span>
+        screen -S $<span style="color: #b3b3b3;">SESSION</span> -p 0 -X screen -t <span style="color: brightblack;">"job$1"</span> sh -c <span style="color: brightblack;">"~/$SCR -run $1 \"$2\";sh"</span>
     }
 }
 
-<span style="color: #531ab6;">case</span> <span style="color: #3548cf;">"$1"</span><span style="color: #531ab6;"> in</span>
+<span style="color: brightblack;">case</span> <span style="color: brightblack;">"$1"</span><span style="color: brightblack;"> in</span>
     -cls) rm -f screenlog.*; rm -f job*.log;;
-    -run) _wrapjob <span style="color: #3548cf;">"$2"</span> <span style="color: #3548cf;">"$3"</span>;;
+    -run) _wrapjob <span style="color: brightblack;">"$2"</span> <span style="color: brightblack;">"$3"</span>;;
     -runall)
-        <span style="color: #005e8b;">i</span>=0
-        rm -f $<span style="color: #005e8b;">LOG</span> 2&gt;/dev/null
-        <span style="color: #531ab6;">while </span><span style="color: #8f0075;">read</span> -r c; <span style="color: #531ab6;">do</span>
-            <span style="color: #005e8b;">c</span>=<span style="color: #8f0075;">`echo $c|tr -d '[:cntrl:]'`</span>
-            <span style="color: #8f0075;">echo</span> $<span style="color: #005e8b;">c</span>|egrep <span style="color: #3548cf;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: #531ab6;">continue</span>
-            _runjob $<span style="color: #005e8b;">i</span> <span style="color: #3548cf;">"$c"</span>
-            <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"Ran $c;"</span> &gt;&gt; $<span style="color: #005e8b;">LOG</span>
-            <span style="color: #005e8b;">i</span>=<span style="color: #8f0075;">`expr $i + 1`</span>
+        <span style="color: #b3b3b3;">i</span>=0
+        rm -f $<span style="color: #b3b3b3;">LOG</span> 2&gt;/dev/null
+        <span style="color: brightblack;">while </span><span style="color: #b3b3b3;">read</span> -r c; <span style="color: brightblack;">do</span>
+            <span style="color: #b3b3b3;">c</span>=<span style="color: #fa8072;">`echo $c|tr -d '[:cntrl:]'`</span>
+            <span style="color: #b3b3b3;">echo</span> $<span style="color: #b3b3b3;">c</span>|egrep <span style="color: brightblack;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: brightblack;">continue</span>
+            _runjob $<span style="color: #b3b3b3;">i</span> <span style="color: brightblack;">"$c"</span>
+            <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"Ran $c;"</span> &gt;&gt; $<span style="color: #b3b3b3;">LOG</span>
+            <span style="color: #b3b3b3;">i</span>=<span style="color: #fa8072;">`expr $i + 1`</span>
             sleep 2
-        <span style="color: #531ab6;">done</span>;;
+        <span style="color: brightblack;">done</span>;;
     -submit)
         rm -f .jobs-suite.tmp 2&gt;/dev/null
-        <span style="color: #531ab6;">while </span><span style="color: #8f0075;">read</span> -r c; <span style="color: #531ab6;">do</span>
-            <span style="color: #8f0075;">echo</span> $<span style="color: #005e8b;">c</span>|egrep <span style="color: #3548cf;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: #531ab6;">continue</span>
-            <span style="color: #8f0075;">eval</span> <span style="color: #3548cf;">"echo $c"</span> &gt;&gt; .jobs-suite.tmp
-        <span style="color: #531ab6;">done</span>
-        scp <span style="color: #3548cf;">"$0"</span> <span style="color: #3548cf;">"$USER@$RMHOST:$SCR"</span>
-        scp <span style="color: #3548cf;">".jobs-suite.tmp"</span> $<span style="color: #005e8b;">USER</span>@$<span style="color: #005e8b;">RMHOST</span>:<span style="color: #3548cf;">".jobs-suite.tmp"</span>
-        ssh -n -l $<span style="color: #005e8b;">USER</span> $<span style="color: #005e8b;">RMHOST</span> <span style="color: #3548cf;">"sh $SCR -runall &lt; .jobs-suite.tmp"</span>;;
+        <span style="color: brightblack;">while </span><span style="color: #b3b3b3;">read</span> -r c; <span style="color: brightblack;">do</span>
+            <span style="color: #b3b3b3;">echo</span> $<span style="color: #b3b3b3;">c</span>|egrep <span style="color: brightblack;">'^-'</span> &gt;/dev/null &amp;&amp; <span style="color: brightblack;">continue</span>
+            <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"echo $c"</span> &gt;&gt; .jobs-suite.tmp
+        <span style="color: brightblack;">done</span>
+        scp <span style="color: brightblack;">"$0"</span> <span style="color: brightblack;">"$USER@$RMHOST:$SCR"</span>
+        scp <span style="color: brightblack;">".jobs-suite.tmp"</span> $<span style="color: #b3b3b3;">USER</span>@$<span style="color: #b3b3b3;">RMHOST</span>:<span style="color: brightblack;">".jobs-suite.tmp"</span>
+        ssh -n -l $<span style="color: #b3b3b3;">USER</span> $<span style="color: #b3b3b3;">RMHOST</span> <span style="color: brightblack;">"sh $SCR -runall &lt; .jobs-suite.tmp"</span>;;
     *)
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"Syntax:"</span>
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"  -cls"</span>
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"  -run JOB-NUMBER 'JOB-COMMAND'"</span>
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"  -runall &lt; FILE-WITH-COMMANDS"</span>
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"  -submit &lt; FILE-WITH-COMMANDS"</span>
-        <span style="color: #8f0075;">echo</span> <span style="color: #3548cf;">"Used env. vars: \$USER (login), \$RMHOST (hostname)"</span>
-        <span style="color: #531ab6;">exit</span> 1;;
-<span style="color: #531ab6;">esac</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"Syntax:"</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"  -cls"</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"  -run JOB-NUMBER 'JOB-COMMAND'"</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"  -runall &lt; FILE-WITH-COMMANDS"</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"  -submit &lt; FILE-WITH-COMMANDS"</span>
+        <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"Used env. vars: \$USER (login), \$RMHOST (hostname)"</span>
+        <span style="color: brightblack;">exit</span> 1;;
+<span style="color: brightblack;">esac</span>
 :
 </pre>
 </div>

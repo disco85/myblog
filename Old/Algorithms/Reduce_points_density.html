@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Reduce points density</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="dsp, python, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Reduce points density</h1>
-<div id="outline-container-org6979525" class="outline-2">
-<h2 id="org6979525">Reduce points density</h2>
-<div class="outline-text-2" id="text-org6979525">
+<div id="outline-container-orgc65924b" class="outline-2">
+<h2 id="orgc65924b">Reduce points density</h2>
+<div class="outline-text-2" id="text-orgc65924b">
 <p>
 Sometimes charts have so many points that drawing of them is very highweight.
 The solution is to reduce points density (to thinning them). Idea is simple:
@@ -63,25 +88,25 @@ The algorithm in Python language:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">reduce_density</span>(k, points):
-    <span style="color: #005e8b;">x0</span> = <span style="color: #005e8b;">y0</span> = <span style="color: #005e8b;">u0</span> = <span style="color: #0000b0;">None</span>
-    <span style="color: #005e8b;">last</span> = <span style="color: #0000b0;">None</span>
-    <span style="color: #531ab6;">for</span> i, (x, y, u) <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">enumerate</span>(points):
-        <span style="color: #531ab6;">if</span> i == 0:
-            <span style="color: #531ab6;">yield</span> (x, y, u)
-            <span style="color: #005e8b;">x0</span>, <span style="color: #005e8b;">y0</span>, <span style="color: #005e8b;">u0</span> = x, y, u
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">abs</span>(y - y0) &lt; k:
-                <span style="color: #005e8b;">last</span> = (x, y, u)
-                <span style="color: #531ab6;">continue</span>
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #005e8b;">x0</span>, <span style="color: #005e8b;">y0</span>, <span style="color: #005e8b;">u0</span> = x, y, u
-                <span style="color: #531ab6;">if</span> last <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                    <span style="color: #531ab6;">yield</span> last
-                <span style="color: #531ab6;">yield</span> (x, y, u)
-                <span style="color: #005e8b;">last</span> = <span style="color: #0000b0;">None</span>
-    <span style="color: #531ab6;">if</span> last <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-        <span style="color: #531ab6;">yield</span> last
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">reduce_density</span>(k, points):
+    <span style="color: #b3b3b3;">x0</span> = <span style="color: #b3b3b3;">y0</span> = <span style="color: #b3b3b3;">u0</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #b3b3b3;">last</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: brightblack;">for</span> i, (x, y, u) <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">enumerate</span>(points):
+        <span style="color: brightblack;">if</span> i == 0:
+            <span style="color: brightblack;">yield</span> (x, y, u)
+            <span style="color: #b3b3b3;">x0</span>, <span style="color: #b3b3b3;">y0</span>, <span style="color: #b3b3b3;">u0</span> = x, y, u
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">abs</span>(y - y0) &lt; k:
+                <span style="color: #b3b3b3;">last</span> = (x, y, u)
+                <span style="color: brightblack;">continue</span>
+            <span style="color: brightblack;">else</span>:
+                <span style="color: #b3b3b3;">x0</span>, <span style="color: #b3b3b3;">y0</span>, <span style="color: #b3b3b3;">u0</span> = x, y, u
+                <span style="color: brightblack;">if</span> last <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                    <span style="color: brightblack;">yield</span> last
+                <span style="color: brightblack;">yield</span> (x, y, u)
+                <span style="color: #b3b3b3;">last</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: brightblack;">if</span> last <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+        <span style="color: brightblack;">yield</span> last
 </pre>
 </div>
 

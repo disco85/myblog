@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Segmential search</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="algorithms, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Segmential search</h1>
-<div id="outline-container-orgd3b6584" class="outline-2">
-<h2 id="orgd3b6584">Segmential search</h2>
-<div class="outline-text-2" id="text-orgd3b6584">
+<div id="outline-container-org42d3d04" class="outline-2">
+<h2 id="org42d3d04">Segmential search</h2>
+<div class="outline-text-2" id="text-org42d3d04">
 <p>
 It's something close to segments tree, but a list is used (+binary search on it) instead of a tree.
 </p>
@@ -55,114 +80,114 @@ We find the segment contained the point with binary search. Then we find the off
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">import</span> random
-<span style="color: #531ab6;">import</span> functools
+<pre class="src src-python"><span style="color: brightblack;">import</span> random
+<span style="color: brightblack;">import</span> functools
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">swap</span>(x, y): <span style="color: #531ab6;">return</span> (y, x)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">swap</span>(x, y): <span style="color: brightblack;">return</span> (y, x)
 
-<span style="color: #005f5f;">@functools.total_ordering</span>
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Seg</span>:
-    <span style="color: #2a5045;">'''Normalized segment'''</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, a, b=<span style="color: #0000b0;">None</span>):
-        <span style="color: #531ab6;">if</span> b <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>: <span style="color: #005f5f;">b</span> = a
-        <span style="color: #531ab6;">if</span> a &gt; <span style="color: #005e8b;">b</span>: <span style="color: #005f5f;">a</span>, <span style="color: #005f5f;">b</span> = swap(a, b)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">a</span> = a
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">b</span> = b
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__contains__</span>(<span style="color: #531ab6;">self</span>, pt):
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.a &lt;= pt &lt;= <span style="color: #531ab6;">self</span>.b
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__len__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.b - <span style="color: #531ab6;">self</span>.a + 1
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__eq__</span>(<span style="color: #531ab6;">self</span>, oth):
-        <span style="color: #531ab6;">assert</span> <span style="color: #8f0075;">type</span>(oth) <span style="color: #531ab6;">is</span> <span style="color: #8f0075;">type</span>(<span style="color: #531ab6;">self</span>)
-        <span style="color: #531ab6;">self</span>.a == oth.a <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.b == oth.b
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__lt__</span>(<span style="color: #531ab6;">self</span>, oth):
-        <span style="color: #531ab6;">assert</span> <span style="color: #8f0075;">type</span>(oth) <span style="color: #531ab6;">is</span> <span style="color: #8f0075;">type</span>(<span style="color: #531ab6;">self</span>)
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.a &lt; oth.a
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__repr__</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> f<span style="color: #3548cf;">'</span>{<span style="color: #531ab6;">self</span>.a}<span style="color: #3548cf;">..</span>{<span style="color: #531ab6;">self</span>.b}<span style="color: #3548cf;">'</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">cmp_pt</span>(<span style="color: #531ab6;">self</span>, pt):
-        <span style="color: #531ab6;">if</span> pt &lt; <span style="color: #531ab6;">self</span>.a: <span style="color: #531ab6;">return</span> 1
-        <span style="color: #531ab6;">elif</span> pt &gt; <span style="color: #531ab6;">self</span>.b: <span style="color: #531ab6;">return</span> -1
-        <span style="color: #531ab6;">else</span>: <span style="color: #531ab6;">return</span> 0
+<span style="color: #cccccc;">@functools.total_ordering</span>
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Seg</span>:
+    <span style="color: brightblack;">'''Normalized segment'''</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, a, b=<span style="color: #7fffd4;">None</span>):
+        <span style="color: brightblack;">if</span> b <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>: <span style="color: #cccccc;">b</span> = a
+        <span style="color: brightblack;">if</span> a &gt; <span style="color: #b3b3b3;">b</span>: <span style="color: #cccccc;">a</span>, <span style="color: #cccccc;">b</span> = swap(a, b)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">a</span> = a
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">b</span> = b
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__contains__</span>(<span style="color: brightblack;">self</span>, pt):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.a &lt;= pt &lt;= <span style="color: brightblack;">self</span>.b
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.b - <span style="color: brightblack;">self</span>.a + 1
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__eq__</span>(<span style="color: brightblack;">self</span>, oth):
+        <span style="color: brightblack;">assert</span> <span style="color: #b3b3b3;">type</span>(oth) <span style="color: brightblack;">is</span> <span style="color: #b3b3b3;">type</span>(<span style="color: brightblack;">self</span>)
+        <span style="color: brightblack;">self</span>.a == oth.a <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.b == oth.b
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__lt__</span>(<span style="color: brightblack;">self</span>, oth):
+        <span style="color: brightblack;">assert</span> <span style="color: #b3b3b3;">type</span>(oth) <span style="color: brightblack;">is</span> <span style="color: #b3b3b3;">type</span>(<span style="color: brightblack;">self</span>)
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.a &lt; oth.a
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'</span>{<span style="color: brightblack;">self</span>.a}<span style="color: brightblack;">..</span>{<span style="color: brightblack;">self</span>.b}<span style="color: brightblack;">'</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">cmp_pt</span>(<span style="color: brightblack;">self</span>, pt):
+        <span style="color: brightblack;">if</span> pt &lt; <span style="color: brightblack;">self</span>.a: <span style="color: brightblack;">return</span> 1
+        <span style="color: brightblack;">elif</span> pt &gt; <span style="color: brightblack;">self</span>.b: <span style="color: brightblack;">return</span> -1
+        <span style="color: brightblack;">else</span>: <span style="color: brightblack;">return</span> 0
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">segs_from_points</span>(pts):
-    <span style="color: #005e8b;">seg</span> = <span style="color: #0000b0;">None</span>
-    <span style="color: #005e8b;">d</span> = 0
-    <span style="color: #531ab6;">for</span> pt <span style="color: #531ab6;">in</span> pts:
-        <span style="color: #531ab6;">if</span> seg <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>:
-            <span style="color: #005e8b;">seg</span> = Seg(pt)
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #005e8b;">d</span> = pt - seg.b
-            <span style="color: #531ab6;">if</span> 0 &gt; d:
-                <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">ValueError</span>(<span style="color: #3548cf;">'Unordered points'</span>)
-            <span style="color: #531ab6;">elif</span> 0 == d:
-                <span style="color: #531ab6;">pass</span>
-            <span style="color: #531ab6;">elif</span> 1 == d:
-                seg.<span style="color: #005e8b;">b</span> += 1
-            <span style="color: #531ab6;">elif</span> 1 &lt; d:
-                <span style="color: #531ab6;">yield</span> seg
-                <span style="color: #005e8b;">seg</span> = Seg(pt)
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">segs_from_points</span>(pts):
+    <span style="color: #b3b3b3;">seg</span> = <span style="color: #7fffd4;">None</span>
+    <span style="color: #b3b3b3;">d</span> = 0
+    <span style="color: brightblack;">for</span> pt <span style="color: brightblack;">in</span> pts:
+        <span style="color: brightblack;">if</span> seg <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
+            <span style="color: #b3b3b3;">seg</span> = Seg(pt)
+        <span style="color: brightblack;">else</span>:
+            <span style="color: #b3b3b3;">d</span> = pt - seg.b
+            <span style="color: brightblack;">if</span> 0 &gt; d:
+                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">ValueError</span>(<span style="color: brightblack;">'Unordered points'</span>)
+            <span style="color: brightblack;">elif</span> 0 == d:
+                <span style="color: brightblack;">pass</span>
+            <span style="color: brightblack;">elif</span> 1 == d:
+                seg.<span style="color: #b3b3b3;">b</span> += 1
+            <span style="color: brightblack;">elif</span> 1 &lt; d:
+                <span style="color: brightblack;">yield</span> seg
+                <span style="color: #b3b3b3;">seg</span> = Seg(pt)
 
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">Usual binary search but of the point in segments,</span>
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">so cmp_pt() is used</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">find_seg</span>(segs, pt):
-    <span style="color: #005e8b;">start</span> = 0
-    <span style="color: #005e8b;">end</span> = <span style="color: #8f0075;">len</span>(segs) - 1
-    <span style="color: #531ab6;">while</span> start &lt;= end:
-        <span style="color: #005e8b;">mid</span> = (start + end) // 2
-        <span style="color: #005e8b;">mid_el</span> = segs[mid]
-        <span style="color: #005e8b;">d</span> = mid_el.cmp_pt(pt)
-        <span style="color: #531ab6;">if</span> d &gt; 0:
-            <span style="color: #005e8b;">end</span> = mid - 1
-        <span style="color: #531ab6;">elif</span> d &lt; 0:
-            <span style="color: #005e8b;">start</span> = mid + 1
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> mid
-    <span style="color: #531ab6;">return</span> -1
+<span style="color: #595959;"># </span><span style="color: #595959;">Usual binary search but of the point in segments,</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">so cmp_pt() is used</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">find_seg</span>(segs, pt):
+    <span style="color: #b3b3b3;">start</span> = 0
+    <span style="color: #b3b3b3;">end</span> = <span style="color: #b3b3b3;">len</span>(segs) - 1
+    <span style="color: brightblack;">while</span> start &lt;= end:
+        <span style="color: #b3b3b3;">mid</span> = (start + end) // 2
+        <span style="color: #b3b3b3;">mid_el</span> = segs[mid]
+        <span style="color: #b3b3b3;">d</span> = mid_el.cmp_pt(pt)
+        <span style="color: brightblack;">if</span> d &gt; 0:
+            <span style="color: #b3b3b3;">end</span> = mid - 1
+        <span style="color: brightblack;">elif</span> d &lt; 0:
+            <span style="color: #b3b3b3;">start</span> = mid + 1
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> mid
+    <span style="color: brightblack;">return</span> -1
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">find</span>(segs, pt):
-    <span style="color: #005e8b;">segi</span> = find_seg(ACCESS(segs, _cap=<span style="color: #3548cf;">'seg'</span>), pt)
-    <span style="color: #531ab6;">if</span> segi &gt;= 0:
-        <span style="color: #005e8b;">seg</span> = segs[segi]
-        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Found seg: </span>{seg}<span style="color: #3548cf;">"</span>)
-        <span style="color: #005e8b;">off_in_seg</span> = pt - seg.a
-        <span style="color: #005e8b;">fnd</span> = 0
-        <span style="color: #531ab6;">for</span> i <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">range</span>(segi):
-            <span style="color: #005e8b;">fnd</span> += <span style="color: #8f0075;">len</span>(segs[i])
-        <span style="color: #005e8b;">fnd</span> += off_in_seg
-        <span style="color: #531ab6;">return</span> fnd
-    <span style="color: #531ab6;">else</span>:
-        <span style="color: #531ab6;">return</span> -1
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">find</span>(segs, pt):
+    <span style="color: #b3b3b3;">segi</span> = find_seg(ACCESS(segs, _cap=<span style="color: brightblack;">'seg'</span>), pt)
+    <span style="color: brightblack;">if</span> segi &gt;= 0:
+        <span style="color: #b3b3b3;">seg</span> = segs[segi]
+        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Found seg: </span>{seg}<span style="color: brightblack;">"</span>)
+        <span style="color: #b3b3b3;">off_in_seg</span> = pt - seg.a
+        <span style="color: #b3b3b3;">fnd</span> = 0
+        <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(segi):
+            <span style="color: #b3b3b3;">fnd</span> += <span style="color: #b3b3b3;">len</span>(segs[i])
+        <span style="color: #b3b3b3;">fnd</span> += off_in_seg
+        <span style="color: brightblack;">return</span> fnd
+    <span style="color: brightblack;">else</span>:
+        <span style="color: brightblack;">return</span> -1
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(<span style="color: #8f0075;">range</span>(num))
-    <span style="color: #005e8b;">i</span> = 0
-    <span style="color: #005e8b;">cnt</span> = <span style="color: #8f0075;">min</span>(num, num*ratio)
-    <span style="color: #531ab6;">while</span> i &lt; cnt:
-        <span style="color: #005e8b;">r</span> = random.randint(num, num + cnt - 1)
-        <span style="color: #005e8b;">res</span>[r - num] = r
-        <span style="color: #005e8b;">i</span> += 1
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
-    <span style="color: #531ab6;">return</span> (res, random.choice(res))
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">range</span>(num))
+    <span style="color: #b3b3b3;">i</span> = 0
+    <span style="color: #b3b3b3;">cnt</span> = <span style="color: #b3b3b3;">min</span>(num, num*ratio)
+    <span style="color: brightblack;">while</span> i &lt; cnt:
+        <span style="color: #b3b3b3;">r</span> = random.randint(num, num + cnt - 1)
+        <span style="color: #b3b3b3;">res</span>[r - num] = r
+        <span style="color: #b3b3b3;">i</span> += 1
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
+    <span style="color: brightblack;">return</span> (res, random.choice(res))
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">ACCESS</span>(<span style="color: #8f0075;">list</span>):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, *a, **kw):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">cap</span> = kw.pop(<span style="color: #3548cf;">'_cap'</span>, <span style="color: #3548cf;">''</span>)
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">cap</span>: <span style="color: #531ab6;">self</span>.<span style="color: #005f5f;">cap</span> += <span style="color: #3548cf;">' '</span>
-        <span style="color: #8f0075;">super</span>().__init__(*a, **kw)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> = 0
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__getitem__</span>(<span style="color: #531ab6;">self</span>, i):
-        <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"</span>{<span style="color: #531ab6;">self</span>.cap}{<span style="color: #531ab6;">self</span>._access}<span style="color: #3548cf;">: get </span>{i}<span style="color: #3548cf;">"</span>)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_access</span> += 1
-        <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">super</span>().__getitem__(i)
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">ACCESS</span>(<span style="color: #b3b3b3;">list</span>):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *a, **kw):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">cap</span> = kw.pop(<span style="color: brightblack;">'_cap'</span>, <span style="color: brightblack;">''</span>)
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">cap</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">cap</span> += <span style="color: brightblack;">' '</span>
+        <span style="color: #b3b3b3;">super</span>().__init__(*a, **kw)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> = 0
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__getitem__</span>(<span style="color: brightblack;">self</span>, i):
+        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"</span>{<span style="color: brightblack;">self</span>.cap}{<span style="color: brightblack;">self</span>._access}<span style="color: brightblack;">: get </span>{i}<span style="color: brightblack;">"</span>)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> += 1
+        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">super</span>().__getitem__(i)
 
 
-<span style="color: #005e8b;">NUM</span> = 10000
-<span style="color: #005e8b;">arr</span>, <span style="color: #005e8b;">x</span> = partiallyrandomdata(NUM, 0.5)
-<span style="color: #005e8b;">segs</span> = <span style="color: #8f0075;">list</span>(segs_from_points(arr))
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Look for </span>{x}<span style="color: #3548cf;"> in </span>{arr}<span style="color: #3548cf;">"</span>)
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Segs: </span>{segs}<span style="color: #3548cf;">"</span>)
-<span style="color: #005e8b;">fnd</span> = find(segs, x)
-<span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">"Looked for </span>{x}<span style="color: #3548cf;"> and found </span>{arr[fnd]}<span style="color: #3548cf;"> at </span>{fnd}<span style="color: #3548cf;">"</span>)
+<span style="color: #b3b3b3;">NUM</span> = 10000
+<span style="color: #b3b3b3;">arr</span>, <span style="color: #b3b3b3;">x</span> = partiallyrandomdata(NUM, 0.5)
+<span style="color: #b3b3b3;">segs</span> = <span style="color: #b3b3b3;">list</span>(segs_from_points(arr))
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Look for </span>{x}<span style="color: brightblack;"> in </span>{arr}<span style="color: brightblack;">"</span>)
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Segs: </span>{segs}<span style="color: brightblack;">"</span>)
+<span style="color: #b3b3b3;">fnd</span> = find(segs, x)
+<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Looked for </span>{x}<span style="color: brightblack;"> and found </span>{arr[fnd]}<span style="color: brightblack;"> at </span>{fnd}<span style="color: brightblack;">"</span>)
 </pre>
 </div>
 </div>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Bottle application helper</title>
@@ -11,94 +11,119 @@
 <meta name="keywords" content="python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Bottle application helper</h1>
-<div id="outline-container-org6a90aac" class="outline-2">
-<h2 id="org6a90aac">Bottle application helper</h2>
-<div class="outline-text-2" id="text-org6a90aac">
+<div id="outline-container-org1c978d9" class="outline-2">
+<h2 id="org1c978d9">Bottle application helper</h2>
+<div class="outline-text-2" id="text-org1c978d9">
 <p>
 Next is the helper class for creation of the Bottle Web Framework applications:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">expose</span>(path, **kw):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">decor</span>(view):
-        view.<span style="color: #005e8b;">_route_path_</span> = path
-        view.<span style="color: #005e8b;">_kwargs_</span> = kw
-        <span style="color: #531ab6;">return</span> view
-    <span style="color: #531ab6;">return</span> decor
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">expose</span>(path, **kw):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">decor</span>(view):
+        view.<span style="color: #b3b3b3;">_route_path_</span> = path
+        view.<span style="color: #b3b3b3;">_kwargs_</span> = kw
+        <span style="color: brightblack;">return</span> view
+    <span style="color: brightblack;">return</span> decor
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">BottleBaseApp</span>(<span style="color: #8f0075;">object</span>):
-    <span style="color: #2a5045;">"""</span>
-<span style="color: #2a5045;">    - Autosave attributes with names from __session__ attribute</span>
-<span style="color: #2a5045;">    - Session type is attr __session_type__ ('cookie'|'pickle'),</span>
-<span style="color: #2a5045;">      'cookie' is default</span>
-<span style="color: #2a5045;">    - Methods decorated with @expose will be auto-routed and</span>
-<span style="color: #2a5045;">      sessions' attrs will be flushed at the end</span>
-<span style="color: #2a5045;">    """</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, bottleapp):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">bottle</span> = bottleapp
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Prepare session manager as attr sessions</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.__session_type__ == <span style="color: #3548cf;">"pickle"</span>:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">sessions</span> = PickleSession()
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">sessions</span> = CookieSession()
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">BottleBaseApp</span>(<span style="color: #b3b3b3;">object</span>):
+    <span style="color: brightblack;">"""</span>
+<span style="color: brightblack;">    - Autosave attributes with names from __session__ attribute</span>
+<span style="color: brightblack;">    - Session type is attr __session_type__ ('cookie'|'pickle'),</span>
+<span style="color: brightblack;">      'cookie' is default</span>
+<span style="color: brightblack;">    - Methods decorated with @expose will be auto-routed and</span>
+<span style="color: brightblack;">      sessions' attrs will be flushed at the end</span>
+<span style="color: brightblack;">    """</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, bottleapp):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">bottle</span> = bottleapp
+        <span style="color: #595959;"># </span><span style="color: #595959;">Prepare session manager as attr sessions</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.__session_type__ == <span style="color: brightblack;">"pickle"</span>:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">sessions</span> = PickleSession()
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">sessions</span> = CookieSession()
 
-        <span style="color: #531ab6;">def</span> <span style="color: #721045;">router</span>(meth):
-            <span style="color: #2a5045;">"""Return wrapped view-method"""</span>
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">meth is already bound to self</span>
-            <span style="color: #531ab6;">def</span> <span style="color: #721045;">wrp</span>(f=meth, *a, **kw):
-                <span style="color: #531ab6;">try</span>:
-                    <span style="color: #005e8b;">ret</span> = f(*a, **kw) <span style="color: #7f0000;"># </span><span style="color: #7f0000;">bound, no needs self,</span>
-                <span style="color: #531ab6;">finally</span>:
-                    <span style="color: #531ab6;">self</span>.flush_session()
-                <span style="color: #531ab6;">return</span> ret
+        <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">router</span>(meth):
+            <span style="color: brightblack;">"""Return wrapped view-method"""</span>
+            <span style="color: #595959;"># </span><span style="color: #595959;">meth is already bound to self</span>
+            <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">wrp</span>(f=meth, *a, **kw):
+                <span style="color: brightblack;">try</span>:
+                    <span style="color: #b3b3b3;">ret</span> = f(*a, **kw) <span style="color: #595959;"># </span><span style="color: #595959;">bound, no needs self,</span>
+                <span style="color: brightblack;">finally</span>:
+                    <span style="color: brightblack;">self</span>.flush_session()
+                <span style="color: brightblack;">return</span> ret
             functools.update_wrapper(wrp, meth)
-            <span style="color: #531ab6;">return</span> wrp
+            <span style="color: brightblack;">return</span> wrp
 
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Route all decorated methods</span>
-        <span style="color: #531ab6;">for</span> attrname <span style="color: #531ab6;">in</span> <span style="color: #8f0075;">dir</span>(<span style="color: #531ab6;">self</span>):
-            <span style="color: #005e8b;">attr</span> = <span style="color: #8f0075;">getattr</span>(<span style="color: #531ab6;">self</span>, attrname)
-            <span style="color: #005e8b;">path</span> = <span style="color: #8f0075;">getattr</span>(attr, <span style="color: #3548cf;">"_route_path_"</span>, <span style="color: #0000b0;">None</span>)
-            <span style="color: #005e8b;">kw</span> = <span style="color: #8f0075;">getattr</span>(attr, <span style="color: #3548cf;">"_kwargs_"</span>, {})
-            <span style="color: #531ab6;">if</span> path:
-                <span style="color: #531ab6;">self</span>.bottle.route(path, callback=router(attr), **kw)
+        <span style="color: #595959;"># </span><span style="color: #595959;">Route all decorated methods</span>
+        <span style="color: brightblack;">for</span> attrname <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">dir</span>(<span style="color: brightblack;">self</span>):
+            <span style="color: #b3b3b3;">attr</span> = <span style="color: #b3b3b3;">getattr</span>(<span style="color: brightblack;">self</span>, attrname)
+            <span style="color: #b3b3b3;">path</span> = <span style="color: #b3b3b3;">getattr</span>(attr, <span style="color: brightblack;">"_route_path_"</span>, <span style="color: #7fffd4;">None</span>)
+            <span style="color: #b3b3b3;">kw</span> = <span style="color: #b3b3b3;">getattr</span>(attr, <span style="color: brightblack;">"_kwargs_"</span>, {})
+            <span style="color: brightblack;">if</span> path:
+                <span style="color: brightblack;">self</span>.bottle.route(path, callback=router(attr), **kw)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">flush_session</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #2a5045;">"""Copy to session all attrs and save session"""</span>
-        <span style="color: #531ab6;">try</span>:
-            <span style="color: #005e8b;">ses</span> = <span style="color: #531ab6;">self</span>.sessions.get_session()
-            <span style="color: #531ab6;">for</span> a <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.__session__:
-                <span style="color: #531ab6;">try</span>:
-                    <span style="color: #005e8b;">v</span> = <span style="color: #8f0075;">getattr</span>(<span style="color: #531ab6;">self</span>, a)
-                    <span style="color: #005e8b;">ses</span>[a] = v
-                <span style="color: #531ab6;">except</span>:
-                    <span style="color: #531ab6;">continue</span>
-            <span style="color: #531ab6;">self</span>.sessions.save(ses)
-        <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">Exception</span> <span style="color: #531ab6;">as</span> x:
-            <span style="color: #531ab6;">pass</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">flush_session</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">"""Copy to session all attrs and save session"""</span>
+        <span style="color: brightblack;">try</span>:
+            <span style="color: #b3b3b3;">ses</span> = <span style="color: brightblack;">self</span>.sessions.get_session()
+            <span style="color: brightblack;">for</span> a <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.__session__:
+                <span style="color: brightblack;">try</span>:
+                    <span style="color: #b3b3b3;">v</span> = <span style="color: #b3b3b3;">getattr</span>(<span style="color: brightblack;">self</span>, a)
+                    <span style="color: #b3b3b3;">ses</span>[a] = v
+                <span style="color: brightblack;">except</span>:
+                    <span style="color: brightblack;">continue</span>
+            <span style="color: brightblack;">self</span>.sessions.save(ses)
+        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span> <span style="color: brightblack;">as</span> x:
+            <span style="color: brightblack;">pass</span>
 </pre>
 </div>
 
@@ -107,22 +132,22 @@ And now is the example how to use this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">class</span> <span style="color: #005f5f;">MyApp</span>(BottleBaseApp):
-    <span style="color: #005e8b;">__session_type__</span> = <span style="color: #3548cf;">"cookie"</span>
-    <span style="color: #005e8b;">__session__</span> = [<span style="color: #3548cf;">"tasks_ctl_res"</span>, <span style="color: #3548cf;">"tasks_prc"</span>, <span style="color: #3548cf;">"prc_conns"</span>,]
+<pre class="src src-python"><span style="color: brightblack;">class</span> <span style="color: #cccccc;">MyApp</span>(BottleBaseApp):
+    <span style="color: #b3b3b3;">__session_type__</span> = <span style="color: brightblack;">"cookie"</span>
+    <span style="color: #b3b3b3;">__session__</span> = [<span style="color: brightblack;">"tasks_ctl_res"</span>, <span style="color: brightblack;">"tasks_prc"</span>, <span style="color: brightblack;">"prc_conns"</span>,]
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, bottleapp):
-        <span style="color: #8f0075;">super</span>(MyApp, <span style="color: #531ab6;">self</span>).__init__(bottleapp)
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">tasks_ctl_res</span> = {}
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">tasks_prc</span> = []
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">prc_conns</span> = {}
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, bottleapp):
+        <span style="color: #b3b3b3;">super</span>(MyApp, <span style="color: brightblack;">self</span>).__init__(bottleapp)
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">tasks_ctl_res</span> = {}
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">tasks_prc</span> = []
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">prc_conns</span> = {}
 
 
-    <span style="color: #005f5f;">@expose</span>(<span style="color: #3548cf;">"/index"</span>)
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">index</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> <span style="color: #3548cf;">"Index page is empty"</span>
+    <span style="color: #cccccc;">@expose</span>(<span style="color: brightblack;">"/index"</span>)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">index</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">"Index page is empty"</span>
 
-    <span style="color: #7f0000;"># </span><span style="color: #7f0000;">... etc ...</span>
+    <span style="color: #595959;"># </span><span style="color: #595959;">... etc ...</span>
 </pre>
 </div>
 

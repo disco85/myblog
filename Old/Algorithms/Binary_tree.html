@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Binary tree</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="algorithms, python" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Binary tree</h1>
-<div id="outline-container-org15456bf" class="outline-2">
-<h2 id="org15456bf">Binary tree</h2>
-<div class="outline-text-2" id="text-org15456bf">
+<div id="outline-container-org13eef9c" class="outline-2">
+<h2 id="org13eef9c">Binary tree</h2>
+<div class="outline-text-2" id="text-org13eef9c">
 <p>
 Binary tree is a container useful for a search of elements and their sorting. Each item has a left and a right branch and the whole structure has a special item - a root:
 </p>
@@ -185,12 +210,12 @@ But if <code>k</code> is equal to the parent's key <code>p.k</code> - it's more 
 <li>both children exist</li>
 </ul>
 </div>
-<div id="outline-container-orgb9673f1" class="outline-3">
-<h3 id="orgb9673f1">right child has not a left child</h3>
+<div id="outline-container-org51e825d" class="outline-3">
+<h3 id="org51e825d">right child has not a left child</h3>
 </div>
-<div id="outline-container-org665b359" class="outline-3">
-<h3 id="org665b359">right child has a left child</h3>
-<div class="outline-text-3" id="text-org665b359">
+<div id="outline-container-org1bfab23" class="outline-3">
+<h3 id="org1bfab23">right child has a left child</h3>
+<div class="outline-text-3" id="text-org1bfab23">
 <ul class="org-ul">
 <li>there is only a left child</li>
 <li>there is only a right child</li>
@@ -557,489 +582,489 @@ Let's see the implementation:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">import</span> random
-<span style="color: #531ab6;">import</span> traceback
+<pre class="src src-python"><span style="color: brightblack;">import</span> random
+<span style="color: brightblack;">import</span> traceback
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">Walk</span>:
-    <span style="color: #2a5045;">'''Traverse way</span>
-<span style="color: #2a5045;">    INFIX   - inorder   - l, root, r  -  l (OP) r</span>
-<span style="color: #2a5045;">    PREFIX  - preorder  - root, l, r  -  (OP) l r</span>
-<span style="color: #2a5045;">    POSTFIX - postorder - l, r, root  -  l r (OP)</span>
-<span style="color: #2a5045;">    '''</span>
-    <span style="color: #005e8b;">INFIX</span> = 1
-    <span style="color: #005e8b;">PREFIX</span> = 2
-    <span style="color: #005e8b;">POSTFIX</span> = 3
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Walk</span>:
+    <span style="color: brightblack;">'''Traverse way</span>
+<span style="color: brightblack;">    INFIX   - inorder   - l, root, r  -  l (OP) r</span>
+<span style="color: brightblack;">    PREFIX  - preorder  - root, l, r  -  (OP) l r</span>
+<span style="color: brightblack;">    POSTFIX - postorder - l, r, root  -  l r (OP)</span>
+<span style="color: brightblack;">    '''</span>
+    <span style="color: #b3b3b3;">INFIX</span> = 1
+    <span style="color: #b3b3b3;">PREFIX</span> = 2
+    <span style="color: #b3b3b3;">POSTFIX</span> = 3
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">WalkPos</span>:
-    <span style="color: #005e8b;">LEFT</span> = 1
-    <span style="color: #005e8b;">RIGHT</span> = 2
-    <span style="color: #005e8b;">SELF</span> = 3
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">WalkPos</span>:
+    <span style="color: #b3b3b3;">LEFT</span> = 1
+    <span style="color: #b3b3b3;">RIGHT</span> = 2
+    <span style="color: #b3b3b3;">SELF</span> = 3
 
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">BinTree</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, *, k=<span style="color: #0000b0;">None</span>, v=<span style="color: #0000b0;">None</span>, p=<span style="color: #0000b0;">None</span>):
-        <span style="color: #2a5045;">"k - key, v - value, p - parent"</span>
-        <span style="color: #531ab6;">if</span> p <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">root</span> = <span style="color: #531ab6;">self</span>
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">root</span> = p.root
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> = 0
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">l</span> = <span style="color: #0000b0;">None</span>
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">r</span> = <span style="color: #0000b0;">None</span>
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">k</span> = k
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = v
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">p</span> = p
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">BinTree</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *, k=<span style="color: #7fffd4;">None</span>, v=<span style="color: #7fffd4;">None</span>, p=<span style="color: #7fffd4;">None</span>):
+        <span style="color: brightblack;">"k - key, v - value, p - parent"</span>
+        <span style="color: brightblack;">if</span> p <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = <span style="color: brightblack;">self</span>
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = p.root
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> = 0
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = <span style="color: #7fffd4;">None</span>
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = <span style="color: #7fffd4;">None</span>
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = k
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">p</span> = p
 
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_prn</span> = SimplePrefixPrinter()
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">_dumprn</span> = DumpPrinter()
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_prn</span> = SimplePrefixPrinter()
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_dumprn</span> = DumpPrinter()
 
         
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">inherit_node</span>(<span style="color: #531ab6;">self</span>, node, *, r=<span style="color: #0000b0;">False</span>, l=<span style="color: #0000b0;">False</span>):
-        <span style="color: #2a5045;">'''Inherits some node data (node is removing and myself will keep all</span>
-<span style="color: #2a5045;">        node's data including its children). Flag arguments tell what optional</span>
-<span style="color: #2a5045;">        data must be inherit.</span>
-<span style="color: #2a5045;">        '''</span>
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">root</span> = node.root
-        <span style="color: #531ab6;">if</span> <span style="color: #005e8b;">l</span>: <span style="color: #531ab6;">self</span>.<span style="color: #005f5f;">l</span> = node.l
-        <span style="color: #531ab6;">if</span> <span style="color: #005e8b;">r</span>: <span style="color: #531ab6;">self</span>.<span style="color: #005f5f;">r</span> = node.r
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">k</span> = node.k
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = node.v
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Fix parent links in node left, right, they referred to the node early,</span>
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">now we (self) steal all node's data including its l,r children, so</span>
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">children must refer myself, not removed node</span>
-        <span style="color: #531ab6;">if</span> node.<span style="color: #005e8b;">l</span>: <span style="color: #005f5f;">node</span>.<span style="color: #005f5f;">l</span>.<span style="color: #005f5f;">p</span> = <span style="color: #531ab6;">self</span>
-        <span style="color: #531ab6;">if</span> node.<span style="color: #005e8b;">r</span>: <span style="color: #005f5f;">node</span>.<span style="color: #005f5f;">r</span>.<span style="color: #005f5f;">p</span> = <span style="color: #531ab6;">self</span>
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">inherit_node</span>(<span style="color: brightblack;">self</span>, node, *, r=<span style="color: #7fffd4;">False</span>, l=<span style="color: #7fffd4;">False</span>):
+        <span style="color: brightblack;">'''Inherits some node data (node is removing and myself will keep all</span>
+<span style="color: brightblack;">        node's data including its children). Flag arguments tell what optional</span>
+<span style="color: brightblack;">        data must be inherit.</span>
+<span style="color: brightblack;">        '''</span>
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = node.root
+        <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">l</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">l</span> = node.l
+        <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">r</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">r</span> = node.r
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = node.k
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = node.v
+        <span style="color: #595959;"># </span><span style="color: #595959;">Fix parent links in node left, right, they referred to the node early,</span>
+        <span style="color: #595959;"># </span><span style="color: #595959;">now we (self) steal all node's data including its l,r children, so</span>
+        <span style="color: #595959;"># </span><span style="color: #595959;">children must refer myself, not removed node</span>
+        <span style="color: brightblack;">if</span> node.<span style="color: #b3b3b3;">l</span>: <span style="color: #cccccc;">node</span>.<span style="color: #cccccc;">l</span>.<span style="color: #cccccc;">p</span> = <span style="color: brightblack;">self</span>
+        <span style="color: brightblack;">if</span> node.<span style="color: #b3b3b3;">r</span>: <span style="color: #cccccc;">node</span>.<span style="color: #cccccc;">r</span>.<span style="color: #cccccc;">p</span> = <span style="color: brightblack;">self</span>
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">dump</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> f<span style="color: #3548cf;">'k=%s(%s) self=%s l=%s r=%s p=%s size=%s lsize=%s rsize=%s'</span> % (<span style="color: #531ab6;">self</span>.k, <span style="color: #531ab6;">self</span>.v,
-            <span style="color: #8f0075;">id</span>(<span style="color: #531ab6;">self</span>), myid(<span style="color: #531ab6;">self</span>.l), myid(<span style="color: #531ab6;">self</span>.r), myid(<span style="color: #531ab6;">self</span>.p), <span style="color: #531ab6;">self</span>.size,
-            <span style="color: #3548cf;">'-'</span> <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.l.size,
-            <span style="color: #3548cf;">'-'</span> <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.r.size)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">dump</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'k=%s(%s) self=%s l=%s r=%s p=%s size=%s lsize=%s rsize=%s'</span> % (<span style="color: brightblack;">self</span>.k, <span style="color: brightblack;">self</span>.v,
+            <span style="color: #b3b3b3;">id</span>(<span style="color: brightblack;">self</span>), myid(<span style="color: brightblack;">self</span>.l), myid(<span style="color: brightblack;">self</span>.r), myid(<span style="color: brightblack;">self</span>.p), <span style="color: brightblack;">self</span>.size,
+            <span style="color: brightblack;">'-'</span> <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size,
+            <span style="color: brightblack;">'-'</span> <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size)
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__repr__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> f<span style="color: #3548cf;">'</span>{<span style="color: #531ab6;">self</span>.k}<span style="color: #3548cf;">:</span>{<span style="color: #531ab6;">self</span>.v}<span style="color: #3548cf;">'</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'</span>{<span style="color: brightblack;">self</span>.k}<span style="color: brightblack;">:</span>{<span style="color: brightblack;">self</span>.v}<span style="color: brightblack;">'</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">new_leaf</span>(<span style="color: #531ab6;">self</span>, k, v, *, p=<span style="color: #0000b0;">None</span>):
-        <span style="color: #531ab6;">return</span> BinTree(k=k, v=v, p=p)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">new_leaf</span>(<span style="color: brightblack;">self</span>, k, v, *, p=<span style="color: #7fffd4;">None</span>):
+        <span style="color: brightblack;">return</span> BinTree(k=k, v=v, p=p)
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">set_my_parent_slot</span>(<span style="color: #531ab6;">self</span>, node):
-        <span style="color: #2a5045;">"Sets the value in my slot in the parent to new `node` value"</span>
-        <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Just try to find my slot in my parent and handle NILs</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.p <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.p.r <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.p.r.k == <span style="color: #531ab6;">self</span>.k:
-                <span style="color: #531ab6;">self</span>.p.<span style="color: #005e8b;">r</span> = node
-            <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.p.l <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.p.l.k == <span style="color: #531ab6;">self</span>.k:
-                <span style="color: #531ab6;">self</span>.p.<span style="color: #005e8b;">l</span> = node
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">set_my_parent_slot</span>(<span style="color: brightblack;">self</span>, node):
+        <span style="color: brightblack;">"Sets the value in my slot in the parent to new `node` value"</span>
+        <span style="color: #595959;"># </span><span style="color: #595959;">Just try to find my slot in my parent and handle NILs</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.p <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.p.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.p.r.k == <span style="color: brightblack;">self</span>.k:
+                <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">r</span> = node
+            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.p.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.p.l.k == <span style="color: brightblack;">self</span>.k:
+                <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">l</span> = node
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">is_empty</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.root.k <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_empty</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.root.k <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">tree_size</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.root.size
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">tree_size</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.root.size
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">no_children</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_children</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">no_left</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_left</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">no_right</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_right</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">both_children</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">both_children</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">is_left</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.no_left
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_left</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.no_left
 
 
-    @<span style="color: #8f0075;">property</span>
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">is_right</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.no_right
+    @<span style="color: #b3b3b3;">property</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_right</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.no_right
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">add</span>(<span style="color: #531ab6;">self</span>, k, v):
-        <span style="color: #2a5045;">'''Returns added the node if still no such key.</span>
-<span style="color: #2a5045;">        '''</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">k</span> = k
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = v
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> += 1
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>
-        <span style="color: #531ab6;">elif</span> k &gt; <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.no_right:
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">r</span> = <span style="color: #531ab6;">self</span>.new_leaf(k, v, p=<span style="color: #531ab6;">self</span>)
-                <span style="color: #531ab6;">self</span>.r.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.r
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #005e8b;">new</span> = <span style="color: #531ab6;">self</span>.r.add(k, v)
-                <span style="color: #531ab6;">if</span> new <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                    <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">return</span> new
-        <span style="color: #531ab6;">elif</span> k &lt; <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.no_left:
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">l</span> = <span style="color: #531ab6;">self</span>.new_leaf(k, v, p=<span style="color: #531ab6;">self</span>)
-                <span style="color: #531ab6;">self</span>.l.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.l
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #005e8b;">new</span> = <span style="color: #531ab6;">self</span>.l.add(k, v)
-                <span style="color: #531ab6;">if</span> new <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                    <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> += 1
-                <span style="color: #531ab6;">return</span> new
-        <span style="color: #531ab6;">elif</span> k == <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = v
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">None</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">add</span>(<span style="color: brightblack;">self</span>, k, v):
+        <span style="color: brightblack;">'''Returns added the node if still no such key.</span>
+<span style="color: brightblack;">        '''</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = k
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
+        <span style="color: brightblack;">elif</span> k &gt; <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_right:
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = <span style="color: brightblack;">self</span>.new_leaf(k, v, p=<span style="color: brightblack;">self</span>)
+                <span style="color: brightblack;">self</span>.r.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r
+            <span style="color: brightblack;">else</span>:
+                <span style="color: #b3b3b3;">new</span> = <span style="color: brightblack;">self</span>.r.add(k, v)
+                <span style="color: brightblack;">if</span> new <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">return</span> new
+        <span style="color: brightblack;">elif</span> k &lt; <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_left:
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = <span style="color: brightblack;">self</span>.new_leaf(k, v, p=<span style="color: brightblack;">self</span>)
+                <span style="color: brightblack;">self</span>.l.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l
+            <span style="color: brightblack;">else</span>:
+                <span style="color: #b3b3b3;">new</span> = <span style="color: brightblack;">self</span>.l.add(k, v)
+                <span style="color: brightblack;">if</span> new <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
+                <span style="color: brightblack;">return</span> new
+        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">remove</span>(<span style="color: #531ab6;">self</span>, k):
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case-1'</span>)
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">None</span>
-        <span style="color: #531ab6;">elif</span> k &gt; <span style="color: #531ab6;">self</span>.k <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.is_right:
-            <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 2'</span>)
-            <span style="color: #005e8b;">old</span> = <span style="color: #531ab6;">self</span>.r.remove(k)
-            <span style="color: #531ab6;">if</span> old <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">return</span> old
-        <span style="color: #531ab6;">elif</span> k &lt; <span style="color: #531ab6;">self</span>.k <span style="color: #531ab6;">and</span> <span style="color: #531ab6;">self</span>.is_left:
-            <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 3'</span>)
-            <span style="color: #005e8b;">old</span> = <span style="color: #531ab6;">self</span>.l.remove(k)
-            <span style="color: #531ab6;">if</span> old <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">return</span> old
-        <span style="color: #531ab6;">elif</span> k == <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #005e8b;">v</span> = <span style="color: #531ab6;">self</span>.v
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.no_children:
-                <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 4'</span>)
-                <span style="color: #531ab6;">self</span>.set_my_parent_slot(<span style="color: #0000b0;">None</span>)
-                <span style="color: #7f0000;"># </span><span style="color: #7f0000;">this is relevant mostly for the root (the last node), but it's required (!):</span>
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">k</span> = <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = <span style="color: #0000b0;">None</span>  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">deallocation for non-root in C/C++</span>
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.both_children:
-                <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.r.no_left:
-                    <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 5'</span>)
-                    <span style="color: #005e8b;">old_self_r</span> = <span style="color: #531ab6;">self</span>.r
-                    <span style="color: #531ab6;">self</span>.inherit_node(<span style="color: #531ab6;">self</span>.r, r=<span style="color: #0000b0;">True</span>)
-                    old_self_r.<span style="color: #005e8b;">k</span> = old_self_r.<span style="color: #005e8b;">v</span> = <span style="color: #0000b0;">None</span>  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">deallocation for non-root in C/C++</span>
-                    <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-                <span style="color: #531ab6;">else</span>:
-                    <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 6'</span>)
-                    <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">k</span> = <span style="color: #531ab6;">self</span>.r.l.k
-                    <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">v</span> = <span style="color: #531ab6;">self</span>.r.l.v
-                    <span style="color: #005e8b;">old</span> = <span style="color: #531ab6;">self</span>.r.remove(<span style="color: #531ab6;">self</span>.r.l.k)
-                    <span style="color: #531ab6;">if</span> old <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.is_left:
-                <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 7'</span>)
-                <span style="color: #005e8b;">old_self_l</span> = <span style="color: #531ab6;">self</span>.l
-                <span style="color: #531ab6;">self</span>.inherit_node(<span style="color: #531ab6;">self</span>.l, l=<span style="color: #0000b0;">True</span>, r=<span style="color: #0000b0;">True</span>)
-                old_self_l.<span style="color: #005e8b;">k</span> = old_self_l.<span style="color: #005e8b;">v</span> = <span style="color: #0000b0;">None</span>  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">deallocation for non-root in C/C++</span>
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.is_right:
-                <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">'case 8'</span>)
-                <span style="color: #005e8b;">old_self_r</span> = <span style="color: #531ab6;">self</span>.r
-                <span style="color: #531ab6;">self</span>.inherit_node(<span style="color: #531ab6;">self</span>.r, l=<span style="color: #0000b0;">True</span>, r=<span style="color: #0000b0;">True</span>)
-                old_self_r.<span style="color: #005e8b;">k</span> = old_self_r.<span style="color: #005e8b;">v</span> = <span style="color: #0000b0;">None</span>  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">deallocation for non-root in C/C++</span>
-                <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">size</span> -= 1
-            <span style="color: #531ab6;">return</span> (k, v)
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">None</span>  <span style="color: #7f0000;"># </span><span style="color: #7f0000;">not found</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">remove</span>(<span style="color: brightblack;">self</span>, k):
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case-1'</span>)
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
+        <span style="color: brightblack;">elif</span> k &gt; <span style="color: brightblack;">self</span>.k <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.is_right:
+            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 2'</span>)
+            <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.r.remove(k)
+            <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">return</span> old
+        <span style="color: brightblack;">elif</span> k &lt; <span style="color: brightblack;">self</span>.k <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.is_left:
+            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 3'</span>)
+            <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.l.remove(k)
+            <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">return</span> old
+        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
+            <span style="color: #b3b3b3;">v</span> = <span style="color: brightblack;">self</span>.v
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_children:
+                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 4'</span>)
+                <span style="color: brightblack;">self</span>.set_my_parent_slot(<span style="color: #7fffd4;">None</span>)
+                <span style="color: #595959;"># </span><span style="color: #595959;">this is relevant mostly for the root (the last node), but it's required (!):</span>
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.both_children:
+                <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r.no_left:
+                    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 5'</span>)
+                    <span style="color: #b3b3b3;">old_self_r</span> = <span style="color: brightblack;">self</span>.r
+                    <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, r=<span style="color: #7fffd4;">True</span>)
+                    old_self_r.<span style="color: #b3b3b3;">k</span> = old_self_r.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
+                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+                <span style="color: brightblack;">else</span>:
+                    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 6'</span>)
+                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = <span style="color: brightblack;">self</span>.r.l.k
+                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = <span style="color: brightblack;">self</span>.r.l.v
+                    <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.r.remove(<span style="color: brightblack;">self</span>.r.l.k)
+                    <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_left:
+                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 7'</span>)
+                <span style="color: #b3b3b3;">old_self_l</span> = <span style="color: brightblack;">self</span>.l
+                <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.l, l=<span style="color: #7fffd4;">True</span>, r=<span style="color: #7fffd4;">True</span>)
+                old_self_l.<span style="color: #b3b3b3;">k</span> = old_self_l.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_right:
+                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 8'</span>)
+                <span style="color: #b3b3b3;">old_self_r</span> = <span style="color: brightblack;">self</span>.r
+                <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, l=<span style="color: #7fffd4;">True</span>, r=<span style="color: #7fffd4;">True</span>)
+                old_self_r.<span style="color: #b3b3b3;">k</span> = old_self_r.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
+                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
+            <span style="color: brightblack;">return</span> (k, v)
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">not found</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">get</span>(<span style="color: #531ab6;">self</span>, k):
-        <span style="color: #2a5045;">"Returns a node (not a value) by a key"</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">None</span>
-        <span style="color: #531ab6;">elif</span> k == <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>  <span style="color: #7f0000;">#</span><span style="color: #7f0000;">.v</span>
-        <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.is_right <span style="color: #531ab6;">and</span> k &gt; <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.r.get(k)
-        <span style="color: #531ab6;">elif</span> <span style="color: #531ab6;">self</span>.is_left <span style="color: #531ab6;">and</span> k &lt; <span style="color: #531ab6;">self</span>.k:
-            <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">self</span>.l.get(k)
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">None</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">get</span>(<span style="color: brightblack;">self</span>, k):
+        <span style="color: brightblack;">"Returns a node (not a value) by a key"</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
+        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>  <span style="color: #595959;">#</span><span style="color: #595959;">.v</span>
+        <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_right <span style="color: brightblack;">and</span> k &gt; <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r.get(k)
+        <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_left <span style="color: brightblack;">and</span> k &lt; <span style="color: brightblack;">self</span>.k:
+            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l.get(k)
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">walk</span>(<span style="color: #531ab6;">self</span>, fn, way=Walk.INFIX, level=0):
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #531ab6;">if</span> way == Walk.PREFIX:
-                fn(<span style="color: #531ab6;">self</span>, level, <span style="color: #531ab6;">self</span>.no_children, WalkPos.SELF)
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_left:
-                <span style="color: #531ab6;">self</span>.l.walk(fn, way, level+1)
-            <span style="color: #531ab6;">else</span>:
-                fn(<span style="color: #0000b0;">None</span>, level+1, <span style="color: #531ab6;">self</span>.no_children, WalkPos.LEFT)
-            <span style="color: #531ab6;">if</span> way == Walk.INFIX:
-                fn(<span style="color: #531ab6;">self</span>, level, <span style="color: #531ab6;">self</span>.no_children, WalkPos.SELF)
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_right:
-                <span style="color: #531ab6;">self</span>.r.walk(fn, way, level+1)
-            <span style="color: #531ab6;">else</span>:
-                fn(<span style="color: #0000b0;">None</span>, level+1, <span style="color: #531ab6;">self</span>.no_children, WalkPos.RIGHT)
-            <span style="color: #531ab6;">if</span> way == Walk.POSTFIX:
-                fn(<span style="color: #531ab6;">self</span>, level, <span style="color: #531ab6;">self</span>.no_children, WalkPos.SELF)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, fn, way=Walk.INFIX, level=0):
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: brightblack;">if</span> way == Walk.PREFIX:
+                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
+                <span style="color: brightblack;">self</span>.l.walk(fn, way, level+1)
+            <span style="color: brightblack;">else</span>:
+                fn(<span style="color: #7fffd4;">None</span>, level+1, <span style="color: brightblack;">self</span>.no_children, WalkPos.LEFT)
+            <span style="color: brightblack;">if</span> way == Walk.INFIX:
+                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
+                <span style="color: brightblack;">self</span>.r.walk(fn, way, level+1)
+            <span style="color: brightblack;">else</span>:
+                fn(<span style="color: #7fffd4;">None</span>, level+1, <span style="color: brightblack;">self</span>.no_children, WalkPos.RIGHT)
+            <span style="color: brightblack;">if</span> way == Walk.POSTFIX:
+                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">asc</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_left:
-                <span style="color: #531ab6;">for</span> node <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.l.asc():
-                    <span style="color: #531ab6;">yield</span> node
-            <span style="color: #531ab6;">yield</span> <span style="color: #531ab6;">self</span>
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_right:
-                <span style="color: #531ab6;">for</span> node <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.r.asc():
-                    <span style="color: #531ab6;">yield</span> node
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">asc</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
+                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.l.asc():
+                    <span style="color: brightblack;">yield</span> node
+            <span style="color: brightblack;">yield</span> <span style="color: brightblack;">self</span>
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
+                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.r.asc():
+                    <span style="color: brightblack;">yield</span> node
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">desc</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_right:
-                <span style="color: #531ab6;">for</span> node <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.r.desc():
-                    <span style="color: #531ab6;">yield</span> node
-            <span style="color: #531ab6;">yield</span> <span style="color: #531ab6;">self</span>
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_left:
-                <span style="color: #531ab6;">for</span> node <span style="color: #531ab6;">in</span> <span style="color: #531ab6;">self</span>.l.desc():
-                    <span style="color: #531ab6;">yield</span> node
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">desc</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
+                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.r.desc():
+                    <span style="color: brightblack;">yield</span> node
+            <span style="color: brightblack;">yield</span> <span style="color: brightblack;">self</span>
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
+                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.l.desc():
+                    <span style="color: brightblack;">yield</span> node
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">union</span>(<span style="color: #531ab6;">self</span>, tr):
-        <span style="color: #531ab6;">pass</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">union</span>(<span style="color: brightblack;">self</span>, tr):
+        <span style="color: brightblack;">pass</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">split</span>(<span style="color: #531ab6;">self</span>, k):
-        <span style="color: #531ab6;">pass</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">split</span>(<span style="color: brightblack;">self</span>, k):
+        <span style="color: brightblack;">pass</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">left_turn</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #2a5045;">'''Turns the subtree to the left</span>
-<span style="color: #2a5045;">        '''</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_right:
-            <span style="color: #005e8b;">tmp</span> = BinTree().inherit_node(<span style="color: #531ab6;">self</span>, l=<span style="color: #0000b0;">True</span>)
-            tmp.<span style="color: #005e8b;">size</span> = 1 + \
-                (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.l.size) + (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.r.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.r.l.size)
-            tmp.<span style="color: #005e8b;">r</span> = <span style="color: #531ab6;">self</span>.r.l
-            <span style="color: #531ab6;">if</span> tmp.r <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                tmp.r.<span style="color: #005e8b;">p</span> = tmp
-            tmp.<span style="color: #005e8b;">p</span> = <span style="color: #531ab6;">self</span>
-            <span style="color: #005e8b;">my_old_r</span> = <span style="color: #531ab6;">self</span>.r
-            <span style="color: #531ab6;">self</span>.inherit_node(<span style="color: #531ab6;">self</span>.r, r=<span style="color: #0000b0;">True</span>)
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Just mark it as deallocated (not needed in Python, sure). Alternative</span>
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">is to use this node instead of tmp</span>
-            my_old_r.<span style="color: #005e8b;">k</span> = <span style="color: #0000b0;">None</span>
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">l</span> = tmp
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">True</span>
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">False</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">left_turn</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">'''Turns the subtree to the left</span>
+<span style="color: brightblack;">        '''</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
+            <span style="color: #b3b3b3;">tmp</span> = BinTree().inherit_node(<span style="color: brightblack;">self</span>, l=<span style="color: #7fffd4;">True</span>)
+            tmp.<span style="color: #b3b3b3;">size</span> = 1 + \
+                (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size) + (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.l.size)
+            tmp.<span style="color: #b3b3b3;">r</span> = <span style="color: brightblack;">self</span>.r.l
+            <span style="color: brightblack;">if</span> tmp.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                tmp.r.<span style="color: #b3b3b3;">p</span> = tmp
+            tmp.<span style="color: #b3b3b3;">p</span> = <span style="color: brightblack;">self</span>
+            <span style="color: #b3b3b3;">my_old_r</span> = <span style="color: brightblack;">self</span>.r
+            <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, r=<span style="color: #7fffd4;">True</span>)
+            <span style="color: #595959;"># </span><span style="color: #595959;">Just mark it as deallocated (not needed in Python, sure). Alternative</span>
+            <span style="color: #595959;"># </span><span style="color: #595959;">is to use this node instead of tmp</span>
+            my_old_r.<span style="color: #b3b3b3;">k</span> = <span style="color: #7fffd4;">None</span>
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = tmp
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">True</span>
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">right_turn</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #2a5045;">'''Turns the subtree to the right</span>
-<span style="color: #2a5045;">        '''</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_left:
-            <span style="color: #005e8b;">tmp</span> = BinTree().inherit_node(<span style="color: #531ab6;">self</span>, r=<span style="color: #0000b0;">True</span>)
-            tmp.<span style="color: #005e8b;">size</span> = 1 + \
-                (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.r.size) + (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.l.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.l.r.size)
-            tmp.<span style="color: #005e8b;">l</span> = <span style="color: #531ab6;">self</span>.l.r
-            <span style="color: #531ab6;">if</span> tmp.l <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-                tmp.l.<span style="color: #005e8b;">p</span> = tmp
-            tmp.<span style="color: #005e8b;">p</span> = <span style="color: #531ab6;">self</span>
-            <span style="color: #005e8b;">my_old_l</span> = <span style="color: #531ab6;">self</span>.l
-            <span style="color: #531ab6;">self</span>.inherit_node(<span style="color: #531ab6;">self</span>.l, l=<span style="color: #0000b0;">True</span>)
-            <span style="color: #7f0000;"># </span><span style="color: #7f0000;">Just mark it as deallocated - see left_turn()</span>
-            my_old_l.<span style="color: #005e8b;">k</span> = <span style="color: #0000b0;">None</span>
-            <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">r</span> = tmp
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">True</span>
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #531ab6;">return</span> <span style="color: #0000b0;">False</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">right_turn</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">'''Turns the subtree to the right</span>
+<span style="color: brightblack;">        '''</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
+            <span style="color: #b3b3b3;">tmp</span> = BinTree().inherit_node(<span style="color: brightblack;">self</span>, r=<span style="color: #7fffd4;">True</span>)
+            tmp.<span style="color: #b3b3b3;">size</span> = 1 + \
+                (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size) + (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.r.size)
+            tmp.<span style="color: #b3b3b3;">l</span> = <span style="color: brightblack;">self</span>.l.r
+            <span style="color: brightblack;">if</span> tmp.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+                tmp.l.<span style="color: #b3b3b3;">p</span> = tmp
+            tmp.<span style="color: #b3b3b3;">p</span> = <span style="color: brightblack;">self</span>
+            <span style="color: #b3b3b3;">my_old_l</span> = <span style="color: brightblack;">self</span>.l
+            <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.l, l=<span style="color: #7fffd4;">True</span>)
+            <span style="color: #595959;"># </span><span style="color: #595959;">Just mark it as deallocated - see left_turn()</span>
+            my_old_l.<span style="color: #b3b3b3;">k</span> = <span style="color: #7fffd4;">None</span>
+            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = tmp
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">True</span>
+        <span style="color: brightblack;">else</span>:
+            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
 
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">disbalance_factor</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.r <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.r.size) - (0 <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.l <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #531ab6;">self</span>.l.size)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">disbalance_factor</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size) - (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size)
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">_balance</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #005e8b;">r</span> = <span style="color: #0000b0;">False</span>
-        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">chsize = lambda child: 0 if child is None else child.size</span>
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>.is_empty:
-            <span style="color: #005e8b;">d</span> = <span style="color: #531ab6;">self</span>.disbalance_factor()
-            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(self, d)</span>
-            <span style="color: #531ab6;">if</span> d &gt;= 2:
-                <span style="color: #005e8b;">r1</span> = <span style="color: #531ab6;">self</span>.left_turn()
-                <span style="color: #7f0000;">#</span><span style="color: #7f0000;">if self.disbalance_factor() != -d:</span>
-                <span style="color: #7f0000;">#    </span><span style="color: #7f0000;">r |= True</span>
-                <span style="color: #531ab6;">if</span> r1:
-                    <span style="color: #005e8b;">d1</span> = <span style="color: #531ab6;">self</span>.disbalance_factor()
-                    <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">abs</span>(d1) &lt; 2 <span style="color: #531ab6;">and</span> d1 != -1*d:
-                        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  ...end on {self}')</span>
-                        <span style="color: #005e8b;">r</span> |= <span style="color: #0000b0;">True</span>
-                    <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  left turned {self}')</span>
-            <span style="color: #531ab6;">elif</span> d &lt;= -2:
-                <span style="color: #005e8b;">r2</span> = <span style="color: #531ab6;">self</span>.right_turn()
-                <span style="color: #7f0000;">#</span><span style="color: #7f0000;">if self.disbalance_factor() != -d:</span>
-                <span style="color: #7f0000;">#    </span><span style="color: #7f0000;">r |= True</span>
-                <span style="color: #531ab6;">if</span> r2:
-                    <span style="color: #005e8b;">d1</span> = <span style="color: #531ab6;">self</span>.disbalance_factor()
-                    <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">abs</span>(d1) &lt; 2 <span style="color: #531ab6;">and</span> d1 != -1*d:
-                        <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  ...end on {self}')</span>
-                        <span style="color: #005e8b;">r</span> |= <span style="color: #0000b0;">True</span>
-                    <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  right turned {self}')</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_balance</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: #b3b3b3;">r</span> = <span style="color: #7fffd4;">False</span>
+        <span style="color: #595959;">#</span><span style="color: #595959;">chsize = lambda child: 0 if child is None else child.size</span>
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
+            <span style="color: #b3b3b3;">d</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
+            <span style="color: #595959;">#</span><span style="color: #595959;">print(self, d)</span>
+            <span style="color: brightblack;">if</span> d &gt;= 2:
+                <span style="color: #b3b3b3;">r1</span> = <span style="color: brightblack;">self</span>.left_turn()
+                <span style="color: #595959;">#</span><span style="color: #595959;">if self.disbalance_factor() != -d:</span>
+                <span style="color: #595959;">#    </span><span style="color: #595959;">r |= True</span>
+                <span style="color: brightblack;">if</span> r1:
+                    <span style="color: #b3b3b3;">d1</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
+                    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">abs</span>(d1) &lt; 2 <span style="color: brightblack;">and</span> d1 != -1*d:
+                        <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  ...end on {self}')</span>
+                        <span style="color: #b3b3b3;">r</span> |= <span style="color: #7fffd4;">True</span>
+                    <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned {self}')</span>
+            <span style="color: brightblack;">elif</span> d &lt;= -2:
+                <span style="color: #b3b3b3;">r2</span> = <span style="color: brightblack;">self</span>.right_turn()
+                <span style="color: #595959;">#</span><span style="color: #595959;">if self.disbalance_factor() != -d:</span>
+                <span style="color: #595959;">#    </span><span style="color: #595959;">r |= True</span>
+                <span style="color: brightblack;">if</span> r2:
+                    <span style="color: #b3b3b3;">d1</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
+                    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">abs</span>(d1) &lt; 2 <span style="color: brightblack;">and</span> d1 != -1*d:
+                        <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  ...end on {self}')</span>
+                        <span style="color: #b3b3b3;">r</span> |= <span style="color: #7fffd4;">True</span>
+                    <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  right turned {self}')</span>
 
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_left:
-                <span style="color: #005e8b;">r</span> |= <span style="color: #531ab6;">self</span>.l._balance()
-                <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  left turned L {self.l}')</span>
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.is_right:
-                <span style="color: #005e8b;">r</span> |= <span style="color: #531ab6;">self</span>.r._balance()
-                <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(f'  left turned R {self.r}')</span>
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
+                <span style="color: #b3b3b3;">r</span> |= <span style="color: brightblack;">self</span>.l._balance()
+                <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned L {self.l}')</span>
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
+                <span style="color: #b3b3b3;">r</span> |= <span style="color: brightblack;">self</span>.r._balance()
+                <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned R {self.r}')</span>
         
-        <span style="color: #531ab6;">return</span> r
+        <span style="color: brightblack;">return</span> r
 
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">balance</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #005e8b;">i</span> = 0
-        <span style="color: #531ab6;">while</span> <span style="color: #0000b0;">True</span>:
-            <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> <span style="color: #531ab6;">self</span>._balance():
-                <span style="color: #8f0075;">print</span>(f<span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">Done for </span>{i}<span style="color: #3548cf;"> steps'</span>)
-                <span style="color: #531ab6;">break</span>
-            <span style="color: #005e8b;">i</span> += 1
-            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">self._prn.walk(bt)</span>
-            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">if self._prn: print(self._prn, '\n')</span>
-            <span style="color: #7f0000;">#</span><span style="color: #7f0000;">print(self._dumprn.walk(self))</span>
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">balance</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: #b3b3b3;">i</span> = 0
+        <span style="color: brightblack;">while</span> <span style="color: #7fffd4;">True</span>:
+            <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>._balance():
+                <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">Done for </span>{i}<span style="color: brightblack;"> steps'</span>)
+                <span style="color: brightblack;">break</span>
+            <span style="color: #b3b3b3;">i</span> += 1
+            <span style="color: #595959;">#</span><span style="color: #595959;">self._prn.walk(bt)</span>
+            <span style="color: #595959;">#</span><span style="color: #595959;">if self._prn: print(self._prn, '\n')</span>
+            <span style="color: #595959;">#</span><span style="color: #595959;">print(self._dumprn.walk(self))</span>
 
 
 
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">SimplePrefixPrinter</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>, with_value=<span style="color: #0000b0;">False</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">lines</span> = []
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">with_value</span> = with_value
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">SimplePrefixPrinter</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, with_value=<span style="color: #7fffd4;">False</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">with_value</span> = with_value
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__len__</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">len</span>(<span style="color: #531ab6;">self</span>.lines)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.lines)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">visiting_node</span>(<span style="color: #531ab6;">self</span>, el, level, no_brothers, pos):
-        <span style="color: #531ab6;">if</span> el <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span>:
-            <span style="color: #531ab6;">if</span> no_brothers:
-                <span style="color: #531ab6;">return</span>
-            <span style="color: #005e8b;">el</span> = <span style="color: #3548cf;">'.'</span>
-        <span style="color: #531ab6;">else</span>:
-            <span style="color: #005e8b;">el</span> = <span style="color: #3548cf;">'%s[%s]'</span> % (el.k, el.v) <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">self</span>.with_value <span style="color: #531ab6;">else</span> <span style="color: #3548cf;">'%s'</span> % el.v
-        <span style="color: #005e8b;">indent</span> = level * <span style="color: #3548cf;">' '</span>
-        <span style="color: #531ab6;">if</span> level:
-            <span style="color: #005e8b;">indent</span> += level*2*<span style="color: #3548cf;">' '</span>
-        <span style="color: #531ab6;">self</span>.lines.append(<span style="color: #3548cf;">'%s+- %s'</span> % (indent, el))
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">visiting_node</span>(<span style="color: brightblack;">self</span>, el, level, no_brothers, pos):
+        <span style="color: brightblack;">if</span> el <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
+            <span style="color: brightblack;">if</span> no_brothers:
+                <span style="color: brightblack;">return</span>
+            <span style="color: #b3b3b3;">el</span> = <span style="color: brightblack;">'.'</span>
+        <span style="color: brightblack;">else</span>:
+            <span style="color: #b3b3b3;">el</span> = <span style="color: brightblack;">'%s[%s]'</span> % (el.k, el.v) <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.with_value <span style="color: brightblack;">else</span> <span style="color: brightblack;">'%s'</span> % el.v
+        <span style="color: #b3b3b3;">indent</span> = level * <span style="color: brightblack;">' '</span>
+        <span style="color: brightblack;">if</span> level:
+            <span style="color: #b3b3b3;">indent</span> += level*2*<span style="color: brightblack;">' '</span>
+        <span style="color: brightblack;">self</span>.lines.append(<span style="color: brightblack;">'%s+- %s'</span> % (indent, el))
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__repr__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>.join(<span style="color: #531ab6;">self</span>.lines)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>.join(<span style="color: brightblack;">self</span>.lines)
 
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">walk</span>(<span style="color: #531ab6;">self</span>, bt):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">lines</span> = []
-        bt.walk(<span style="color: #531ab6;">self</span>.visiting_node, Walk.PREFIX)
-        <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">str</span>(<span style="color: #531ab6;">self</span>)
-
-
-<span style="color: #531ab6;">class</span> <span style="color: #005f5f;">DumpPrinter</span>:
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__init__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">lines</span> = []
-
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__len__</span>(<span style="color: #531ab6;">self</span>): <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">len</span>(<span style="color: #531ab6;">self</span>.lines)
-
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">visiting_node</span>(<span style="color: #531ab6;">self</span>, el, level, no_brothers, pos):
-        <span style="color: #531ab6;">if</span> el <span style="color: #531ab6;">is</span> <span style="color: #531ab6;">not</span> <span style="color: #0000b0;">None</span>:
-            <span style="color: #005e8b;">s</span> = el.dump()
-            <span style="color: #005e8b;">s</span> += f<span style="color: #3548cf;">'  level=</span>{level}<span style="color: #3548cf;">  no_brothers=</span>{no_brothers}<span style="color: #3548cf;">  pos=</span>{pos}<span style="color: #3548cf;">'</span>
-            <span style="color: #531ab6;">self</span>.lines.append(s)
-
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">__repr__</span>(<span style="color: #531ab6;">self</span>):
-        <span style="color: #531ab6;">return</span> <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>.join(<span style="color: #531ab6;">self</span>.lines)
-
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">walk</span>(<span style="color: #531ab6;">self</span>, bt):
-        <span style="color: #531ab6;">self</span>.<span style="color: #005e8b;">lines</span> = []
-        bt.walk(<span style="color: #531ab6;">self</span>.visiting_node, Walk.PREFIX)
-        <span style="color: #531ab6;">return</span> <span style="color: #8f0075;">str</span>(<span style="color: #531ab6;">self</span>)
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, bt):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
+        bt.walk(<span style="color: brightblack;">self</span>.visiting_node, Walk.PREFIX)
+        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">str</span>(<span style="color: brightblack;">self</span>)
 
 
-<span style="color: #7f0000;">########################################</span>
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(<span style="color: #8f0075;">range</span>(num))
-    <span style="color: #005e8b;">i</span> = 0
-    <span style="color: #005e8b;">cnt</span> = <span style="color: #8f0075;">min</span>(num, num*ratio)
-    <span style="color: #531ab6;">while</span> i &lt; cnt:
-        <span style="color: #005e8b;">r</span> = random.randint(num, num + cnt - 1)
-        <span style="color: #005e8b;">res</span>[r - num] = r
-        <span style="color: #005e8b;">i</span> += 1
-    <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">sorted</span>(res)
-    <span style="color: #531ab6;">return</span> (res, random.choice(res))
+<span style="color: brightblack;">class</span> <span style="color: #cccccc;">DumpPrinter</span>:
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
+
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.lines)
+
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">visiting_node</span>(<span style="color: brightblack;">self</span>, el, level, no_brothers, pos):
+        <span style="color: brightblack;">if</span> el <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
+            <span style="color: #b3b3b3;">s</span> = el.dump()
+            <span style="color: #b3b3b3;">s</span> += f<span style="color: brightblack;">'  level=</span>{level}<span style="color: brightblack;">  no_brothers=</span>{no_brothers}<span style="color: brightblack;">  pos=</span>{pos}<span style="color: brightblack;">'</span>
+            <span style="color: brightblack;">self</span>.lines.append(s)
+
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>.join(<span style="color: brightblack;">self</span>.lines)
+
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, bt):
+        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
+        bt.walk(<span style="color: brightblack;">self</span>.visiting_node, Walk.PREFIX)
+        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">str</span>(<span style="color: brightblack;">self</span>)
 
 
-<span style="color: #531ab6;">def</span> <span style="color: #721045;">myid</span>(obj):
-    <span style="color: #531ab6;">return</span> (0 <span style="color: #531ab6;">if</span> obj <span style="color: #531ab6;">is</span> <span style="color: #0000b0;">None</span> <span style="color: #531ab6;">else</span> <span style="color: #8f0075;">id</span>(obj))
+<span style="color: #595959;">########################################</span>
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">partiallyrandomdata</span>(num, ratio=0.5):
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">range</span>(num))
+    <span style="color: #b3b3b3;">i</span> = 0
+    <span style="color: #b3b3b3;">cnt</span> = <span style="color: #b3b3b3;">min</span>(num, num*ratio)
+    <span style="color: brightblack;">while</span> i &lt; cnt:
+        <span style="color: #b3b3b3;">r</span> = random.randint(num, num + cnt - 1)
+        <span style="color: #b3b3b3;">res</span>[r - num] = r
+        <span style="color: #b3b3b3;">i</span> += 1
+    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
+    <span style="color: brightblack;">return</span> (res, random.choice(res))
 
 
-<span style="color: #005e8b;">NUM</span> = 100
-<span style="color: #005e8b;">bt</span> = BinTree()
-<span style="color: #7f0000;">#</span><span style="color: #7f0000;">arr, x = partiallyrandomdata(NUM, 0.01)</span>
-<span style="color: #005e8b;">arr</span> = [] <span style="color: #7f0000;">#</span><span style="color: #7f0000;">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]</span>
-<span style="color: #531ab6;">for</span> el <span style="color: #531ab6;">in</span> arr:
+<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">myid</span>(obj):
+    <span style="color: brightblack;">return</span> (0 <span style="color: brightblack;">if</span> obj <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: #b3b3b3;">id</span>(obj))
+
+
+<span style="color: #b3b3b3;">NUM</span> = 100
+<span style="color: #b3b3b3;">bt</span> = BinTree()
+<span style="color: #595959;">#</span><span style="color: #595959;">arr, x = partiallyrandomdata(NUM, 0.01)</span>
+<span style="color: #b3b3b3;">arr</span> = [] <span style="color: #595959;">#</span><span style="color: #595959;">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]</span>
+<span style="color: brightblack;">for</span> el <span style="color: brightblack;">in</span> arr:
     bt.add(el, el)
-<span style="color: #531ab6;">while</span> <span style="color: #0000b0;">True</span>:
-    <span style="color: #005e8b;">prn</span> = SimplePrefixPrinter()
-    <span style="color: #005e8b;">dumprn</span> = DumpPrinter()
+<span style="color: brightblack;">while</span> <span style="color: #7fffd4;">True</span>:
+    <span style="color: #b3b3b3;">prn</span> = SimplePrefixPrinter()
+    <span style="color: #b3b3b3;">dumprn</span> = DumpPrinter()
     prn.walk(bt)
-    <span style="color: #531ab6;">if</span> prn:
-        <span style="color: #8f0075;">print</span>(prn, <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
-    <span style="color: #005e8b;">entered</span> = <span style="color: #8f0075;">input</span>(<span style="color: #3548cf;">"Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T/b)? "</span>).split()
-    <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> entered:
-        <span style="color: #8f0075;">print</span>(<span style="color: #3548cf;">"?"</span>)
-        <span style="color: #531ab6;">continue</span>
-    <span style="color: #005e8b;">cmd</span>, *<span style="color: #005e8b;">args</span> = entered
-    <span style="color: #531ab6;">if</span> cmd == <span style="color: #3548cf;">'q'</span>:
-        <span style="color: #531ab6;">break</span>
-    <span style="color: #531ab6;">else</span>:
-        <span style="color: #531ab6;">try</span>:
-            <span style="color: #531ab6;">if</span> cmd == <span style="color: #3548cf;">'d'</span>:
-                <span style="color: #005e8b;">res</span> = bt.remove(<span style="color: #8f0075;">int</span>(args[0]))
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'s'</span>:
-                <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(args):
-                    <span style="color: #005e8b;">res</span> = bt.get(<span style="color: #8f0075;">int</span>(args[0])).size
-                <span style="color: #531ab6;">else</span>:
-                    <span style="color: #005e8b;">res</span> = bt.tree_size
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'g'</span>:
-                <span style="color: #005e8b;">res</span> = bt.get(<span style="color: #8f0075;">int</span>(args[0]))
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'a'</span>:
-                <span style="color: #005e8b;">res</span> = bt.add(<span style="color: #8f0075;">int</span>(args[0]), <span style="color: #8f0075;">int</span>(args[0]))
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'D'</span>:
-                <span style="color: #531ab6;">if</span> <span style="color: #8f0075;">len</span>(args):
-                    <span style="color: #005e8b;">res</span> = bt.get(<span style="color: #8f0075;">int</span>(args[0]))
-                    <span style="color: #005e8b;">res</span> = res.dump()
-                <span style="color: #531ab6;">else</span>:
-                    <span style="color: #005e8b;">res</span> = dumprn.walk(bt)
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'o'</span>:
-                <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(bt.asc())
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'O'</span>:
-                <span style="color: #005e8b;">res</span> = <span style="color: #8f0075;">list</span>(bt.desc())
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'t'</span>:
-                <span style="color: #005e8b;">res</span> = bt.get(<span style="color: #8f0075;">int</span>(args[0])).left_turn()
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'T'</span>:
-                <span style="color: #005e8b;">res</span> = bt.get(<span style="color: #8f0075;">int</span>(args[0])).right_turn()
-            <span style="color: #531ab6;">elif</span> cmd == <span style="color: #3548cf;">'b'</span>:
-                <span style="color: #005e8b;">res</span> = bt.balance()
-            <span style="color: #531ab6;">else</span>:
-                <span style="color: #531ab6;">raise</span> <span style="color: #005f5f;">RuntimeError</span>(<span style="color: #3548cf;">'Unknown command'</span>)
-            <span style="color: #8f0075;">print</span>(res, <span style="color: #3548cf;">'</span><span style="color: #0000b0;">\n</span><span style="color: #3548cf;">'</span>)
-        <span style="color: #531ab6;">except</span> <span style="color: #005f5f;">Exception</span> <span style="color: #531ab6;">as</span> x:
+    <span style="color: brightblack;">if</span> prn:
+        <span style="color: #b3b3b3;">print</span>(prn, <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
+    <span style="color: #b3b3b3;">entered</span> = <span style="color: #b3b3b3;">input</span>(<span style="color: brightblack;">"Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T/b)? "</span>).split()
+    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> entered:
+        <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">"?"</span>)
+        <span style="color: brightblack;">continue</span>
+    <span style="color: #b3b3b3;">cmd</span>, *<span style="color: #b3b3b3;">args</span> = entered
+    <span style="color: brightblack;">if</span> cmd == <span style="color: brightblack;">'q'</span>:
+        <span style="color: brightblack;">break</span>
+    <span style="color: brightblack;">else</span>:
+        <span style="color: brightblack;">try</span>:
+            <span style="color: brightblack;">if</span> cmd == <span style="color: brightblack;">'d'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.remove(<span style="color: #b3b3b3;">int</span>(args[0]))
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'s'</span>:
+                <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(args):
+                    <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).size
+                <span style="color: brightblack;">else</span>:
+                    <span style="color: #b3b3b3;">res</span> = bt.tree_size
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'g'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0]))
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'a'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.add(<span style="color: #b3b3b3;">int</span>(args[0]), <span style="color: #b3b3b3;">int</span>(args[0]))
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'D'</span>:
+                <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(args):
+                    <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0]))
+                    <span style="color: #b3b3b3;">res</span> = res.dump()
+                <span style="color: brightblack;">else</span>:
+                    <span style="color: #b3b3b3;">res</span> = dumprn.walk(bt)
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'o'</span>:
+                <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(bt.asc())
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'O'</span>:
+                <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(bt.desc())
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'t'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).left_turn()
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'T'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).right_turn()
+            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'b'</span>:
+                <span style="color: #b3b3b3;">res</span> = bt.balance()
+            <span style="color: brightblack;">else</span>:
+                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">RuntimeError</span>(<span style="color: brightblack;">'Unknown command'</span>)
+            <span style="color: #b3b3b3;">print</span>(res, <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
+        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span> <span style="color: brightblack;">as</span> x:
             traceback.print_exc()
 </pre>
 </div>

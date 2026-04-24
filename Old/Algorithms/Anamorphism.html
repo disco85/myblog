@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Anamorphism</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="python, algorithms" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Anamorphism</h1>
-<div id="outline-container-org7ea5fb6" class="outline-2">
-<h2 id="org7ea5fb6">Anamorphism</h2>
-<div class="outline-text-2" id="text-org7ea5fb6">
+<div id="outline-container-orgce5cb28" class="outline-2">
+<h2 id="orgce5cb28">Anamorphism</h2>
+<div class="outline-text-2" id="text-orgce5cb28">
 <p>
 Anamorphism is the one of well known recursive schemes which is defined in
 pseudocode as:
@@ -58,7 +83,7 @@ The scheme looks like:
 </p>
 
 
-<div id="org51a8f3d" class="figure">
+<div id="org8ce9594" class="figure">
 <p><img src="../../assets/Anamorphism1.svg" alt="Anamorphism1.svg" class="org-svg" />
 </p>
 </div>
@@ -73,11 +98,11 @@ It can be easy coded in Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">ana</span>(b, g, p):
-    <span style="color: #531ab6;">if</span> p(b): <span style="color: #531ab6;">return</span> []
-    <span style="color: #531ab6;">else</span>:
-        <span style="color: #005e8b;">a</span>, <span style="color: #005e8b;">b_</span> = g(b)
-        <span style="color: #531ab6;">return</span> a + ana(b_, g, p)
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">ana</span>(b, g, p):
+    <span style="color: brightblack;">if</span> p(b): <span style="color: brightblack;">return</span> []
+    <span style="color: brightblack;">else</span>:
+        <span style="color: #b3b3b3;">a</span>, <span style="color: #b3b3b3;">b_</span> = g(b)
+        <span style="color: brightblack;">return</span> a + ana(b_, g, p)
 </pre>
 </div>
 
@@ -86,19 +111,19 @@ Most known example of usage is:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #531ab6;">def</span> <span style="color: #721045;">myzip</span>(l0, l1):
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">g</span>(b):
-        <span style="color: #005e8b;">x</span>, *<span style="color: #005e8b;">xs</span> = b[0]
-        <span style="color: #005e8b;">y</span>, *<span style="color: #005e8b;">ys</span> = b[1]
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> xs <span style="color: #531ab6;">and</span> <span style="color: #005e8b;">ys</span>: <span style="color: #005f5f;">xs</span> = [<span style="color: #0000b0;">None</span>]
-        <span style="color: #531ab6;">if</span> <span style="color: #531ab6;">not</span> ys <span style="color: #531ab6;">and</span> <span style="color: #005e8b;">xs</span>: <span style="color: #005f5f;">ys</span> = [<span style="color: #0000b0;">None</span>]
-        <span style="color: #531ab6;">return</span> ([(x, y)], (xs, ys))
-    <span style="color: #531ab6;">def</span> <span style="color: #721045;">p</span>(b):
-        <span style="color: #531ab6;">return</span> <span style="color: #531ab6;">not</span> (b[0] <span style="color: #531ab6;">or</span> b[1])
-    <span style="color: #531ab6;">return</span> ana((l0, l1), g, p)
+<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">myzip</span>(l0, l1):
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">g</span>(b):
+        <span style="color: #b3b3b3;">x</span>, *<span style="color: #b3b3b3;">xs</span> = b[0]
+        <span style="color: #b3b3b3;">y</span>, *<span style="color: #b3b3b3;">ys</span> = b[1]
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> xs <span style="color: brightblack;">and</span> <span style="color: #b3b3b3;">ys</span>: <span style="color: #cccccc;">xs</span> = [<span style="color: #7fffd4;">None</span>]
+        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> ys <span style="color: brightblack;">and</span> <span style="color: #b3b3b3;">xs</span>: <span style="color: #cccccc;">ys</span> = [<span style="color: #7fffd4;">None</span>]
+        <span style="color: brightblack;">return</span> ([(x, y)], (xs, ys))
+    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">p</span>(b):
+        <span style="color: brightblack;">return</span> <span style="color: brightblack;">not</span> (b[0] <span style="color: brightblack;">or</span> b[1])
+    <span style="color: brightblack;">return</span> ana((l0, l1), g, p)
 
-<span style="color: #8f0075;">print</span>(myzip([1,2,3,4], [10,20,30]))
-<span style="color: #8f0075;">print</span>(<span style="color: #8f0075;">list</span>(<span style="color: #8f0075;">zip</span>([1,2,3], [10,20,30])))
+<span style="color: #b3b3b3;">print</span>(myzip([1,2,3,4], [10,20,30]))
+<span style="color: #b3b3b3;">print</span>(<span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">zip</span>([1,2,3], [10,20,30])))
 </pre>
 </div>
 
@@ -107,7 +132,7 @@ A specially ZIP looks like:
 </p>
 
 
-<div id="org0ff468b" class="figure">
+<div id="orgea947fa" class="figure">
 <p><img src="../../assets/Anamorphism2.svg" alt="Anamorphism2.svg" class="org-svg" />
 </p>
 </div>

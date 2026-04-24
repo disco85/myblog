@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Traversing over paths in Tcl</title>
@@ -11,33 +11,58 @@
 <meta name="keywords" content="misc, tcl/tk" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Traversing over paths in Tcl</h1>
-<div id="outline-container-org3050d2f" class="outline-2">
-<h2 id="org3050d2f">Traversing over paths in Tcl</h2>
-<div class="outline-text-2" id="text-org3050d2f">
+<div id="outline-container-orgbc46609" class="outline-2">
+<h2 id="orgbc46609">Traversing over paths in Tcl</h2>
+<div class="outline-text-2" id="text-orgbc46609">
 <p>
 If we have paths - string like directories of DOS, we can want to group them and walking on all of them:
 </p>
@@ -65,54 +90,54 @@ Next procedure does it, but paths are list of lists (each item is list of direct
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #531ab6;">proc</span> <span style="color: #721045;">forpaths</span> {boundVarNames paths <span style="color: #531ab6;">body</span>} {
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">walk on paths, each is list of dirs. $body will execute on visit each dir,</span>
-<span style="color: #7f0000;"># </span><span style="color: #7f0000;">variables bound:</span>
-<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">$keyName - current path</span>
-<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">$levelName - current level (0...N)</span>
-<span style="color: #7f0000;">#   </span><span style="color: #7f0000;">$leafName - is leaf or not (1, 0)</span>
-    <span style="color: #531ab6;">foreach</span> {keyName levelName leafName} [<span style="color: #8f0075;">lrange</span> $<span style="color: #005e8b;">boundVarNames</span> 0 2] {}
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">group</span> [dict create]
-    <span style="color: #531ab6;">foreach</span> path $<span style="color: #005e8b;">paths</span> {
-        dict <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">group</span> {*}$<span style="color: #005e8b;">path</span> <span style="color: #3548cf;">"@LEAF"</span>
+<pre class="src src-tcl"><span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">forpaths</span> {boundVarNames paths <span style="color: brightblack;">body</span>} {
+<span style="color: #595959;"># </span><span style="color: #595959;">walk on paths, each is list of dirs. $body will execute on visit each dir,</span>
+<span style="color: #595959;"># </span><span style="color: #595959;">variables bound:</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">$keyName - current path</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">$levelName - current level (0...N)</span>
+<span style="color: #595959;">#   </span><span style="color: #595959;">$leafName - is leaf or not (1, 0)</span>
+    <span style="color: brightblack;">foreach</span> {keyName levelName leafName} [<span style="color: #b3b3b3;">lrange</span> $<span style="color: #b3b3b3;">boundVarNames</span> 0 2] {}
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">group</span> [dict create]
+    <span style="color: brightblack;">foreach</span> path $<span style="color: #b3b3b3;">paths</span> {
+        dict <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">group</span> {*}$<span style="color: #b3b3b3;">path</span> <span style="color: brightblack;">"@LEAF"</span>
     }
-    <span style="color: #531ab6;">proc</span> <span style="color: #721045;">_cmp</span> {a b} {
-        <span style="color: #531ab6;">if</span> {[<span style="color: #8f0075;">expr</span> {$<span style="color: #005e8b;">a</span> &gt; $<span style="color: #005e8b;">b</span>}]} { <span style="color: #531ab6;">return</span> 1 } <span style="color: #3548cf;">\</span>
-        <span style="color: #531ab6;">elseif</span> {[<span style="color: #8f0075;">expr</span> {$<span style="color: #005e8b;">a</span> &lt; $<span style="color: #005e8b;">b</span>}]} { <span style="color: #531ab6;">return</span> -1 } <span style="color: #3548cf;">\</span>
-        <span style="color: #531ab6;">else</span> { <span style="color: #531ab6;">return</span> 0 }
+    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">_cmp</span> {a b} {
+        <span style="color: brightblack;">if</span> {[<span style="color: #b3b3b3;">expr</span> {$<span style="color: #b3b3b3;">a</span> &gt; $<span style="color: #b3b3b3;">b</span>}]} { <span style="color: brightblack;">return</span> 1 } <span style="color: brightblack;">\</span>
+        <span style="color: brightblack;">elseif</span> {[<span style="color: #b3b3b3;">expr</span> {$<span style="color: #b3b3b3;">a</span> &lt; $<span style="color: #b3b3b3;">b</span>}]} { <span style="color: brightblack;">return</span> -1 } <span style="color: brightblack;">\</span>
+        <span style="color: brightblack;">else</span> { <span style="color: brightblack;">return</span> 0 }
     }
-    <span style="color: #531ab6;">proc</span> <span style="color: #721045;">_trackpath</span> {track level dir} {
-        <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">track</span> eq <span style="color: #3548cf;">""</span>} { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">track</span> {<span style="color: #3548cf;">"@DUMMY"</span>} }
-        <span style="color: #531ab6;">switch</span> -- [_cmp [<span style="color: #8f0075;">expr</span> $<span style="color: #005e8b;">level</span>+1] [<span style="color: #8f0075;">llength</span> $<span style="color: #005e8b;">track</span>]] {
-            1  { <span style="color: #8f0075;">lappend</span> track $<span style="color: #005e8b;">dir</span> }
-            0  { lset track end $<span style="color: #005e8b;">dir</span> }
-            -1 { <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">track</span> [<span style="color: #8f0075;">lreplace</span> $<span style="color: #005e8b;">track</span> $<span style="color: #005e8b;">level</span> end $<span style="color: #005e8b;">dir</span>] }
+    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">_trackpath</span> {track level dir} {
+        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">track</span> eq <span style="color: brightblack;">""</span>} { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">track</span> {<span style="color: brightblack;">"@DUMMY"</span>} }
+        <span style="color: brightblack;">switch</span> -- [_cmp [<span style="color: #b3b3b3;">expr</span> $<span style="color: #b3b3b3;">level</span>+1] [<span style="color: #b3b3b3;">llength</span> $<span style="color: #b3b3b3;">track</span>]] {
+            1  { <span style="color: #b3b3b3;">lappend</span> track $<span style="color: #b3b3b3;">dir</span> }
+            0  { lset track end $<span style="color: #b3b3b3;">dir</span> }
+            -1 { <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">track</span> [<span style="color: #b3b3b3;">lreplace</span> $<span style="color: #b3b3b3;">track</span> $<span style="color: #b3b3b3;">level</span> end $<span style="color: #b3b3b3;">dir</span>] }
         }
-        <span style="color: #531ab6;">return</span> $<span style="color: #005e8b;">track</span>
+        <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">track</span>
     }
-    <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">gtrack</span> {}; <span style="color: #7f0000;"># current path when visit each node</span>
-    <span style="color: #531ab6;">proc</span> <span style="color: #721045;">_walk</span> {d keyName levelName leafName <span style="color: #531ab6;">body</span> {_deep 2}} {
-    <span style="color: #7f0000;"># here $level is level in tree, not in stack</span>
-    <span style="color: #7f0000;"># $_deep is level in stack</span>
-        <span style="color: #005f5f;">upvar</span> $<span style="color: #005e8b;">_deep</span> $<span style="color: #005e8b;">keyName</span> key $<span style="color: #005e8b;">levelName</span> level
-        <span style="color: #005f5f;">upvar</span> gtrack gtrack
-        <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">leafName</span> ne <span style="color: #3548cf;">""</span>} { <span style="color: #005f5f;">upvar</span> $<span style="color: #005e8b;">_deep</span> $<span style="color: #005e8b;">leafName</span> leaf }
-        dict <span style="color: #531ab6;">for</span> {k v} $<span style="color: #005e8b;">d</span> {
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">level</span> [<span style="color: #8f0075;">expr</span> {$<span style="color: #005e8b;">_deep</span>-2}]
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">gtrack</span> [_trackpath $<span style="color: #005e8b;">gtrack</span> $<span style="color: #005e8b;">level</span> $<span style="color: #005e8b;">k</span>]
-            <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">key</span> $<span style="color: #005e8b;">gtrack</span>
-            <span style="color: #531ab6;">if</span> {$<span style="color: #005e8b;">v</span> eq <span style="color: #3548cf;">"@LEAF"</span>} {
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">leaf</span> 1
-                <span style="color: #531ab6;">uplevel</span> $<span style="color: #005e8b;">_deep</span> $<span style="color: #005e8b;">body</span>
-            } <span style="color: #531ab6;">else</span> {
-            <span style="color: #7f0000;"># nested</span>
-                <span style="color: #8f0075;">set</span> <span style="color: #005e8b;">leaf</span> 0
-                <span style="color: #531ab6;">uplevel</span> $<span style="color: #005e8b;">_deep</span> $<span style="color: #005e8b;">body</span>
-                _walk $<span style="color: #005e8b;">v</span> $<span style="color: #005e8b;">keyName</span> $<span style="color: #005e8b;">levelName</span> $<span style="color: #005e8b;">leafName</span> $<span style="color: #005e8b;">body</span> [<span style="color: #8f0075;">expr</span> {$<span style="color: #005e8b;">_deep</span>+1}]
+    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">gtrack</span> {}; <span style="color: #595959;"># current path when visit each node</span>
+    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">_walk</span> {d keyName levelName leafName <span style="color: brightblack;">body</span> {_deep 2}} {
+    <span style="color: #595959;"># here $level is level in tree, not in stack</span>
+    <span style="color: #595959;"># $_deep is level in stack</span>
+        <span style="color: #cccccc;">upvar</span> $<span style="color: #b3b3b3;">_deep</span> $<span style="color: #b3b3b3;">keyName</span> key $<span style="color: #b3b3b3;">levelName</span> level
+        <span style="color: #cccccc;">upvar</span> gtrack gtrack
+        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">leafName</span> ne <span style="color: brightblack;">""</span>} { <span style="color: #cccccc;">upvar</span> $<span style="color: #b3b3b3;">_deep</span> $<span style="color: #b3b3b3;">leafName</span> leaf }
+        dict <span style="color: brightblack;">for</span> {k v} $<span style="color: #b3b3b3;">d</span> {
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">level</span> [<span style="color: #b3b3b3;">expr</span> {$<span style="color: #b3b3b3;">_deep</span>-2}]
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">gtrack</span> [_trackpath $<span style="color: #b3b3b3;">gtrack</span> $<span style="color: #b3b3b3;">level</span> $<span style="color: #b3b3b3;">k</span>]
+            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">key</span> $<span style="color: #b3b3b3;">gtrack</span>
+            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">v</span> eq <span style="color: brightblack;">"@LEAF"</span>} {
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">leaf</span> 1
+                <span style="color: brightblack;">uplevel</span> $<span style="color: #b3b3b3;">_deep</span> $<span style="color: #b3b3b3;">body</span>
+            } <span style="color: brightblack;">else</span> {
+            <span style="color: #595959;"># nested</span>
+                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">leaf</span> 0
+                <span style="color: brightblack;">uplevel</span> $<span style="color: #b3b3b3;">_deep</span> $<span style="color: #b3b3b3;">body</span>
+                _walk $<span style="color: #b3b3b3;">v</span> $<span style="color: #b3b3b3;">keyName</span> $<span style="color: #b3b3b3;">levelName</span> $<span style="color: #b3b3b3;">leafName</span> $<span style="color: #b3b3b3;">body</span> [<span style="color: #b3b3b3;">expr</span> {$<span style="color: #b3b3b3;">_deep</span>+1}]
             }
         }
     }
-    _walk $<span style="color: #005e8b;">group</span> $<span style="color: #005e8b;">keyName</span> $<span style="color: #005e8b;">levelName</span> $<span style="color: #005e8b;">leafName</span> $<span style="color: #005e8b;">body</span>
+    _walk $<span style="color: #b3b3b3;">group</span> $<span style="color: #b3b3b3;">keyName</span> $<span style="color: #b3b3b3;">levelName</span> $<span style="color: #b3b3b3;">leafName</span> $<span style="color: #b3b3b3;">body</span>
 }
 </pre>
 </div>
@@ -122,8 +147,8 @@ It works like <code>foreach</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl">forpaths {k level leaf} $<span style="color: #005e8b;">someDirs</span> {
-    <span style="color: #8f0075;">puts</span> <span style="color: #3548cf;">"key: $k level: $level isLeaf: $leaf"</span>
+<pre class="src src-tcl">forpaths {k level leaf} $<span style="color: #b3b3b3;">someDirs</span> {
+    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"key: $k level: $level isLeaf: $leaf"</span>
 }
 </pre>
 </div>

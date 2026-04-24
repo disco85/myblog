@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-13 Mon 15:18 -->
+<!-- 2026-04-24 Fri 07:44 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR32: prescalers for ticks generation</title>
@@ -11,72 +11,97 @@
 <meta name="keywords" content="embedded, clang" />
 <meta name="generator" content="Org Mode" />
 <style>
-:root { color-scheme: light;
-        --stroke-color: black; }
-body { font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif;
-       color-scheme: light;
-       color: black;
-       background-color: #F8F4E8; }
-h1 { background-color: #CDAB8F; color: black; }
-h2 { color: black; }
-a:link { color: #1A5FB4; }
-a:visited { color: #903909; }
-code, pre { background-color: #FFEDDF;
-            padding: 2px;
-            font-family: monospace; }
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000; }
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: dark;
+  color: #FF8000;
+  background-color: black; }
+h1, h2 {
+  display: inline-block;      /* so the underline fits the text width */
+  border-bottom: 2px dashed #FF8000;
+  padding-bottom: 0.1em; }
+a:link {
+  color: #FF8000;
+  text-decoration: underlined; }
+a:visited { color: #DD7000; }
+div {
+  padding: 0;
+  margin: 0; }
+code {
+  background-color: #FF8000;
+  border: 1px solid #FF8000;
+  color: black;
+  padding: 2px;
+  font-family: monospace; }
+pre, .verse {
+  display: inline-block;
+  border: 1px solid #FF8000;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace; }
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */ }
 </style>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
-<a href="../../index.html">Sitemap</a>
-| <a href="https://github.com/disco85/">My&nbsp;Github</a>
+[<a href="../../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR32: prescalers for ticks generation</h1>
-<div id="outline-container-org75dc205" class="outline-2">
-<h2 id="org75dc205">AVR32: prescalers for ticks generation</h2>
-<div class="outline-text-2" id="text-org75dc205">
+<div id="outline-container-orgf44e50c" class="outline-2">
+<h2 id="orgf44e50c">AVR32: prescalers for ticks generation</h2>
+<div class="outline-text-2" id="text-orgf44e50c">
 <p>
 It's for AVR32 with usage of ASF. If we need to generate ticks, we can use one of wave generation mode of AVR32 TCs. For this we need to define value of RC register and to select clock source (internal line). We use PBA line divided by 2, 8, 32, 128 dividers (so sources are <code>TC_CLOCK_SOURCE2..5</code> in ASF 'terminology' - macroses :).
 Here is the source of calculator of RC, divider:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;stdint.h&gt;</span>
-<span style="color: #a0132f;">#include</span> <span style="color: #3548cf;">&lt;limits.h&gt;</span>
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdint.h&gt;</span>
+<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;limits.h&gt;</span>
 
-<span style="color: #7f0000;">// </span><span style="color: #7f0000;">max value of RC register with type uint16_t (unsigned short of AVR32 GCC)</span>
-<span style="color: #a0132f;">#define</span> <span style="color: #005e8b;">MAX_RC</span> (1&lt;&lt;(<span style="color: #531ab6;">sizeof</span>(uint16_t)*CHAR_BIT))
-<span style="color: #005f5f;">int</span>
-<span style="color: #721045;">calc_tc_params</span>(<span style="color: #005f5f;">long</span> *<span style="color: #005e8b;">freq</span>, <span style="color: #005f5f;">long</span> *<span style="color: #005e8b;">err</span>, <span style="color: #005f5f;">uint16_t</span> *<span style="color: #005e8b;">presc</span>, <span style="color: #005f5f;">uint16_t</span> *<span style="color: #005e8b;">rc</span>)
+<span style="color: #595959;">// </span><span style="color: #595959;">max value of RC register with type uint16_t (unsigned short of AVR32 GCC)</span>
+<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">MAX_RC</span> (1&lt;&lt;(<span style="color: brightblack;">sizeof</span>(uint16_t)*CHAR_BIT))
+<span style="color: #cccccc;">int</span>
+<span style="color: #a52a2a;">calc_tc_params</span>(<span style="color: #cccccc;">long</span> *<span style="color: #b3b3b3;">freq</span>, <span style="color: #cccccc;">long</span> *<span style="color: #b3b3b3;">err</span>, <span style="color: #cccccc;">uint16_t</span> *<span style="color: #b3b3b3;">presc</span>, <span style="color: #cccccc;">uint16_t</span> *<span style="color: #b3b3b3;">rc</span>)
 {
-        <span style="color: #531ab6;">static</span> <span style="color: #531ab6;">const</span> <span style="color: #005f5f;">long</span> <span style="color: #005e8b;">divs</span>[] = {2, 8, 32, 128};
-        <span style="color: #531ab6;">static</span> <span style="color: #531ab6;">const</span> <span style="color: #005f5f;">int</span> <span style="color: #005e8b;">ndivs</span> = <span style="color: #531ab6;">sizeof</span> divs/<span style="color: #531ab6;">sizeof</span> divs[0];
-        <span style="color: #005f5f;">long</span> <span style="color: #005e8b;">_err</span> = 0, <span style="color: #005e8b;">_merr</span> = *err;
-        <span style="color: #005f5f;">uint16_t</span> <span style="color: #005e8b;">_rc</span> = 0, <span style="color: #005e8b;">_mrc</span> = 0, <span style="color: #005e8b;">_idiv</span> = 0, <span style="color: #005e8b;">_midiv</span> = 0;
+        <span style="color: brightblack;">static</span> <span style="color: brightblack;">const</span> <span style="color: #cccccc;">long</span> <span style="color: #b3b3b3;">divs</span>[] = {2, 8, 32, 128};
+        <span style="color: brightblack;">static</span> <span style="color: brightblack;">const</span> <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">ndivs</span> = <span style="color: brightblack;">sizeof</span> divs/<span style="color: brightblack;">sizeof</span> divs[0];
+        <span style="color: #cccccc;">long</span> <span style="color: #b3b3b3;">_err</span> = 0, <span style="color: #b3b3b3;">_merr</span> = *err;
+        <span style="color: #cccccc;">uint16_t</span> <span style="color: #b3b3b3;">_rc</span> = 0, <span style="color: #b3b3b3;">_mrc</span> = 0, <span style="color: #b3b3b3;">_idiv</span> = 0, <span style="color: #b3b3b3;">_midiv</span> = 0;
 
-        <span style="color: #531ab6;">for</span> (_idiv = 0; _idiv &lt; ndivs; _idiv++) {
+        <span style="color: brightblack;">for</span> (_idiv = 0; _idiv &lt; ndivs; _idiv++) {
                 _rc = (FPBA / divs[_idiv]) / (*freq);
                 _rc = (_rc==0? 1 : _rc&gt;MAX_RC? MAX_RC : _rc);
-                _err = abs((*freq) - (FPBA / divs[_idiv]) / (<span style="color: #005f5f;">long</span>)_rc);
-                <span style="color: #531ab6;">if</span> (_err &lt;= _merr) {
+                _err = abs((*freq) - (FPBA / divs[_idiv]) / (<span style="color: #cccccc;">long</span>)_rc);
+                <span style="color: brightblack;">if</span> (_err &lt;= _merr) {
                         _merr = _err;
                         _midiv = _idiv;
                         _mrc = _rc;
                 }
-                <span style="color: #531ab6;">if</span> (<span style="color: #a60000; font-weight: bold;">!</span>_err) <span style="color: #531ab6;">break</span>;
+                <span style="color: brightblack;">if</span> (!_err) <span style="color: brightblack;">break</span>;
         }
 
-        <span style="color: #531ab6;">if</span> (_mrc) {
+        <span style="color: brightblack;">if</span> (_mrc) {
                 *rc = _mrc;
                 *err = _merr;
                 *presc = divs[_midiv];
                 *freq = (FPBA / divs[_midiv]) / _mrc;
-                <span style="color: #531ab6;">return</span> (1);
-        } <span style="color: #531ab6;">else</span>
-                <span style="color: #531ab6;">return</span> (0);
+                <span style="color: brightblack;">return</span> (1);
+        } <span style="color: brightblack;">else</span>
+                <span style="color: brightblack;">return</span> (0);
 }
 </pre>
 </div>
@@ -106,7 +131,7 @@ Timer source can be found in this way:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #a0132f;">#define</span> <span style="color: #721045;">PRESC2TCSRC</span>(<span style="color: #005e8b;">PRESC</span>) ((PRESC)==2? TC_CLOCK_SOURCE_TC2 \
+<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRESC2TCSRC</span>(<span style="color: #b3b3b3;">PRESC</span>) ((PRESC)==2? TC_CLOCK_SOURCE_TC2 \
                             :(PRESC)==8? TC_CLOCK_SOURCE_TC3 \
                             :(PRESC)==32? TC_CLOCK_SOURCE_TC4 \
                             :(PRESC)==128? TC_CLOCK_SOURCE_TC5 \
