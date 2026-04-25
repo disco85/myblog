@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gnome sorting</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Gnome sorting</h1>
-<div id="outline-container-org541854b" class="outline-2">
-<h2 id="org541854b">Gnome sorting</h2>
-<div class="outline-text-2" id="text-org541854b">
+<div id="outline-container-orgafb55c7" class="outline-2">
+<h2 id="orgafb55c7">Gnome sorting</h2>
+<div class="outline-text-2" id="text-orgafb55c7">
 <p>
 The central idea is to walk to the line of pairs, to check them and if they are unordered then swap them. Otherwise - forward to the next pair (1 position forward, not 2, ie, from (1,2) to (2,3) in 1,2,3,4). But if we swapped the pair, we shift one pair backward and check them again. If it's impossible (we are already at the beginning), then shift forward to the pair next after tested one. The end is when no more pairs to test (tested - ok, forward - ops, we are at the end).
 </p>
@@ -102,37 +227,37 @@ Why we shift forward to 1 position, not to 1 pair? I.e. from (1,2) to (2,3) in 1
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">swap</span>(arr, i, j):
-    <span style="color: #b3b3b3;">tmp</span> = arr[i]
-    <span style="color: #b3b3b3;">arr</span>[i] = arr[j]
-    <span style="color: #b3b3b3;">arr</span>[j] = tmp
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">swap</span>(arr, i, j):
+    <span class="org-variable-name">tmp</span> <span class="org-operator">=</span> arr[i]
+    <span class="org-variable-name">arr</span>[i] <span class="org-operator">=</span> arr[j]
+    <span class="org-variable-name">arr</span>[j] <span class="org-operator">=</span> tmp
     
 
-<span style="color: #595959;"># </span><span style="color: #595959;">array    in focus       actions</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">-----------------------------------------------------------------------------------------</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">4 3 1 2   (4, 3)     not ok, swap, backward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">3 4 1 2   (3, 4)     ok, forward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">3 4 1 2   (4, 1)     not ok, swap, backward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">3 1 4 2   (3, 1)     not ok, swap, backward (not possible, forward to next/not tested pair)</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">1 3 4 2   (4, 2)     not ok, swap, backward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">1 3 2 4   (3, 2)     not ok, swap, backward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">1 2 3 4   (1, 2)     ok, forward</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">1 2 3 4   (3, 4)     ok. forward (not possible - end)</span>
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">gnome_sort</span>(arr):
-    <span style="color: #b3b3b3;">i</span> = 1
-    <span style="color: brightblack;">while</span> i &lt; <span style="color: #b3b3b3;">len</span>(arr):
-        <span style="color: brightblack;">if</span> arr[i - 1] &gt; arr[i]:
-            swap(arr, i - 1, i)
-            <span style="color: brightblack;">if</span> i == 1:
-                <span style="color: #b3b3b3;">i</span> += 1
-            <span style="color: brightblack;">else</span>:
-                <span style="color: #b3b3b3;">i</span> -= 1
-        <span style="color: brightblack;">else</span>:
-            <span style="color: #b3b3b3;">i</span> += 1
+<span class="org-comment-delimiter"># </span><span class="org-comment">array    in focus       actions</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">-----------------------------------------------------------------------------------------</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">4 3 1 2   (4, 3)     not ok, swap, backward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">3 4 1 2   (3, 4)     ok, forward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">3 4 1 2   (4, 1)     not ok, swap, backward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">3 1 4 2   (3, 1)     not ok, swap, backward (not possible, forward to next/not tested pair)</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1 3 4 2   (4, 2)     not ok, swap, backward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1 3 2 4   (3, 2)     not ok, swap, backward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1 2 3 4   (1, 2)     ok, forward</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1 2 3 4   (3, 4)     ok. forward (not possible - end)</span>
+<span class="org-keyword">def</span> <span class="org-function-name">gnome_sort</span>(arr):
+    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 1
+    <span class="org-keyword">while</span> i <span class="org-operator">&lt;</span> <span class="org-builtin">len</span>(arr):
+        <span class="org-keyword">if</span> arr[i <span class="org-operator">-</span> 1] <span class="org-operator">&gt;</span> arr[i]:
+            swap(arr, i <span class="org-operator">-</span> 1, i)
+            <span class="org-keyword">if</span> i <span class="org-operator">==</span> 1:
+                <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
+            <span class="org-keyword">else</span>:
+                <span class="org-variable-name">i</span> <span class="org-operator">-=</span> 1
+        <span class="org-keyword">else</span>:
+            <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
 
-<span style="color: #b3b3b3;">a</span> = [10, 2, 0, 8, 5, 7, 1, 2, 9, 6, 0, 60, 12, 34, 8, 6, 3, 1, 11]
+<span class="org-variable-name">a</span> <span class="org-operator">=</span> [10, 2, 0, 8, 5, 7, 1, 2, 9, 6, 0, 60, 12, 34, 8, 6, 3, 1, 11]
 gnome_sort(a)
-<span style="color: #b3b3b3;">print</span>(a)
+<span class="org-builtin">print</span>(a)
 </pre>
 </div>
 </div>

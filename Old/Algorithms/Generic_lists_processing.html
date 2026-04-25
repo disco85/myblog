@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Generic lists processing</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,45 +194,45 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Generic lists processing</h1>
-<div id="outline-container-orgaa219dd" class="outline-2">
-<h2 id="orgaa219dd">Generic lists processing</h2>
-<div class="outline-text-2" id="text-orgaa219dd">
+<div id="outline-container-org42da692" class="outline-2">
+<h2 id="org42da692">Generic lists processing</h2>
+<div class="outline-text-2" id="text-org42da692">
 <p>
 <code>lst_tmpl()</code> is the generic function of processing lists, all other functions
 may be implemented in easy way with using of it. Actually it's ported from Haskell:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">from</span> operator <span style="color: brightblack;">import</span> add, mul, concat
+<pre class="src src-python"><span class="org-keyword">from</span> operator <span class="org-keyword">import</span> add, mul, concat
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">lst_tmpl</span>(f1, f2, f3, f4, f5, l):
-    <span style="color: brightblack;">"Generic recursive processing of list (head, tail, empty list, etc)"</span>
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> l: <span style="color: brightblack;">return</span> f1([])
-    <span style="color: brightblack;">else</span>:
-        <span style="color: #b3b3b3;">x</span> = l[0]
-        <span style="color: #b3b3b3;">xs</span> = l[1:]
-        <span style="color: brightblack;">return</span> f2(f3(x), f4(lst_tmpl(f1, f2, f3, f4, f5, f5(xs))))
+<span class="org-keyword">def</span> <span class="org-function-name">lst_tmpl</span>(f1, f2, f3, f4, f5, l):
+    <span class="org-doc">"Generic recursive processing of list (head, tail, empty list, etc)"</span>
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> l: <span class="org-keyword">return</span> f1([])
+    <span class="org-keyword">else</span>:
+        <span class="org-variable-name">x</span> <span class="org-operator">=</span> l[0]
+        <span class="org-variable-name">xs</span> <span class="org-operator">=</span> l[1:]
+        <span class="org-keyword">return</span> f2(f3(x), f4(lst_tmpl(f1, f2, f3, f4, f5, f5(xs))))
 
-<span style="color: #b3b3b3;">lst_const</span> = <span style="color: brightblack;">lambda</span> n: <span style="color: brightblack;">lambda</span> _: n
-<span style="color: #b3b3b3;">lst_id</span> = <span style="color: brightblack;">lambda</span> x: x
-<span style="color: #b3b3b3;">lst_swap</span> = <span style="color: brightblack;">lambda</span> op: <span style="color: brightblack;">lambda</span> x, y: op(y, x)
-<span style="color: #b3b3b3;">lst_list</span> = <span style="color: brightblack;">lambda</span> x: [x]
-<span style="color: #b3b3b3;">lst_cons</span> = <span style="color: brightblack;">lambda</span> x, xs: [x] + xs
+<span class="org-variable-name">lst_const</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> n: <span class="org-keyword">lambda</span> _: n
+<span class="org-variable-name">lst_id</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> x: x
+<span class="org-variable-name">lst_swap</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> op: <span class="org-keyword">lambda</span> x, y: op(y, x)
+<span class="org-variable-name">lst_list</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> x: [x]
+<span class="org-variable-name">lst_cons</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> x, xs: [x] <span class="org-operator">+</span> xs
 
-<span style="color: #b3b3b3;">lst_len</span> = <span style="color: brightblack;">lambda</span> l: lst_tmpl(lst_const(0), add, lst_const(1), lst_id, lst_id, l)
+<span class="org-variable-name">lst_len</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> l: lst_tmpl(lst_const(0), add, lst_const(1), lst_id, lst_id, l)
 
-<span style="color: #b3b3b3;">lst_sum</span> = <span style="color: brightblack;">lambda</span> l: lst_tmpl(lst_const(0), add, lst_id, lst_id, lst_id, l)
-<span style="color: #b3b3b3;">lst_mul</span> = <span style="color: brightblack;">lambda</span> l: lst_tmpl(lst_const(1), mul, lst_id, lst_id, lst_id, l)
-<span style="color: #b3b3b3;">lst_rev</span> = <span style="color: brightblack;">lambda</span> l: lst_tmpl(lst_id, lst_swap(concat), lst_list, lst_id, lst_id, l)
-<span style="color: #b3b3b3;">lst_map</span> = <span style="color: brightblack;">lambda</span> f, l: lst_tmpl(lst_id, lst_cons, f, lst_id, lst_id, l)
+<span class="org-variable-name">lst_sum</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> l: lst_tmpl(lst_const(0), add, lst_id, lst_id, lst_id, l)
+<span class="org-variable-name">lst_mul</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> l: lst_tmpl(lst_const(1), mul, lst_id, lst_id, lst_id, l)
+<span class="org-variable-name">lst_rev</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> l: lst_tmpl(lst_id, lst_swap(concat), lst_list, lst_id, lst_id, l)
+<span class="org-variable-name">lst_map</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> f, l: lst_tmpl(lst_id, lst_cons, f, lst_id, lst_id, l)
 
 
-<span style="color: #595959;">###### </span><span style="color: #595959;">test ############</span>
-<span style="color: #b3b3b3;">print</span> lst_len([1, 2, 3, 4, 5])
-<span style="color: #b3b3b3;">print</span> lst_sum([1, 2, 3, 4, 5])
-<span style="color: #b3b3b3;">print</span> lst_mul([1, 2, 3, 4, 5])
-<span style="color: #b3b3b3;">print</span> lst_rev([1, 2, 3, 4, 5])
-<span style="color: #b3b3b3;">print</span> lst_map(<span style="color: brightblack;">lambda</span> x: x*100, [1, 2, 3, 4, 5])
+<span class="org-comment-delimiter">###### </span><span class="org-comment">test ############</span>
+<span class="org-builtin">print</span> lst_len([1, 2, 3, 4, 5])
+<span class="org-builtin">print</span> lst_sum([1, 2, 3, 4, 5])
+<span class="org-builtin">print</span> lst_mul([1, 2, 3, 4, 5])
+<span class="org-builtin">print</span> lst_rev([1, 2, 3, 4, 5])
+<span class="org-builtin">print</span> lst_map(<span class="org-keyword">lambda</span> x: x<span class="org-operator">*</span>100, [1, 2, 3, 4, 5])
 </pre>
 </div>
 </div>

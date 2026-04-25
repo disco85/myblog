@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Binary tree</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Binary tree</h1>
-<div id="outline-container-org5a80414" class="outline-2">
-<h2 id="org5a80414">Binary tree</h2>
-<div class="outline-text-2" id="text-org5a80414">
+<div id="outline-container-org72103e3" class="outline-2">
+<h2 id="org72103e3">Binary tree</h2>
+<div class="outline-text-2" id="text-org72103e3">
 <p>
 Binary tree is a container useful for a search of elements and their sorting. Each item has a left and a right branch and the whole structure has a special item - a root:
 </p>
@@ -219,12 +344,12 @@ But if <code>k</code> is equal to the parent's key <code>p.k</code> - it's more 
 <li>both children exist</li>
 </ul>
 </div>
-<div id="outline-container-orgb033176" class="outline-3">
-<h3 id="orgb033176">right child has not a left child</h3>
+<div id="outline-container-org9890788" class="outline-3">
+<h3 id="org9890788">right child has not a left child</h3>
 </div>
-<div id="outline-container-orgf9d7260" class="outline-3">
-<h3 id="orgf9d7260">right child has a left child</h3>
-<div class="outline-text-3" id="text-orgf9d7260">
+<div id="outline-container-org385eacc" class="outline-3">
+<h3 id="org385eacc">right child has a left child</h3>
+<div class="outline-text-3" id="text-org385eacc">
 <ul class="org-ul">
 <li>there is only a left child</li>
 <li>there is only a right child</li>
@@ -591,489 +716,489 @@ Let's see the implementation:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">import</span> random
-<span style="color: brightblack;">import</span> traceback
+<pre class="src src-python"><span class="org-keyword">import</span> random
+<span class="org-keyword">import</span> traceback
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Walk</span>:
-    <span style="color: brightblack;">'''Traverse way</span>
-<span style="color: brightblack;">    INFIX   - inorder   - l, root, r  -  l (OP) r</span>
-<span style="color: brightblack;">    PREFIX  - preorder  - root, l, r  -  (OP) l r</span>
-<span style="color: brightblack;">    POSTFIX - postorder - l, r, root  -  l r (OP)</span>
-<span style="color: brightblack;">    '''</span>
-    <span style="color: #b3b3b3;">INFIX</span> = 1
-    <span style="color: #b3b3b3;">PREFIX</span> = 2
-    <span style="color: #b3b3b3;">POSTFIX</span> = 3
+<span class="org-keyword">class</span> <span class="org-type">Walk</span>:
+    <span class="org-doc">'''Traverse way</span>
+<span class="org-doc">    INFIX   - inorder   - l, root, r  -  l (OP) r</span>
+<span class="org-doc">    PREFIX  - preorder  - root, l, r  -  (OP) l r</span>
+<span class="org-doc">    POSTFIX - postorder - l, r, root  -  l r (OP)</span>
+<span class="org-doc">    '''</span>
+    <span class="org-variable-name">INFIX</span> <span class="org-operator">=</span> 1
+    <span class="org-variable-name">PREFIX</span> <span class="org-operator">=</span> 2
+    <span class="org-variable-name">POSTFIX</span> <span class="org-operator">=</span> 3
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">WalkPos</span>:
-    <span style="color: #b3b3b3;">LEFT</span> = 1
-    <span style="color: #b3b3b3;">RIGHT</span> = 2
-    <span style="color: #b3b3b3;">SELF</span> = 3
+<span class="org-keyword">class</span> <span class="org-type">WalkPos</span>:
+    <span class="org-variable-name">LEFT</span> <span class="org-operator">=</span> 1
+    <span class="org-variable-name">RIGHT</span> <span class="org-operator">=</span> 2
+    <span class="org-variable-name">SELF</span> <span class="org-operator">=</span> 3
 
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">BinTree</span>:
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *, k=<span style="color: #7fffd4;">None</span>, v=<span style="color: #7fffd4;">None</span>, p=<span style="color: #7fffd4;">None</span>):
-        <span style="color: brightblack;">"k - key, v - value, p - parent"</span>
-        <span style="color: brightblack;">if</span> p <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = <span style="color: brightblack;">self</span>
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = p.root
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> = 0
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = k
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">p</span> = p
+<span class="org-keyword">class</span> <span class="org-type">BinTree</span>:
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, <span class="org-operator">*</span>, k<span class="org-operator">=</span><span class="org-constant">None</span>, v<span class="org-operator">=</span><span class="org-constant">None</span>, p<span class="org-operator">=</span><span class="org-constant">None</span>):
+        <span class="org-doc">"k - key, v - value, p - parent"</span>
+        <span class="org-keyword">if</span> p <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+            <span class="org-keyword">self</span>.<span class="org-variable-name">root</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">self</span>.<span class="org-variable-name">root</span> <span class="org-operator">=</span> p.root
+        <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">=</span> 0
+        <span class="org-keyword">self</span>.<span class="org-variable-name">l</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> k
+        <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> v
+        <span class="org-keyword">self</span>.<span class="org-variable-name">p</span> <span class="org-operator">=</span> p
 
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_prn</span> = SimplePrefixPrinter()
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_dumprn</span> = DumpPrinter()
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_prn</span> <span class="org-operator">=</span> SimplePrefixPrinter()
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_dumprn</span> <span class="org-operator">=</span> DumpPrinter()
 
         
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">inherit_node</span>(<span style="color: brightblack;">self</span>, node, *, r=<span style="color: #7fffd4;">False</span>, l=<span style="color: #7fffd4;">False</span>):
-        <span style="color: brightblack;">'''Inherits some node data (node is removing and myself will keep all</span>
-<span style="color: brightblack;">        node's data including its children). Flag arguments tell what optional</span>
-<span style="color: brightblack;">        data must be inherit.</span>
-<span style="color: brightblack;">        '''</span>
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">root</span> = node.root
-        <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">l</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">l</span> = node.l
-        <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">r</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">r</span> = node.r
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = node.k
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = node.v
-        <span style="color: #595959;"># </span><span style="color: #595959;">Fix parent links in node left, right, they referred to the node early,</span>
-        <span style="color: #595959;"># </span><span style="color: #595959;">now we (self) steal all node's data including its l,r children, so</span>
-        <span style="color: #595959;"># </span><span style="color: #595959;">children must refer myself, not removed node</span>
-        <span style="color: brightblack;">if</span> node.<span style="color: #b3b3b3;">l</span>: <span style="color: #cccccc;">node</span>.<span style="color: #cccccc;">l</span>.<span style="color: #cccccc;">p</span> = <span style="color: brightblack;">self</span>
-        <span style="color: brightblack;">if</span> node.<span style="color: #b3b3b3;">r</span>: <span style="color: #cccccc;">node</span>.<span style="color: #cccccc;">r</span>.<span style="color: #cccccc;">p</span> = <span style="color: brightblack;">self</span>
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">inherit_node</span>(<span class="org-keyword">self</span>, node, <span class="org-operator">*</span>, r<span class="org-operator">=</span><span class="org-constant">False</span>, l<span class="org-operator">=</span><span class="org-constant">False</span>):
+        <span class="org-doc">'''Inherits some node data (node is removing and myself will keep all</span>
+<span class="org-doc">        node's data including its children). Flag arguments tell what optional</span>
+<span class="org-doc">        data must be inherit.</span>
+<span class="org-doc">        '''</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">root</span> <span class="org-operator">=</span> node.root
+        <span class="org-keyword">if</span> <span class="org-variable-name">l</span>: <span class="org-keyword">self</span>.<span class="org-type">l</span> <span class="org-operator">=</span> node.l
+        <span class="org-keyword">if</span> <span class="org-variable-name">r</span>: <span class="org-keyword">self</span>.<span class="org-type">r</span> <span class="org-operator">=</span> node.r
+        <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> node.k
+        <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> node.v
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Fix parent links in node left, right, they referred to the node early,</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">now we (self) steal all node's data including its l,r children, so</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">children must refer myself, not removed node</span>
+        <span class="org-keyword">if</span> node.<span class="org-variable-name">l</span>: <span class="org-type">node</span>.<span class="org-type">l</span>.<span class="org-type">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+        <span class="org-keyword">if</span> node.<span class="org-variable-name">r</span>: <span class="org-type">node</span>.<span class="org-type">r</span>.<span class="org-type">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">dump</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'k=%s(%s) self=%s l=%s r=%s p=%s size=%s lsize=%s rsize=%s'</span> % (<span style="color: brightblack;">self</span>.k, <span style="color: brightblack;">self</span>.v,
-            <span style="color: #b3b3b3;">id</span>(<span style="color: brightblack;">self</span>), myid(<span style="color: brightblack;">self</span>.l), myid(<span style="color: brightblack;">self</span>.r), myid(<span style="color: brightblack;">self</span>.p), <span style="color: brightblack;">self</span>.size,
-            <span style="color: brightblack;">'-'</span> <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size,
-            <span style="color: brightblack;">'-'</span> <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size)
+    <span class="org-keyword">def</span> <span class="org-function-name">dump</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> f<span class="org-string">'k=%s(%s) self=%s l=%s r=%s p=%s size=%s lsize=%s rsize=%s'</span> <span class="org-operator">%</span> (<span class="org-keyword">self</span>.k, <span class="org-keyword">self</span>.v,
+            <span class="org-builtin">id</span>(<span class="org-keyword">self</span>), myid(<span class="org-keyword">self</span>.l), myid(<span class="org-keyword">self</span>.r), myid(<span class="org-keyword">self</span>.p), <span class="org-keyword">self</span>.size,
+            <span class="org-string">'-'</span> <span class="org-keyword">if</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.l.size,
+            <span class="org-string">'-'</span> <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.r.size)
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'</span>{<span style="color: brightblack;">self</span>.k}<span style="color: brightblack;">:</span>{<span style="color: brightblack;">self</span>.v}<span style="color: brightblack;">'</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> f<span class="org-string">'</span>{<span class="org-keyword">self</span>.k}<span class="org-string">:</span>{<span class="org-keyword">self</span>.v}<span class="org-string">'</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">new_leaf</span>(<span style="color: brightblack;">self</span>, k, v, *, p=<span style="color: #7fffd4;">None</span>):
-        <span style="color: brightblack;">return</span> BinTree(k=k, v=v, p=p)
+    <span class="org-keyword">def</span> <span class="org-function-name">new_leaf</span>(<span class="org-keyword">self</span>, k, v, <span class="org-operator">*</span>, p<span class="org-operator">=</span><span class="org-constant">None</span>):
+        <span class="org-keyword">return</span> BinTree(k<span class="org-operator">=</span>k, v<span class="org-operator">=</span>v, p<span class="org-operator">=</span>p)
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">set_my_parent_slot</span>(<span style="color: brightblack;">self</span>, node):
-        <span style="color: brightblack;">"Sets the value in my slot in the parent to new `node` value"</span>
-        <span style="color: #595959;"># </span><span style="color: #595959;">Just try to find my slot in my parent and handle NILs</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.p <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.p.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.p.r.k == <span style="color: brightblack;">self</span>.k:
-                <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">r</span> = node
-            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.p.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.p.l.k == <span style="color: brightblack;">self</span>.k:
-                <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">l</span> = node
+    <span class="org-keyword">def</span> <span class="org-function-name">set_my_parent_slot</span>(<span class="org-keyword">self</span>, node):
+        <span class="org-doc">"Sets the value in my slot in the parent to new `node` value"</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Just try to find my slot in my parent and handle NILs</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.p <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.p.r <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.p.r.k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
+                <span class="org-keyword">self</span>.p.<span class="org-variable-name">r</span> <span class="org-operator">=</span> node
+            <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.p.l <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.p.l.k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
+                <span class="org-keyword">self</span>.p.<span class="org-variable-name">l</span> <span class="org-operator">=</span> node
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_empty</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.root.k <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">is_empty</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.root.k <span class="org-keyword">is</span> <span class="org-constant">None</span>
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">tree_size</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.root.size
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">tree_size</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.root.size
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_children</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">no_children</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-constant">None</span>
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_left</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">no_left</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-constant">None</span>
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">no_right</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">no_right</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-constant">None</span>
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">both_children</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">both_children</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_left</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.no_left
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">is_left</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.no_left
 
 
-    @<span style="color: #b3b3b3;">property</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">is_right</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.no_right
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">is_right</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.no_right
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">add</span>(<span style="color: brightblack;">self</span>, k, v):
-        <span style="color: brightblack;">'''Returns added the node if still no such key.</span>
-<span style="color: brightblack;">        '''</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = k
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
-            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
-        <span style="color: brightblack;">elif</span> k &gt; <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_right:
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = <span style="color: brightblack;">self</span>.new_leaf(k, v, p=<span style="color: brightblack;">self</span>)
-                <span style="color: brightblack;">self</span>.r.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r
-            <span style="color: brightblack;">else</span>:
-                <span style="color: #b3b3b3;">new</span> = <span style="color: brightblack;">self</span>.r.add(k, v)
-                <span style="color: brightblack;">if</span> new <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">return</span> new
-        <span style="color: brightblack;">elif</span> k &lt; <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_left:
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = <span style="color: brightblack;">self</span>.new_leaf(k, v, p=<span style="color: brightblack;">self</span>)
-                <span style="color: brightblack;">self</span>.l.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l
-            <span style="color: brightblack;">else</span>:
-                <span style="color: #b3b3b3;">new</span> = <span style="color: brightblack;">self</span>.l.add(k, v)
-                <span style="color: brightblack;">if</span> new <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> += 1
-                <span style="color: brightblack;">return</span> new
-        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = v
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">add</span>(<span class="org-keyword">self</span>, k, v):
+        <span class="org-doc">'''Returns added the node if still no such key.</span>
+<span class="org-doc">        '''</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> k
+            <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> v
+            <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+            <span class="org-keyword">return</span> <span class="org-keyword">self</span>
+        <span class="org-keyword">elif</span> k <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.no_right:
+                <span class="org-keyword">self</span>.<span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.new_leaf(k, v, p<span class="org-operator">=</span><span class="org-keyword">self</span>)
+                <span class="org-keyword">self</span>.r.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">return</span> <span class="org-keyword">self</span>.r
+            <span class="org-keyword">else</span>:
+                <span class="org-variable-name">new</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.add(k, v)
+                <span class="org-keyword">if</span> new <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                    <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">return</span> new
+        <span class="org-keyword">elif</span> k <span class="org-operator">&lt;</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.no_left:
+                <span class="org-keyword">self</span>.<span class="org-variable-name">l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.new_leaf(k, v, p<span class="org-operator">=</span><span class="org-keyword">self</span>)
+                <span class="org-keyword">self</span>.l.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l
+            <span class="org-keyword">else</span>:
+                <span class="org-variable-name">new</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l.add(k, v)
+                <span class="org-keyword">if</span> new <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                    <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">+=</span> 1
+                <span class="org-keyword">return</span> new
+        <span class="org-keyword">elif</span> k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> v
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">remove</span>(<span style="color: brightblack;">self</span>, k):
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case-1'</span>)
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">elif</span> k &gt; <span style="color: brightblack;">self</span>.k <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.is_right:
-            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 2'</span>)
-            <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.r.remove(k)
-            <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">return</span> old
-        <span style="color: brightblack;">elif</span> k &lt; <span style="color: brightblack;">self</span>.k <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.is_left:
-            <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 3'</span>)
-            <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.l.remove(k)
-            <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">return</span> old
-        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
-            <span style="color: #b3b3b3;">v</span> = <span style="color: brightblack;">self</span>.v
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.no_children:
-                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 4'</span>)
-                <span style="color: brightblack;">self</span>.set_my_parent_slot(<span style="color: #7fffd4;">None</span>)
-                <span style="color: #595959;"># </span><span style="color: #595959;">this is relevant mostly for the root (the last node), but it's required (!):</span>
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.both_children:
-                <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r.no_left:
-                    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 5'</span>)
-                    <span style="color: #b3b3b3;">old_self_r</span> = <span style="color: brightblack;">self</span>.r
-                    <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, r=<span style="color: #7fffd4;">True</span>)
-                    old_self_r.<span style="color: #b3b3b3;">k</span> = old_self_r.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
-                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-                <span style="color: brightblack;">else</span>:
-                    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 6'</span>)
-                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">k</span> = <span style="color: brightblack;">self</span>.r.l.k
-                    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">v</span> = <span style="color: brightblack;">self</span>.r.l.v
-                    <span style="color: #b3b3b3;">old</span> = <span style="color: brightblack;">self</span>.r.remove(<span style="color: brightblack;">self</span>.r.l.k)
-                    <span style="color: brightblack;">if</span> old <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_left:
-                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 7'</span>)
-                <span style="color: #b3b3b3;">old_self_l</span> = <span style="color: brightblack;">self</span>.l
-                <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.l, l=<span style="color: #7fffd4;">True</span>, r=<span style="color: #7fffd4;">True</span>)
-                old_self_l.<span style="color: #b3b3b3;">k</span> = old_self_l.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_right:
-                <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'case 8'</span>)
-                <span style="color: #b3b3b3;">old_self_r</span> = <span style="color: brightblack;">self</span>.r
-                <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, l=<span style="color: #7fffd4;">True</span>, r=<span style="color: #7fffd4;">True</span>)
-                old_self_r.<span style="color: #b3b3b3;">k</span> = old_self_r.<span style="color: #b3b3b3;">v</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">deallocation for non-root in C/C++</span>
-                <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">size</span> -= 1
-            <span style="color: brightblack;">return</span> (k, v)
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">not found</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">remove</span>(<span class="org-keyword">self</span>, k):
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-builtin">print</span>(<span class="org-string">'case-1'</span>)
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>
+        <span class="org-keyword">elif</span> k <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.k <span class="org-keyword">and</span> <span class="org-keyword">self</span>.is_right:
+            <span class="org-builtin">print</span>(<span class="org-string">'case 2'</span>)
+            <span class="org-variable-name">old</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.remove(k)
+            <span class="org-keyword">if</span> old <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">return</span> old
+        <span class="org-keyword">elif</span> k <span class="org-operator">&lt;</span> <span class="org-keyword">self</span>.k <span class="org-keyword">and</span> <span class="org-keyword">self</span>.is_left:
+            <span class="org-builtin">print</span>(<span class="org-string">'case 3'</span>)
+            <span class="org-variable-name">old</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l.remove(k)
+            <span class="org-keyword">if</span> old <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">return</span> old
+        <span class="org-keyword">elif</span> k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
+            <span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.v
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.no_children:
+                <span class="org-builtin">print</span>(<span class="org-string">'case 4'</span>)
+                <span class="org-keyword">self</span>.set_my_parent_slot(<span class="org-constant">None</span>)
+                <span class="org-comment-delimiter"># </span><span class="org-comment">this is relevant mostly for the root (the last node), but it's required (!):</span>
+                <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.both_children:
+                <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r.no_left:
+                    <span class="org-builtin">print</span>(<span class="org-string">'case 5'</span>)
+                    <span class="org-variable-name">old_self_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
+                    <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, r<span class="org-operator">=</span><span class="org-constant">True</span>)
+                    old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
+                    <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+                <span class="org-keyword">else</span>:
+                    <span class="org-builtin">print</span>(<span class="org-string">'case 6'</span>)
+                    <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.l.k
+                    <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.l.v
+                    <span class="org-variable-name">old</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.remove(<span class="org-keyword">self</span>.r.l.k)
+                    <span class="org-keyword">if</span> old <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                        <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_left:
+                <span class="org-builtin">print</span>(<span class="org-string">'case 7'</span>)
+                <span class="org-variable-name">old_self_l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l
+                <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.l, l<span class="org-operator">=</span><span class="org-constant">True</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
+                old_self_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_l.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-builtin">print</span>(<span class="org-string">'case 8'</span>)
+                <span class="org-variable-name">old_self_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
+                <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, l<span class="org-operator">=</span><span class="org-constant">True</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
+                old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
+                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+            <span class="org-keyword">return</span> (k, v)
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">not found</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">get</span>(<span style="color: brightblack;">self</span>, k):
-        <span style="color: brightblack;">"Returns a node (not a value) by a key"</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">elif</span> k == <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>  <span style="color: #595959;">#</span><span style="color: #595959;">.v</span>
-        <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_right <span style="color: brightblack;">and</span> k &gt; <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.r.get(k)
-        <span style="color: brightblack;">elif</span> <span style="color: brightblack;">self</span>.is_left <span style="color: brightblack;">and</span> k &lt; <span style="color: brightblack;">self</span>.k:
-            <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.l.get(k)
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">get</span>(<span class="org-keyword">self</span>, k):
+        <span class="org-doc">"Returns a node (not a value) by a key"</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>
+        <span class="org-keyword">elif</span> k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">return</span> <span class="org-keyword">self</span>  <span class="org-comment-delimiter">#</span><span class="org-comment">.v</span>
+        <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_right <span class="org-keyword">and</span> k <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">return</span> <span class="org-keyword">self</span>.r.get(k)
+        <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_left <span class="org-keyword">and</span> k <span class="org-operator">&lt;</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l.get(k)
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, fn, way=Walk.INFIX, level=0):
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: brightblack;">if</span> way == Walk.PREFIX:
-                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
-                <span style="color: brightblack;">self</span>.l.walk(fn, way, level+1)
-            <span style="color: brightblack;">else</span>:
-                fn(<span style="color: #7fffd4;">None</span>, level+1, <span style="color: brightblack;">self</span>.no_children, WalkPos.LEFT)
-            <span style="color: brightblack;">if</span> way == Walk.INFIX:
-                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
-                <span style="color: brightblack;">self</span>.r.walk(fn, way, level+1)
-            <span style="color: brightblack;">else</span>:
-                fn(<span style="color: #7fffd4;">None</span>, level+1, <span style="color: brightblack;">self</span>.no_children, WalkPos.RIGHT)
-            <span style="color: brightblack;">if</span> way == Walk.POSTFIX:
-                fn(<span style="color: brightblack;">self</span>, level, <span style="color: brightblack;">self</span>.no_children, WalkPos.SELF)
+    <span class="org-keyword">def</span> <span class="org-function-name">walk</span>(<span class="org-keyword">self</span>, fn, way<span class="org-operator">=</span>Walk.INFIX, level<span class="org-operator">=</span>0):
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-keyword">if</span> way <span class="org-operator">==</span> Walk.PREFIX:
+                fn(<span class="org-keyword">self</span>, level, <span class="org-keyword">self</span>.no_children, WalkPos.SELF)
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
+                <span class="org-keyword">self</span>.l.walk(fn, way, level<span class="org-operator">+</span>1)
+            <span class="org-keyword">else</span>:
+                fn(<span class="org-constant">None</span>, level<span class="org-operator">+</span>1, <span class="org-keyword">self</span>.no_children, WalkPos.LEFT)
+            <span class="org-keyword">if</span> way <span class="org-operator">==</span> Walk.INFIX:
+                fn(<span class="org-keyword">self</span>, level, <span class="org-keyword">self</span>.no_children, WalkPos.SELF)
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-keyword">self</span>.r.walk(fn, way, level<span class="org-operator">+</span>1)
+            <span class="org-keyword">else</span>:
+                fn(<span class="org-constant">None</span>, level<span class="org-operator">+</span>1, <span class="org-keyword">self</span>.no_children, WalkPos.RIGHT)
+            <span class="org-keyword">if</span> way <span class="org-operator">==</span> Walk.POSTFIX:
+                fn(<span class="org-keyword">self</span>, level, <span class="org-keyword">self</span>.no_children, WalkPos.SELF)
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">asc</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
-                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.l.asc():
-                    <span style="color: brightblack;">yield</span> node
-            <span style="color: brightblack;">yield</span> <span style="color: brightblack;">self</span>
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
-                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.r.asc():
-                    <span style="color: brightblack;">yield</span> node
+    <span class="org-keyword">def</span> <span class="org-function-name">asc</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
+                <span class="org-keyword">for</span> node <span class="org-keyword">in</span> <span class="org-keyword">self</span>.l.asc():
+                    <span class="org-keyword">yield</span> node
+            <span class="org-keyword">yield</span> <span class="org-keyword">self</span>
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-keyword">for</span> node <span class="org-keyword">in</span> <span class="org-keyword">self</span>.r.asc():
+                    <span class="org-keyword">yield</span> node
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">desc</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
-                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.r.desc():
-                    <span style="color: brightblack;">yield</span> node
-            <span style="color: brightblack;">yield</span> <span style="color: brightblack;">self</span>
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
-                <span style="color: brightblack;">for</span> node <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.l.desc():
-                    <span style="color: brightblack;">yield</span> node
+    <span class="org-keyword">def</span> <span class="org-function-name">desc</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-keyword">for</span> node <span class="org-keyword">in</span> <span class="org-keyword">self</span>.r.desc():
+                    <span class="org-keyword">yield</span> node
+            <span class="org-keyword">yield</span> <span class="org-keyword">self</span>
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
+                <span class="org-keyword">for</span> node <span class="org-keyword">in</span> <span class="org-keyword">self</span>.l.desc():
+                    <span class="org-keyword">yield</span> node
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">union</span>(<span style="color: brightblack;">self</span>, tr):
-        <span style="color: brightblack;">pass</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">union</span>(<span class="org-keyword">self</span>, tr):
+        <span class="org-keyword">pass</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">split</span>(<span style="color: brightblack;">self</span>, k):
-        <span style="color: brightblack;">pass</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">split</span>(<span class="org-keyword">self</span>, k):
+        <span class="org-keyword">pass</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">left_turn</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">'''Turns the subtree to the left</span>
-<span style="color: brightblack;">        '''</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
-            <span style="color: #b3b3b3;">tmp</span> = BinTree().inherit_node(<span style="color: brightblack;">self</span>, l=<span style="color: #7fffd4;">True</span>)
-            tmp.<span style="color: #b3b3b3;">size</span> = 1 + \
-                (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size) + (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.l.size)
-            tmp.<span style="color: #b3b3b3;">r</span> = <span style="color: brightblack;">self</span>.r.l
-            <span style="color: brightblack;">if</span> tmp.r <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                tmp.r.<span style="color: #b3b3b3;">p</span> = tmp
-            tmp.<span style="color: #b3b3b3;">p</span> = <span style="color: brightblack;">self</span>
-            <span style="color: #b3b3b3;">my_old_r</span> = <span style="color: brightblack;">self</span>.r
-            <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.r, r=<span style="color: #7fffd4;">True</span>)
-            <span style="color: #595959;"># </span><span style="color: #595959;">Just mark it as deallocated (not needed in Python, sure). Alternative</span>
-            <span style="color: #595959;"># </span><span style="color: #595959;">is to use this node instead of tmp</span>
-            my_old_r.<span style="color: #b3b3b3;">k</span> = <span style="color: #7fffd4;">None</span>
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">l</span> = tmp
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">True</span>
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">left_turn</span>(<span class="org-keyword">self</span>):
+        <span class="org-doc">'''Turns the subtree to the left</span>
+<span class="org-doc">        '''</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+            <span class="org-variable-name">tmp</span> <span class="org-operator">=</span> BinTree().inherit_node(<span class="org-keyword">self</span>, l<span class="org-operator">=</span><span class="org-constant">True</span>)
+            tmp.<span class="org-variable-name">size</span> <span class="org-operator">=</span> 1 <span class="org-operator">+</span> \
+                (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.l.size) <span class="org-operator">+</span> (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r.l <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.r.l.size)
+            tmp.<span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.l
+            <span class="org-keyword">if</span> tmp.r <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                tmp.r.<span class="org-variable-name">p</span> <span class="org-operator">=</span> tmp
+            tmp.<span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+            <span class="org-variable-name">my_old_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
+            <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, r<span class="org-operator">=</span><span class="org-constant">True</span>)
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated (not needed in Python, sure). Alternative</span>
+            <span class="org-comment-delimiter"># </span><span class="org-comment">is to use this node instead of tmp</span>
+            my_old_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+            <span class="org-keyword">self</span>.<span class="org-variable-name">l</span> <span class="org-operator">=</span> tmp
+            <span class="org-keyword">return</span> <span class="org-constant">True</span>
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> <span class="org-constant">False</span>
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">right_turn</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">'''Turns the subtree to the right</span>
-<span style="color: brightblack;">        '''</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
-            <span style="color: #b3b3b3;">tmp</span> = BinTree().inherit_node(<span style="color: brightblack;">self</span>, r=<span style="color: #7fffd4;">True</span>)
-            tmp.<span style="color: #b3b3b3;">size</span> = 1 + \
-                (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size) + (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.r.size)
-            tmp.<span style="color: #b3b3b3;">l</span> = <span style="color: brightblack;">self</span>.l.r
-            <span style="color: brightblack;">if</span> tmp.l <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-                tmp.l.<span style="color: #b3b3b3;">p</span> = tmp
-            tmp.<span style="color: #b3b3b3;">p</span> = <span style="color: brightblack;">self</span>
-            <span style="color: #b3b3b3;">my_old_l</span> = <span style="color: brightblack;">self</span>.l
-            <span style="color: brightblack;">self</span>.inherit_node(<span style="color: brightblack;">self</span>.l, l=<span style="color: #7fffd4;">True</span>)
-            <span style="color: #595959;"># </span><span style="color: #595959;">Just mark it as deallocated - see left_turn()</span>
-            my_old_l.<span style="color: #b3b3b3;">k</span> = <span style="color: #7fffd4;">None</span>
-            <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">r</span> = tmp
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">True</span>
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">right_turn</span>(<span class="org-keyword">self</span>):
+        <span class="org-doc">'''Turns the subtree to the right</span>
+<span class="org-doc">        '''</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
+            <span class="org-variable-name">tmp</span> <span class="org-operator">=</span> BinTree().inherit_node(<span class="org-keyword">self</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
+            tmp.<span class="org-variable-name">size</span> <span class="org-operator">=</span> 1 <span class="org-operator">+</span> \
+                (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.r.size) <span class="org-operator">+</span> (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.l.r <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.l.r.size)
+            tmp.<span class="org-variable-name">l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l.r
+            <span class="org-keyword">if</span> tmp.l <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                tmp.l.<span class="org-variable-name">p</span> <span class="org-operator">=</span> tmp
+            tmp.<span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+            <span class="org-variable-name">my_old_l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l
+            <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.l, l<span class="org-operator">=</span><span class="org-constant">True</span>)
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated - see left_turn()</span>
+            my_old_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+            <span class="org-keyword">self</span>.<span class="org-variable-name">r</span> <span class="org-operator">=</span> tmp
+            <span class="org-keyword">return</span> <span class="org-constant">True</span>
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> <span class="org-constant">False</span>
 
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">disbalance_factor</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.r <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.r.size) - (0 <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.l <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: brightblack;">self</span>.l.size)
+    <span class="org-keyword">def</span> <span class="org-function-name">disbalance_factor</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.r.size) <span class="org-operator">-</span> (0 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.l <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-keyword">self</span>.l.size)
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_balance</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: #b3b3b3;">r</span> = <span style="color: #7fffd4;">False</span>
-        <span style="color: #595959;">#</span><span style="color: #595959;">chsize = lambda child: 0 if child is None else child.size</span>
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.is_empty:
-            <span style="color: #b3b3b3;">d</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
-            <span style="color: #595959;">#</span><span style="color: #595959;">print(self, d)</span>
-            <span style="color: brightblack;">if</span> d &gt;= 2:
-                <span style="color: #b3b3b3;">r1</span> = <span style="color: brightblack;">self</span>.left_turn()
-                <span style="color: #595959;">#</span><span style="color: #595959;">if self.disbalance_factor() != -d:</span>
-                <span style="color: #595959;">#    </span><span style="color: #595959;">r |= True</span>
-                <span style="color: brightblack;">if</span> r1:
-                    <span style="color: #b3b3b3;">d1</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
-                    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">abs</span>(d1) &lt; 2 <span style="color: brightblack;">and</span> d1 != -1*d:
-                        <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  ...end on {self}')</span>
-                        <span style="color: #b3b3b3;">r</span> |= <span style="color: #7fffd4;">True</span>
-                    <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned {self}')</span>
-            <span style="color: brightblack;">elif</span> d &lt;= -2:
-                <span style="color: #b3b3b3;">r2</span> = <span style="color: brightblack;">self</span>.right_turn()
-                <span style="color: #595959;">#</span><span style="color: #595959;">if self.disbalance_factor() != -d:</span>
-                <span style="color: #595959;">#    </span><span style="color: #595959;">r |= True</span>
-                <span style="color: brightblack;">if</span> r2:
-                    <span style="color: #b3b3b3;">d1</span> = <span style="color: brightblack;">self</span>.disbalance_factor()
-                    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">abs</span>(d1) &lt; 2 <span style="color: brightblack;">and</span> d1 != -1*d:
-                        <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  ...end on {self}')</span>
-                        <span style="color: #b3b3b3;">r</span> |= <span style="color: #7fffd4;">True</span>
-                    <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  right turned {self}')</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_balance</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-constant">False</span>
+        <span class="org-comment-delimiter">#</span><span class="org-comment">chsize = lambda child: 0 if child is None else child.size</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
+            <span class="org-variable-name">d</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
+            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self, d)</span>
+            <span class="org-keyword">if</span> d <span class="org-operator">&gt;=</span> 2:
+                <span class="org-variable-name">r1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.left_turn()
+                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:</span>
+                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True</span>
+                <span class="org-keyword">if</span> r1:
+                    <span class="org-variable-name">d1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
+                    <span class="org-keyword">if</span> <span class="org-builtin">abs</span>(d1) <span class="org-operator">&lt;</span> 2 <span class="org-keyword">and</span> d1 <span class="org-operator">!=</span> <span class="org-operator">-</span>1<span class="org-operator">*</span>d:
+                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')</span>
+                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
+                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned {self}')</span>
+            <span class="org-keyword">elif</span> d <span class="org-operator">&lt;=</span> <span class="org-operator">-</span>2:
+                <span class="org-variable-name">r2</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.right_turn()
+                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:</span>
+                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True</span>
+                <span class="org-keyword">if</span> r2:
+                    <span class="org-variable-name">d1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
+                    <span class="org-keyword">if</span> <span class="org-builtin">abs</span>(d1) <span class="org-operator">&lt;</span> 2 <span class="org-keyword">and</span> d1 <span class="org-operator">!=</span> <span class="org-operator">-</span>1<span class="org-operator">*</span>d:
+                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')</span>
+                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
+                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  right turned {self}')</span>
 
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_left:
-                <span style="color: #b3b3b3;">r</span> |= <span style="color: brightblack;">self</span>.l._balance()
-                <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned L {self.l}')</span>
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.is_right:
-                <span style="color: #b3b3b3;">r</span> |= <span style="color: brightblack;">self</span>.r._balance()
-                <span style="color: #595959;">#</span><span style="color: #595959;">print(f'  left turned R {self.r}')</span>
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
+                <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-keyword">self</span>.l._balance()
+                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned L {self.l}')</span>
+            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-keyword">self</span>.r._balance()
+                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned R {self.r}')</span>
         
-        <span style="color: brightblack;">return</span> r
+        <span class="org-keyword">return</span> r
 
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">balance</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: #b3b3b3;">i</span> = 0
-        <span style="color: brightblack;">while</span> <span style="color: #7fffd4;">True</span>:
-            <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>._balance():
-                <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">Done for </span>{i}<span style="color: brightblack;"> steps'</span>)
-                <span style="color: brightblack;">break</span>
-            <span style="color: #b3b3b3;">i</span> += 1
-            <span style="color: #595959;">#</span><span style="color: #595959;">self._prn.walk(bt)</span>
-            <span style="color: #595959;">#</span><span style="color: #595959;">if self._prn: print(self._prn, '\n')</span>
-            <span style="color: #595959;">#</span><span style="color: #595959;">print(self._dumprn.walk(self))</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">balance</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0
+        <span class="org-keyword">while</span> <span class="org-constant">True</span>:
+            <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>._balance():
+                <span class="org-builtin">print</span>(f<span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">Done for </span>{i}<span class="org-string"> steps'</span>)
+                <span class="org-keyword">break</span>
+            <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
+            <span class="org-comment-delimiter">#</span><span class="org-comment">self._prn.walk(bt)</span>
+            <span class="org-comment-delimiter">#</span><span class="org-comment">if self._prn: print(self._prn, '\n')</span>
+            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self._dumprn.walk(self))</span>
 
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">SimplePrefixPrinter</span>:
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, with_value=<span style="color: #7fffd4;">False</span>):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">with_value</span> = with_value
+<span class="org-keyword">class</span> <span class="org-type">SimplePrefixPrinter</span>:
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, with_value<span class="org-operator">=</span><span class="org-constant">False</span>):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lines</span> <span class="org-operator">=</span> []
+        <span class="org-keyword">self</span>.<span class="org-variable-name">with_value</span> <span class="org-operator">=</span> with_value
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.lines)
+    <span class="org-keyword">def</span> <span class="org-function-name">__len__</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-builtin">len</span>(<span class="org-keyword">self</span>.lines)
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">visiting_node</span>(<span style="color: brightblack;">self</span>, el, level, no_brothers, pos):
-        <span style="color: brightblack;">if</span> el <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
-            <span style="color: brightblack;">if</span> no_brothers:
-                <span style="color: brightblack;">return</span>
-            <span style="color: #b3b3b3;">el</span> = <span style="color: brightblack;">'.'</span>
-        <span style="color: brightblack;">else</span>:
-            <span style="color: #b3b3b3;">el</span> = <span style="color: brightblack;">'%s[%s]'</span> % (el.k, el.v) <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.with_value <span style="color: brightblack;">else</span> <span style="color: brightblack;">'%s'</span> % el.v
-        <span style="color: #b3b3b3;">indent</span> = level * <span style="color: brightblack;">' '</span>
-        <span style="color: brightblack;">if</span> level:
-            <span style="color: #b3b3b3;">indent</span> += level*2*<span style="color: brightblack;">' '</span>
-        <span style="color: brightblack;">self</span>.lines.append(<span style="color: brightblack;">'%s+- %s'</span> % (indent, el))
+    <span class="org-keyword">def</span> <span class="org-function-name">visiting_node</span>(<span class="org-keyword">self</span>, el, level, no_brothers, pos):
+        <span class="org-keyword">if</span> el <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+            <span class="org-keyword">if</span> no_brothers:
+                <span class="org-keyword">return</span>
+            <span class="org-variable-name">el</span> <span class="org-operator">=</span> <span class="org-string">'.'</span>
+        <span class="org-keyword">else</span>:
+            <span class="org-variable-name">el</span> <span class="org-operator">=</span> <span class="org-string">'%s[%s]'</span> <span class="org-operator">%</span> (el.k, el.v) <span class="org-keyword">if</span> <span class="org-keyword">self</span>.with_value <span class="org-keyword">else</span> <span class="org-string">'%s'</span> <span class="org-operator">%</span> el.v
+        <span class="org-variable-name">indent</span> <span class="org-operator">=</span> level <span class="org-operator">*</span> <span class="org-string">' '</span>
+        <span class="org-keyword">if</span> level:
+            <span class="org-variable-name">indent</span> <span class="org-operator">+=</span> level<span class="org-operator">*</span>2<span class="org-operator">*</span><span class="org-string">' '</span>
+        <span class="org-keyword">self</span>.lines.append(<span class="org-string">'%s+- %s'</span> <span class="org-operator">%</span> (indent, el))
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>.join(<span style="color: brightblack;">self</span>.lines)
+    <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>.join(<span class="org-keyword">self</span>.lines)
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, bt):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
-        bt.walk(<span style="color: brightblack;">self</span>.visiting_node, Walk.PREFIX)
-        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">str</span>(<span style="color: brightblack;">self</span>)
-
-
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">DumpPrinter</span>:
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
-
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.lines)
-
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">visiting_node</span>(<span style="color: brightblack;">self</span>, el, level, no_brothers, pos):
-        <span style="color: brightblack;">if</span> el <span style="color: brightblack;">is</span> <span style="color: brightblack;">not</span> <span style="color: #7fffd4;">None</span>:
-            <span style="color: #b3b3b3;">s</span> = el.dump()
-            <span style="color: #b3b3b3;">s</span> += f<span style="color: brightblack;">'  level=</span>{level}<span style="color: brightblack;">  no_brothers=</span>{no_brothers}<span style="color: brightblack;">  pos=</span>{pos}<span style="color: brightblack;">'</span>
-            <span style="color: brightblack;">self</span>.lines.append(s)
-
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>.join(<span style="color: brightblack;">self</span>.lines)
-
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">walk</span>(<span style="color: brightblack;">self</span>, bt):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lines</span> = []
-        bt.walk(<span style="color: brightblack;">self</span>.visiting_node, Walk.PREFIX)
-        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">str</span>(<span style="color: brightblack;">self</span>)
+    <span class="org-keyword">def</span> <span class="org-function-name">walk</span>(<span class="org-keyword">self</span>, bt):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lines</span> <span class="org-operator">=</span> []
+        bt.walk(<span class="org-keyword">self</span>.visiting_node, Walk.PREFIX)
+        <span class="org-keyword">return</span> <span class="org-builtin">str</span>(<span class="org-keyword">self</span>)
 
 
-<span style="color: #595959;">########################################</span>
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">range</span>(num))
-    <span style="color: #b3b3b3;">i</span> = 0
-    <span style="color: #b3b3b3;">cnt</span> = <span style="color: #b3b3b3;">min</span>(num, num*ratio)
-    <span style="color: brightblack;">while</span> i &lt; cnt:
-        <span style="color: #b3b3b3;">r</span> = random.randint(num, num + cnt - 1)
-        <span style="color: #b3b3b3;">res</span>[r - num] = r
-        <span style="color: #b3b3b3;">i</span> += 1
-    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
-    <span style="color: brightblack;">return</span> (res, random.choice(res))
+<span class="org-keyword">class</span> <span class="org-type">DumpPrinter</span>:
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lines</span> <span class="org-operator">=</span> []
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__len__</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-builtin">len</span>(<span class="org-keyword">self</span>.lines)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">visiting_node</span>(<span class="org-keyword">self</span>, el, level, no_brothers, pos):
+        <span class="org-keyword">if</span> el <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            <span class="org-variable-name">s</span> <span class="org-operator">=</span> el.dump()
+            <span class="org-variable-name">s</span> <span class="org-operator">+=</span> f<span class="org-string">'  level=</span>{level}<span class="org-string">  no_brothers=</span>{no_brothers}<span class="org-string">  pos=</span>{pos}<span class="org-string">'</span>
+            <span class="org-keyword">self</span>.lines.append(s)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>.join(<span class="org-keyword">self</span>.lines)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">walk</span>(<span class="org-keyword">self</span>, bt):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lines</span> <span class="org-operator">=</span> []
+        bt.walk(<span class="org-keyword">self</span>.visiting_node, Walk.PREFIX)
+        <span class="org-keyword">return</span> <span class="org-builtin">str</span>(<span class="org-keyword">self</span>)
 
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">myid</span>(obj):
-    <span style="color: brightblack;">return</span> (0 <span style="color: brightblack;">if</span> obj <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span> <span style="color: brightblack;">else</span> <span style="color: #b3b3b3;">id</span>(obj))
+<span class="org-comment-delimiter">########################################</span>
+<span class="org-keyword">def</span> <span class="org-function-name">partiallyrandomdata</span>(num, ratio<span class="org-operator">=</span>0.5):
+    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(<span class="org-builtin">range</span>(num))
+    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0
+    <span class="org-variable-name">cnt</span> <span class="org-operator">=</span> <span class="org-builtin">min</span>(num, num<span class="org-operator">*</span>ratio)
+    <span class="org-keyword">while</span> i <span class="org-operator">&lt;</span> cnt:
+        <span class="org-variable-name">r</span> <span class="org-operator">=</span> random.randint(num, num <span class="org-operator">+</span> cnt <span class="org-operator">-</span> 1)
+        <span class="org-variable-name">res</span>[r <span class="org-operator">-</span> num] <span class="org-operator">=</span> r
+        <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
+    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">sorted</span>(res)
+    <span class="org-keyword">return</span> (res, random.choice(res))
 
 
-<span style="color: #b3b3b3;">NUM</span> = 100
-<span style="color: #b3b3b3;">bt</span> = BinTree()
-<span style="color: #595959;">#</span><span style="color: #595959;">arr, x = partiallyrandomdata(NUM, 0.01)</span>
-<span style="color: #b3b3b3;">arr</span> = [] <span style="color: #595959;">#</span><span style="color: #595959;">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]</span>
-<span style="color: brightblack;">for</span> el <span style="color: brightblack;">in</span> arr:
+<span class="org-keyword">def</span> <span class="org-function-name">myid</span>(obj):
+    <span class="org-keyword">return</span> (0 <span class="org-keyword">if</span> obj <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">else</span> <span class="org-builtin">id</span>(obj))
+
+
+<span class="org-variable-name">NUM</span> <span class="org-operator">=</span> 100
+<span class="org-variable-name">bt</span> <span class="org-operator">=</span> BinTree()
+<span class="org-comment-delimiter">#</span><span class="org-comment">arr, x = partiallyrandomdata(NUM, 0.01)</span>
+<span class="org-variable-name">arr</span> <span class="org-operator">=</span> [] <span class="org-comment-delimiter">#</span><span class="org-comment">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]</span>
+<span class="org-keyword">for</span> el <span class="org-keyword">in</span> arr:
     bt.add(el, el)
-<span style="color: brightblack;">while</span> <span style="color: #7fffd4;">True</span>:
-    <span style="color: #b3b3b3;">prn</span> = SimplePrefixPrinter()
-    <span style="color: #b3b3b3;">dumprn</span> = DumpPrinter()
+<span class="org-keyword">while</span> <span class="org-constant">True</span>:
+    <span class="org-variable-name">prn</span> <span class="org-operator">=</span> SimplePrefixPrinter()
+    <span class="org-variable-name">dumprn</span> <span class="org-operator">=</span> DumpPrinter()
     prn.walk(bt)
-    <span style="color: brightblack;">if</span> prn:
-        <span style="color: #b3b3b3;">print</span>(prn, <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
-    <span style="color: #b3b3b3;">entered</span> = <span style="color: #b3b3b3;">input</span>(<span style="color: brightblack;">"Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T/b)? "</span>).split()
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> entered:
-        <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">"?"</span>)
-        <span style="color: brightblack;">continue</span>
-    <span style="color: #b3b3b3;">cmd</span>, *<span style="color: #b3b3b3;">args</span> = entered
-    <span style="color: brightblack;">if</span> cmd == <span style="color: brightblack;">'q'</span>:
-        <span style="color: brightblack;">break</span>
-    <span style="color: brightblack;">else</span>:
-        <span style="color: brightblack;">try</span>:
-            <span style="color: brightblack;">if</span> cmd == <span style="color: brightblack;">'d'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.remove(<span style="color: #b3b3b3;">int</span>(args[0]))
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'s'</span>:
-                <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(args):
-                    <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).size
-                <span style="color: brightblack;">else</span>:
-                    <span style="color: #b3b3b3;">res</span> = bt.tree_size
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'g'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0]))
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'a'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.add(<span style="color: #b3b3b3;">int</span>(args[0]), <span style="color: #b3b3b3;">int</span>(args[0]))
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'D'</span>:
-                <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(args):
-                    <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0]))
-                    <span style="color: #b3b3b3;">res</span> = res.dump()
-                <span style="color: brightblack;">else</span>:
-                    <span style="color: #b3b3b3;">res</span> = dumprn.walk(bt)
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'o'</span>:
-                <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(bt.asc())
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'O'</span>:
-                <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(bt.desc())
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'t'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).left_turn()
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'T'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.get(<span style="color: #b3b3b3;">int</span>(args[0])).right_turn()
-            <span style="color: brightblack;">elif</span> cmd == <span style="color: brightblack;">'b'</span>:
-                <span style="color: #b3b3b3;">res</span> = bt.balance()
-            <span style="color: brightblack;">else</span>:
-                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">RuntimeError</span>(<span style="color: brightblack;">'Unknown command'</span>)
-            <span style="color: #b3b3b3;">print</span>(res, <span style="color: brightblack;">'</span><span style="color: #7fffd4;">\n</span><span style="color: brightblack;">'</span>)
-        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span> <span style="color: brightblack;">as</span> x:
+    <span class="org-keyword">if</span> prn:
+        <span class="org-builtin">print</span>(prn, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>)
+    <span class="org-variable-name">entered</span> <span class="org-operator">=</span> <span class="org-builtin">input</span>(<span class="org-string">"Command (D KEY/d KEY/g KEY/a KEY/o/O/q/s/t/T/b)? "</span>).split()
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> entered:
+        <span class="org-builtin">print</span>(<span class="org-string">"?"</span>)
+        <span class="org-keyword">continue</span>
+    <span class="org-variable-name">cmd</span>, <span class="org-operator">*</span><span class="org-variable-name">args</span> <span class="org-operator">=</span> entered
+    <span class="org-keyword">if</span> cmd <span class="org-operator">==</span> <span class="org-string">'q'</span>:
+        <span class="org-keyword">break</span>
+    <span class="org-keyword">else</span>:
+        <span class="org-keyword">try</span>:
+            <span class="org-keyword">if</span> cmd <span class="org-operator">==</span> <span class="org-string">'d'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.remove(<span class="org-builtin">int</span>(args[0]))
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'s'</span>:
+                <span class="org-keyword">if</span> <span class="org-builtin">len</span>(args):
+                    <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.get(<span class="org-builtin">int</span>(args[0])).size
+                <span class="org-keyword">else</span>:
+                    <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.tree_size
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'g'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.get(<span class="org-builtin">int</span>(args[0]))
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'a'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.add(<span class="org-builtin">int</span>(args[0]), <span class="org-builtin">int</span>(args[0]))
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'D'</span>:
+                <span class="org-keyword">if</span> <span class="org-builtin">len</span>(args):
+                    <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.get(<span class="org-builtin">int</span>(args[0]))
+                    <span class="org-variable-name">res</span> <span class="org-operator">=</span> res.dump()
+                <span class="org-keyword">else</span>:
+                    <span class="org-variable-name">res</span> <span class="org-operator">=</span> dumprn.walk(bt)
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'o'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(bt.asc())
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'O'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(bt.desc())
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'t'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.get(<span class="org-builtin">int</span>(args[0])).left_turn()
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'T'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.get(<span class="org-builtin">int</span>(args[0])).right_turn()
+            <span class="org-keyword">elif</span> cmd <span class="org-operator">==</span> <span class="org-string">'b'</span>:
+                <span class="org-variable-name">res</span> <span class="org-operator">=</span> bt.balance()
+            <span class="org-keyword">else</span>:
+                <span class="org-keyword">raise</span> <span class="org-type">RuntimeError</span>(<span class="org-string">'Unknown command'</span>)
+            <span class="org-builtin">print</span>(res, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>)
+        <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
             traceback.print_exc()
 </pre>
 </div>

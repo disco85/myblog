@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Merge sorting in Python</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Merge sorting in Python</h1>
-<div id="outline-container-org03dfe64" class="outline-2">
-<h2 id="org03dfe64">Merge sorting in Python</h2>
-<div class="outline-text-2" id="text-org03dfe64">
+<div id="outline-container-orge6ea093" class="outline-2">
+<h2 id="orge6ea093">Merge sorting in Python</h2>
+<div class="outline-text-2" id="text-orge6ea093">
 <p>
 Early subject was implemented in C/C++, but actually I do prototyping usually
 in Python, so this was first :)
@@ -79,49 +204,49 @@ in Python, so this was first :)
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">MergerSort</span>(a):
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">MergerGroup</span>(a, left, m, right):
-        <span style="color: brightblack;">if</span> left &gt;= right: <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">if</span> m &lt; left <span style="color: brightblack;">or</span> right &lt; m: <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-        <span style="color: #b3b3b3;">print</span> <span style="color: brightblack;">"left:"</span>, left, <span style="color: brightblack;">"m:"</span>, m, <span style="color: brightblack;">"right:"</span>, right
-        <span style="color: #b3b3b3;">t</span> = left
-        <span style="color: brightblack;">for</span> j <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">xrange</span>(m+1, right+1):
-            <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">xrange</span>(t, j):
-                <span style="color: brightblack;">if</span> a[j] &lt; a[i]:
-                    <span style="color: #b3b3b3;">r</span> = a[j]
-                    <span style="color: brightblack;">for</span> k <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">xrange</span>(j, i, -1):
-                        <span style="color: #b3b3b3;">a</span>[k] = a[k - 1]
-                    <span style="color: #b3b3b3;">a</span>[i] = r
-                    <span style="color: #b3b3b3;">t</span> = i
-                    <span style="color: brightblack;">break</span>
-    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(a) &lt; 2: <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-    <span style="color: #b3b3b3;">k</span>=1
-    <span style="color: brightblack;">while</span> k&lt;<span style="color: #b3b3b3;">len</span>(a):
-       <span style="color: #b3b3b3;">g</span>=0
-       <span style="color: brightblack;">while</span> g&lt;<span style="color: #b3b3b3;">len</span>(a):
-            <span style="color: #b3b3b3;">z</span> = g + k + k - 1
-            <span style="color: #b3b3b3;">r</span> = z <span style="color: brightblack;">if</span> z &lt; <span style="color: #b3b3b3;">len</span>(a) <span style="color: brightblack;">else</span> <span style="color: #b3b3b3;">len</span>(a) - 1
-            <span style="color: #b3b3b3;">print</span> <span style="color: brightblack;">"k ="</span>, k, <span style="color: brightblack;">"g ="</span>, g, <span style="color: brightblack;">"z ="</span>, z, <span style="color: brightblack;">"r ="</span>, r, <span style="color: brightblack;">" | "</span>\
-                    <span style="color: brightblack;">"left:"</span>, g, <span style="color: brightblack;">"m:"</span>, g+k-1, <span style="color: brightblack;">"right:"</span>, r
-            MergerGroup(a, g, g + k - 1, r)
-            <span style="color: #b3b3b3;">g</span>+=2*k
-       <span style="color: #b3b3b3;">k</span>*=2
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">MergerSort</span>(a):
+    <span class="org-keyword">def</span> <span class="org-function-name">MergerGroup</span>(a, left, m, right):
+        <span class="org-keyword">if</span> left <span class="org-operator">&gt;=</span> right: <span class="org-keyword">return</span> <span class="org-constant">None</span>
+        <span class="org-keyword">if</span> m <span class="org-operator">&lt;</span> left <span class="org-keyword">or</span> right <span class="org-operator">&lt;</span> m: <span class="org-keyword">return</span> <span class="org-constant">None</span>
+        <span class="org-builtin">print</span> <span class="org-string">"left:"</span>, left, <span class="org-string">"m:"</span>, m, <span class="org-string">"right:"</span>, right
+        <span class="org-variable-name">t</span> <span class="org-operator">=</span> left
+        <span class="org-keyword">for</span> j <span class="org-keyword">in</span> <span class="org-builtin">xrange</span>(m<span class="org-operator">+</span>1, right<span class="org-operator">+</span>1):
+            <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">xrange</span>(t, j):
+                <span class="org-keyword">if</span> a[j] <span class="org-operator">&lt;</span> a[i]:
+                    <span class="org-variable-name">r</span> <span class="org-operator">=</span> a[j]
+                    <span class="org-keyword">for</span> k <span class="org-keyword">in</span> <span class="org-builtin">xrange</span>(j, i, <span class="org-operator">-</span>1):
+                        <span class="org-variable-name">a</span>[k] <span class="org-operator">=</span> a[k <span class="org-operator">-</span> 1]
+                    <span class="org-variable-name">a</span>[i] <span class="org-operator">=</span> r
+                    <span class="org-variable-name">t</span> <span class="org-operator">=</span> i
+                    <span class="org-keyword">break</span>
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(a) <span class="org-operator">&lt;</span> 2: <span class="org-keyword">return</span> <span class="org-constant">None</span>
+    <span class="org-variable-name">k</span><span class="org-operator">=</span>1
+    <span class="org-keyword">while</span> k<span class="org-operator">&lt;</span><span class="org-builtin">len</span>(a):
+       <span class="org-variable-name">g</span><span class="org-operator">=</span>0
+       <span class="org-keyword">while</span> g<span class="org-operator">&lt;</span><span class="org-builtin">len</span>(a):
+            <span class="org-variable-name">z</span> <span class="org-operator">=</span> g <span class="org-operator">+</span> k <span class="org-operator">+</span> k <span class="org-operator">-</span> 1
+            <span class="org-variable-name">r</span> <span class="org-operator">=</span> z <span class="org-keyword">if</span> z <span class="org-operator">&lt;</span> <span class="org-builtin">len</span>(a) <span class="org-keyword">else</span> <span class="org-builtin">len</span>(a) <span class="org-operator">-</span> 1
+            <span class="org-builtin">print</span> <span class="org-string">"k ="</span>, k, <span class="org-string">"g ="</span>, g, <span class="org-string">"z ="</span>, z, <span class="org-string">"r ="</span>, r, <span class="org-string">" | "</span>\
+                    <span class="org-string">"left:"</span>, g, <span class="org-string">"m:"</span>, g<span class="org-operator">+</span>k<span class="org-operator">-</span>1, <span class="org-string">"right:"</span>, r
+            MergerGroup(a, g, g <span class="org-operator">+</span> k <span class="org-operator">-</span> 1, r)
+            <span class="org-variable-name">g</span><span class="org-operator">+=</span>2<span class="org-operator">*</span>k
+       <span class="org-variable-name">k</span><span class="org-operator">*=</span>2
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">mergsort</span>(arr):
-    <span style="color: #b3b3b3;">arrlen</span> = <span style="color: #b3b3b3;">len</span>(a)
-    <span style="color: #b3b3b3;">k</span> = 2
-    <span style="color: brightblack;">while</span> k &lt; 2*arrlen:
-        <span style="color: #b3b3b3;">left</span> = 0
-        <span style="color: brightblack;">while</span> left &lt; arrlen:
-            <span style="color: #b3b3b3;">right</span> = <span style="color: #b3b3b3;">min</span>(left + k - 1, arrlen-1)
-            <span style="color: #b3b3b3;">print</span> left, right, <span style="color: brightblack;">"|"</span>, k
-            <span style="color: #b3b3b3;">left</span> += k
-        <span style="color: #b3b3b3;">k</span> *= 2
+<span class="org-keyword">def</span> <span class="org-function-name">mergsort</span>(arr):
+    <span class="org-variable-name">arrlen</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(a)
+    <span class="org-variable-name">k</span> <span class="org-operator">=</span> 2
+    <span class="org-keyword">while</span> k <span class="org-operator">&lt;</span> 2<span class="org-operator">*</span>arrlen:
+        <span class="org-variable-name">left</span> <span class="org-operator">=</span> 0
+        <span class="org-keyword">while</span> left <span class="org-operator">&lt;</span> arrlen:
+            <span class="org-variable-name">right</span> <span class="org-operator">=</span> <span class="org-builtin">min</span>(left <span class="org-operator">+</span> k <span class="org-operator">-</span> 1, arrlen<span class="org-operator">-</span>1)
+            <span class="org-builtin">print</span> left, right, <span class="org-string">"|"</span>, k
+            <span class="org-variable-name">left</span> <span class="org-operator">+=</span> k
+        <span class="org-variable-name">k</span> <span class="org-operator">*=</span> 2
 
-<span style="color: #b3b3b3;">a</span> = [10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121]
-<span style="color: #b3b3b3;">print</span> a, <span style="color: #b3b3b3;">len</span>(a)
+<span class="org-variable-name">a</span> <span class="org-operator">=</span> [10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121]
+<span class="org-builtin">print</span> a, <span class="org-builtin">len</span>(a)
 MergerSort(a)
-<span style="color: #b3b3b3;">print</span> a
+<span class="org-builtin">print</span> a
 </pre>
 </div>
 </div>

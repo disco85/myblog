@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Virtual root</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Virtual root</h1>
-<div id="outline-container-orgf6f6cc1" class="outline-2">
-<h2 id="orgf6f6cc1">Virtual root</h2>
-<div class="outline-text-2" id="text-orgf6f6cc1">
+<div id="outline-container-org750631e" class="outline-2">
+<h2 id="org750631e">Virtual root</h2>
+<div class="outline-text-2" id="text-org750631e">
 <p>
 Virtual root is for sandbox - portable file system pie. May be used when app need portable FS pie:
 </p>
@@ -106,121 +231,121 @@ And function:
 </ul>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">from</span> os <span style="color: brightblack;">import</span> path
+<pre class="src src-python"><span class="org-keyword">from</span> os <span class="org-keyword">import</span> path
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">VRoot</span>:
-    <span style="color: brightblack;">"""Use always unicode in path!</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: #b3b3b3;">_mp</span> = <span style="color: #7fffd4;">None</span>
+<span class="org-keyword">class</span> <span class="org-type">VRoot</span>:
+    <span class="org-doc">"""Use always unicode in path!</span>
+<span class="org-doc">    """</span>
+    <span class="org-variable-name">_mp</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, mp):
-        <span style="color: brightblack;">"mp is the mount-point: abs. path on host"</span>
-        <span style="color: brightblack;">self</span>.mount(mp)
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, mp):
+        <span class="org-doc">"mp is the mount-point: abs. path on host"</span>
+        <span class="org-keyword">self</span>.mount(mp)
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">hpath</span>(<span style="color: brightblack;">self</span>, vp):
-        <span style="color: brightblack;">"""Returns host path from virtual path:</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr = VRoot(u'/a/b')</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.hpath(u'c///') == VRoot._fixed_abspath(u'/a/b/c')</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.hpath(u'/c///') == VRoot._fixed_abspath(u'/a/b/c')</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.hpath(u"../../../c/") == VRoot._fixed_abspath(u'/a/b/c')</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.hpath(u"/../c/") == VRoot._fixed_abspath(u'/a/b/c')</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        """</span>
-        <span style="color: #b3b3b3;">vp</span> = vp.replace(u<span style="color: brightblack;">"</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">"</span>, u<span style="color: brightblack;">"/"</span>).split(u<span style="color: brightblack;">'/'</span>)
-        <span style="color: #b3b3b3;">vp</span> = u<span style="color: brightblack;">'/'</span>.join(x <span style="color: brightblack;">for</span> x <span style="color: brightblack;">in</span> vp <span style="color: brightblack;">if</span> x <span style="color: brightblack;">and</span> x!=u<span style="color: brightblack;">".."</span>)
-        <span style="color: brightblack;">return</span> VRoot._fixed_abspath(path.join(<span style="color: brightblack;">self</span>._mp, vp))
+    <span class="org-keyword">def</span> <span class="org-function-name">hpath</span>(<span class="org-keyword">self</span>, vp):
+        <span class="org-doc">"""Returns host path from virtual path:</span>
+<span class="org-doc">        &gt;&gt;&gt; vr = VRoot(u'/a/b')</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.hpath(u'c///') == VRoot._fixed_abspath(u'/a/b/c')</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.hpath(u'/c///') == VRoot._fixed_abspath(u'/a/b/c')</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.hpath(u"../../../c/") == VRoot._fixed_abspath(u'/a/b/c')</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.hpath(u"/../c/") == VRoot._fixed_abspath(u'/a/b/c')</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">vp</span> <span class="org-operator">=</span> vp.replace(u<span class="org-string">"</span><span class="org-constant">\\</span><span class="org-string">"</span>, u<span class="org-string">"/"</span>).split(u<span class="org-string">'/'</span>)
+        <span class="org-variable-name">vp</span> <span class="org-operator">=</span> u<span class="org-string">'/'</span>.join(x <span class="org-keyword">for</span> x <span class="org-keyword">in</span> vp <span class="org-keyword">if</span> x <span class="org-keyword">and</span> x<span class="org-operator">!=</span>u<span class="org-string">".."</span>)
+        <span class="org-keyword">return</span> VRoot._fixed_abspath(path.join(<span class="org-keyword">self</span>._mp, vp))
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">vpath</span>(<span style="color: brightblack;">self</span>, hp, keep_host=<span style="color: #7fffd4;">False</span>):
-        <span style="color: brightblack;">"""Returns virtual path, relative to _mp. If keep_host, then</span>
-<span style="color: brightblack;">        returns original hp when hp is not in _mp, otherwise returns None:</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr = VRoot(u'/a/b/')</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.vpath(u'/a/b/') == path.sep</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.vpath(u'/a/b/', True) == path.sep</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.vpath(u"/x///")</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.vpath(u"/x/", True) == path.sep + u'x'</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr = VRoot(u'/')</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; vr.vpath(u'/a/b/') == path.normpath(u"a/b")</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        """</span>
-        <span style="color: #b3b3b3;">ap</span> = VRoot._fixed_abspath(hp)
-        <span style="color: #b3b3b3;">ap</span> = VRoot._fixed_relpath(ap, <span style="color: brightblack;">self</span>._mp)
-        <span style="color: brightblack;">if</span> u<span style="color: brightblack;">".."</span> <span style="color: brightblack;">in</span> ap:
-            <span style="color: brightblack;">if</span> keep_host:
-                <span style="color: brightblack;">return</span> path.normpath(hp)
-            <span style="color: brightblack;">else</span>:
-                <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">None</span>
-        <span style="color: brightblack;">elif</span> ap == u<span style="color: brightblack;">"."</span>:
-            <span style="color: brightblack;">return</span> path.sep
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> ap
+    <span class="org-keyword">def</span> <span class="org-function-name">vpath</span>(<span class="org-keyword">self</span>, hp, keep_host<span class="org-operator">=</span><span class="org-constant">False</span>):
+        <span class="org-doc">"""Returns virtual path, relative to _mp. If keep_host, then</span>
+<span class="org-doc">        returns original hp when hp is not in _mp, otherwise returns None:</span>
+<span class="org-doc">        &gt;&gt;&gt; vr = VRoot(u'/a/b/')</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.vpath(u'/a/b/') == path.sep</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.vpath(u'/a/b/', True) == path.sep</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.vpath(u"/x///")</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.vpath(u"/x/", True) == path.sep + u'x'</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; vr = VRoot(u'/')</span>
+<span class="org-doc">        &gt;&gt;&gt; vr.vpath(u'/a/b/') == path.normpath(u"a/b")</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">ap</span> <span class="org-operator">=</span> VRoot._fixed_abspath(hp)
+        <span class="org-variable-name">ap</span> <span class="org-operator">=</span> VRoot._fixed_relpath(ap, <span class="org-keyword">self</span>._mp)
+        <span class="org-keyword">if</span> u<span class="org-string">".."</span> <span class="org-keyword">in</span> ap:
+            <span class="org-keyword">if</span> keep_host:
+                <span class="org-keyword">return</span> path.normpath(hp)
+            <span class="org-keyword">else</span>:
+                <span class="org-keyword">return</span> <span class="org-constant">None</span>
+        <span class="org-keyword">elif</span> ap <span class="org-operator">==</span> u<span class="org-string">"."</span>:
+            <span class="org-keyword">return</span> path.sep
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> ap
 
-    @<span style="color: #b3b3b3;">staticmethod</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_pathroot</span>(p):
-        <span style="color: brightblack;">"""Returns absolute path of root of path p:</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; VRoot._pathroot("/a/") == VRoot._fixed_abspath("/")</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; VRoot._pathroot(r"d:</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">x</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">y</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">\\")</span>
-<span style="color: brightblack;">        'd:</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">\\'</span>
-<span style="color: brightblack;">        """</span>
-        <span style="color: #b3b3b3;">p_drive</span> = path.splitdrive(p)[0]
-        <span style="color: brightblack;">if</span> p_drive:
-            <span style="color: #595959;"># </span><span style="color: #595959;">if there is the drive, absroot will be ''</span>
-            <span style="color: #b3b3b3;">absroot</span> = p_drive + path.sep
-        <span style="color: brightblack;">else</span>:
-            <span style="color: #595959;"># </span><span style="color: #595959;">else will be default system root</span>
-            <span style="color: #b3b3b3;">absroot</span> = VRoot._fixed_abspath(u<span style="color: brightblack;">"/"</span>)
-        <span style="color: brightblack;">return</span> absroot
+    @<span class="org-builtin">staticmethod</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_pathroot</span>(p):
+        <span class="org-doc">"""Returns absolute path of root of path p:</span>
+<span class="org-doc">        &gt;&gt;&gt; VRoot._pathroot("/a/") == VRoot._fixed_abspath("/")</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; VRoot._pathroot(r"d:</span><span class="org-constant">\\</span><span class="org-doc">x</span><span class="org-constant">\\</span><span class="org-doc">y</span><span class="org-constant">\\</span><span class="org-doc">\\")</span>
+<span class="org-doc">        'd:</span><span class="org-constant">\\</span><span class="org-doc">\\'</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">p_drive</span> <span class="org-operator">=</span> path.splitdrive(p)[0]
+        <span class="org-keyword">if</span> p_drive:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">if there is the drive, absroot will be ''</span>
+            <span class="org-variable-name">absroot</span> <span class="org-operator">=</span> p_drive <span class="org-operator">+</span> path.sep
+        <span class="org-keyword">else</span>:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">else will be default system root</span>
+            <span class="org-variable-name">absroot</span> <span class="org-operator">=</span> VRoot._fixed_abspath(u<span class="org-string">"/"</span>)
+        <span class="org-keyword">return</span> absroot
 
-    @<span style="color: #b3b3b3;">staticmethod</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_fixed_abspath</span>(p):
-        <span style="color: brightblack;">"""Issue: not normalized case"""</span>
-        <span style="color: brightblack;">return</span> path.normcase(path.abspath(p))
+    @<span class="org-builtin">staticmethod</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_fixed_abspath</span>(p):
+        <span class="org-doc">"""Issue: not normalized case"""</span>
+        <span class="org-keyword">return</span> path.normcase(path.abspath(p))
 
-    @<span style="color: #b3b3b3;">staticmethod</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_fixed_relpath</span>(p, base):
-        <span style="color: brightblack;">"""Issue: when base is root, p is prefixed by '..':</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; VRoot._fixed_relpath('/a/b/c/', '/') == r'a</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">b</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">c'</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        &gt;&gt;&gt; VRoot._fixed_relpath(r'd:</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">x</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">y', r'd:</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">\\') == path.normpath("x/y")</span>
-<span style="color: brightblack;">        True</span>
-<span style="color: brightblack;">        """</span>
-        <span style="color: #b3b3b3;">base_drive</span> = path.splitdrive(base)[0]
-        <span style="color: brightblack;">if</span> base_drive:
-            <span style="color: #595959;"># </span><span style="color: #595959;">if there is the drive, absroot will be ''</span>
-            <span style="color: #b3b3b3;">absroot</span> = base_drive + path.sep
-        <span style="color: brightblack;">else</span>:
-            <span style="color: #595959;"># </span><span style="color: #595959;">else will be default system root</span>
-            <span style="color: #b3b3b3;">absroot</span> = VRoot._fixed_abspath(u<span style="color: brightblack;">"/"</span>)
-        <span style="color: brightblack;">if</span> VRoot._fixed_abspath(base) == absroot:
-            <span style="color: #595959;"># </span><span style="color: #595959;">if base is root</span>
-            <span style="color: brightblack;">return</span> path.normpath(p).lstrip(u<span style="color: brightblack;">".."</span> + absroot)
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> path.relpath(p, base)
+    @<span class="org-builtin">staticmethod</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_fixed_relpath</span>(p, base):
+        <span class="org-doc">"""Issue: when base is root, p is prefixed by '..':</span>
+<span class="org-doc">        &gt;&gt;&gt; VRoot._fixed_relpath('/a/b/c/', '/') == r'a</span><span class="org-constant">\\</span><span class="org-doc">b</span><span class="org-constant">\\</span><span class="org-doc">c'</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        &gt;&gt;&gt; VRoot._fixed_relpath(r'd:</span><span class="org-constant">\\</span><span class="org-doc">x</span><span class="org-constant">\\</span><span class="org-doc">y', r'd:</span><span class="org-constant">\\</span><span class="org-doc">\\') == path.normpath("x/y")</span>
+<span class="org-doc">        True</span>
+<span class="org-doc">        """</span>
+        <span class="org-variable-name">base_drive</span> <span class="org-operator">=</span> path.splitdrive(base)[0]
+        <span class="org-keyword">if</span> base_drive:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">if there is the drive, absroot will be ''</span>
+            <span class="org-variable-name">absroot</span> <span class="org-operator">=</span> base_drive <span class="org-operator">+</span> path.sep
+        <span class="org-keyword">else</span>:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">else will be default system root</span>
+            <span class="org-variable-name">absroot</span> <span class="org-operator">=</span> VRoot._fixed_abspath(u<span class="org-string">"/"</span>)
+        <span class="org-keyword">if</span> VRoot._fixed_abspath(base) <span class="org-operator">==</span> absroot:
+            <span class="org-comment-delimiter"># </span><span class="org-comment">if base is root</span>
+            <span class="org-keyword">return</span> path.normpath(p).lstrip(u<span class="org-string">".."</span> <span class="org-operator">+</span> absroot)
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> path.relpath(p, base)
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">mount</span>(<span style="color: brightblack;">self</span>, mp):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_mp</span> = VRoot._fixed_abspath(mp)
+    <span class="org-keyword">def</span> <span class="org-function-name">mount</span>(<span class="org-keyword">self</span>, mp):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_mp</span> <span class="org-operator">=</span> VRoot._fixed_abspath(mp)
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">path2uri</span>(p, base=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">"""Path to uri, but without 'file:///'! See:</span>
-<span style="color: brightblack;">    &gt;&gt;&gt; path2uri('/a/b/c///')</span>
-<span style="color: brightblack;">    u'a/b/c'</span>
-<span style="color: brightblack;">    &gt;&gt;&gt; path2uri(r'd:</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">x</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">y')</span>
-<span style="color: brightblack;">    u'x/y'</span>
-<span style="color: brightblack;">    &gt;&gt;&gt; path2uri(u'/x/y/z', '/x')</span>
-<span style="color: brightblack;">    u'y/z'</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: brightblack;">return</span> VRoot(base <span style="color: brightblack;">or</span> VRoot._pathroot(p)).vpath(p).replace(<span style="color: brightblack;">'</span><span style="color: #7fffd4;">\\</span><span style="color: brightblack;">'</span>, <span style="color: brightblack;">'/'</span>)
+<span class="org-keyword">def</span> <span class="org-function-name">path2uri</span>(p, base<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-doc">"""Path to uri, but without 'file:///'! See:</span>
+<span class="org-doc">    &gt;&gt;&gt; path2uri('/a/b/c///')</span>
+<span class="org-doc">    u'a/b/c'</span>
+<span class="org-doc">    &gt;&gt;&gt; path2uri(r'd:</span><span class="org-constant">\\</span><span class="org-doc">x</span><span class="org-constant">\\</span><span class="org-doc">y')</span>
+<span class="org-doc">    u'x/y'</span>
+<span class="org-doc">    &gt;&gt;&gt; path2uri(u'/x/y/z', '/x')</span>
+<span class="org-doc">    u'y/z'</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">return</span> VRoot(base <span class="org-keyword">or</span> VRoot._pathroot(p)).vpath(p).replace(<span class="org-string">'</span><span class="org-constant">\\</span><span class="org-string">'</span>, <span class="org-string">'/'</span>)
 
-<span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">__name__</span> == <span style="color: brightblack;">"__main__"</span>:
-    <span style="color: brightblack;">import</span> doctest
+<span class="org-keyword">if</span> <span class="org-builtin">__name__</span> <span class="org-operator">==</span> <span class="org-string">"__main__"</span>:
+    <span class="org-keyword">import</span> doctest
     doctest.testmod()
-    <span style="color: #595959;">#</span><span style="color: #595959;">print VRoot._pathroot(r'd:\\\\x\y')</span>
+    <span class="org-comment-delimiter">#</span><span class="org-comment">print VRoot._pathroot(r'd:\\\\x\y')</span>
 </pre>
 </div>
 </div>

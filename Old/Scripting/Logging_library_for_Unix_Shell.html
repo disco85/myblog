@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Logging library for Unix Shell</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,268 +194,268 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Logging library for Unix Shell</h1>
-<div id="outline-container-org97e3fc4" class="outline-2">
-<h2 id="org97e3fc4">Logging library for Unix Shell</h2>
-<div class="outline-text-2" id="text-org97e3fc4">
+<div id="outline-container-org50a305e" class="outline-2">
+<h2 id="org50a305e">Logging library for Unix Shell</h2>
+<div class="outline-text-2" id="text-org50a305e">
 <p>
 This library is similar to Log library for Python or Java. Here its code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/bin/</span><span style="color: brightblack;">sh</span>
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Simple logging facility for Unix /bin/sh</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">========================================</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Configuration</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">-------------</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">and log record</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">* _LOGGING_FMT : uses format similar to Python logging Lib</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#       </span><span style="color: #595959;">Available fields for _LOGGING_FMT are:</span>
-<span style="color: #595959;">#         </span><span style="color: #595959;">asctime, filename, levelname, levelno, message, name, pathname,</span>
-<span style="color: #595959;">#         </span><span style="color: #595959;">process, processName, user</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Example</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">-------</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">getLogger prg1</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">getLogger prg2</span>
-<span style="color: #595959;">#     </span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">addLogHandler prg1 FileHandler /dev/stderr</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">addLogHandler prg2 ConsoleHandler</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">addLogHandler prg2 FileHandler /var/log/somefile</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">addLogHandler prg2 FileHandler /var/log/somefile_copy</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">setLogLevel prg1 DEBUG</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">prg1_debug DebugMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">prg1_error ErrorMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">echo InfoMessage|prg2_info</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">will produces on STDERR console:</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">will produces on console:</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">and in /var/log/somefile:</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">and in /var/log/somefile_copy:</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">...</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Simple logging facility for Unix /bin/sh</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">========================================</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Configuration</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">-------------</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">and log record</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_FMT : uses format similar to Python logging Lib</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#       </span><span class="org-comment">Available fields for _LOGGING_FMT are:</span>
+<span class="org-comment-delimiter">#         </span><span class="org-comment">asctime, filename, levelname, levelno, message, name, pathname,</span>
+<span class="org-comment-delimiter">#         </span><span class="org-comment">process, processName, user</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Example</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">-------</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg1</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg2</span>
+<span class="org-comment-delimiter">#     </span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg1 FileHandler /dev/stderr</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 ConsoleHandler</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile_copy</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">setLogLevel prg1 DEBUG</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_debug DebugMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_error ErrorMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">echo InfoMessage|prg2_info</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on STDERR console:</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on console:</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile:</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile_copy:</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
 
-<span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;">: log levels per handlers</span>
-
-
-<span style="color: #595959;">############################## </span><span style="color: #595959;">Settings #####################################</span>
-
-<span style="color: #595959;"># </span><span style="color: #595959;">Global log record format and date format:</span>
-<span style="color: #b3b3b3;">_LOGGING_DATEFMT</span>=<span style="color: brightblack;">"%Y-%m-%dT%H:%M:%S%z"</span>
-<span style="color: #b3b3b3;">_LOGGING_FMT</span>=<span style="color: brightblack;">"%asctime  %levelname %message"</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: log levels per handlers</span>
 
 
+<span class="org-comment-delimiter">############################## </span><span class="org-comment">Settings #####################################</span>
 
-<span style="color: #595959;">################################### </span><span style="color: #595959;">Code #####################################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Global log record format and date format:</span>
+<span class="org-variable-name">_LOGGING_DATEFMT</span>=<span class="org-string">"%Y-%m-%dT%H:%M:%S%z"</span>
+<span class="org-variable-name">_LOGGING_FMT</span>=<span class="org-string">"%asctime  %levelname %message"</span>
 
-<span style="color: #b3b3b3;">_log_SCRIPT</span>=<span style="color: #fa8072;">`readlink -f $0`</span>
 
-<span style="color: #a52a2a;">_log_getLogAttr</span>() {
-  <span style="color: #b3b3b3;">name</span>=$<span style="color: #b3b3b3;">1</span>; <span style="color: #b3b3b3;">attr</span>=${<span style="color: #b3b3b3;">1</span>}_$<span style="color: #b3b3b3;">2</span>
-  <span style="color: #b3b3b3;">eval</span> echo $<span style="color: #fa8072;">`echo $attr`</span>
+
+<span class="org-comment-delimiter">################################### </span><span class="org-comment">Code #####################################</span>
+
+<span class="org-variable-name">_log_SCRIPT</span>=<span class="org-sh-quoted-exec">`readlink -f $0`</span>
+
+<span class="org-function-name">_log_getLogAttr</span>() {
+  <span class="org-variable-name">name</span>=$<span class="org-variable-name">1</span>; <span class="org-variable-name">attr</span>=${<span class="org-variable-name">1</span>}_$<span class="org-variable-name">2</span>
+  <span class="org-builtin">eval</span> echo $<span class="org-sh-quoted-exec">`echo $attr`</span>
 }
 
-<span style="color: #595959;">################################### </span><span style="color: #595959;">Handlers #################################</span>
+<span class="org-comment-delimiter">################################### </span><span class="org-comment">Handlers #################################</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: ...</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Nothing to do, all args are ignored</span>
-<span style="color: #a52a2a;">_log_NullHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: ...</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Nothing to do, all args are ignored</span>
+<span class="org-function-name">_log_NullHandler</span>() {
   :
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $name $level $msg</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Logs $msg with $level via logger(1) utility</span>
-<span style="color: #a52a2a;">_log_SyslogHandler</span>() {
-  <span style="color: #b3b3b3;">local</span> name level msg syslog_level
-  <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">msg</span>=<span style="color: brightblack;">"$3"</span>
-  <span style="color: #b3b3b3;">syslog_level</span>=<span style="color: #fa8072;">`_log_syslogLevel $level`</span>
-  logger -p <span style="color: brightblack;">"local0.${syslog_level}"</span> -t $<span style="color: #b3b3b3;">name</span> <span style="color: brightblack;">"$msg"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Logs $msg with $level via logger(1) utility</span>
+<span class="org-function-name">_log_SyslogHandler</span>() {
+  <span class="org-builtin">local</span> name level msg syslog_level
+  <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$3"</span>
+  <span class="org-variable-name">syslog_level</span>=<span class="org-sh-quoted-exec">`_log_syslogLevel $level`</span>
+  logger -p <span class="org-string">"local0.${syslog_level}"</span> -t $<span class="org-variable-name">name</span> <span class="org-string">"$msg"</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $name $level $msg</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Logs message $msg on console</span>
-<span style="color: #a52a2a;">_log_ConsoleHandler</span>() {
-  <span style="color: #b3b3b3;">local</span> name level msg
-  <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">msg</span>=<span style="color: brightblack;">"$3"</span>
-  <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"$msg"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Logs message $msg on console</span>
+<span class="org-function-name">_log_ConsoleHandler</span>() {
+  <span class="org-builtin">local</span> name level msg
+  <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$3"</span>
+  <span class="org-builtin">echo</span> <span class="org-string">"$msg"</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $subject $address $msg</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">If mail(1) exists, call it to send $msg via EMail</span>
-<span style="color: #a52a2a;">_log_MailHandler</span>() {
-  <span style="color: #b3b3b3;">command</span> -v mail &gt;/dev/null 2&gt;&amp;1 || <span style="color: brightblack;">return</span> 1
-  <span style="color: #b3b3b3;">local</span> subj addr name level msg
-  <span style="color: #b3b3b3;">subj</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">addr</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$3"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: brightblack;">"$4"</span>; <span style="color: #b3b3b3;">msg</span>=<span style="color: brightblack;">"$5"</span>
-  <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"$msg"</span>|mail -s <span style="color: brightblack;">"${subj}${level}: $name"</span> $<span style="color: #b3b3b3;">addr</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $subject $address $msg</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">If mail(1) exists, call it to send $msg via EMail</span>
+<span class="org-function-name">_log_MailHandler</span>() {
+  <span class="org-builtin">command</span> -v mail &gt;/dev/null 2&gt;&amp;1 || <span class="org-keyword">return</span> 1
+  <span class="org-builtin">local</span> subj addr name level msg
+  <span class="org-variable-name">subj</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">addr</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">name</span>=<span class="org-string">"$3"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$4"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$5"</span>
+  <span class="org-builtin">echo</span> <span class="org-string">"$msg"</span>|mail -s <span class="org-string">"${subj}${level}: $name"</span> $<span class="org-variable-name">addr</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $filename $msg</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Append message $msg to file $filename</span>
-<span style="color: #a52a2a;">_log_FileHandler</span>() {
-  <span style="color: #b3b3b3;">local</span> filename name level msg
-  <span style="color: #b3b3b3;">filename</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: brightblack;">"$3"</span>; <span style="color: #b3b3b3;">msg</span>=<span style="color: brightblack;">"$4"</span>
-  touch <span style="color: brightblack;">"$filename"</span>
-  <span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"$msg"</span> &gt;&gt; <span style="color: brightblack;">"$filename"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $filename $msg</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Append message $msg to file $filename</span>
+<span class="org-function-name">_log_FileHandler</span>() {
+  <span class="org-builtin">local</span> filename name level msg
+  <span class="org-variable-name">filename</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">name</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$3"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$4"</span>
+  touch <span class="org-string">"$filename"</span>
+  <span class="org-builtin">echo</span> <span class="org-string">"$msg"</span> &gt;&gt; <span class="org-string">"$filename"</span>
 }
 
-<span style="color: #a52a2a;">_log_syslogLevel</span>() {
-  <span style="color: brightblack;">case</span> $<span style="color: #b3b3b3;">1</span><span style="color: brightblack;"> in</span>
+<span class="org-function-name">_log_syslogLevel</span>() {
+  <span class="org-keyword">case</span> $<span class="org-variable-name">1</span><span class="org-keyword"> in</span>
     CRITICAL)
-      <span style="color: #b3b3b3;">echo</span> crit;;
+      <span class="org-builtin">echo</span> crit;;
     FATAL)
-      <span style="color: #b3b3b3;">echo</span> panic;;
+      <span class="org-builtin">echo</span> panic;;
     ERROR)
-      <span style="color: #b3b3b3;">echo</span> error;;
+      <span class="org-builtin">echo</span> error;;
     WARNING)
-      <span style="color: #b3b3b3;">echo</span> warning;;
+      <span class="org-builtin">echo</span> warning;;
     INFO)
-      <span style="color: #b3b3b3;">echo</span> info;;
+      <span class="org-builtin">echo</span> info;;
     DEBUG)
-      <span style="color: #b3b3b3;">echo</span> debug;;
+      <span class="org-builtin">echo</span> debug;;
     *)
-      <span style="color: #b3b3b3;">echo</span> notice;;
-  <span style="color: brightblack;">esac</span>
+      <span class="org-builtin">echo</span> notice;;
+  <span class="org-keyword">esac</span>
 }
 
-<span style="color: #a52a2a;">_log_levelNo</span>() {
-  <span style="color: brightblack;">case</span> $<span style="color: #b3b3b3;">1</span><span style="color: brightblack;"> in</span>
+<span class="org-function-name">_log_levelNo</span>() {
+  <span class="org-keyword">case</span> $<span class="org-variable-name">1</span><span class="org-keyword"> in</span>
     CRITICAL|FATAL)
-      <span style="color: #b3b3b3;">echo</span> 50;;
+      <span class="org-builtin">echo</span> 50;;
     ERROR)
-      <span style="color: #b3b3b3;">echo</span> 40;;
+      <span class="org-builtin">echo</span> 40;;
     WARNING)
-      <span style="color: #b3b3b3;">echo</span> 30;;
+      <span class="org-builtin">echo</span> 30;;
     INFO)
-      <span style="color: #b3b3b3;">echo</span> 20;;
+      <span class="org-builtin">echo</span> 20;;
     DEBUG)
-      <span style="color: #b3b3b3;">echo</span> 10;;
+      <span class="org-builtin">echo</span> 10;;
     *)
-      <span style="color: #b3b3b3;">echo</span> 0;;
-  <span style="color: brightblack;">esac</span>
+      <span class="org-builtin">echo</span> 0;;
+  <span class="org-keyword">esac</span>
 }
 
-<span style="color: #a52a2a;">_log</span>() {
-  <span style="color: #b3b3b3;">local</span> name level msg handlers h closure_args skip no_closure_args levelno enabled_levelno
-  <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">msg</span>=<span style="color: brightblack;">"$3"</span>
+<span class="org-function-name">_log</span>() {
+  <span class="org-builtin">local</span> name level msg handlers h closure_args skip no_closure_args levelno enabled_levelno
+  <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$3"</span>
 
-  <span style="color: #b3b3b3;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $level`</span>
-  <span style="color: #b3b3b3;">enabled_levelno</span>=<span style="color: #fa8072;">`_log_getLogAttr $name level`</span>
-  [ $<span style="color: #b3b3b3;">levelno</span> -lt $<span style="color: #b3b3b3;">enabled_levelno</span> ] &amp;&amp; <span style="color: brightblack;">return</span>
+  <span class="org-variable-name">levelno</span>=<span class="org-sh-quoted-exec">`_log_levelNo $level`</span>
+  <span class="org-variable-name">enabled_levelno</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name level`</span>
+  [ $<span class="org-variable-name">levelno</span> -lt $<span class="org-variable-name">enabled_levelno</span> ] &amp;&amp; <span class="org-keyword">return</span>
 
-  <span style="color: #b3b3b3;">handlers</span>=<span style="color: #fa8072;">`_log_getLogAttr $name handlers`</span>
-  <span style="color: #b3b3b3;">handlers</span>=<span style="color: #fa8072;">`echo "$handlers"|sed 's/__COMMA__/\\ /g'`</span>
-  <span style="color: brightblack;">for</span> h<span style="color: brightblack;"> in</span> $<span style="color: #b3b3b3;">handlers</span>; <span style="color: brightblack;">do</span>
-    <span style="color: #b3b3b3;">echo</span> $<span style="color: #b3b3b3;">skip</span>|grep $<span style="color: #b3b3b3;">h</span> &gt;/dev/null &amp;&amp; <span style="color: brightblack;">continue</span>
-    <span style="color: #b3b3b3;">closure_args</span>=<span style="color: #fa8072;">`_log_getLogAttr $name ${h}_handler_args`</span>
-    <span style="color: #b3b3b3;">closure_args</span>=<span style="color: #fa8072;">`echo "$closure_args"|sed 's/__COMMA__/\\ /g'`</span>
-    <span style="color: #b3b3b3;">no_closure_args</span>=1
-    <span style="color: brightblack;">for</span> ca<span style="color: brightblack;"> in</span> $<span style="color: #b3b3b3;">closure_args</span>; <span style="color: brightblack;">do</span>
-      <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"$h $ca $name $level \"$msg\""</span>
-      <span style="color: #b3b3b3;">no_closure_args</span>=0
-    <span style="color: brightblack;">done</span>
-    [ $<span style="color: #b3b3b3;">no_closure_args</span> ] &amp;&amp; <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"$h $name $level \"$msg\""</span>
-    <span style="color: #b3b3b3;">skip</span>=<span style="color: brightblack;">"$h $skip"</span>
-  <span style="color: brightblack;">done</span>
+  <span class="org-variable-name">handlers</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name handlers`</span>
+  <span class="org-variable-name">handlers</span>=<span class="org-sh-quoted-exec">`echo "$handlers"|sed 's/__COMMA__/\\ /g'`</span>
+  <span class="org-keyword">for</span> h<span class="org-keyword"> in</span> $<span class="org-variable-name">handlers</span>; <span class="org-keyword">do</span>
+    <span class="org-builtin">echo</span> $<span class="org-variable-name">skip</span>|grep $<span class="org-variable-name">h</span> &gt;/dev/null &amp;&amp; <span class="org-keyword">continue</span>
+    <span class="org-variable-name">closure_args</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name ${h}_handler_args`</span>
+    <span class="org-variable-name">closure_args</span>=<span class="org-sh-quoted-exec">`echo "$closure_args"|sed 's/__COMMA__/\\ /g'`</span>
+    <span class="org-variable-name">no_closure_args</span>=1
+    <span class="org-keyword">for</span> ca<span class="org-keyword"> in</span> $<span class="org-variable-name">closure_args</span>; <span class="org-keyword">do</span>
+      <span class="org-builtin">eval</span> <span class="org-string">"$h $ca $name $level \"$msg\""</span>
+      <span class="org-variable-name">no_closure_args</span>=0
+    <span class="org-keyword">done</span>
+    [ $<span class="org-variable-name">no_closure_args</span> ] &amp;&amp; <span class="org-builtin">eval</span> <span class="org-string">"$h $name $level \"$msg\""</span>
+    <span class="org-variable-name">skip</span>=<span class="org-string">"$h $skip"</span>
+  <span class="org-keyword">done</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $name $h [$args...]</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Adds handler $h for logger $name with possible arguments</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">(see handlers' implementations for concrete args)</span>
-<span style="color: #a52a2a;">addLogHandler</span>() {
-  <span style="color: #b3b3b3;">local</span> name handler oldhandlers exthandler args oldargs
-  <span style="color: #b3b3b3;">name</span>=$<span style="color: #b3b3b3;">1</span>; <span style="color: #b3b3b3;">exthandler</span>=<span style="color: brightblack;">"$2"</span>; <span style="color: #b3b3b3;">handler</span>=_log_<span style="color: brightblack;">"$exthandler"</span>; <span style="color: #b3b3b3;">shift</span> 2; <span style="color: #b3b3b3;">args</span>=<span style="color: brightblack;">"$*"</span>
-  <span style="color: #b3b3b3;">oldhandlers</span>=<span style="color: #fa8072;">`_log_getLogAttr $name handlers`</span>
-  <span style="color: #b3b3b3;">oldargs</span>=<span style="color: #fa8072;">`_log_getLogAttr $name ${handler}_handler_args`</span>
-  <span style="color: #595959;"># </span><span style="color: #595959;">__COMMA__ is used to separate items in lists</span>
-  <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
-  <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"${name}_${handler}_handler_args=\"$args\"__COMMA__$oldargs"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $h [$args...]</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Adds handler $h for logger $name with possible arguments</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">(see handlers' implementations for concrete args)</span>
+<span class="org-function-name">addLogHandler</span>() {
+  <span class="org-builtin">local</span> name handler oldhandlers exthandler args oldargs
+  <span class="org-variable-name">name</span>=$<span class="org-variable-name">1</span>; <span class="org-variable-name">exthandler</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">handler</span>=_log_<span class="org-string">"$exthandler"</span>; <span class="org-builtin">shift</span> 2; <span class="org-variable-name">args</span>=<span class="org-string">"$*"</span>
+  <span class="org-variable-name">oldhandlers</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name handlers`</span>
+  <span class="org-variable-name">oldargs</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name ${handler}_handler_args`</span>
+  <span class="org-comment-delimiter"># </span><span class="org-comment">__COMMA__ is used to separate items in lists</span>
+  <span class="org-builtin">eval</span> <span class="org-string">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
+  <span class="org-builtin">eval</span> <span class="org-string">"${name}_${handler}_handler_args=\"$args\"__COMMA__$oldargs"</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $name | $name $longname</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">No return and no output but setups logger for this $name. In 2nd form $longname</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">is used in message substitution</span>
-<span style="color: #a52a2a;">getLogger</span>() {
-  <span style="color: #b3b3b3;">local</span> asctime filename levelname levelno message name pathname process processName _lv user longname
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name | $name $longname</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">No return and no output but setups logger for this $name. In 2nd form $longname</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">is used in message substitution</span>
+<span class="org-function-name">getLogger</span>() {
+  <span class="org-builtin">local</span> asctime filename levelname levelno message name pathname process processName _lv user longname
 
-  <span style="color: #b3b3b3;">asctime</span>=$<span style="color: #b3b3b3;">_LOGGING_DATEFMT</span>
-  <span style="color: #b3b3b3;">filename</span>=<span style="color: #fa8072;">`getScriptName`</span>
-  <span style="color: #b3b3b3;">message</span>=<span style="color: brightblack;">'${1:-`tee`}'</span>
-  <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$1"</span>
-  <span style="color: #b3b3b3;">longname</span>=${<span style="color: #b3b3b3;">2</span>:-$<span style="color: #b3b3b3;">name</span>}
-  <span style="color: #b3b3b3;">pathname</span>=<span style="color: #fa8072;">`echo "$_log_SCRIPT"|sed 's/\\//\\\\\//g'`</span>
-  <span style="color: #b3b3b3;">process</span>=<span style="color: brightblack;">'$$'</span>
-  <span style="color: #b3b3b3;">processName</span>=<span style="color: #fa8072;">`ps -A -opid,comm | awk -v PID=$$ '$1 == PID { print $2 }'`</span>
-  <span style="color: #b3b3b3;">processName</span>=<span style="color: #fa8072;">`echo "$processName"|sed 's/\\//\\\\\//g'`</span>
-  <span style="color: #b3b3b3;">user</span>=<span style="color: brightblack;">"$USER"</span>
+  <span class="org-variable-name">asctime</span>=$<span class="org-variable-name">_LOGGING_DATEFMT</span>
+  <span class="org-variable-name">filename</span>=<span class="org-sh-quoted-exec">`getScriptName`</span>
+  <span class="org-variable-name">message</span>=<span class="org-string">'${1:-`tee`}'</span>
+  <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>
+  <span class="org-variable-name">longname</span>=${<span class="org-variable-name">2</span>:-$<span class="org-variable-name">name</span>}
+  <span class="org-variable-name">pathname</span>=<span class="org-sh-quoted-exec">`echo "$_log_SCRIPT"|sed 's/\\//\\\\\//g'`</span>
+  <span class="org-variable-name">process</span>=<span class="org-string">'$$'</span>
+  <span class="org-variable-name">processName</span>=<span class="org-sh-quoted-exec">`ps -A -opid,comm | awk -v PID=$$ '$1 == PID { print $2 }'`</span>
+  <span class="org-variable-name">processName</span>=<span class="org-sh-quoted-exec">`echo "$processName"|sed 's/\\//\\\\\//g'`</span>
+  <span class="org-variable-name">user</span>=<span class="org-string">"$USER"</span>
 
-  <span style="color: brightblack;">for</span> _lv<span style="color: brightblack;"> in</span> debug info warning error fatal critical; <span style="color: brightblack;">do</span>
-    <span style="color: #b3b3b3;">levelname</span>=<span style="color: #fa8072;">`echo -n $_lv|tr '[:lower:]' '[:upper:]'`</span>
-    <span style="color: #b3b3b3;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $levelname`</span>
+  <span class="org-keyword">for</span> _lv<span class="org-keyword"> in</span> debug info warning error fatal critical; <span class="org-keyword">do</span>
+    <span class="org-variable-name">levelname</span>=<span class="org-sh-quoted-exec">`echo -n $_lv|tr '[:lower:]' '[:upper:]'`</span>
+    <span class="org-variable-name">levelno</span>=<span class="org-sh-quoted-exec">`_log_levelNo $levelname`</span>
 
-    <span style="color: #b3b3b3;">fmt</span>=<span style="color: #fa8072;">`echo $_LOGGING_FMT | \</span>
-<span style="color: #fa8072;">      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \</span>
-<span style="color: #fa8072;">      sed "s/%filename/$filename/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%levelname/$levelname/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%levelno/$levelno/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%message/$message/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%pathname/$pathname/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%processName/$processName/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%process/$process/g" | \</span>
-<span style="color: #fa8072;">      sed "s/%user/$user/g" | \</span>
-<span style="color: #fa8072;">      sed "s//$longname/g"`</span>
-    <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"${name}_${_lv} () { _log $name $levelname \"$fmt\"; }"</span>
-  <span style="color: brightblack;">done</span>
-  setLogLevel $<span style="color: #b3b3b3;">name</span> INFO
+    <span class="org-variable-name">fmt</span>=<span class="org-sh-quoted-exec">`echo $_LOGGING_FMT | \</span>
+<span class="org-sh-quoted-exec">      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%filename/$filename/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%levelname/$levelname/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%levelno/$levelno/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%message/$message/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%pathname/$pathname/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%processName/$processName/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%process/$process/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s/%user/$user/g" | \</span>
+<span class="org-sh-quoted-exec">      sed "s//$longname/g"`</span>
+    <span class="org-builtin">eval</span> <span class="org-string">"${name}_${_lv} () { _log $name $levelname \"$fmt\"; }"</span>
+  <span class="org-keyword">done</span>
+  setLogLevel $<span class="org-variable-name">name</span> INFO
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS: $name $level</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">messages which are less severe than $level will be ignored.</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Default is INFO</span>
-<span style="color: #a52a2a;">setLogLevel</span>() {
-  <span style="color: #b3b3b3;">local</span> name level levelno
-  <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"$1"</span>; <span style="color: #b3b3b3;">level</span>=<span style="color: #fa8072;">`echo -n $2|tr '[:lower:]' '[:upper:]'`</span>
-  <span style="color: #b3b3b3;">levelno</span>=<span style="color: #fa8072;">`_log_levelNo $level`</span>
-  <span style="color: #b3b3b3;">eval</span> <span style="color: brightblack;">"${name}_level=$levelno"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">messages which are less severe than $level will be ignored.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Default is INFO</span>
+<span class="org-function-name">setLogLevel</span>() {
+  <span class="org-builtin">local</span> name level levelno
+  <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-sh-quoted-exec">`echo -n $2|tr '[:lower:]' '[:upper:]'`</span>
+  <span class="org-variable-name">levelno</span>=<span class="org-sh-quoted-exec">`_log_levelNo $level`</span>
+  <span class="org-builtin">eval</span> <span class="org-string">"${name}_level=$levelno"</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">SYNOPSIS:</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Echos name of script</span>
-<span style="color: #a52a2a;">getScriptName</span>() {
-  <span style="color: #b3b3b3;">echo</span> <span style="color: #fa8072;">`basename "$_log_SCRIPT"`</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS:</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Echos name of script</span>
+<span class="org-function-name">getScriptName</span>() {
+  <span class="org-builtin">echo</span> <span class="org-sh-quoted-exec">`basename "$_log_SCRIPT"`</span>
 }
 
 </pre>
@@ -341,10 +466,10 @@ Example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/bin/</span><span style="color: brightblack;">sh</span>
-<span style="color: #b3b3b3;">.</span> ./logging.sh
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
+<span class="org-builtin">.</span> ./logging.sh
 
-getLogger prg1 <span style="color: #fa8072;">`getScriptName`</span>
+getLogger prg1 <span class="org-sh-quoted-exec">`getScriptName`</span>
 addLogHandler prg1 ConsoleHandler
 addLogHandler prg1 FileHandler ./lll1.log
 addLogHandler prg1 FileHandler ./lll2.log
@@ -352,9 +477,9 @@ setLogLevel prg1 DEBUG
 
 prg1_debug Debugggg
 prg1_error Errrrror
-<span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">'Message-INFO!!!!</span>
-<span style="color: brightblack;">1111</span>
-<span style="color: brightblack;">2222'</span>|prg1_info
+<span class="org-builtin">echo</span> <span class="org-string">'Message-INFO!!!!</span>
+<span class="org-string">1111</span>
+<span class="org-string">2222'</span>|prg1_info
 
 </pre>
 </div>

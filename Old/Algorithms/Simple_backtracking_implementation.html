@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple backtracking implementation</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Simple backtracking implementation</h1>
-<div id="outline-container-org149451e" class="outline-2">
-<h2 id="org149451e">Simple backtracking implementation</h2>
-<div class="outline-text-2" id="text-org149451e">
+<div id="outline-container-org4e551e5" class="outline-2">
+<h2 id="org4e551e5">Simple backtracking implementation</h2>
+<div class="outline-text-2" id="text-org4e551e5">
 <p>
 Classical task: you have numbers <code>1,5,6,7</code> and operations <code>(),+,-,*,/,^</code>. You have to build arithmetical expression which result will be <code>21</code> (without
 repeats!). For searching is solutions tree we'll use backtracking, for
@@ -83,50 +208,50 @@ more than 1 numbers on the stack!
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">from</span> functools <span style="color: brightblack;">import</span> *
+<pre class="src src-python"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-operator">*</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">split seq by element index, returns element and all other elements</span>
-<span style="color: #b3b3b3;">extract_e</span> = <span style="color: brightblack;">lambda</span> seq, i: (seq[i], seq[:i] + seq[i+1:])
-<span style="color: #595959;"># </span><span style="color: #595959;">all indexes of sequence</span>
-<span style="color: #b3b3b3;">indexes</span> = <span style="color: brightblack;">lambda</span> seq: <span style="color: #b3b3b3;">range</span>(<span style="color: #b3b3b3;">len</span>(seq))
+<span class="org-comment-delimiter"># </span><span class="org-comment">split seq by element index, returns element and all other elements</span>
+<span class="org-variable-name">extract_e</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> seq, i: (seq[i], seq[:i] <span class="org-operator">+</span> seq[i<span class="org-operator">+</span>1:])
+<span class="org-comment-delimiter"># </span><span class="org-comment">all indexes of sequence</span>
+<span class="org-variable-name">indexes</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> seq: <span class="org-builtin">range</span>(<span class="org-builtin">len</span>(seq))
 
-<span style="color: #595959;"># </span><span style="color: #595959;">backtracking</span>
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">bt</span>(cases, goal, found=[], level=0, path=[]):
-    <span style="color: brightblack;">if</span> goal(path, level): found.append(path)
-    <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> indexes(cases):
-        <span style="color: #b3b3b3;">c</span>, <span style="color: #b3b3b3;">rest</span> = extract_e(cases, i)
-        bt(rest, goal, found, level+1, path + [c])
-    <span style="color: brightblack;">if</span> 0 == level: <span style="color: brightblack;">return</span> found
+<span class="org-comment-delimiter"># </span><span class="org-comment">backtracking</span>
+<span class="org-keyword">def</span> <span class="org-function-name">bt</span>(cases, goal, found<span class="org-operator">=</span>[], level<span class="org-operator">=</span>0, path<span class="org-operator">=</span>[]):
+    <span class="org-keyword">if</span> goal(path, level): found.append(path)
+    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> indexes(cases):
+        <span class="org-variable-name">c</span>, <span class="org-variable-name">rest</span> <span class="org-operator">=</span> extract_e(cases, i)
+        bt(rest, goal, found, level<span class="org-operator">+</span>1, path <span class="org-operator">+</span> [c])
+    <span class="org-keyword">if</span> 0 <span class="org-operator">==</span> level: <span class="org-keyword">return</span> found
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Solver - uses postfix arithm.</span>
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Solver</span>:
-    <span style="color: #b3b3b3;">VALUES</span>, <span style="color: #b3b3b3;">OPERATORS</span> = (1,5,6,7), (<span style="color: brightblack;">'+'</span>, <span style="color: brightblack;">'-'</span>, <span style="color: brightblack;">'*'</span>, <span style="color: brightblack;">'/'</span>, <span style="color: brightblack;">'^'</span>)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Solver - uses postfix arithm.</span>
+<span class="org-keyword">class</span> <span class="org-type">Solver</span>:
+    <span class="org-variable-name">VALUES</span>, <span class="org-variable-name">OPERATORS</span> <span class="org-operator">=</span> (1,5,6,7), (<span class="org-string">'+'</span>, <span class="org-string">'-'</span>, <span class="org-string">'*'</span>, <span class="org-string">'/'</span>, <span class="org-string">'^'</span>)
 
-    @<span style="color: #b3b3b3;">staticmethod</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_binop</span>(stack, op_ch):
-        <span style="color: #b3b3b3;">ops</span> = { <span style="color: brightblack;">"+"</span>: <span style="color: brightblack;">lambda</span> a, b: b+a, <span style="color: brightblack;">"-"</span>: <span style="color: brightblack;">lambda</span> a, b: b-a,
-                <span style="color: brightblack;">"*"</span>: <span style="color: brightblack;">lambda</span> a, b: b*a, <span style="color: brightblack;">"/"</span>: <span style="color: brightblack;">lambda</span> a, b: b/a,
-                <span style="color: brightblack;">"^"</span>: <span style="color: brightblack;">lambda</span> a, b: b**a, }
+    @<span class="org-builtin">staticmethod</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_binop</span>(stack, op_ch):
+        <span class="org-variable-name">ops</span> <span class="org-operator">=</span> { <span class="org-string">"+"</span>: <span class="org-keyword">lambda</span> a, b: b<span class="org-operator">+</span>a, <span class="org-string">"-"</span>: <span class="org-keyword">lambda</span> a, b: b<span class="org-operator">-</span>a,
+                <span class="org-string">"*"</span>: <span class="org-keyword">lambda</span> a, b: b<span class="org-operator">*</span>a, <span class="org-string">"/"</span>: <span class="org-keyword">lambda</span> a, b: b<span class="org-operator">/</span>a,
+                <span class="org-string">"^"</span>: <span class="org-keyword">lambda</span> a, b: b<span class="org-operator">**</span>a, }
         stack.append(ops[op_ch](stack.pop(), stack.pop()))
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">eval</span>(<span style="color: brightblack;">self</span>, state, default=<span style="color: #7fffd4;">None</span>):
-        <span style="color: brightblack;">try</span>:
-            <span style="color: #b3b3b3;">stack</span> = []
-            <span style="color: brightblack;">for</span> c <span style="color: brightblack;">in</span> state:
-                <span style="color: brightblack;">if</span> c <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.VALUES: stack.append(<span style="color: #b3b3b3;">int</span>(c))
-                <span style="color: brightblack;">else</span>: <span style="color: brightblack;">self</span>._binop(stack, c)
-            <span style="color: brightblack;">return</span> stack.pop()
-        <span style="color: brightblack;">except</span>:
-            <span style="color: brightblack;">return</span> default
+    <span class="org-keyword">def</span> <span class="org-function-name">eval</span>(<span class="org-keyword">self</span>, state, default<span class="org-operator">=</span><span class="org-constant">None</span>):
+        <span class="org-keyword">try</span>:
+            <span class="org-variable-name">stack</span> <span class="org-operator">=</span> []
+            <span class="org-keyword">for</span> c <span class="org-keyword">in</span> state:
+                <span class="org-keyword">if</span> c <span class="org-keyword">in</span> <span class="org-keyword">self</span>.VALUES: stack.append(<span class="org-builtin">int</span>(c))
+                <span class="org-keyword">else</span>: <span class="org-keyword">self</span>._binop(stack, c)
+            <span class="org-keyword">return</span> stack.pop()
+        <span class="org-keyword">except</span>:
+            <span class="org-keyword">return</span> default
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__call__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">goal</span>(path, level):
-            <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(path) &gt; 2 <span style="color: brightblack;">and</span> <span style="color: #b3b3b3;">all</span>(e <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.VALUES <span style="color: brightblack;">for</span> e <span style="color: brightblack;">in</span> path[:2]):
-                <span style="color: brightblack;">try</span>: <span style="color: brightblack;">return</span> 21 == <span style="color: #b3b3b3;">int</span>(<span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">eval</span>(path))
-                <span style="color: brightblack;">except</span>: <span style="color: brightblack;">return</span>
-        <span style="color: brightblack;">return</span> bt(<span style="color: brightblack;">self</span>.VALUES + <span style="color: brightblack;">self</span>.OPERATORS, goal)
+    <span class="org-keyword">def</span> <span class="org-function-name">__call__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">def</span> <span class="org-function-name">goal</span>(path, level):
+            <span class="org-keyword">if</span> <span class="org-builtin">len</span>(path) <span class="org-operator">&gt;</span> 2 <span class="org-keyword">and</span> <span class="org-builtin">all</span>(e <span class="org-keyword">in</span> <span class="org-keyword">self</span>.VALUES <span class="org-keyword">for</span> e <span class="org-keyword">in</span> path[:2]):
+                <span class="org-keyword">try</span>: <span class="org-keyword">return</span> 21 <span class="org-operator">==</span> <span class="org-builtin">int</span>(<span class="org-keyword">self</span>.<span class="org-builtin">eval</span>(path))
+                <span class="org-keyword">except</span>: <span class="org-keyword">return</span>
+        <span class="org-keyword">return</span> bt(<span class="org-keyword">self</span>.VALUES <span class="org-operator">+</span> <span class="org-keyword">self</span>.OPERATORS, goal)
 
-<span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">"Found:"</span>, Solver()())
+<span class="org-builtin">print</span>(<span class="org-string">"Found:"</span>, Solver()())
 </pre>
 </div>
 
@@ -135,13 +260,13 @@ The same BT-search may be used for sorting:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">predicate: is seq ordered?</span>
-<span style="color: #b3b3b3;">ordered</span> = <span style="color: brightblack;">lambda</span> seq: <span style="color: #b3b3b3;">reduce</span>(<span style="color: brightblack;">lambda</span> i,e: (i[0] <span style="color: brightblack;">and</span> e&gt;=i[1], e), seq, (1, seq[0]))[0]
-<span style="color: #b3b3b3;">seq</span> = [9,1,5,4]
-<span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">"In:"</span>, seq)
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">completed</span>(path, level): <span style="color: brightblack;">return</span> level==<span style="color: #b3b3b3;">len</span>(seq) \
-    <span style="color: brightblack;">and</span> ordered(path)
-<span style="color: #b3b3b3;">print</span>(bt(seq, completed))
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">predicate: is seq ordered?</span>
+<span class="org-variable-name">ordered</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> seq: <span class="org-builtin">reduce</span>(<span class="org-keyword">lambda</span> i,e: (i[0] <span class="org-keyword">and</span> e<span class="org-operator">&gt;=</span>i[1], e), seq, (1, seq[0]))[0]
+<span class="org-variable-name">seq</span> <span class="org-operator">=</span> [9,1,5,4]
+<span class="org-builtin">print</span>(<span class="org-string">"In:"</span>, seq)
+<span class="org-keyword">def</span> <span class="org-function-name">completed</span>(path, level): <span class="org-keyword">return</span> level<span class="org-operator">==</span><span class="org-builtin">len</span>(seq) \
+    <span class="org-keyword">and</span> ordered(path)
+<span class="org-builtin">print</span>(bt(seq, completed))
 </pre>
 </div>
 </div>

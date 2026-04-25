@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Equation solver</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,73 +194,73 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Equation solver</h1>
-<div id="outline-container-orgac7d5df" class="outline-2">
-<h2 id="orgac7d5df">Equation solver</h2>
-<div class="outline-text-2" id="text-orgac7d5df">
+<div id="outline-container-org9d0fd52" class="outline-2">
+<h2 id="org9d0fd52">Equation solver</h2>
+<div class="outline-text-2" id="text-org9d0fd52">
 <div class="org-src-container">
 <pre class="src src-fortran">module utils
-<span style="color: #cccccc;">implicit none</span>
+<span class="org-type">implicit none</span>
 
   interface
-    <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f_if</span>(x)
-      <span style="color: #cccccc;">real</span> :: f_if, x
-    <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f_if</span>
-  <span style="color: brightblack;">end</span> interface
+    <span class="org-keyword">function</span> <span class="org-function-name">f_if</span>(x)
+      <span class="org-type">real</span> :: f_if, x
+    <span class="org-keyword">end</span> <span class="org-keyword">function</span> <span class="org-function-name">f_if</span>
+  <span class="org-keyword">end</span> interface
 
-<span style="color: #595959;">c</span><span style="color: #595959;">ontains</span>
+<span class="org-comment-delimiter">c</span><span class="org-comment">ontains</span>
 
-  <span style="color: #595959;">!</span><span style="color: #595959;">Custom equation: f = ...</span>
-  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f</span>(x)
-    <span style="color: #cccccc;">real</span> :: f, x
+  <span class="org-comment-delimiter">!</span><span class="org-comment">Custom equation: f = ...</span>
+  <span class="org-keyword">function</span> <span class="org-function-name">f</span>(x)
+    <span class="org-type">real</span> :: f, x
 
     f = x**3 + (1.1 * x**2) + 0.9 * x - 1.4
-  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">f</span>
+  <span class="org-keyword">end</span> <span class="org-keyword">function</span> <span class="org-function-name">f</span>
 
-  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">next_x</span>(x, x_1, fn)
-    <span style="color: #cccccc;">real</span> :: next_x, x, x_1
+  <span class="org-keyword">function</span> <span class="org-function-name">next_x</span>(x, x_1, fn)
+    <span class="org-type">real</span> :: next_x, x, x_1
     procedure(f_if), pointer :: fn
 
     next_x = x_1 - (fn(x_1) * (x - x_1))/(fn(x) - fn(x_1))
-  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">next_x</span>
+  <span class="org-keyword">end</span> <span class="org-keyword">function</span> <span class="org-function-name">next_x</span>
 
-  <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">solve</span>(x, x_1, fn, eps)
-    <span style="color: #cccccc;">real</span> :: solve, root, root_1, delta, eps_
-    <span style="color: #cccccc;">real</span>, intent(inout) :: x, x_1
-    <span style="color: #cccccc;">real</span>, optional :: eps
-    <span style="color: #cccccc;">integer</span> :: i = 0
+  <span class="org-keyword">function</span> <span class="org-function-name">solve</span>(x, x_1, fn, eps)
+    <span class="org-type">real</span> :: solve, root, root_1, delta, eps_
+    <span class="org-type">real</span>, intent(inout) :: x, x_1
+    <span class="org-type">real</span>, optional :: eps
+    <span class="org-type">integer</span> :: i = 0
     procedure(f_if), pointer :: fn
 
-    <span style="color: brightblack;">if</span> (<span style="color: brightblack;">.not.</span> present(eps)) <span style="color: brightblack;">then</span>
+    <span class="org-keyword">if</span> (<span class="org-keyword">.not.</span> present(eps)) <span class="org-keyword">then</span>
       eps_ = 0.001
-    <span style="color: brightblack;">else</span>
+    <span class="org-keyword">else</span>
       eps_ = eps
-    <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
-    <span style="color: brightblack;">do</span>
+    <span class="org-keyword">end</span> <span class="org-keyword">if</span>
+    <span class="org-keyword">do</span>
       root = next_x(x, x_1, fn)
-      <span style="color: brightblack;">if</span> (i /= 0 ) <span style="color: brightblack;">then</span>
-        delta = <span style="color: #b3b3b3;">abs</span>(root - root_1)
-        <span style="color: brightblack;">if</span> (delta &lt;= eps_) <span style="color: brightblack;">then</span>
-          <span style="color: brightblack;">exit</span>
-        <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
-      <span style="color: brightblack;">end</span> <span style="color: brightblack;">if</span>
+      <span class="org-keyword">if</span> (i /= 0 ) <span class="org-keyword">then</span>
+        delta = <span class="org-builtin">abs</span>(root - root_1)
+        <span class="org-keyword">if</span> (delta &lt;= eps_) <span class="org-keyword">then</span>
+          <span class="org-keyword">exit</span>
+        <span class="org-keyword">end</span> <span class="org-keyword">if</span>
+      <span class="org-keyword">end</span> <span class="org-keyword">if</span>
       i = i + 1
       x_1 = x
       x = root
       root_1 = root
-    <span style="color: brightblack;">end</span> <span style="color: brightblack;">do</span>
+    <span class="org-keyword">end</span> <span class="org-keyword">do</span>
     solve = root
-  <span style="color: brightblack;">end</span> <span style="color: brightblack;">function</span> <span style="color: #a52a2a;">solve</span>
+  <span class="org-keyword">end</span> <span class="org-keyword">function</span> <span class="org-function-name">solve</span>
 
-<span style="color: brightblack;">end</span> module utils
+<span class="org-keyword">end</span> module utils
 
-<span style="color: brightblack;">program</span> <span style="color: #a52a2a;">eqsolver</span>
+<span class="org-keyword">program</span> <span class="org-function-name">eqsolver</span>
   use utils
-  <span style="color: #cccccc;">implicit none</span>
-  <span style="color: #cccccc;">real</span> :: x=1., x_1=0.
+  <span class="org-type">implicit none</span>
+  <span class="org-type">real</span> :: x=1., x_1=0.
   procedure(f_if), pointer :: fn =&gt; f
-  <span style="color: #595959;">!</span><span style="color: #595959;">write(*,*) next_x(1., 0., fn)</span>
-  <span style="color: brightblack;">write</span>(*,*) solve(x, x_1, fn)
-<span style="color: brightblack;">end</span> <span style="color: brightblack;">program</span> <span style="color: #a52a2a;">eqsolver</span>
+  <span class="org-comment-delimiter">!</span><span class="org-comment">write(*,*) next_x(1., 0., fn)</span>
+  <span class="org-keyword">write</span>(*,*) solve(x, x_1, fn)
+<span class="org-keyword">end</span> <span class="org-keyword">program</span> <span class="org-function-name">eqsolver</span>
 </pre>
 </div>
 </div>

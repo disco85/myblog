@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>C: code-generator</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">C: code-generator</h1>
-<div id="outline-container-orgda09b3f" class="outline-2">
-<h2 id="orgda09b3f">C: code-generator</h2>
-<div class="outline-text-2" id="text-orgda09b3f">
+<div id="outline-container-org1903331" class="outline-2">
+<h2 id="org1903331">C: code-generator</h2>
+<div class="outline-text-2" id="text-org1903331">
 <p>
 Sometimes we need to code algorithms on C in very general way, alternatives - many functions for different parameters (optimization reasons, parametrized code, etc.). And if we want to avoid function pointers and other slow methods then we can use strong macros tricks. One of them is code generators with self-including.
 Idea is that header file has sections:
@@ -88,30 +213,30 @@ and it looks like this (file self.h):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _USUAL_H_GUARD
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_USUAL_H_GUARD</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _USUAL_H_GUARD
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">_USUAL_H_GUARD</span>
 
-<span style="color: #595959;">// </span><span style="color: #595959;">common code, included in anyway</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">common code, included in anyway</span>
 
-<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/*</span><span style="color: #595959;">_USUAL_H_GUARD</span><span style="color: #595959;">*/</span>
+<span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/*</span><span class="org-comment">_USUAL_H_GUARD</span><span class="org-comment-delimiter">*/</span>
 
-<span style="color: #595959;">// </span><span style="color: #595959;">templates of codegenerators:</span>
-<span style="color: #b3b3b3;">#ifdef</span> SOME_CODEGEN_ARG
-<span style="color: #595959;">// </span><span style="color: #595959;">some template with DEFINE's substitution</span>
-<span style="color: #b3b3b3;">#else</span> <span style="color: brightblack;">if</span> defined(ANOTHER_CODEGEN_ARG0) &amp;&amp; defined(ANOTHER_CODEGEN_ARG1)
-<span style="color: #595959;">// </span><span style="color: #595959;">another template</span>
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">templates of codegenerators:</span>
+<span class="org-preprocessor">#ifdef</span> SOME_CODEGEN_ARG
+<span class="org-comment-delimiter">// </span><span class="org-comment">some template with DEFINE's substitution</span>
+<span class="org-preprocessor">#else</span> <span class="org-keyword">if</span> defined(ANOTHER_CODEGEN_ARG0) &amp;&amp; defined(ANOTHER_CODEGEN_ARG1)
+<span class="org-comment-delimiter">// </span><span class="org-comment">another template</span>
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #595959;">// </span><span style="color: #595959;">start of code generating:</span>
-<span style="color: #595959;">// </span><span style="color: #595959;">one version of general algorithm:</span>
-<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> SOME_CODEGEN_ARG <span style="color: #595959;">/* </span><span style="color: #595959;">guard of recursive including!</span><span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SOME_CODEGEN_ARG</span> <span style="color: brightblack;">"something"</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"self.h"</span>
-<span style="color: #b3b3b3;">#endif</span>
-<span style="color: #595959;">// </span><span style="color: #595959;">another version of the same generalized algorithm:</span>
-<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> SOME_CODEGEN_ARG <span style="color: #595959;">/* </span><span style="color: #595959;">guard of recursive including!</span><span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SOME_CODEGEN_ARG</span> <span style="color: brightblack;">"something else"</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"self.h"</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">start of code generating:</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">one version of general algorithm:</span>
+<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> SOME_CODEGEN_ARG <span class="org-comment-delimiter">/* </span><span class="org-comment">guard of recursive including!</span><span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SOME_CODEGEN_ARG</span> <span class="org-string">"something"</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"self.h"</span>
+<span class="org-preprocessor">#endif</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">another version of the same generalized algorithm:</span>
+<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> SOME_CODEGEN_ARG <span class="org-comment-delimiter">/* </span><span class="org-comment">guard of recursive including!</span><span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SOME_CODEGEN_ARG</span> <span class="org-string">"something else"</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"self.h"</span>
 </pre>
 </div>
 
@@ -120,9 +245,9 @@ You also can have generalized function names! See:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">__CONC3</span>(<span style="color: #b3b3b3;">X</span>, <span style="color: #b3b3b3;">Y</span>, <span style="color: #b3b3b3;">Z</span>) X ## Y ## Z
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">_CONC3</span>(<span style="color: #b3b3b3;">X</span>, <span style="color: #b3b3b3;">Y</span>, <span style="color: #b3b3b3;">Z</span>) __CONC3(X, Y, Z)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">FUNC_NAME</span>(<span style="color: #b3b3b3;">N</span>) _CONC3(N, ANOTHER_CODEGEN_ARG0, ANOTHER_CODEGEN_ARG1)
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-function-name">__CONC3</span>(<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span>, <span class="org-variable-name">Z</span>) X ## Y ## Z
+<span class="org-preprocessor">#define</span> <span class="org-function-name">_CONC3</span>(<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span>, <span class="org-variable-name">Z</span>) __CONC3(X, Y, Z)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">FUNC_NAME</span>(<span class="org-variable-name">N</span>) _CONC3(N, ANOTHER_CODEGEN_ARG0, ANOTHER_CODEGEN_ARG1)
 </pre>
 </div>
 
@@ -147,8 +272,8 @@ First, we should generate suffix for function depended on parameters. We ca use 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">ARG1</span> MAX
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">ARG2</span> NOFLAG
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-variable-name">ARG1</span> MAX
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">ARG2</span> NOFLAG
 </pre>
 </div>
 
@@ -157,7 +282,7 @@ and in the .def-file:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #cccccc;">int</span> <span style="color: #a52a2a;">FUNC_NAME</span>(func_, ARG1, ARG2)(<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">a</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">b</span>);
+<pre class="src src-cpp"><span class="org-type">int</span> <span class="org-function-name">FUNC_NAME</span>(func_, ARG1, ARG2)(<span class="org-type">int</span> <span class="org-variable-name">a</span>, <span class="org-type">int</span> <span class="org-variable-name">b</span>);
 </pre>
 </div>
 
@@ -171,13 +296,13 @@ To minimize code you can use instead of many parameters, one with bitfields. Tes
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">MAX</span> (1&lt;&lt;1)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">MIN</span> (1&lt;&lt;2)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">FLAG</span> (1&lt;&lt;3)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">NOFLAG</span> (1&lt;&lt;4)
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-variable-name">MAX</span> (1&lt;&lt;1)
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">MIN</span> (1&lt;&lt;2)
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">FLAG</span> (1&lt;&lt;3)
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">NOFLAG</span> (1&lt;&lt;4)
 ...
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">ARGS</span> (MIN|NOFLAG)
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"template.def"</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">ARGS</span> (MIN|NOFLAG)
+<span class="org-preprocessor">#include</span> <span class="org-string">"template.def"</span>
 </pre>
 </div>
 
@@ -186,25 +311,25 @@ and in template.def something like this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span> ARGS&amp;MIN
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">N1</span> MIN
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">N1</span> MAX
-<span style="color: #b3b3b3;">#endif</span>
-... <span style="color: brightblack;">and</span> the same <span style="color: brightblack;">for</span> FLAG/NOFLAG
+<pre class="src src-cpp"><span class="org-preprocessor">#if</span> ARGS&amp;MIN
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">N1</span> MIN
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">N1</span> MAX
+<span class="org-preprocessor">#endif</span>
+... <span class="org-keyword">and</span> the same <span class="org-keyword">for</span> FLAG/NOFLAG
 
-<span style="color: #595959;">// </span><span style="color: #595959;">generator for similar functions with one, common, general algorithm.</span>
-<span style="color: #cccccc;">int</span> FUNC_NAME(func_, N1, N2)(<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">a</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">b</span>) {
-<span style="color: #b3b3b3;">#if</span> ARGS&amp;MIN
-... code <span style="color: brightblack;">for</span> min
-<span style="color: #b3b3b3;">#else</span>
-... code <span style="color: brightblack;">for</span> max
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">generator for similar functions with one, common, general algorithm.</span>
+<span class="org-type">int</span> FUNC_NAME(func_, N1, N2)(<span class="org-type">int</span> <span class="org-variable-name">a</span>, <span class="org-type">int</span> <span class="org-variable-name">b</span>) {
+<span class="org-preprocessor">#if</span> ARGS&amp;MIN
+... code <span class="org-keyword">for</span> min
+<span class="org-preprocessor">#else</span>
+... code <span class="org-keyword">for</span> max
+<span class="org-preprocessor">#endif</span>
 }
 
-<span style="color: #b3b3b3;">#undef</span> ARGS
-<span style="color: #b3b3b3;">#undef</span> N1
-<span style="color: #b3b3b3;">#undef</span> N2
+<span class="org-preprocessor">#undef</span> ARGS
+<span class="org-preprocessor">#undef</span> N1
+<span class="org-preprocessor">#undef</span> N2
 </pre>
 </div>
 

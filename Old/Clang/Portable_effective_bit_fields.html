@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Portable effective C bit fields</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,33 +194,33 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Portable effective C bit fields</h1>
-<div id="outline-container-orgbabe3e3" class="outline-2">
-<h2 id="orgbabe3e3">Portable effective C bit fields</h2>
-<div class="outline-text-2" id="text-orgbabe3e3">
+<div id="outline-container-org8bd6429" class="outline-2">
+<h2 id="org8bd6429">Portable effective C bit fields</h2>
+<div class="outline-text-2" id="text-org8bd6429">
 <p>
 As you know bit's fields in C are not portable when we're talking about external world (network/different architecture/file transmission): order of the fields is unspecified, also as real wrapper struct&#x2026;
 Often bitwise operations are used instead of bitfield struct syntax but result code may be less readable opposite to original idea: bitfields. But there is simple solution to workaround weird syntax. Here you are:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">__BITSTRUCT_MASK</span>(<span style="color: #b3b3b3;">LEN</span>) ((1&lt;&lt;(LEN))-1)
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-function-name">__BITSTRUCT_MASK</span>(<span class="org-variable-name">LEN</span>) ((1&lt;&lt;(LEN))-1)
 
-<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> BITSTRUCT_GETBITS_IMPL
-<span style="color: #b3b3b3;"># define</span> <span style="color: #a52a2a;">BITSTRUCT_GETBITS_IMPL</span>(<span style="color: #b3b3b3;">BS</span>, <span style="color: #b3b3b3;">OFFSET</span>, <span style="color: #b3b3b3;">LEN</span>) \
+<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> BITSTRUCT_GETBITS_IMPL
+<span class="org-preprocessor"># define</span> <span class="org-function-name">BITSTRUCT_GETBITS_IMPL</span>(<span class="org-variable-name">BS</span>, <span class="org-variable-name">OFFSET</span>, <span class="org-variable-name">LEN</span>) \
     (((BS)&gt;&gt;(OFFSET)) &amp; __BITSTRUCT_MASK(LEN))
-<span style="color: #b3b3b3;">#endif</span>
-<span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> BITSTRUCT_SETBITS_IMPL
-<span style="color: #b3b3b3;"># define</span> <span style="color: #a52a2a;">BITSTRUCT_SETBITS_IMPL</span>(<span style="color: #b3b3b3;">BS</span>, <span style="color: #b3b3b3;">OFFSET</span>, <span style="color: #b3b3b3;">LEN</span>, <span style="color: #b3b3b3;">VALUE</span>) \
+<span class="org-preprocessor">#endif</span>
+<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> BITSTRUCT_SETBITS_IMPL
+<span class="org-preprocessor"># define</span> <span class="org-function-name">BITSTRUCT_SETBITS_IMPL</span>(<span class="org-variable-name">BS</span>, <span class="org-variable-name">OFFSET</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">VALUE</span>) \
     ((BS) &amp; ~(__BITSTRUCT_MASK(LEN)&lt;&lt;(OFFSET)) | \
      (((VALUE) &amp; __BITSTRUCT_MASK(LEN))&lt;&lt;(OFFSET)))
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">BITSTRUCT</span> <span style="color: brightblack;">enum</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">BITFIELD</span>(<span style="color: #b3b3b3;">NAME</span>, <span style="color: #b3b3b3;">OFFSET</span>, <span style="color: #b3b3b3;">LEN</span>) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">BITFIELD_MASK</span>(<span style="color: #b3b3b3;">NAME</span>) __BITSTRUCT_MASK(NAME##_LEN)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">BITFIELD_GET</span>(<span style="color: #b3b3b3;">NAME</span>, <span style="color: #b3b3b3;">BS</span>) \
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">BITSTRUCT</span> <span class="org-keyword">enum</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">BITFIELD</span>(<span class="org-variable-name">NAME</span>, <span class="org-variable-name">OFFSET</span>, <span class="org-variable-name">LEN</span>) NAME##_OFF = (OFFSET), NAME##_LEN=(LEN)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">BITFIELD_MASK</span>(<span class="org-variable-name">NAME</span>) __BITSTRUCT_MASK(NAME##_LEN)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">BITFIELD_GET</span>(<span class="org-variable-name">NAME</span>, <span class="org-variable-name">BS</span>) \
   BITSTRUCT_GETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">BITFIELD_SET</span>(<span style="color: #b3b3b3;">NAME</span>, <span style="color: #b3b3b3;">BS</span>, <span style="color: #b3b3b3;">VALUE</span>) \
+<span class="org-preprocessor">#define</span> <span class="org-function-name">BITFIELD_SET</span>(<span class="org-variable-name">NAME</span>, <span class="org-variable-name">BS</span>, <span class="org-variable-name">VALUE</span>) \
   BITSTRUCT_SETBITS_IMPL(BS, NAME##_OFF, NAME##_LEN, VALUE)
 </pre>
 </div>
@@ -111,20 +236,20 @@ So now it's possible to write something like this to describe register X:
 </div>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #cccccc;">BITSTRUCT</span> <span style="color: #b3b3b3;">RegisterX</span> {
-        <span style="color: #595959;">// </span><span style="color: #595959;">BITFIELD(NAME, OFFSET, LENGTH)</span>
+<pre class="src src-cpp"><span class="org-type">BITSTRUCT</span> <span class="org-variable-name">RegisterX</span> {
+        <span class="org-comment-delimiter">// </span><span class="org-comment">BITFIELD(NAME, OFFSET, LENGTH)</span>
         BITFIELD(RX_COUNT, 0, 4),
         BITFIELD(RX_FLAG, 4, 4),
         BITFIELD(RX_ENABLE, 8, 8)
 };
 
-<span style="color: #cccccc;">int</span> <span style="color: #a52a2a;">main</span>(<span style="color: #cccccc;">void</span>)
+<span class="org-type">int</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>)
 {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">x</span> = 0x1234; <span style="color: #595959;">// </span><span style="color: #595959;">raw value of register</span>
-        <span style="color: #595959;">// </span><span style="color: #595959;">example of get/set field of bits' struct</span>
+        <span class="org-type">int</span> <span class="org-variable-name">x</span> = 0x1234; <span class="org-comment-delimiter">// </span><span class="org-comment">raw value of register</span>
+        <span class="org-comment-delimiter">// </span><span class="org-comment">example of get/set field of bits' struct</span>
         x = BITFIELD_SET(RX_ENABLE, x, 0x98);
-        printf(<span style="color: brightblack;">"%0X"</span>, BITFIELD_GET(RX_ENABLE, x));
-        <span style="color: brightblack;">return</span> (0);
+        printf(<span class="org-string">"%0X"</span>, BITFIELD_GET(RX_ENABLE, x));
+        <span class="org-keyword">return</span> (0);
 }
 </pre>
 </div>

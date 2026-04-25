@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Crossplatform software delays</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,73 +194,73 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Crossplatform software delays</h1>
-<div id="outline-container-orgcafd8bf" class="outline-2">
-<h2 id="orgcafd8bf">Crossplatform software delays</h2>
-<div class="outline-text-2" id="text-orgcafd8bf">
+<div id="outline-container-org72db030" class="outline-2">
+<h2 id="org72db030">Crossplatform software delays</h2>
+<div class="outline-text-2" id="text-org72db030">
 <p>
 This is the simple macros for different delays useful on Unix and Windows:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _DELAYS_H
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_DELAYS_H</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _DELAYS_H
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">_DELAYS_H</span>
 
-<span style="color: #b3b3b3;">#include</span> 
-<span style="color: #b3b3b3;">#include</span> 
+<span class="org-preprocessor">#include</span> 
+<span class="org-preprocessor">#include</span> 
 
-<span style="color: #595959;">/* </span><span style="color: #595959;">Converting between seconds and CPU ticks (clock_t):</span>
-<span style="color: #595959;"> *      MS2TICKS() converts milliseconds to ticks</span>
-<span style="color: #595959;"> *      US2TICKS() converts microseconds to ticks</span>
-<span style="color: #595959;"> *      TICKS2MS() converts ticks to milliseconds</span>
-<span style="color: #595959;"> *      TICKS2US() converts ticks to microseconds</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">MS2TICKS</span>(<span style="color: #b3b3b3;">MS</span>) ((MS)*(CLOCKS_PER_SEC)/1000)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">US2TICKS</span>(<span style="color: #b3b3b3;">US</span>) ((US)*(CLOCKS_PER_SEC)/1000000)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">TICKS2MS</span>(<span style="color: #b3b3b3;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000))
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">TICKS2US</span>(<span style="color: #b3b3b3;">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000000))
+<span class="org-comment-delimiter">/* </span><span class="org-comment">Converting between seconds and CPU ticks (clock_t):</span>
+<span class="org-comment"> *      MS2TICKS() converts milliseconds to ticks</span>
+<span class="org-comment"> *      US2TICKS() converts microseconds to ticks</span>
+<span class="org-comment"> *      TICKS2MS() converts ticks to milliseconds</span>
+<span class="org-comment"> *      TICKS2US() converts ticks to microseconds</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">MS2TICKS</span>(<span class="org-variable-name">MS</span>) ((MS)*(CLOCKS_PER_SEC)/1000)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">US2TICKS</span>(<span class="org-variable-name">US</span>) ((US)*(CLOCKS_PER_SEC)/1000000)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">TICKS2MS</span>(<span class="org-variable-name">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000))
+<span class="org-preprocessor">#define</span> <span class="org-function-name">TICKS2US</span>(<span class="org-variable-name">T</span>)  ((T)/((CLOCKS_PER_SEC)*1000000))
 
-<span style="color: #595959;">/*</span>
-<span style="color: #595959;"> * delay(MS)         sleeping on MS milliseconds</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#if</span> <span style="color: #b3b3b3;">defined</span>(WIN32) || <span style="color: #b3b3b3;">defined</span>(_WIN32) || <span style="color: #b3b3b3;">defined</span>(__WIN32)
-<span style="color: #b3b3b3;">#  include</span> 
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">delay</span>(<span style="color: #b3b3b3;">MS</span>) Sleep(MS)
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#  if</span> <span style="color: #b3b3b3;">defined</span>(HAVE_USLEEP)
-<span style="color: #b3b3b3;">#    define</span> <span style="color: #a52a2a;">delay</span>(<span style="color: #b3b3b3;">MS</span>) usleep((MS)*1000)
-<span style="color: #b3b3b3;">#  elif</span> <span style="color: #b3b3b3;">defined</span>(HAVE_SLEEP)
-<span style="color: #b3b3b3;">#    include</span> 
-<span style="color: #b3b3b3;">#    define</span> <span style="color: #a52a2a;">delay</span>(<span style="color: #b3b3b3;">MS</span>) sleep((MS)/1000) <span style="color: #595959;">/* </span><span style="color: #595959;">granularity only ONE SECOND!</span><span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#  else</span>
-<span style="color: #b3b3b3;">#    error</span> <span style="color: brightblack;">Can not found any sleep_clocks() implementation ideas</span>
-<span style="color: #b3b3b3;"># endif</span>
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-comment-delimiter">/*</span>
+<span class="org-comment"> * delay(MS)         sleeping on MS milliseconds</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#if</span> <span class="org-preprocessor">defined</span>(WIN32) || <span class="org-preprocessor">defined</span>(_WIN32) || <span class="org-preprocessor">defined</span>(__WIN32)
+<span class="org-preprocessor">#  include</span> 
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">delay</span>(<span class="org-variable-name">MS</span>) Sleep(MS)
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#  if</span> <span class="org-preprocessor">defined</span>(HAVE_USLEEP)
+<span class="org-preprocessor">#    define</span> <span class="org-function-name">delay</span>(<span class="org-variable-name">MS</span>) usleep((MS)*1000)
+<span class="org-preprocessor">#  elif</span> <span class="org-preprocessor">defined</span>(HAVE_SLEEP)
+<span class="org-preprocessor">#    include</span> 
+<span class="org-preprocessor">#    define</span> <span class="org-function-name">delay</span>(<span class="org-variable-name">MS</span>) sleep((MS)/1000) <span class="org-comment-delimiter">/* </span><span class="org-comment">granularity only ONE SECOND!</span><span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#  else</span>
+<span class="org-preprocessor">#    error</span> <span class="org-string">Can not found any sleep_clocks() implementation ideas</span>
+<span class="org-preprocessor"># endif</span>
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #595959;">/*</span>
-<span style="color: #595959;"> * pthread_delay(MS) sleeping thread on MS milliseconds</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#if</span> <span style="color: #b3b3b3;">defined</span>(HAVE_PTHREAD_DELAY_NP)
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">pthread_delay</span>(<span style="color: #b3b3b3;">MS</span>) \
-     <span style="color: brightblack;">do</span> { \
-             <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">timespec</span> <span style="color: #b3b3b3;">__timespec</span>={(MS)/1000,((MS)%1000)*1000000000}; \
+<span class="org-comment-delimiter">/*</span>
+<span class="org-comment"> * pthread_delay(MS) sleeping thread on MS milliseconds</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#if</span> <span class="org-preprocessor">defined</span>(HAVE_PTHREAD_DELAY_NP)
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">pthread_delay</span>(<span class="org-variable-name">MS</span>) \
+     <span class="org-keyword">do</span> { \
+             <span class="org-keyword">struct</span> <span class="org-type">timespec</span> <span class="org-variable-name">__timespec</span>={(MS)/1000,((MS)%1000)*1000000000}; \
              pthread_delay_np(&amp;__timespec); \
      } \
-     <span style="color: brightblack;">while</span>(0)
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">pthread_delay</span>(<span style="color: #b3b3b3;">MS</span>) delay(MS)
-<span style="color: #b3b3b3;">#endif</span>
+     <span class="org-keyword">while</span>(0)
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">pthread_delay</span>(<span class="org-variable-name">MS</span>) delay(MS)
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #595959;">/*</span>
-<span style="color: #595959;"> * unow(PNOW) store in var pointed by PNOW microseconds since Epoch</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">unow</span>(<span style="color: #b3b3b3;">PNOW</span>) \
+<span class="org-comment-delimiter">/*</span>
+<span class="org-comment"> * unow(PNOW) store in var pointed by PNOW microseconds since Epoch</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">unow</span>(<span class="org-variable-name">PNOW</span>) \
 { \
-        <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">timeval</span> <span style="color: #b3b3b3;">__tv</span>;  \
-        gettimeofday(&amp;__tv, <span style="color: #7fffd4;">NULL</span>); \
+        <span class="org-keyword">struct</span> <span class="org-type">timeval</span> <span class="org-variable-name">__tv</span>;  \
+        gettimeofday(&amp;__tv, <span class="org-constant">NULL</span>); \
         *(PNOW) = (__tv.tv_sec * 1000000) + __tv.tv_usec; \
 }
 
-<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/*</span><span style="color: #595959;">!_DELAYS_H</span><span style="color: #595959;">*/</span>
+<span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/*</span><span class="org-comment">!_DELAYS_H</span><span class="org-comment-delimiter">*/</span>
 </pre>
 </div>
 

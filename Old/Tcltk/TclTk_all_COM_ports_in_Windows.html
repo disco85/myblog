@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl/Tk: all COM ports in Windows</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,50 +194,50 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl/Tk: all COM ports in Windows</h1>
-<div id="outline-container-org59ca8f3" class="outline-2">
-<h2 id="org59ca8f3">Tcl/Tk: all COM ports in Windows</h2>
-<div class="outline-text-2" id="text-org59ca8f3">
+<div id="outline-container-orgba6b42a" class="outline-2">
+<h2 id="orgba6b42a">Tcl/Tk: all COM ports in Windows</h2>
+<div class="outline-text-2" id="text-orgba6b42a">
 <p>
 If you need helper for user like combobox with available COM ports (serial devices, and they can be real COM ports or virtual like FTDI "bridges") in Tcl/Tk, use this procedures:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #595959;"># </span><span style="color: #595959;">list all ports as FTDIBUS and USB. Returns list of {PortName, FriendlyName, Auto?}</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">where Auto is flag - port for HMC6343 or not</span>
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">_ls_vports</span> {} {
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">res</span> {}
-    <span style="color: brightblack;">foreach</span> type {FTDIBUS USB} {
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">k0</span> <span style="color: brightblack;">"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\$type"</span>
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">k0ch</span> [<span style="color: #b3b3b3;">registry</span> keys <span style="color: brightblack;">"$k0"</span> {V[iI][dD]_*}]
-        <span style="color: brightblack;">foreach</span> k1 $<span style="color: #b3b3b3;">k0ch</span> {
-            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">k1ch</span> [<span style="color: #b3b3b3;">registry</span> keys <span style="color: brightblack;">"$k0\\$k1"</span>]
-            <span style="color: brightblack;">foreach</span> k2 $<span style="color: #b3b3b3;">k1ch</span> {
-                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">Class</span> [<span style="color: #b3b3b3;">registry</span> get <span style="color: brightblack;">"$k0\\$k1\\$k2"</span> Class]
-                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">Class</span> == <span style="color: brightblack;">"Ports"</span>} {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">FriendlyName</span> [<span style="color: #b3b3b3;">registry</span> get <span style="color: brightblack;">"$k0\\$k1\\$k2"</span> FriendlyName]
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">PortName</span> [<span style="color: #b3b3b3;">registry</span> get <span style="color: brightblack;">"$k0\\$k1\\$k2\\Device Parameters"</span> PortName]
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">Auto</span> [<span style="color: #b3b3b3;">expr</span> {<span style="color: brightblack;">"silabser"</span> == [<span style="color: #b3b3b3;">registry</span> get <span style="color: brightblack;">"$k0\\$k1\\$k2"</span> <span style="color: brightblack;">"Service"</span>]}]; <span style="color: #595959;">#auto-detected</span>
-                    <span style="color: #b3b3b3;">lappend</span> res [<span style="color: #b3b3b3;">list</span> $<span style="color: #b3b3b3;">PortName</span> $<span style="color: #b3b3b3;">FriendlyName</span> $<span style="color: #b3b3b3;">Auto</span>]
+<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">list all ports as FTDIBUS and USB. Returns list of {PortName, FriendlyName, Auto?}</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">where Auto is flag - port for HMC6343 or not</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">_ls_vports</span> {} {
+    <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
+    <span class="org-keyword">foreach</span> type {FTDIBUS USB} {
+        <span class="org-builtin">set</span> <span class="org-variable-name">k0</span> <span class="org-string">"HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\$type"</span>
+        <span class="org-builtin">set</span> <span class="org-variable-name">k0ch</span> [<span class="org-builtin">registry</span> keys <span class="org-string">"$k0"</span> {V[iI][dD]_*}]
+        <span class="org-keyword">foreach</span> k1 $<span class="org-variable-name">k0ch</span> {
+            <span class="org-builtin">set</span> <span class="org-variable-name">k1ch</span> [<span class="org-builtin">registry</span> keys <span class="org-string">"$k0\\$k1"</span>]
+            <span class="org-keyword">foreach</span> k2 $<span class="org-variable-name">k1ch</span> {
+                <span class="org-builtin">set</span> <span class="org-variable-name">Class</span> [<span class="org-builtin">registry</span> get <span class="org-string">"$k0\\$k1\\$k2"</span> Class]
+                <span class="org-keyword">if</span> {$<span class="org-variable-name">Class</span> == <span class="org-string">"Ports"</span>} {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">FriendlyName</span> [<span class="org-builtin">registry</span> get <span class="org-string">"$k0\\$k1\\$k2"</span> FriendlyName]
+                    <span class="org-builtin">set</span> <span class="org-variable-name">PortName</span> [<span class="org-builtin">registry</span> get <span class="org-string">"$k0\\$k1\\$k2\\Device Parameters"</span> PortName]
+                    <span class="org-builtin">set</span> <span class="org-variable-name">Auto</span> [<span class="org-builtin">expr</span> {<span class="org-string">"silabser"</span> == [<span class="org-builtin">registry</span> get <span class="org-string">"$k0\\$k1\\$k2"</span> <span class="org-string">"Service"</span>]}]; <span class="org-comment">#auto-detected</span>
+                    <span class="org-builtin">lappend</span> res [<span class="org-builtin">list</span> $<span class="org-variable-name">PortName</span> $<span class="org-variable-name">FriendlyName</span> $<span class="org-variable-name">Auto</span>]
                 }
             }
         }
     }
-    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">res</span>
+    <span class="org-keyword">return</span> $<span class="org-variable-name">res</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Returns list of {PortName, "Com Port", 0} -</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">auto-detect is impossible in this mode, no friendly name also</span>
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">_ls_all</span> {} {
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">serial_base</span> <span style="color: brightblack;">"HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"</span>
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">values</span> [<span style="color: #b3b3b3;">registry</span> values $<span style="color: #b3b3b3;">serial_base</span>]
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">res</span> {}
-    <span style="color: brightblack;">foreach</span> valueName $<span style="color: #b3b3b3;">values</span> {
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">PortName</span> [<span style="color: #b3b3b3;">registry</span> get $<span style="color: #b3b3b3;">serial_base</span> $<span style="color: #b3b3b3;">valueName</span>]
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">FriendlyName</span> <span style="color: brightblack;">"COM Port"</span>
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">Auto</span> 0
-        <span style="color: #b3b3b3;">lappend</span> res [<span style="color: #b3b3b3;">list</span> $<span style="color: #b3b3b3;">PortName</span> $<span style="color: #b3b3b3;">FriendlyName</span> $<span style="color: #b3b3b3;">Auto</span>]
+<span class="org-comment-delimiter"># </span><span class="org-comment">Returns list of {PortName, "Com Port", 0} -</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">auto-detect is impossible in this mode, no friendly name also</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">_ls_all</span> {} {
+    <span class="org-builtin">set</span> <span class="org-variable-name">serial_base</span> <span class="org-string">"HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"</span>
+    <span class="org-builtin">set</span> <span class="org-variable-name">values</span> [<span class="org-builtin">registry</span> values $<span class="org-variable-name">serial_base</span>]
+    <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
+    <span class="org-keyword">foreach</span> valueName $<span class="org-variable-name">values</span> {
+        <span class="org-builtin">set</span> <span class="org-variable-name">PortName</span> [<span class="org-builtin">registry</span> get $<span class="org-variable-name">serial_base</span> $<span class="org-variable-name">valueName</span>]
+        <span class="org-builtin">set</span> <span class="org-variable-name">FriendlyName</span> <span class="org-string">"COM Port"</span>
+        <span class="org-builtin">set</span> <span class="org-variable-name">Auto</span> 0
+        <span class="org-builtin">lappend</span> res [<span class="org-builtin">list</span> $<span class="org-variable-name">PortName</span> $<span class="org-variable-name">FriendlyName</span> $<span class="org-variable-name">Auto</span>]
     }
-    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">res</span>
+    <span class="org-keyword">return</span> $<span class="org-variable-name">res</span>
 }
 </pre>
 </div>

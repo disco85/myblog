@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR32: prescalers for ticks generation</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,48 +194,48 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR32: prescalers for ticks generation</h1>
-<div id="outline-container-org6585e90" class="outline-2">
-<h2 id="org6585e90">AVR32: prescalers for ticks generation</h2>
-<div class="outline-text-2" id="text-org6585e90">
+<div id="outline-container-org75c3d58" class="outline-2">
+<h2 id="org75c3d58">AVR32: prescalers for ticks generation</h2>
+<div class="outline-text-2" id="text-org75c3d58">
 <p>
 It's for AVR32 with usage of ASF. If we need to generate ticks, we can use one of wave generation mode of AVR32 TCs. For this we need to define value of RC register and to select clock source (internal line). We use PBA line divided by 2, 8, 32, 128 dividers (so sources are <code>TC_CLOCK_SOURCE2..5</code> in ASF 'terminology' - macroses :).
 Here is the source of calculator of RC, divider:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdint.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;limits.h&gt;</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdint.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;limits.h&gt;</span>
 
-<span style="color: #595959;">// </span><span style="color: #595959;">max value of RC register with type uint16_t (unsigned short of AVR32 GCC)</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">MAX_RC</span> (1&lt;&lt;(<span style="color: brightblack;">sizeof</span>(uint16_t)*CHAR_BIT))
-<span style="color: #cccccc;">int</span>
-<span style="color: #a52a2a;">calc_tc_params</span>(<span style="color: #cccccc;">long</span> *<span style="color: #b3b3b3;">freq</span>, <span style="color: #cccccc;">long</span> *<span style="color: #b3b3b3;">err</span>, <span style="color: #cccccc;">uint16_t</span> *<span style="color: #b3b3b3;">presc</span>, <span style="color: #cccccc;">uint16_t</span> *<span style="color: #b3b3b3;">rc</span>)
+<span class="org-comment-delimiter">// </span><span class="org-comment">max value of RC register with type uint16_t (unsigned short of AVR32 GCC)</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">MAX_RC</span> (1&lt;&lt;(<span class="org-keyword">sizeof</span>(uint16_t)*CHAR_BIT))
+<span class="org-type">int</span>
+<span class="org-function-name">calc_tc_params</span>(<span class="org-type">long</span> *<span class="org-variable-name">freq</span>, <span class="org-type">long</span> *<span class="org-variable-name">err</span>, <span class="org-type">uint16_t</span> *<span class="org-variable-name">presc</span>, <span class="org-type">uint16_t</span> *<span class="org-variable-name">rc</span>)
 {
-        <span style="color: brightblack;">static</span> <span style="color: brightblack;">const</span> <span style="color: #cccccc;">long</span> <span style="color: #b3b3b3;">divs</span>[] = {2, 8, 32, 128};
-        <span style="color: brightblack;">static</span> <span style="color: brightblack;">const</span> <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">ndivs</span> = <span style="color: brightblack;">sizeof</span> divs/<span style="color: brightblack;">sizeof</span> divs[0];
-        <span style="color: #cccccc;">long</span> <span style="color: #b3b3b3;">_err</span> = 0, <span style="color: #b3b3b3;">_merr</span> = *err;
-        <span style="color: #cccccc;">uint16_t</span> <span style="color: #b3b3b3;">_rc</span> = 0, <span style="color: #b3b3b3;">_mrc</span> = 0, <span style="color: #b3b3b3;">_idiv</span> = 0, <span style="color: #b3b3b3;">_midiv</span> = 0;
+        <span class="org-keyword">static</span> <span class="org-keyword">const</span> <span class="org-type">long</span> <span class="org-variable-name">divs</span>[] = {2, 8, 32, 128};
+        <span class="org-keyword">static</span> <span class="org-keyword">const</span> <span class="org-type">int</span> <span class="org-variable-name">ndivs</span> = <span class="org-keyword">sizeof</span> divs/<span class="org-keyword">sizeof</span> divs[0];
+        <span class="org-type">long</span> <span class="org-variable-name">_err</span> = 0, <span class="org-variable-name">_merr</span> = *err;
+        <span class="org-type">uint16_t</span> <span class="org-variable-name">_rc</span> = 0, <span class="org-variable-name">_mrc</span> = 0, <span class="org-variable-name">_idiv</span> = 0, <span class="org-variable-name">_midiv</span> = 0;
 
-        <span style="color: brightblack;">for</span> (_idiv = 0; _idiv &lt; ndivs; _idiv++) {
+        <span class="org-keyword">for</span> (_idiv = 0; _idiv &lt; ndivs; _idiv++) {
                 _rc = (FPBA / divs[_idiv]) / (*freq);
                 _rc = (_rc==0? 1 : _rc&gt;MAX_RC? MAX_RC : _rc);
-                _err = abs((*freq) - (FPBA / divs[_idiv]) / (<span style="color: #cccccc;">long</span>)_rc);
-                <span style="color: brightblack;">if</span> (_err &lt;= _merr) {
+                _err = abs((*freq) - (FPBA / divs[_idiv]) / (<span class="org-type">long</span>)_rc);
+                <span class="org-keyword">if</span> (_err &lt;= _merr) {
                         _merr = _err;
                         _midiv = _idiv;
                         _mrc = _rc;
                 }
-                <span style="color: brightblack;">if</span> (!_err) <span style="color: brightblack;">break</span>;
+                <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>_err) <span class="org-keyword">break</span>;
         }
 
-        <span style="color: brightblack;">if</span> (_mrc) {
+        <span class="org-keyword">if</span> (_mrc) {
                 *rc = _mrc;
                 *err = _merr;
                 *presc = divs[_midiv];
                 *freq = (FPBA / divs[_midiv]) / _mrc;
-                <span style="color: brightblack;">return</span> (1);
-        } <span style="color: brightblack;">else</span>
-                <span style="color: brightblack;">return</span> (0);
+                <span class="org-keyword">return</span> (1);
+        } <span class="org-keyword">else</span>
+                <span class="org-keyword">return</span> (0);
 }
 </pre>
 </div>
@@ -140,7 +265,7 @@ Timer source can be found in this way:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">PRESC2TCSRC</span>(<span style="color: #b3b3b3;">PRESC</span>) ((PRESC)==2? TC_CLOCK_SOURCE_TC2 \
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-function-name">PRESC2TCSRC</span>(<span class="org-variable-name">PRESC</span>) ((PRESC)==2? TC_CLOCK_SOURCE_TC2 \
                             :(PRESC)==8? TC_CLOCK_SOURCE_TC3 \
                             :(PRESC)==32? TC_CLOCK_SOURCE_TC4 \
                             :(PRESC)==128? TC_CLOCK_SOURCE_TC5 \

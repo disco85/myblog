@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>L-Systems</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">L-Systems</h1>
-<div id="outline-container-org40f1088" class="outline-2">
-<h2 id="org40f1088">L-Systems</h2>
-<div class="outline-text-2" id="text-org40f1088">
+<div id="outline-container-org5930b94" class="outline-2">
+<h2 id="org5930b94">L-Systems</h2>
+<div class="outline-text-2" id="text-org5930b94">
 <p>
 More about L-System: <a href="https://en.wikipedia.org/wiki/L-system">https://en.wikipedia.org/wiki/L-system</a>
 </p>
@@ -96,7 +221,7 @@ Example of generated picture:
 </p>
 
 
-<div id="org0debfc5" class="figure">
+<div id="org6cb8ccb" class="figure">
 <p><img src="../../assets/Lsys1.svg" alt="Lsys1.svg" class="org-svg" />
 </p>
 </div>
@@ -110,308 +235,308 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">The idea is to iteratively match variables and to replace them with another one,</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">step by step. Like A -&gt; AB (where A,B are variables)... Finally it's unfolded</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">into some long sequence of variables that can be treated in some way (to draw</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">picture, to play music, etc).</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">More: https://en.wikipedia.org/wiki/L-system</span>
-<span style="color: #595959;">#</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Parameters of variables are supported including dynamic ones (based on original,</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">matched variables, as references in regexp). But for color, width set they are</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">not used - context manager `draw_attrs()` is used instead of, because draw of</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">PythTree is as to-leaf/back-to-root, to-leaf/back-to-root... and in this case</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">colors would be black/white, black/white... not black/lighter/more-ligher/white.</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">So, the context manager calculates relative Y-coord (how far it's from the root)</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">and sets color/width.</span>
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">The idea is to iteratively match variables and to replace them with another one,</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">step by step. Like A -&gt; AB (where A,B are variables)... Finally it's unfolded</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">into some long sequence of variables that can be treated in some way (to draw</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">picture, to play music, etc).</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">More: https://en.wikipedia.org/wiki/L-system</span>
+<span class="org-comment-delimiter">#</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Parameters of variables are supported including dynamic ones (based on original,</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">matched variables, as references in regexp). But for color, width set they are</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">not used - context manager `draw_attrs()` is used instead of, because draw of</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">PythTree is as to-leaf/back-to-root, to-leaf/back-to-root... and in this case</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">colors would be black/white, black/white... not black/lighter/more-ligher/white.</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">So, the context manager calculates relative Y-coord (how far it's from the root)</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">and sets color/width.</span>
 
-<span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;"> draw from the bottom of the screen</span>
-<span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;"> support big number of iterations</span>
-<span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;"> set thickness and color using `pars`</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> draw from the bottom of the screen</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> support big number of iterations</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> set thickness and color using `pars`</span>
 
-<span style="color: brightblack;">import</span> random
-<span style="color: brightblack;">import</span> svg_turtle
-<span style="color: brightblack;">from</span> contextlib <span style="color: brightblack;">import</span> contextmanager
-
-
-<span style="color: #595959;">################################## </span><span style="color: #595959;">L-System ####################################</span>
-
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">DynPars</span>:
-  <span style="color: brightblack;">"""Dynamic parameters: they can get parameters of matched variables and to</span>
-<span style="color: brightblack;">  transform them into parameters of new coming (tail) variables</span>
-<span style="color: brightblack;">  """</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, new_pars=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">new_pars</span> = new_pars <span style="color: brightblack;">or</span> (<span style="color: brightblack;">lambda</span> a: a)
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">tail_pars</span>(<span style="color: brightblack;">self</span>, tail_vars, matched_vars_pars):
-    <span style="color: #b3b3b3;">tail_vars_pars</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: brightblack;">self</span>.new_pars(matched_vars_pars))
-    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(tail_vars_pars) == 1:                       <span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #595959;"> not sure </span>
-      <span style="color: #b3b3b3;">tail_vars_pars</span> = tail_vars_pars * <span style="color: #b3b3b3;">len</span>(tail_vars) <span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold; text-decoration: underline;">XXX</span><span style="color: #595959;"> not sure</span>
-    <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(<span style="color: #b3b3b3;">len</span>(tail_vars)):
-      <span style="color: brightblack;">if</span> i &gt;= <span style="color: #b3b3b3;">len</span>(tail_vars_pars):
-        <span style="color: brightblack;">break</span>
-      tail_vars[i].<span style="color: #b3b3b3;">pars</span> = tail_vars_pars[i]
-    <span style="color: #595959;"># </span><span style="color: #595959;">print(matched_vars_pars, '=&gt;', tail_vars)</span>
-    <span style="color: brightblack;">return</span> tail_vars
+<span class="org-keyword">import</span> random
+<span class="org-keyword">import</span> svg_turtle
+<span class="org-keyword">from</span> contextlib <span class="org-keyword">import</span> contextmanager
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Var</span>:
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, name, pars=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">name</span> = name
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">pars</span> = pars <span style="color: brightblack;">or</span> []
+<span class="org-comment-delimiter">################################## </span><span class="org-comment">L-System ####################################</span>
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__eq__</span>(<span style="color: brightblack;">self</span>, oth):
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.name != oth.name: <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
-    <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(<span style="color: #b3b3b3;">min</span>(<span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.pars), <span style="color: #b3b3b3;">len</span>(oth.pars))):
-      <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.pars[i] != oth.pars[i]: <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">False</span>
-    <span style="color: brightblack;">return</span> <span style="color: #7fffd4;">True</span>
+<span class="org-keyword">class</span> <span class="org-type">DynPars</span>:
+  <span class="org-doc">"""Dynamic parameters: they can get parameters of matched variables and to</span>
+<span class="org-doc">  transform them into parameters of new coming (tail) variables</span>
+<span class="org-doc">  """</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, new_pars<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">new_pars</span> <span class="org-operator">=</span> new_pars <span class="org-keyword">or</span> (<span class="org-keyword">lambda</span> a: a)
 
-  @<span style="color: #b3b3b3;">classmethod</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">make</span>(cls, s, pars=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">"""Short factory creating a list of Var-s: 1 letter in `s` is a name of 1 Var"""</span>
-    <span style="color: brightblack;">return</span> [cls(ch, pars <span style="color: brightblack;">or</span> []) <span style="color: brightblack;">for</span> ch <span style="color: brightblack;">in</span> s]
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
-    <span style="color: #b3b3b3;">pars</span> = <span style="color: #b3b3b3;">str</span>(<span style="color: #b3b3b3;">tuple</span>(<span style="color: brightblack;">self</span>.pars)) <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.pars <span style="color: brightblack;">else</span> <span style="color: brightblack;">''</span>
-    <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'"</span>{<span style="color: brightblack;">self</span>.name}<span style="color: brightblack;">"</span>{pars}<span style="color: brightblack;">'</span>
-
-
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Rule</span>:
-  <span style="color: brightblack;">"""Rule transforming head Var-s to tail Var-s"""</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, head, tail):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">head</span> = head
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">tail</span> = tail
-
-  @<span style="color: #b3b3b3;">classmethod</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">make</span>(cls, heads, tails, heads_pars=<span style="color: #7fffd4;">None</span>, tails_pars=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">"""Short factory: heads, tails are strings where 1 letter is one Var name"""</span>
-    <span style="color: brightblack;">return</span> cls(Var.make(heads, heads_pars), Var.make(tails, tails_pars))
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">match</span>(<span style="color: brightblack;">self</span>, <span style="color: #b3b3b3;">vars</span>):
-    <span style="color: #b3b3b3;">head_len</span> = <span style="color: #b3b3b3;">len</span>(<span style="color: brightblack;">self</span>.head)
-    <span style="color: #b3b3b3;">vars_len</span> = <span style="color: #b3b3b3;">len</span>(<span style="color: #b3b3b3;">vars</span>)
-    <span style="color: brightblack;">if</span> vars_len &lt; head_len:
-      <span style="color: brightblack;">return</span> {<span style="color: brightblack;">'matched'</span>: <span style="color: #7fffd4;">False</span>, <span style="color: brightblack;">'shift'</span>: 0}
-    <span style="color: brightblack;">elif</span> head_len == 0:
-      <span style="color: brightblack;">return</span> {<span style="color: brightblack;">'matched'</span>: <span style="color: #7fffd4;">True</span>, <span style="color: brightblack;">'shift'</span>: 1}
-    <span style="color: brightblack;">elif</span> <span style="color: #b3b3b3;">all</span>(<span style="color: brightblack;">self</span>.head[i] == <span style="color: #b3b3b3;">vars</span>[i] <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(head_len)):
-      <span style="color: brightblack;">return</span> {<span style="color: brightblack;">'matched'</span>: <span style="color: #7fffd4;">True</span>, <span style="color: brightblack;">'shift'</span>: head_len}
-    <span style="color: brightblack;">else</span>:
-      <span style="color: brightblack;">return</span> {<span style="color: brightblack;">'matched'</span>: <span style="color: #7fffd4;">False</span>, <span style="color: brightblack;">'shift'</span>: 0}
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>):
-    <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'</span>{<span style="color: brightblack;">self</span>.head}<span style="color: brightblack;">-&gt;</span>{<span style="color: brightblack;">self</span>.tail}<span style="color: brightblack;">'</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">tail_pars</span>(<span class="org-keyword">self</span>, tail_vars, matched_vars_pars):
+    <span class="org-variable-name">tail_vars_pars</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(<span class="org-keyword">self</span>.new_pars(matched_vars_pars))
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(tail_vars_pars) <span class="org-operator">==</span> 1:                       <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure </span>
+      <span class="org-variable-name">tail_vars_pars</span> <span class="org-operator">=</span> tail_vars_pars <span class="org-operator">*</span> <span class="org-builtin">len</span>(tail_vars) <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure</span>
+    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-builtin">len</span>(tail_vars)):
+      <span class="org-keyword">if</span> i <span class="org-operator">&gt;=</span> <span class="org-builtin">len</span>(tail_vars_pars):
+        <span class="org-keyword">break</span>
+      tail_vars[i].<span class="org-variable-name">pars</span> <span class="org-operator">=</span> tail_vars_pars[i]
+    <span class="org-comment-delimiter"># </span><span class="org-comment">print(matched_vars_pars, '=&gt;', tail_vars)</span>
+    <span class="org-keyword">return</span> tail_vars
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Prefer</span>:
-  <span style="color: brightblack;">"""How to select a rule when multiple rules matched"""</span>
-  <span style="color: #b3b3b3;">FIRST</span> = 1
-  <span style="color: #b3b3b3;">LAST</span> = 2
-  <span style="color: #b3b3b3;">RANDOM</span> = 3
+<span class="org-keyword">class</span> <span class="org-type">Var</span>:
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, name, pars<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">name</span> <span class="org-operator">=</span> name
+    <span class="org-keyword">self</span>.<span class="org-variable-name">pars</span> <span class="org-operator">=</span> pars <span class="org-keyword">or</span> []
+
+  <span class="org-keyword">def</span> <span class="org-function-name">__eq__</span>(<span class="org-keyword">self</span>, oth):
+    <span class="org-keyword">if</span> <span class="org-keyword">self</span>.name <span class="org-operator">!=</span> oth.name: <span class="org-keyword">return</span> <span class="org-constant">False</span>
+    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-builtin">min</span>(<span class="org-builtin">len</span>(<span class="org-keyword">self</span>.pars), <span class="org-builtin">len</span>(oth.pars))):
+      <span class="org-keyword">if</span> <span class="org-keyword">self</span>.pars[i] <span class="org-operator">!=</span> oth.pars[i]: <span class="org-keyword">return</span> <span class="org-constant">False</span>
+    <span class="org-keyword">return</span> <span class="org-constant">True</span>
+
+  @<span class="org-builtin">classmethod</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">make</span>(cls, s, pars<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-doc">"""Short factory creating a list of Var-s: 1 letter in `s` is a name of 1 Var"""</span>
+    <span class="org-keyword">return</span> [cls(ch, pars <span class="org-keyword">or</span> []) <span class="org-keyword">for</span> ch <span class="org-keyword">in</span> s]
+
+  <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>):
+    <span class="org-variable-name">pars</span> <span class="org-operator">=</span> <span class="org-builtin">str</span>(<span class="org-builtin">tuple</span>(<span class="org-keyword">self</span>.pars)) <span class="org-keyword">if</span> <span class="org-keyword">self</span>.pars <span class="org-keyword">else</span> <span class="org-string">''</span>
+    <span class="org-keyword">return</span> f<span class="org-string">'"</span>{<span class="org-keyword">self</span>.name}<span class="org-string">"</span>{pars}<span class="org-string">'</span>
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Lsys</span>:
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, rules, axiom, dyn_pars=<span style="color: #7fffd4;">None</span>):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">rules</span> = rules
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">axiom</span> = axiom
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">dyn_pars</span> = dyn_pars
+<span class="org-keyword">class</span> <span class="org-type">Rule</span>:
+  <span class="org-doc">"""Rule transforming head Var-s to tail Var-s"""</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, head, tail):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">head</span> <span class="org-operator">=</span> head
+    <span class="org-keyword">self</span>.<span class="org-variable-name">tail</span> <span class="org-operator">=</span> tail
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">refer_pars</span>(<span style="color: brightblack;">self</span>, tail_vars, matched_vars_pars):
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.dyn_pars:
-      <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.dyn_pars.tail_pars(tail_vars, matched_vars_pars)
-    <span style="color: brightblack;">else</span>:
-      <span style="color: brightblack;">return</span> tail_vars
+  @<span class="org-builtin">classmethod</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">make</span>(cls, heads, tails, heads_pars<span class="org-operator">=</span><span class="org-constant">None</span>, tails_pars<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-doc">"""Short factory: heads, tails are strings where 1 letter is one Var name"""</span>
+    <span class="org-keyword">return</span> cls(Var.make(heads, heads_pars), Var.make(tails, tails_pars))
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">apply_one_rule</span>(<span style="color: brightblack;">self</span>, <span style="color: #b3b3b3;">vars</span>, prefer=Prefer.LAST):
-    <span style="color: brightblack;">"""Applies one of known rules to input `vars`"""</span>
-    <span style="color: #b3b3b3;">matched_rules</span> = []
-    <span style="color: brightblack;">for</span> rule <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.rules:
-      <span style="color: #b3b3b3;">match_res</span> = rule.<span style="color: brightblack;">match</span>(<span style="color: #b3b3b3;">vars</span>)
-      <span style="color: brightblack;">if</span> match_res[<span style="color: brightblack;">'matched'</span>]:
+  <span class="org-keyword">def</span> <span class="org-function-name">match</span>(<span class="org-keyword">self</span>, <span class="org-builtin">vars</span>):
+    <span class="org-variable-name">head_len</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(<span class="org-keyword">self</span>.head)
+    <span class="org-variable-name">vars_len</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(<span class="org-builtin">vars</span>)
+    <span class="org-keyword">if</span> vars_len <span class="org-operator">&lt;</span> head_len:
+      <span class="org-keyword">return</span> {<span class="org-string">'matched'</span>: <span class="org-constant">False</span>, <span class="org-string">'shift'</span>: 0}
+    <span class="org-keyword">elif</span> head_len <span class="org-operator">==</span> 0:
+      <span class="org-keyword">return</span> {<span class="org-string">'matched'</span>: <span class="org-constant">True</span>, <span class="org-string">'shift'</span>: 1}
+    <span class="org-keyword">elif</span> <span class="org-builtin">all</span>(<span class="org-keyword">self</span>.head[i] <span class="org-operator">==</span> <span class="org-builtin">vars</span>[i] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(head_len)):
+      <span class="org-keyword">return</span> {<span class="org-string">'matched'</span>: <span class="org-constant">True</span>, <span class="org-string">'shift'</span>: head_len}
+    <span class="org-keyword">else</span>:
+      <span class="org-keyword">return</span> {<span class="org-string">'matched'</span>: <span class="org-constant">False</span>, <span class="org-string">'shift'</span>: 0}
+
+  <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>):
+    <span class="org-keyword">return</span> f<span class="org-string">'</span>{<span class="org-keyword">self</span>.head}<span class="org-string">-&gt;</span>{<span class="org-keyword">self</span>.tail}<span class="org-string">'</span>
+
+
+<span class="org-keyword">class</span> <span class="org-type">Prefer</span>:
+  <span class="org-doc">"""How to select a rule when multiple rules matched"""</span>
+  <span class="org-variable-name">FIRST</span> <span class="org-operator">=</span> 1
+  <span class="org-variable-name">LAST</span> <span class="org-operator">=</span> 2
+  <span class="org-variable-name">RANDOM</span> <span class="org-operator">=</span> 3
+
+
+<span class="org-keyword">class</span> <span class="org-type">Lsys</span>:
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, rules, axiom, dyn_pars<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">rules</span> <span class="org-operator">=</span> rules
+    <span class="org-keyword">self</span>.<span class="org-variable-name">axiom</span> <span class="org-operator">=</span> axiom
+    <span class="org-keyword">self</span>.<span class="org-variable-name">dyn_pars</span> <span class="org-operator">=</span> dyn_pars
+
+  <span class="org-keyword">def</span> <span class="org-function-name">refer_pars</span>(<span class="org-keyword">self</span>, tail_vars, matched_vars_pars):
+    <span class="org-keyword">if</span> <span class="org-keyword">self</span>.dyn_pars:
+      <span class="org-keyword">return</span> <span class="org-keyword">self</span>.dyn_pars.tail_pars(tail_vars, matched_vars_pars)
+    <span class="org-keyword">else</span>:
+      <span class="org-keyword">return</span> tail_vars
+
+  <span class="org-keyword">def</span> <span class="org-function-name">apply_one_rule</span>(<span class="org-keyword">self</span>, <span class="org-builtin">vars</span>, prefer<span class="org-operator">=</span>Prefer.LAST):
+    <span class="org-doc">"""Applies one of known rules to input `vars`"""</span>
+    <span class="org-variable-name">matched_rules</span> <span class="org-operator">=</span> []
+    <span class="org-keyword">for</span> rule <span class="org-keyword">in</span> <span class="org-keyword">self</span>.rules:
+      <span class="org-variable-name">match_res</span> <span class="org-operator">=</span> rule.<span class="org-keyword">match</span>(<span class="org-builtin">vars</span>)
+      <span class="org-keyword">if</span> match_res[<span class="org-string">'matched'</span>]:
         matched_rules.append((rule, match_res))
 
-    <span style="color: brightblack;">if</span> <span style="color: #b3b3b3;">len</span>(matched_rules) &gt; 1:
-      <span style="color: brightblack;">if</span> prefer == Prefer.LAST:
-        <span style="color: #b3b3b3;">matched</span> = matched_rules[-1]
-      <span style="color: brightblack;">elif</span> prefer == Prefer.FIRST:
-        <span style="color: #b3b3b3;">matched</span> = matched_rules[0]
-      <span style="color: brightblack;">elif</span> prefer == Prefer.RANDOM:
-        <span style="color: #b3b3b3;">matched</span> = matched_rules[random.randint(0, <span style="color: #b3b3b3;">len</span>(matched_rules) - 1)]
-    <span style="color: brightblack;">elif</span> <span style="color: #b3b3b3;">len</span>(matched_rules) == 1:
-      <span style="color: #b3b3b3;">matched</span> = matched_rules[0]
-    <span style="color: brightblack;">elif</span> <span style="color: #b3b3b3;">len</span>(matched_rules) == 0:
-      <span style="color: #b3b3b3;">matched</span> = <span style="color: #7fffd4;">None</span>
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(matched_rules) <span class="org-operator">&gt;</span> 1:
+      <span class="org-keyword">if</span> prefer <span class="org-operator">==</span> Prefer.LAST:
+        <span class="org-variable-name">matched</span> <span class="org-operator">=</span> matched_rules[<span class="org-operator">-</span>1]
+      <span class="org-keyword">elif</span> prefer <span class="org-operator">==</span> Prefer.FIRST:
+        <span class="org-variable-name">matched</span> <span class="org-operator">=</span> matched_rules[0]
+      <span class="org-keyword">elif</span> prefer <span class="org-operator">==</span> Prefer.RANDOM:
+        <span class="org-variable-name">matched</span> <span class="org-operator">=</span> matched_rules[random.randint(0, <span class="org-builtin">len</span>(matched_rules) <span class="org-operator">-</span> 1)]
+    <span class="org-keyword">elif</span> <span class="org-builtin">len</span>(matched_rules) <span class="org-operator">==</span> 1:
+      <span class="org-variable-name">matched</span> <span class="org-operator">=</span> matched_rules[0]
+    <span class="org-keyword">elif</span> <span class="org-builtin">len</span>(matched_rules) <span class="org-operator">==</span> 0:
+      <span class="org-variable-name">matched</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
 
-    <span style="color: brightblack;">if</span> matched <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
-      <span style="color: #b3b3b3;">matched_pars</span> = [v.pars <span style="color: brightblack;">for</span> v <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">vars</span>[:1]]
-      <span style="color: #595959;">#</span><span style="color: #595959;">print('1', matched_pars, len(vars[:1]))</span>
-      <span style="color: #b3b3b3;">ret</span> = {<span style="color: brightblack;">'applied'</span>: <span style="color: #b3b3b3;">vars</span>[0:1], <span style="color: brightblack;">'rest'</span>: <span style="color: #b3b3b3;">vars</span>[1:]}
-    <span style="color: brightblack;">else</span>:
-      <span style="color: #b3b3b3;">matched_rule</span>, <span style="color: #b3b3b3;">match_res</span> = matched
-      <span style="color: #b3b3b3;">new_vars</span> = matched_rule.tail[:]
-      <span style="color: #b3b3b3;">matched_pars</span> = [v.pars <span style="color: brightblack;">for</span> v <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">vars</span>[:match_res[<span style="color: brightblack;">'shift'</span>]]]
-      <span style="color: #b3b3b3;">ret</span> = {<span style="color: brightblack;">'applied'</span>: new_vars, <span style="color: brightblack;">'rest'</span>: <span style="color: #b3b3b3;">vars</span>[match_res[<span style="color: brightblack;">'shift'</span>]:]}
-    <span style="color: brightblack;">if</span> matched_pars:
-      <span style="color: brightblack;">self</span>.refer_pars(ret[<span style="color: brightblack;">'applied'</span>], matched_pars)
-    <span style="color: brightblack;">return</span> ret
+    <span class="org-keyword">if</span> matched <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+      <span class="org-variable-name">matched_pars</span> <span class="org-operator">=</span> [v.pars <span class="org-keyword">for</span> v <span class="org-keyword">in</span> <span class="org-builtin">vars</span>[:1]]
+      <span class="org-comment-delimiter">#</span><span class="org-comment">print('1', matched_pars, len(vars[:1]))</span>
+      <span class="org-variable-name">ret</span> <span class="org-operator">=</span> {<span class="org-string">'applied'</span>: <span class="org-builtin">vars</span>[0:1], <span class="org-string">'rest'</span>: <span class="org-builtin">vars</span>[1:]}
+    <span class="org-keyword">else</span>:
+      <span class="org-variable-name">matched_rule</span>, <span class="org-variable-name">match_res</span> <span class="org-operator">=</span> matched
+      <span class="org-variable-name">new_vars</span> <span class="org-operator">=</span> matched_rule.tail[:]
+      <span class="org-variable-name">matched_pars</span> <span class="org-operator">=</span> [v.pars <span class="org-keyword">for</span> v <span class="org-keyword">in</span> <span class="org-builtin">vars</span>[:match_res[<span class="org-string">'shift'</span>]]]
+      <span class="org-variable-name">ret</span> <span class="org-operator">=</span> {<span class="org-string">'applied'</span>: new_vars, <span class="org-string">'rest'</span>: <span class="org-builtin">vars</span>[match_res[<span class="org-string">'shift'</span>]:]}
+    <span class="org-keyword">if</span> matched_pars:
+      <span class="org-keyword">self</span>.refer_pars(ret[<span class="org-string">'applied'</span>], matched_pars)
+    <span class="org-keyword">return</span> ret
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">apply_rules</span>(<span style="color: brightblack;">self</span>, <span style="color: #b3b3b3;">vars</span>, prefer=Prefer.LAST):
-    <span style="color: brightblack;">"""Performs 1 step of L-System: applies all rules on `vars` (input string)</span>
-<span style="color: brightblack;">    until the end of input string</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: #b3b3b3;">result</span> = []
-    <span style="color: #b3b3b3;">rest</span> = <span style="color: #b3b3b3;">vars</span>[:]
-    <span style="color: brightblack;">while</span> rest:
-      <span style="color: #b3b3b3;">apply_res</span> = <span style="color: brightblack;">self</span>.apply_one_rule(rest, prefer)
-      <span style="color: #b3b3b3;">result</span> += apply_res[<span style="color: brightblack;">'applied'</span>]
-      <span style="color: #b3b3b3;">rest</span> = apply_res[<span style="color: brightblack;">'rest'</span>]
-    <span style="color: brightblack;">return</span> result
+  <span class="org-keyword">def</span> <span class="org-function-name">apply_rules</span>(<span class="org-keyword">self</span>, <span class="org-builtin">vars</span>, prefer<span class="org-operator">=</span>Prefer.LAST):
+    <span class="org-doc">"""Performs 1 step of L-System: applies all rules on `vars` (input string)</span>
+<span class="org-doc">    until the end of input string</span>
+<span class="org-doc">    """</span>
+    <span class="org-variable-name">result</span> <span class="org-operator">=</span> []
+    <span class="org-variable-name">rest</span> <span class="org-operator">=</span> <span class="org-builtin">vars</span>[:]
+    <span class="org-keyword">while</span> rest:
+      <span class="org-variable-name">apply_res</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.apply_one_rule(rest, prefer)
+      <span class="org-variable-name">result</span> <span class="org-operator">+=</span> apply_res[<span class="org-string">'applied'</span>]
+      <span class="org-variable-name">rest</span> <span class="org-operator">=</span> apply_res[<span class="org-string">'rest'</span>]
+    <span class="org-keyword">return</span> result
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">iapply</span>(<span style="color: brightblack;">self</span>, max_steps, prefer=Prefer.LAST):
-    <span style="color: brightblack;">"""Generates all transformations results"""</span>
-    <span style="color: #b3b3b3;">vars</span> = <span style="color: brightblack;">self</span>.axiom[:]
-    <span style="color: brightblack;">yield</span> <span style="color: #b3b3b3;">vars</span>
-    <span style="color: brightblack;">for</span> step <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(max_steps):
-      <span style="color: #b3b3b3;">new_vars</span> = <span style="color: brightblack;">self</span>.apply_rules(<span style="color: #b3b3b3;">vars</span>, prefer)
-      <span style="color: brightblack;">if</span> new_vars == <span style="color: #b3b3b3;">vars</span>:
-        <span style="color: brightblack;">break</span>
-      <span style="color: brightblack;">else</span>:
-        <span style="color: #b3b3b3;">vars</span> = new_vars
-        <span style="color: brightblack;">yield</span> new_vars
-    <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">vars</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">iapply</span>(<span class="org-keyword">self</span>, max_steps, prefer<span class="org-operator">=</span>Prefer.LAST):
+    <span class="org-doc">"""Generates all transformations results"""</span>
+    <span class="org-builtin">vars</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.axiom[:]
+    <span class="org-keyword">yield</span> <span class="org-builtin">vars</span>
+    <span class="org-keyword">for</span> step <span class="org-keyword">in</span> <span class="org-builtin">range</span>(max_steps):
+      <span class="org-variable-name">new_vars</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.apply_rules(<span class="org-builtin">vars</span>, prefer)
+      <span class="org-keyword">if</span> new_vars <span class="org-operator">==</span> <span class="org-builtin">vars</span>:
+        <span class="org-keyword">break</span>
+      <span class="org-keyword">else</span>:
+        <span class="org-builtin">vars</span> <span class="org-operator">=</span> new_vars
+        <span class="org-keyword">yield</span> new_vars
+    <span class="org-keyword">return</span> <span class="org-builtin">vars</span>
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">apply</span>(<span style="color: brightblack;">self</span>, max_steps, prefer=Prefer.LAST):
-    <span style="color: brightblack;">"""Returns the last transformation result"""</span>
-    <span style="color: brightblack;">for</span> r <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.iapply(max_steps, prefer):
-      <span style="color: brightblack;">continue</span>
-    <span style="color: brightblack;">return</span> r
-
-
-<span style="color: #595959;">#################################### </span><span style="color: #595959;">Render ####################################</span>
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">IRender</span>:
-  <span style="color: brightblack;">"""Render interface"""</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, lsys):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lsys</span> = lsys
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">max_steps</span> = 0
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_render</span>(<span style="color: brightblack;">self</span>, step, new_vars):
-    <span style="color: brightblack;">return</span> <span style="color: #cccccc;">NotImplementedError</span>
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_syntax_check</span>(<span style="color: brightblack;">self</span>, <span style="color: #b3b3b3;">vars</span>):
-    <span style="color: brightblack;">"""Raise exception on error in `vars`"""</span>
-    <span style="color: brightblack;">pass</span>
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">render</span>(<span style="color: brightblack;">self</span>, max_steps):
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">max_steps</span> = max_steps
-    <span style="color: brightblack;">for</span> step, new_vars <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">enumerate</span>(<span style="color: brightblack;">self</span>.lsys.iapply(max_steps)):
-      <span style="color: brightblack;">self</span>.do_syntax_check(new_vars)
-      <span style="color: brightblack;">self</span>.do_render(step, new_vars)
+  <span class="org-keyword">def</span> <span class="org-function-name">apply</span>(<span class="org-keyword">self</span>, max_steps, prefer<span class="org-operator">=</span>Prefer.LAST):
+    <span class="org-doc">"""Returns the last transformation result"""</span>
+    <span class="org-keyword">for</span> r <span class="org-keyword">in</span> <span class="org-keyword">self</span>.iapply(max_steps, prefer):
+      <span class="org-keyword">continue</span>
+    <span class="org-keyword">return</span> r
 
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">PythTree</span>(IRender):
-  <span style="color: brightblack;">"""Pythagorean tree renderer using turtle interface"""</span>
-  <span style="color: #b3b3b3;">ALPHABET</span> = <span style="color: brightblack;">'[01]'</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, lsys, turtle, *, only_last_step=<span style="color: #7fffd4;">True</span>, styles=<span style="color: #7fffd4;">None</span>):
-    <span style="color: #b3b3b3;">super</span>().__init__(lsys)
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">turtle</span> = turtle
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">stack</span> = []
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">only_last_step</span> = only_last_step
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">styles</span> = styles <span style="color: brightblack;">or</span> {}
-    <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">y0</span> = <span style="color: #7fffd4;">None</span>  <span style="color: #595959;"># </span><span style="color: #595959;">start of drawing, 1st point</span>
+<span class="org-comment-delimiter">#################################### </span><span class="org-comment">Render ####################################</span>
+<span class="org-keyword">class</span> <span class="org-type">IRender</span>:
+  <span class="org-doc">"""Render interface"""</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, lsys):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">lsys</span> <span class="org-operator">=</span> lsys
+    <span class="org-keyword">self</span>.<span class="org-variable-name">max_steps</span> <span class="org-operator">=</span> 0
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_syntax_check</span>(<span style="color: brightblack;">self</span>, new_vars):
-    <span style="color: brightblack;">for</span> var <span style="color: brightblack;">in</span> new_vars:
-      <span style="color: brightblack;">if</span> var.name <span style="color: brightblack;">not</span> <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.ALPHABET:
-        <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">RuntimeError</span>(f<span style="color: brightblack;">'Unsupported variable </span>{var.name}<span style="color: brightblack;">'</span>)
+  <span class="org-keyword">def</span> <span class="org-function-name">do_render</span>(<span class="org-keyword">self</span>, step, new_vars):
+    <span class="org-keyword">return</span> <span class="org-type">NotImplementedError</span>
 
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">do_render</span>(<span style="color: brightblack;">self</span>, step, new_vars):
-    <span style="color: #b3b3b3;">draw</span> = (<span style="color: brightblack;">not</span> <span style="color: brightblack;">self</span>.only_last_step) <span style="color: brightblack;">or</span> (step == <span style="color: brightblack;">self</span>.max_steps)
-    <span style="color: brightblack;">if</span> draw:
-      <span style="color: brightblack;">self</span>.turtle.pencolor(<span style="color: brightblack;">self</span>.styles.get(<span style="color: brightblack;">'branch_color'</span>, <span style="color: brightblack;">'black'</span>))
-      <span style="color: brightblack;">self</span>.turtle.screen.colormode(255)
-      <span style="color: brightblack;">self</span>.turtle.pendown()
-      <span style="color: brightblack;">for</span> var <span style="color: brightblack;">in</span> new_vars:
-        <span style="color: brightblack;">with</span> <span style="color: brightblack;">self</span>.draw_attrs():
-          <span style="color: brightblack;">self</span>.interp_var(var)
-      <span style="color: brightblack;">self</span>.turtle.penup()
+  <span class="org-keyword">def</span> <span class="org-function-name">do_syntax_check</span>(<span class="org-keyword">self</span>, <span class="org-builtin">vars</span>):
+    <span class="org-doc">"""Raise exception on error in `vars`"""</span>
+    <span class="org-keyword">pass</span>
 
-  <span style="color: #cccccc;">@contextmanager</span>
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">draw_attrs</span>(<span style="color: brightblack;">self</span>):
-    <span style="color: #b3b3b3;">y</span> = <span style="color: brightblack;">self</span>.turtle.ycor()
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.y0 <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
-      <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">y0</span> = y
-      <span style="color: brightblack;">self</span>.turtle.screen.colormode(255)
-    <span style="color: #b3b3b3;">c0</span> = <span style="color: brightblack;">self</span>.turtle.pencolor()
-    <span style="color: #b3b3b3;">w0</span> = <span style="color: brightblack;">self</span>.turtle.width()
-    <span style="color: #b3b3b3;">color_step</span> = <span style="color: #b3b3b3;">abs</span>(y - <span style="color: brightblack;">self</span>.y0)
-    <span style="color: #b3b3b3;">c1</span> = [40, 5 + color_step, 5 + color_step/4]  <span style="color: #595959;"># </span><span style="color: #595959;">current color</span>
-    <span style="color: #b3b3b3;">w1</span> = 20 - <span style="color: #b3b3b3;">abs</span>(y - <span style="color: brightblack;">self</span>.y0)/15                <span style="color: #595959;"># </span><span style="color: #595959;">current width</span>
-    <span style="color: brightblack;">self</span>.turtle.pencolor(c1)
-    <span style="color: brightblack;">self</span>.turtle.width(w1)
-    <span style="color: brightblack;">yield</span> <span style="color: #7fffd4;">None</span>
-    <span style="color: brightblack;">self</span>.turtle.pencolor(c0)
-    <span style="color: brightblack;">self</span>.turtle.width(w0)
-
-  <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">interp_var</span>(<span style="color: brightblack;">self</span>, var):
-    <span style="color: brightblack;">if</span> var.name == <span style="color: brightblack;">'0'</span>:
-      <span style="color: brightblack;">self</span>.turtle.forward(2)
-      <span style="color: #b3b3b3;">c</span> = <span style="color: brightblack;">self</span>.turtle.pencolor()
-      <span style="color: brightblack;">self</span>.turtle.pencolor(<span style="color: brightblack;">self</span>.styles.get(<span style="color: brightblack;">'berry_color'</span>, <span style="color: brightblack;">'red'</span>))
-      <span style="color: brightblack;">self</span>.turtle.dot(5)
-      <span style="color: brightblack;">self</span>.turtle.pencolor(c)
-    <span style="color: brightblack;">elif</span> var.name == <span style="color: brightblack;">'1'</span>:
-      <span style="color: brightblack;">self</span>.turtle.forward(2)
-    <span style="color: brightblack;">elif</span> var.name == <span style="color: brightblack;">'['</span>:
-      <span style="color: #b3b3b3;">pos</span>, <span style="color: #b3b3b3;">angle</span> = <span style="color: brightblack;">self</span>.turtle.pos(), <span style="color: brightblack;">self</span>.turtle.heading()
-      <span style="color: brightblack;">self</span>.stack.append((pos, angle))
-      <span style="color: brightblack;">self</span>.turtle.penup()
-      <span style="color: brightblack;">self</span>.turtle.left(45)
-      <span style="color: brightblack;">self</span>.turtle.pendown()
-    <span style="color: brightblack;">elif</span> var.name == <span style="color: brightblack;">']'</span>:
-      <span style="color: #b3b3b3;">pos</span>, <span style="color: #b3b3b3;">angle</span> = <span style="color: brightblack;">self</span>.stack.pop()
-      <span style="color: brightblack;">self</span>.turtle.penup()
-      <span style="color: brightblack;">self</span>.turtle.setpos(pos)
-      <span style="color: brightblack;">self</span>.turtle.setheading(angle)
-      <span style="color: brightblack;">self</span>.turtle.right(45)
-      <span style="color: brightblack;">self</span>.turtle.pendown()
+  <span class="org-keyword">def</span> <span class="org-function-name">render</span>(<span class="org-keyword">self</span>, max_steps):
+    <span class="org-keyword">self</span>.<span class="org-variable-name">max_steps</span> <span class="org-operator">=</span> max_steps
+    <span class="org-keyword">for</span> step, new_vars <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(<span class="org-keyword">self</span>.lsys.iapply(max_steps)):
+      <span class="org-keyword">self</span>.do_syntax_check(new_vars)
+      <span class="org-keyword">self</span>.do_render(step, new_vars)
 
 
-<span style="color: #595959;">#############################</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">Test 1</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">rules = [Rule.make('A','AB'), Rule.make('B','A')]</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">ls = Lsys(rules, Var.make('A'))</span>
-<span style="color: #595959;">###</span><span style="color: #595959;">r = ls.apply_rules(Var.make('ABAAB'))</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">r = ls.apply(7)  # WORKS</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">print(r)</span>
+<span class="org-keyword">class</span> <span class="org-type">PythTree</span>(IRender):
+  <span class="org-doc">"""Pythagorean tree renderer using turtle interface"""</span>
+  <span class="org-variable-name">ALPHABET</span> <span class="org-operator">=</span> <span class="org-string">'[01]'</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, lsys, turtle, <span class="org-operator">*</span>, only_last_step<span class="org-operator">=</span><span class="org-constant">True</span>, styles<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-builtin">super</span>().__init__(lsys)
+    <span class="org-keyword">self</span>.<span class="org-variable-name">turtle</span> <span class="org-operator">=</span> turtle
+    <span class="org-keyword">self</span>.<span class="org-variable-name">stack</span> <span class="org-operator">=</span> []
+    <span class="org-keyword">self</span>.<span class="org-variable-name">only_last_step</span> <span class="org-operator">=</span> only_last_step
+    <span class="org-keyword">self</span>.<span class="org-variable-name">styles</span> <span class="org-operator">=</span> styles <span class="org-keyword">or</span> {}
+    <span class="org-keyword">self</span>.<span class="org-variable-name">y0</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">start of drawing, 1st point</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Test 2</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">rules = [Rule.make('1','11'), Rule.make('0','1[0]0')]</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">ls = Lsys(rules, Var.make('0'))</span>
-<span style="color: #595959;">###</span><span style="color: #595959;">r = ls.apply_rules(Var.make('1[0]0'))</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">r = ls.apply(3)  # WORKS</span>
-<span style="color: #595959;">##</span><span style="color: #595959;">print(r)</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">do_syntax_check</span>(<span class="org-keyword">self</span>, new_vars):
+    <span class="org-keyword">for</span> var <span class="org-keyword">in</span> new_vars:
+      <span class="org-keyword">if</span> var.name <span class="org-keyword">not</span> <span class="org-keyword">in</span> <span class="org-keyword">self</span>.ALPHABET:
+        <span class="org-keyword">raise</span> <span class="org-type">RuntimeError</span>(f<span class="org-string">'Unsupported variable </span>{var.name}<span class="org-string">'</span>)
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Just example how to change parameters dynamically</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">def new_pars(old_pars):</span>
-<span style="color: #595959;">#   </span><span style="color: #595959;">for pars in old_pars:</span>
-<span style="color: #595959;">#     </span><span style="color: #595959;">if len(pars) == 4:</span>
-<span style="color: #595959;">#       </span><span style="color: #595959;">r, g, b, thickness = pars</span>
-<span style="color: #595959;">#       </span><span style="color: #595959;">res = [min(255, r+1), min(255, g+1), min(255, b+1), thickness+0.1]</span>
-<span style="color: #595959;">#       </span><span style="color: #595959;">yield res</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">do_render</span>(<span class="org-keyword">self</span>, step, new_vars):
+    <span class="org-variable-name">draw</span> <span class="org-operator">=</span> (<span class="org-keyword">not</span> <span class="org-keyword">self</span>.only_last_step) <span class="org-keyword">or</span> (step <span class="org-operator">==</span> <span class="org-keyword">self</span>.max_steps)
+    <span class="org-keyword">if</span> draw:
+      <span class="org-keyword">self</span>.turtle.pencolor(<span class="org-keyword">self</span>.styles.get(<span class="org-string">'branch_color'</span>, <span class="org-string">'black'</span>))
+      <span class="org-keyword">self</span>.turtle.screen.colormode(255)
+      <span class="org-keyword">self</span>.turtle.pendown()
+      <span class="org-keyword">for</span> var <span class="org-keyword">in</span> new_vars:
+        <span class="org-keyword">with</span> <span class="org-keyword">self</span>.draw_attrs():
+          <span class="org-keyword">self</span>.interp_var(var)
+      <span class="org-keyword">self</span>.turtle.penup()
 
-<span style="color: #b3b3b3;">rules</span> = [Rule.make(<span style="color: brightblack;">'1'</span>,<span style="color: brightblack;">'11'</span>), Rule.make(<span style="color: brightblack;">'0'</span>,<span style="color: brightblack;">'1[0]0'</span>)]
-<span style="color: #595959;"># </span><span style="color: #595959;">Example of usage of dynamic parameters</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">ls = Lsys(rules, Var.make('0', [2,2,2,0.5])), DynPars(new_pars))</span>
-<span style="color: #b3b3b3;">ls</span> = Lsys(rules, Var.make(<span style="color: brightblack;">'0'</span>))
-<span style="color: #b3b3b3;">t</span> = svg_turtle.SvgTurtle(1000, 1000)
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">go</span>(t, heading=90, pos=(0,0), styles=<span style="color: #7fffd4;">None</span>):
+  <span class="org-type">@contextmanager</span>
+  <span class="org-keyword">def</span> <span class="org-function-name">draw_attrs</span>(<span class="org-keyword">self</span>):
+    <span class="org-variable-name">y</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.ycor()
+    <span class="org-keyword">if</span> <span class="org-keyword">self</span>.y0 <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+      <span class="org-keyword">self</span>.<span class="org-variable-name">y0</span> <span class="org-operator">=</span> y
+      <span class="org-keyword">self</span>.turtle.screen.colormode(255)
+    <span class="org-variable-name">c0</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.pencolor()
+    <span class="org-variable-name">w0</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.width()
+    <span class="org-variable-name">color_step</span> <span class="org-operator">=</span> <span class="org-builtin">abs</span>(y <span class="org-operator">-</span> <span class="org-keyword">self</span>.y0)
+    <span class="org-variable-name">c1</span> <span class="org-operator">=</span> [40, 5 <span class="org-operator">+</span> color_step, 5 <span class="org-operator">+</span> color_step<span class="org-operator">/</span>4]  <span class="org-comment-delimiter"># </span><span class="org-comment">current color</span>
+    <span class="org-variable-name">w1</span> <span class="org-operator">=</span> 20 <span class="org-operator">-</span> <span class="org-builtin">abs</span>(y <span class="org-operator">-</span> <span class="org-keyword">self</span>.y0)<span class="org-operator">/</span>15                <span class="org-comment-delimiter"># </span><span class="org-comment">current width</span>
+    <span class="org-keyword">self</span>.turtle.pencolor(c1)
+    <span class="org-keyword">self</span>.turtle.width(w1)
+    <span class="org-keyword">yield</span> <span class="org-constant">None</span>
+    <span class="org-keyword">self</span>.turtle.pencolor(c0)
+    <span class="org-keyword">self</span>.turtle.width(w0)
+
+  <span class="org-keyword">def</span> <span class="org-function-name">interp_var</span>(<span class="org-keyword">self</span>, var):
+    <span class="org-keyword">if</span> var.name <span class="org-operator">==</span> <span class="org-string">'0'</span>:
+      <span class="org-keyword">self</span>.turtle.forward(2)
+      <span class="org-variable-name">c</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.pencolor()
+      <span class="org-keyword">self</span>.turtle.pencolor(<span class="org-keyword">self</span>.styles.get(<span class="org-string">'berry_color'</span>, <span class="org-string">'red'</span>))
+      <span class="org-keyword">self</span>.turtle.dot(5)
+      <span class="org-keyword">self</span>.turtle.pencolor(c)
+    <span class="org-keyword">elif</span> var.name <span class="org-operator">==</span> <span class="org-string">'1'</span>:
+      <span class="org-keyword">self</span>.turtle.forward(2)
+    <span class="org-keyword">elif</span> var.name <span class="org-operator">==</span> <span class="org-string">'['</span>:
+      <span class="org-variable-name">pos</span>, <span class="org-variable-name">angle</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.pos(), <span class="org-keyword">self</span>.turtle.heading()
+      <span class="org-keyword">self</span>.stack.append((pos, angle))
+      <span class="org-keyword">self</span>.turtle.penup()
+      <span class="org-keyword">self</span>.turtle.left(45)
+      <span class="org-keyword">self</span>.turtle.pendown()
+    <span class="org-keyword">elif</span> var.name <span class="org-operator">==</span> <span class="org-string">']'</span>:
+      <span class="org-variable-name">pos</span>, <span class="org-variable-name">angle</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.stack.pop()
+      <span class="org-keyword">self</span>.turtle.penup()
+      <span class="org-keyword">self</span>.turtle.setpos(pos)
+      <span class="org-keyword">self</span>.turtle.setheading(angle)
+      <span class="org-keyword">self</span>.turtle.right(45)
+      <span class="org-keyword">self</span>.turtle.pendown()
+
+
+<span class="org-comment-delimiter">#############################</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Test 1</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('A','AB'), Rule.make('B','A')]</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('A'))</span>
+<span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('ABAAB'))</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(7)  # WORKS</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">print(r)</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Test 2</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('1','11'), Rule.make('0','1[0]0')]</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('0'))</span>
+<span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('1[0]0'))</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(3)  # WORKS</span>
+<span class="org-comment-delimiter">##</span><span class="org-comment">print(r)</span>
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Just example how to change parameters dynamically</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">def new_pars(old_pars):</span>
+<span class="org-comment-delimiter">#   </span><span class="org-comment">for pars in old_pars:</span>
+<span class="org-comment-delimiter">#     </span><span class="org-comment">if len(pars) == 4:</span>
+<span class="org-comment-delimiter">#       </span><span class="org-comment">r, g, b, thickness = pars</span>
+<span class="org-comment-delimiter">#       </span><span class="org-comment">res = [min(255, r+1), min(255, g+1), min(255, b+1), thickness+0.1]</span>
+<span class="org-comment-delimiter">#       </span><span class="org-comment">yield res</span>
+
+<span class="org-variable-name">rules</span> <span class="org-operator">=</span> [Rule.make(<span class="org-string">'1'</span>,<span class="org-string">'11'</span>), Rule.make(<span class="org-string">'0'</span>,<span class="org-string">'1[0]0'</span>)]
+<span class="org-comment-delimiter"># </span><span class="org-comment">Example of usage of dynamic parameters</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">ls = Lsys(rules, Var.make('0', [2,2,2,0.5])), DynPars(new_pars))</span>
+<span class="org-variable-name">ls</span> <span class="org-operator">=</span> Lsys(rules, Var.make(<span class="org-string">'0'</span>))
+<span class="org-variable-name">t</span> <span class="org-operator">=</span> svg_turtle.SvgTurtle(1000, 1000)
+<span class="org-keyword">def</span> <span class="org-function-name">go</span>(t, heading<span class="org-operator">=</span>90, pos<span class="org-operator">=</span>(0,0), styles<span class="org-operator">=</span><span class="org-constant">None</span>):
   t.penup()
   t.setheading(heading)
-  t.setpos(*pos)
+  t.setpos(<span class="org-operator">*</span>pos)
   t.pendown()
-  <span style="color: #b3b3b3;">pt</span> = PythTree(ls, t, styles=styles)
+  <span class="org-variable-name">pt</span> <span class="org-operator">=</span> PythTree(ls, t, styles<span class="org-operator">=</span>styles)
   pt.render(7)
 go(t)
-t.save_as(<span style="color: brightblack;">'ls.svg'</span>)
+t.save_as(<span class="org-string">'ls.svg'</span>)
 
 </pre>
 </div>

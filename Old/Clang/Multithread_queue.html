@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Multithread queue</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Multithread queue</h1>
-<div id="outline-container-org65a4ccf" class="outline-2">
-<h2 id="org65a4ccf">Multithread queue</h2>
-<div class="outline-text-2" id="text-org65a4ccf">
+<div id="outline-container-orgfa9625b" class="outline-2">
+<h2 id="orgfa9625b">Multithread queue</h2>
+<div class="outline-text-2" id="text-orgfa9625b">
 <p>
 This C module is similar to Python Queue - for multithreading programs. It is based on POSIX Threads and BSD queue.h.
 </p>
@@ -95,47 +220,47 @@ See the code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;assert.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdlib.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"mtqueue.h"</span>
-<span style="color: #b3b3b3;">#ifdef</span> HAVE_LEAKDEBUG
-<span style="color: #b3b3b3;">#  include</span> <span style="color: brightblack;">"cMemDbg.h"</span>
-<span style="color: #b3b3b3;">#endif</span>
-<span style="color: brightblack;">extern</span> <span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">panic</span>(<span style="color: brightblack;">const</span> <span style="color: #cccccc;">char</span> *<span style="color: #b3b3b3;">msg</span>);
-<span style="color: #cccccc;">queue_t</span>*
-<span style="color: #a52a2a;">create_queue</span>(<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">maxlen</span>) {
-        <span style="color: #cccccc;">queue_t</span>* <span style="color: #b3b3b3;">q</span> = (<span style="color: #cccccc;">queue_t</span>*)malloc(<span style="color: brightblack;">sizeof</span> (queue_t));
-        <span style="color: brightblack;">if</span> (!q)
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">alloc_error</span>;
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;assert.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdlib.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"mtqueue.h"</span>
+<span class="org-preprocessor">#ifdef</span> HAVE_LEAKDEBUG
+<span class="org-preprocessor">#  include</span> <span class="org-string">"cMemDbg.h"</span>
+<span class="org-preprocessor">#endif</span>
+<span class="org-keyword">extern</span> <span class="org-type">void</span> <span class="org-function-name">panic</span>(<span class="org-keyword">const</span> <span class="org-type">char</span> *<span class="org-variable-name">msg</span>);
+<span class="org-type">queue_t</span>*
+<span class="org-function-name">create_queue</span>(<span class="org-type">int</span> <span class="org-variable-name">maxlen</span>) {
+        <span class="org-type">queue_t</span>* <span class="org-variable-name">q</span> = (<span class="org-type">queue_t</span>*)malloc(<span class="org-keyword">sizeof</span> (queue_t));
+        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>q)
+                <span class="org-keyword">goto</span> <span class="org-constant">alloc_error</span>;
         SIMPLEQ_INIT(&amp;q-&gt;head);
         q-&gt;len = 0;
-        pthread_mutex_init(&amp;q-&gt;qlock, <span style="color: #7fffd4;">NULL</span>);
+        pthread_mutex_init(&amp;q-&gt;qlock, <span class="org-constant">NULL</span>);
         q-&gt;maxlen = maxlen;
-        <span style="color: brightblack;">return</span> (q);
-<span style="color: #7fffd4;">alloc_error</span>:
-    panic(<span style="color: brightblack;">"Can not allocate queue"</span>);
-    <span style="color: brightblack;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        <span class="org-keyword">return</span> (q);
+<span class="org-constant">alloc_error</span>:
+    panic(<span class="org-string">"Can not allocate queue"</span>);
+    <span class="org-keyword">return</span> (<span class="org-constant">NULL</span>);
 }
-<span style="color: #cccccc;">void</span>
-<span style="color: #a52a2a;">delete_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> (*<span style="color: #a52a2a;">delete_data</span>)(<span style="color: #cccccc;">void</span>*)) {
-        <span style="color: brightblack;">if</span> (q) {
-                clear_queue(q, delete_data); <span style="color: #595959;">// </span><span style="color: #595959;">delete all items from queue</span>
+<span class="org-type">void</span>
+<span class="org-function-name">delete_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*)) {
+        <span class="org-keyword">if</span> (q) {
+                clear_queue(q, delete_data); <span class="org-comment-delimiter">// </span><span class="org-comment">delete all items from queue</span>
                 pthread_mutex_destroy(&amp;q-&gt;qlock);
-                free(q); <span style="color: #595959;">// </span><span style="color: #595959;">free queue</span>
+                free(q); <span class="org-comment-delimiter">// </span><span class="org-comment">free queue</span>
         }
 }
-<span style="color: #cccccc;">void</span>
-<span style="color: #a52a2a;">clear_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> (*<span style="color: #a52a2a;">delete_data</span>)(<span style="color: #cccccc;">void</span>*)) {
-        <span style="color: #cccccc;">qitem_t</span> *<span style="color: #b3b3b3;">itemp</span> = <span style="color: #7fffd4;">NULL</span>;
+<span class="org-type">void</span>
+<span class="org-function-name">clear_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*)) {
+        <span class="org-type">qitem_t</span> *<span class="org-variable-name">itemp</span> = <span class="org-constant">NULL</span>;
         assert(q);
-        <span style="color: brightblack;">if</span> (lock_queue(q)) {
-                panic(<span style="color: brightblack;">"Can not lock the queue qlock"</span>);
-                <span style="color: brightblack;">return</span>;
+        <span class="org-keyword">if</span> (lock_queue(q)) {
+                panic(<span class="org-string">"Can not lock the queue qlock"</span>);
+                <span class="org-keyword">return</span>;
         }
-        <span style="color: brightblack;">while</span> (!SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
+        <span class="org-keyword">while</span> (<span class="org-negation-char">!</span>SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
                 itemp = SIMPLEQ_FIRST(&amp;q-&gt;head);
-                <span style="color: brightblack;">if</span> (itemp) {
-                        <span style="color: brightblack;">if</span> (<span style="color: #cccccc;">delete_data</span> &amp;&amp; <span style="color: #b3b3b3;">itemp</span>-&gt;data)
+                <span class="org-keyword">if</span> (itemp) {
+                        <span class="org-keyword">if</span> (<span class="org-type">delete_data</span> &amp;&amp; <span class="org-variable-name">itemp</span>-&gt;data)
                                 delete_data(itemp-&gt;data);
                         free(itemp);
                 }
@@ -144,67 +269,67 @@ See the code:
         q-&gt;len = 0;
         unlock_queue(q);
 }
-<span style="color: #cccccc;">qerror_t</span>
-<span style="color: #a52a2a;">put_to_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">data</span>) {
-        <span style="color: #cccccc;">qerror_t</span> <span style="color: #b3b3b3;">result</span> = (<span style="color: #cccccc;">qerror_t</span>)0;
-        <span style="color: #cccccc;">qitem_t</span> *<span style="color: #b3b3b3;">item</span> = <span style="color: #7fffd4;">NULL</span>;
+<span class="org-type">qerror_t</span>
+<span class="org-function-name">put_to_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> *<span class="org-variable-name">data</span>) {
+        <span class="org-type">qerror_t</span> <span class="org-variable-name">result</span> = (<span class="org-type">qerror_t</span>)0;
+        <span class="org-type">qitem_t</span> *<span class="org-variable-name">item</span> = <span class="org-constant">NULL</span>;
         lock_queue(q);
-        <span style="color: brightblack;">if</span> (q-&gt;len == q-&gt;maxlen) {
+        <span class="org-keyword">if</span> (q-&gt;len == q-&gt;maxlen) {
                 result = EQUEUEFULL;
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">unlock</span>;
+                <span class="org-keyword">goto</span> <span class="org-constant">unlock</span>;
         }
-        item = (<span style="color: #cccccc;">qitem_t</span>*)malloc(<span style="color: brightblack;">sizeof</span> (qitem_t));
-        <span style="color: brightblack;">if</span> (!item) {
+        item = (<span class="org-type">qitem_t</span>*)malloc(<span class="org-keyword">sizeof</span> (qitem_t));
+        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>item) {
                 result = EQUEUEMEMORY;
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">unlock</span>;
+                <span class="org-keyword">goto</span> <span class="org-constant">unlock</span>;
         }
         item-&gt;data = data;
         SIMPLEQ_INSERT_TAIL(&amp;q-&gt;head, item, items);
         q-&gt;len++;
-<span style="color: #7fffd4;">unlock</span>:
+<span class="org-constant">unlock</span>:
         unlock_queue(q);
-        <span style="color: brightblack;">return</span> (result);
+        <span class="org-keyword">return</span> (result);
 }
-<span style="color: #cccccc;">qerror_t</span>
-<span style="color: #a52a2a;">get_from_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> **<span style="color: #b3b3b3;">dataptr</span>) {
-        <span style="color: #cccccc;">qerror_t</span> <span style="color: #b3b3b3;">result</span> = (<span style="color: #cccccc;">qerror_t</span>)0;
-        <span style="color: #cccccc;">qitem_t</span> *<span style="color: #b3b3b3;">item</span> = <span style="color: #7fffd4;">NULL</span>;
+<span class="org-type">qerror_t</span>
+<span class="org-function-name">get_from_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> **<span class="org-variable-name">dataptr</span>) {
+        <span class="org-type">qerror_t</span> <span class="org-variable-name">result</span> = (<span class="org-type">qerror_t</span>)0;
+        <span class="org-type">qitem_t</span> *<span class="org-variable-name">item</span> = <span class="org-constant">NULL</span>;
         lock_queue(q);
-        <span style="color: brightblack;">if</span> (SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
+        <span class="org-keyword">if</span> (SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
                 result = EQUEUEEMPTY;
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">unlock</span>;
+                <span class="org-keyword">goto</span> <span class="org-constant">unlock</span>;
         }
         item = SIMPLEQ_FIRST(&amp;q-&gt;head);
         *dataptr = item-&gt;data;
         SIMPLEQ_REMOVE_HEAD(&amp;q-&gt;head, items);
         q-&gt;len--;
         free(item);
-<span style="color: #7fffd4;">unlock</span>:
+<span class="org-constant">unlock</span>:
         unlock_queue(q);
-        <span style="color: brightblack;">return</span> (result);
+        <span class="org-keyword">return</span> (result);
 }
-<span style="color: #cccccc;">qerror_t</span>
-<span style="color: #a52a2a;">get_all_from_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> **<span style="color: #b3b3b3;">dataptr</span>, <span style="color: #cccccc;">int</span> *<span style="color: #b3b3b3;">num</span>) {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>;
-        <span style="color: #cccccc;">qerror_t</span> <span style="color: #b3b3b3;">result</span> = (<span style="color: #cccccc;">qerror_t</span>)0;
-        <span style="color: #cccccc;">qitem_t</span> *<span style="color: #b3b3b3;">item</span> = <span style="color: #7fffd4;">NULL</span>;
-        <span style="color: #cccccc;">void</span> **<span style="color: #b3b3b3;">all</span> = <span style="color: #7fffd4;">NULL</span>;
+<span class="org-type">qerror_t</span>
+<span class="org-function-name">get_all_from_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> **<span class="org-variable-name">dataptr</span>, <span class="org-type">int</span> *<span class="org-variable-name">num</span>) {
+        <span class="org-type">int</span> <span class="org-variable-name">i</span>;
+        <span class="org-type">qerror_t</span> <span class="org-variable-name">result</span> = (<span class="org-type">qerror_t</span>)0;
+        <span class="org-type">qitem_t</span> *<span class="org-variable-name">item</span> = <span class="org-constant">NULL</span>;
+        <span class="org-type">void</span> **<span class="org-variable-name">all</span> = <span class="org-constant">NULL</span>;
         lock_queue(q);
-        <span style="color: brightblack;">if</span> (SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
+        <span class="org-keyword">if</span> (SIMPLEQ_EMPTY(&amp;q-&gt;head)) {
                 result = EQUEUEEMPTY;
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">unlock</span>;
+                <span class="org-keyword">goto</span> <span class="org-constant">unlock</span>;
         }
         assert(q-&gt;len);
-        all = malloc(q-&gt;len * <span style="color: brightblack;">sizeof</span> (<span style="color: #cccccc;">void</span>*));
-        <span style="color: brightblack;">if</span> (!all) {
+        all = malloc(q-&gt;len * <span class="org-keyword">sizeof</span> (<span class="org-type">void</span>*));
+        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>all) {
                 result = EQUEUEMEMORY;
-                panic(<span style="color: brightblack;">"Can not allocate result items for get_all_from_queue()"</span>);
-                <span style="color: brightblack;">goto</span> <span style="color: #7fffd4;">unlock</span>;
+                panic(<span class="org-string">"Can not allocate result items for get_all_from_queue()"</span>);
+                <span class="org-keyword">goto</span> <span class="org-constant">unlock</span>;
         }
-        <span style="color: brightblack;">for</span> (i=0; i&lt;q-&gt;len; i++) {
+        <span class="org-keyword">for</span> (i=0; i&lt;q-&gt;len; i++) {
                 item = SIMPLEQ_FIRST(&amp;q-&gt;head);
-                <span style="color: #595959;">//</span><span style="color: #595959;">assert(item);</span>
-                <span style="color: brightblack;">if</span> (!item) <span style="color: brightblack;">break</span>;
+                <span class="org-comment-delimiter">//</span><span class="org-comment">assert(item);</span>
+                <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>item) <span class="org-keyword">break</span>;
                 all[i] = item-&gt;data;
                 SIMPLEQ_REMOVE_HEAD(&amp;q-&gt;head, items);
                 free(item);
@@ -212,9 +337,9 @@ See the code:
         *num = q-&gt;len;
         *dataptr = all;
         q-&gt;len = 0;
-<span style="color: #7fffd4;">unlock</span>:
+<span class="org-constant">unlock</span>:
         unlock_queue(q);
-        <span style="color: brightblack;">return</span> (result);
+        <span class="org-keyword">return</span> (result);
 }
 </pre>
 </div>
@@ -224,36 +349,36 @@ Here is .h file:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _MTQUEUE_H
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_MTQUEUE_H</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;pthread.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;queue.h&gt;</span>
-<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">qitem_t</span> {
-        <span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">data</span>;
-        SIMPLEQ_ENTRY(<span style="color: #cccccc;">qitem_t</span>) items; <span style="color: #595959;">/* </span><span style="color: #595959;">links</span><span style="color: #595959;"> */</span>
-} <span style="color: #cccccc;">qitem_t</span>;
-<span style="color: brightblack;">typedef</span> <span style="color: #cccccc;">SIMPLEQ_HEAD</span>(<span style="color: #cccccc;">qhead_t</span>, <span style="color: #cccccc;">qitem_t</span>) qhead_t;
-<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">queue_t</span> {
-        <span style="color: #cccccc;">qhead_t</span> <span style="color: #b3b3b3;">head</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">len</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">maxlen</span>;
-        <span style="color: #cccccc;">pthread_mutex_t</span> <span style="color: #b3b3b3;">qlock</span>;
-} <span style="color: #cccccc;">queue_t</span>;
-<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">enum</span> <span style="color: #cccccc;">qerror_t</span> {
-        <span style="color: #b3b3b3;">EQUEUEFULL</span> = 1,
-        <span style="color: #b3b3b3;">EQUEUEEMPTY</span>,
-        <span style="color: #b3b3b3;">EQUEUEMEMORY</span>
-} <span style="color: #cccccc;">qerror_t</span>;
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">FREE_QDATA</span> free
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">lock_queue</span>(<span style="color: #b3b3b3;">q</span>) pthread_mutex_lock(&amp;(q)-&gt;qlock)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">unlock_queue</span>(<span style="color: #b3b3b3;">q</span>) pthread_mutex_unlock(&amp;(q)-&gt;qlock)
-<span style="color: #cccccc;">queue_t</span>* <span style="color: #a52a2a;">create_queue</span>(<span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">maxlen</span>);
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">delete_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> (*<span style="color: #a52a2a;">delete_data</span>)(<span style="color: #cccccc;">void</span>*));
-<span style="color: #cccccc;">qerror_t</span> <span style="color: #a52a2a;">put_to_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">data</span>);
-<span style="color: #cccccc;">qerror_t</span> <span style="color: #a52a2a;">get_from_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> **<span style="color: #b3b3b3;">dataptr</span>);
-<span style="color: #cccccc;">qerror_t</span> <span style="color: #a52a2a;">get_all_from_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> **<span style="color: #b3b3b3;">dataptr</span>, <span style="color: #cccccc;">int</span> *<span style="color: #b3b3b3;">num</span>);
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">clear_queue</span>(<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span>, <span style="color: #cccccc;">void</span> (*<span style="color: #a52a2a;">delete_data</span>)(<span style="color: #cccccc;">void</span>*));
-<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/*</span><span style="color: #595959;">!_MTQUEUE_H</span><span style="color: #595959;">*/</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _MTQUEUE_H
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">_MTQUEUE_H</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;pthread.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;queue.h&gt;</span>
+<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">qitem_t</span> {
+        <span class="org-type">void</span> *<span class="org-variable-name">data</span>;
+        SIMPLEQ_ENTRY(<span class="org-type">qitem_t</span>) items; <span class="org-comment-delimiter">/* </span><span class="org-comment">links</span><span class="org-comment-delimiter"> */</span>
+} <span class="org-type">qitem_t</span>;
+<span class="org-keyword">typedef</span> <span class="org-type">SIMPLEQ_HEAD</span>(<span class="org-type">qhead_t</span>, <span class="org-type">qitem_t</span>) qhead_t;
+<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">queue_t</span> {
+        <span class="org-type">qhead_t</span> <span class="org-variable-name">head</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">len</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">maxlen</span>;
+        <span class="org-type">pthread_mutex_t</span> <span class="org-variable-name">qlock</span>;
+} <span class="org-type">queue_t</span>;
+<span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">qerror_t</span> {
+        <span class="org-variable-name">EQUEUEFULL</span> = 1,
+        <span class="org-variable-name">EQUEUEEMPTY</span>,
+        <span class="org-variable-name">EQUEUEMEMORY</span>
+} <span class="org-type">qerror_t</span>;
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">FREE_QDATA</span> free
+<span class="org-preprocessor">#define</span> <span class="org-function-name">lock_queue</span>(<span class="org-variable-name">q</span>) pthread_mutex_lock(&amp;(q)-&gt;qlock)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">unlock_queue</span>(<span class="org-variable-name">q</span>) pthread_mutex_unlock(&amp;(q)-&gt;qlock)
+<span class="org-type">queue_t</span>* <span class="org-function-name">create_queue</span>(<span class="org-type">int</span> <span class="org-variable-name">maxlen</span>);
+<span class="org-type">void</span> <span class="org-function-name">delete_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*));
+<span class="org-type">qerror_t</span> <span class="org-function-name">put_to_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> *<span class="org-variable-name">data</span>);
+<span class="org-type">qerror_t</span> <span class="org-function-name">get_from_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> **<span class="org-variable-name">dataptr</span>);
+<span class="org-type">qerror_t</span> <span class="org-function-name">get_all_from_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> **<span class="org-variable-name">dataptr</span>, <span class="org-type">int</span> *<span class="org-variable-name">num</span>);
+<span class="org-type">void</span> <span class="org-function-name">clear_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*));
+<span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/*</span><span class="org-comment">!_MTQUEUE_H</span><span class="org-comment-delimiter">*/</span>
 </pre>
 </div>
 
@@ -262,104 +387,104 @@ And an example of the usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;assert.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdio.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdlib.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"mtqueue.h"</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"delays.h"</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">NCICLES</span> 200
-<span style="color: #cccccc;">queue_t</span> *<span style="color: #b3b3b3;">q</span> = <span style="color: #7fffd4;">NULL</span>;
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">panic</span>(<span style="color: #cccccc;">char</span> *<span style="color: #b3b3b3;">msg</span>){
-        printf(<span style="color: brightblack;">"PANIC: %s\n"</span>, msg);
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;assert.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdio.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdlib.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"mtqueue.h"</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"delays.h"</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">NCICLES</span> 200
+<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span> = <span class="org-constant">NULL</span>;
+<span class="org-type">void</span> <span class="org-function-name">panic</span>(<span class="org-type">char</span> *<span class="org-variable-name">msg</span>){
+        printf(<span class="org-string">"PANIC: %s\n"</span>, msg);
         exit(1);
 }
-<span style="color: #595959;">/* </span><span style="color: #595959;">Thread of putting an elements to queue.</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #cccccc;">void</span>* <span style="color: #a52a2a;">thrput</span>(<span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">arg</span>) {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">n</span>;
-        <span style="color: #cccccc;">int</span> *<span style="color: #b3b3b3;">data</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span> = *(<span style="color: #cccccc;">int</span>*)arg;
-        <span style="color: brightblack;">while</span> (i--) {
-                printf(<span style="color: brightblack;">"put #%d\n"</span>, i);
+<span class="org-comment-delimiter">/* </span><span class="org-comment">Thread of putting an elements to queue.</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-type">void</span>* <span class="org-function-name">thrput</span>(<span class="org-type">void</span> *<span class="org-variable-name">arg</span>) {
+        <span class="org-type">int</span> <span class="org-variable-name">n</span>;
+        <span class="org-type">int</span> *<span class="org-variable-name">data</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">i</span> = *(<span class="org-type">int</span>*)arg;
+        <span class="org-keyword">while</span> (i--) {
+                printf(<span class="org-string">"put #%d\n"</span>, i);
                 n = NCICLES;
-                <span style="color: brightblack;">while</span> (n--) {
-                        data = (<span style="color: #cccccc;">int</span>*)malloc(<span style="color: brightblack;">sizeof</span> (<span style="color: #cccccc;">int</span>)); <span style="color: #595959;">/* </span><span style="color: #595959;">msg in heap!</span><span style="color: #595959;"> */</span>
-                        <span style="color: brightblack;">if</span> (!data) {
-                                panic(<span style="color: brightblack;">"Can not allocate data for put"</span>);
+                <span class="org-keyword">while</span> (n--) {
+                        data = (<span class="org-type">int</span>*)malloc(<span class="org-keyword">sizeof</span> (<span class="org-type">int</span>)); <span class="org-comment-delimiter">/* </span><span class="org-comment">msg in heap!</span><span class="org-comment-delimiter"> */</span>
+                        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>data) {
+                                panic(<span class="org-string">"Can not allocate data for put"</span>);
                         }
                         *data = i*NCICLES + n;
-                        <span style="color: brightblack;">while</span> (put_to_queue(q, (<span style="color: #cccccc;">void</span>*)data)) {
-                            printf(<span style="color: brightblack;">"*** ERROR: queue is full!\n"</span>);
-                            <span style="color: #595959;">// </span><span style="color: #595959;">wait 1 sec and try again</span>
+                        <span class="org-keyword">while</span> (put_to_queue(q, (<span class="org-type">void</span>*)data)) {
+                            printf(<span class="org-string">"*** ERROR: queue is full!\n"</span>);
+                            <span class="org-comment-delimiter">// </span><span class="org-comment">wait 1 sec and try again</span>
                             pthread_delay(1000);
                         }
                 }
         }
 }
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">thrget1</span>() {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">num</span> = 0;
-        <span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">data</span> = <span style="color: #7fffd4;">NULL</span>;
-        <span style="color: #cccccc;">int</span>** <span style="color: #b3b3b3;">idata</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">prev</span> = -1;
-        <span style="color: brightblack;">while</span> (1) {
-                data = <span style="color: #7fffd4;">NULL</span>;
-                <span style="color: brightblack;">if</span> (get_all_from_queue(q, &amp;data, &amp;num)) {
+<span class="org-type">void</span> <span class="org-function-name">thrget1</span>() {
+        <span class="org-type">int</span> <span class="org-variable-name">i</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">num</span> = 0;
+        <span class="org-type">void</span> *<span class="org-variable-name">data</span> = <span class="org-constant">NULL</span>;
+        <span class="org-type">int</span>** <span class="org-variable-name">idata</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">prev</span> = -1;
+        <span class="org-keyword">while</span> (1) {
+                data = <span class="org-constant">NULL</span>;
+                <span class="org-keyword">if</span> (get_all_from_queue(q, &amp;data, &amp;num)) {
                         pthread_delay(2000);
-                        <span style="color: brightblack;">if</span> (!q-&gt;len)
-                                <span style="color: brightblack;">break</span>;
-                        <span style="color: brightblack;">else</span>
-                                <span style="color: brightblack;">continue</span>;
+                        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>q-&gt;len)
+                                <span class="org-keyword">break</span>;
+                        <span class="org-keyword">else</span>
+                                <span class="org-keyword">continue</span>;
                 }
-                printf(<span style="color: brightblack;">"get_all_from_queue num=%d\n"</span>, num);
-                idata = (<span style="color: #cccccc;">int</span>**)data;
-                <span style="color: brightblack;">for</span> (i=0; i&lt;num; i++) {
-                        printf(<span style="color: brightblack;">"got %d (prev=%d)\n"</span>, *idata[i], prev);
+                printf(<span class="org-string">"get_all_from_queue num=%d\n"</span>, num);
+                idata = (<span class="org-type">int</span>**)data;
+                <span class="org-keyword">for</span> (i=0; i&lt;num; i++) {
+                        printf(<span class="org-string">"got %d (prev=%d)\n"</span>, *idata[i], prev);
                         assert(prev==-1 || prev-*idata[i]==1);
                         prev = *idata[i];
                         free(idata[i]);
                 }
                 free(data);
         }
-<span style="color: #7fffd4;">end</span>:
-        <span style="color: brightblack;">return</span>;
+<span class="org-constant">end</span>:
+        <span class="org-keyword">return</span>;
 }
 
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">thrget2</span>() {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">prev</span> = -1;
-        <span style="color: #cccccc;">int</span> *<span style="color: #b3b3b3;">data</span>;
-        <span style="color: brightblack;">while</span> (1) {
-                <span style="color: brightblack;">if</span> (get_from_queue(q, (<span style="color: #cccccc;">void</span>**)&amp;data)) {
+<span class="org-type">void</span> <span class="org-function-name">thrget2</span>() {
+        <span class="org-type">int</span> <span class="org-variable-name">prev</span> = -1;
+        <span class="org-type">int</span> *<span class="org-variable-name">data</span>;
+        <span class="org-keyword">while</span> (1) {
+                <span class="org-keyword">if</span> (get_from_queue(q, (<span class="org-type">void</span>**)&amp;data)) {
                         pthread_delay(2000);
-                        <span style="color: brightblack;">if</span> (!q&gt;len)
-                                <span style="color: brightblack;">break</span>;
-                        <span style="color: brightblack;">else</span>
-                                <span style="color: brightblack;">continue</span>;
+                        <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>q&gt;len)
+                                <span class="org-keyword">break</span>;
+                        <span class="org-keyword">else</span>
+                                <span class="org-keyword">continue</span>;
                 }
-                printf(<span style="color: brightblack;">"got %d (prev=%d)\n"</span>, *data, prev);
+                printf(<span class="org-string">"got %d (prev=%d)\n"</span>, *data, prev);
                 assert(prev==-1 || prev-*data==1);
                 prev = *data;
                 free(data);
         }
 }
-<span style="color: #cccccc;">void</span> *<span style="color: #a52a2a;">thrget</span>(<span style="color: #cccccc;">void</span> *<span style="color: #b3b3b3;">arg</span>) {
-        thrget2(); <span style="color: #595959;">// </span><span style="color: #595959;">first, get all until NULL</span>
-        thrget1(); <span style="color: #595959;">// </span><span style="color: #595959;">then get one by one until NULL</span>
+<span class="org-type">void</span> *<span class="org-function-name">thrget</span>(<span class="org-type">void</span> *<span class="org-variable-name">arg</span>) {
+        thrget2(); <span class="org-comment-delimiter">// </span><span class="org-comment">first, get all until NULL</span>
+        thrget1(); <span class="org-comment-delimiter">// </span><span class="org-comment">then get one by one until NULL</span>
 }
-<span style="color: #cccccc;">void</span>
-<span style="color: #a52a2a;">main</span>() {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">n</span> = 2;
-        <span style="color: #cccccc;">pthread_t</span> <span style="color: #b3b3b3;">thrput_id</span>, <span style="color: #b3b3b3;">thrget_id</span>;
-        q = create_queue(200); <span style="color: #595959;">// </span><span style="color: #595959;">size of queue</span>
-        pthread_create(&amp;thrput_id, <span style="color: #7fffd4;">NULL</span>, thrput, (<span style="color: #cccccc;">void</span>*)&amp;n);
-        pthread_create(&amp;thrget_id, <span style="color: #7fffd4;">NULL</span>, thrget, <span style="color: #7fffd4;">NULL</span>);
-        <span style="color: #595959;">// </span><span style="color: #595959;">wait finishing of the threads</span>
-        pthread_join(thrget_id, <span style="color: #7fffd4;">NULL</span>);
-        pthread_join(thrput_id, <span style="color: #7fffd4;">NULL</span>);
+<span class="org-type">void</span>
+<span class="org-function-name">main</span>() {
+        <span class="org-type">int</span> <span class="org-variable-name">n</span> = 2;
+        <span class="org-type">pthread_t</span> <span class="org-variable-name">thrput_id</span>, <span class="org-variable-name">thrget_id</span>;
+        q = create_queue(200); <span class="org-comment-delimiter">// </span><span class="org-comment">size of queue</span>
+        pthread_create(&amp;thrput_id, <span class="org-constant">NULL</span>, thrput, (<span class="org-type">void</span>*)&amp;n);
+        pthread_create(&amp;thrget_id, <span class="org-constant">NULL</span>, thrget, <span class="org-constant">NULL</span>);
+        <span class="org-comment-delimiter">// </span><span class="org-comment">wait finishing of the threads</span>
+        pthread_join(thrget_id, <span class="org-constant">NULL</span>);
+        pthread_join(thrput_id, <span class="org-constant">NULL</span>);
         delete_queue(q, FREE_QDATA);
-<span style="color: #b3b3b3;">#ifdef</span> HAVE_LEAKDEBUG
+<span class="org-preprocessor">#ifdef</span> HAVE_LEAKDEBUG
         PrintMemoryLeakInfo();
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-preprocessor">#endif</span>
 }
 </pre>
 </div>

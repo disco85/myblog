@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR32/ASF: ANSI terminal on UART</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,81 +194,81 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR32/ASF: ANSI terminal on UART</h1>
-<div id="outline-container-org6a8ffe6" class="outline-2">
-<h2 id="org6a8ffe6">AVR32/ASF: ANSI terminal on UART</h2>
-<div class="outline-text-2" id="text-org6a8ffe6">
+<div id="outline-container-orgac73cda" class="outline-2">
+<h2 id="orgac73cda">AVR32/ASF: ANSI terminal on UART</h2>
+<div class="outline-text-2" id="text-orgac73cda">
 <p>
 It's good known goal - to run terminal (with some kind of shell) of one (or all) of the UARTs. This snippet shows how to process input byte from UART and to emulate ANSI terminal behavior:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: brightblack;">/**</span>
-<span style="color: brightblack;"> * Handle input byte via USART; process it to emulate edit line behaviour.</span>
-<span style="color: brightblack;"> * After processing, sets self-&gt;response array to 4 possible responses (until</span>
-<span style="color: brightblack;"> * one is NULL). </span><span style="color: #7fffd4;">sh_task()</span><span style="color: brightblack;"> will send these responses via UART...</span>
-<span style="color: brightblack;"> * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user</span>
-<span style="color: brightblack;"> * terminal should be in ANSI TERM mode. Supported:</span>
-<span style="color: brightblack;"> * - BS/DEL - delete prev. char</span>
-<span style="color: brightblack;"> * - ^U - delete entire line</span>
-<span style="color: brightblack;"> * - ^L - clear screen but keep edited line</span>
-<span style="color: brightblack;"> * - TAB - changed to SPACE</span>
-<span style="color: brightblack;"> * On error sends BEL ('\7')</span>
-<span style="color: brightblack;"> */</span>
-<span style="color: #cccccc;">void</span> <span style="color: #a52a2a;">handle_input_byte</span>(<span style="color: #cccccc;">sh_t</span> *<span style="color: #b3b3b3;">self</span>, <span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">ch</span>)
+<pre class="src src-cpp"><span class="org-doc">/**</span>
+<span class="org-doc"> * Handle input byte via USART; process it to emulate edit line behaviour.</span>
+<span class="org-doc"> * After processing, sets self-&gt;response array to 4 possible responses (until</span>
+<span class="org-doc"> * one is NULL). </span><span class="org-doc"><span class="org-doc-markup">sh_task()</span></span><span class="org-doc"> will send these responses via UART...</span>
+<span class="org-doc"> * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user</span>
+<span class="org-doc"> * terminal should be in ANSI TERM mode. Supported:</span>
+<span class="org-doc"> * - BS/DEL - delete prev. char</span>
+<span class="org-doc"> * - ^U - delete entire line</span>
+<span class="org-doc"> * - ^L - clear screen but keep edited line</span>
+<span class="org-doc"> * - TAB - changed to SPACE</span>
+<span class="org-doc"> * On error sends BEL ('\7')</span>
+<span class="org-doc"> */</span>
+<span class="org-type">void</span> <span class="org-function-name">handle_input_byte</span>(<span class="org-type">sh_t</span> *<span class="org-variable-name">self</span>, <span class="org-type">uint8_t</span> <span class="org-variable-name">ch</span>)
 {
-    <span style="color: brightblack;">switch</span> (ch) {
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\r'</span>:
-            ch = <span style="color: brightblack;">'\n'</span>;
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\n'</span>:
+    <span class="org-keyword">switch</span> (ch) {
+        <span class="org-keyword">case</span> <span class="org-string">'\r'</span>:
+            ch = <span class="org-string">'\n'</span>;
+        <span class="org-keyword">case</span> <span class="org-string">'\n'</span>:
             self-&gt;inpos = 0;
             self-&gt;inbuf[0] = 0;
-            _SETRESP(self, <span style="color: brightblack;">"\r\n"</span>, self-&gt;promptbuf, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
-        <span style="color: brightblack;">break</span>;
+            _SETRESP(self, <span class="org-string">"\r\n"</span>, self-&gt;promptbuf, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
+        <span class="org-keyword">break</span>;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">backspace, del</span><span style="color: #595959;"> */</span>
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\b'</span>:
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\x7f'</span>:
-            <span style="color: brightblack;">if</span> (self-&gt;inpos &gt; 0) {
+        <span class="org-comment-delimiter">/* </span><span class="org-comment">backspace, del</span><span class="org-comment-delimiter"> */</span>
+        <span class="org-keyword">case</span> <span class="org-string">'\b'</span>:
+        <span class="org-keyword">case</span> <span class="org-string">'\x7f'</span>:
+            <span class="org-keyword">if</span> (self-&gt;inpos &gt; 0) {
                 self-&gt;inpos--;
                 self-&gt;inbuf[self-&gt;inpos] = 0;
-                _SETRESP(self, <span style="color: brightblack;">"\b \b"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
-            } <span style="color: brightblack;">else</span> {
-                _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+                _SETRESP(self, <span class="org-string">"\b \b"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
+            } <span class="org-keyword">else</span> {
+                _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
             }
-        <span style="color: brightblack;">break</span>;
+        <span class="org-keyword">break</span>;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">^U - del line</span><span style="color: #595959;"> */</span>
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'u'</span> &amp; 0x1f:
+        <span class="org-comment-delimiter">/* </span><span class="org-comment">^U - del line</span><span class="org-comment-delimiter"> */</span>
+        <span class="org-keyword">case</span> <span class="org-string">'u'</span> &amp; 0x1f:
             self-&gt;inpos = 0;
             self-&gt;inbuf[self-&gt;inpos] = 0;
-            _SETRESP(self, <span style="color: brightblack;">"\x1B[2K\r"</span>, self-&gt;promptbuf, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
-        <span style="color: brightblack;">break</span>;
+            _SETRESP(self, <span class="org-string">"\x1B[2K\r"</span>, self-&gt;promptbuf, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
+        <span class="org-keyword">break</span>;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">^L - clear screen</span><span style="color: #595959;"> */</span>
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'l'</span> &amp; 0x1f:
-            _SETRESP(self, <span style="color: brightblack;">"\x1B[2J\x1B[H"</span>, self-&gt;promptbuf, self-&gt;inbuf, <span style="color: #7fffd4;">NULL</span>);
-        <span style="color: brightblack;">break</span>;
+        <span class="org-comment-delimiter">/* </span><span class="org-comment">^L - clear screen</span><span class="org-comment-delimiter"> */</span>
+        <span class="org-keyword">case</span> <span class="org-string">'l'</span> &amp; 0x1f:
+            _SETRESP(self, <span class="org-string">"\x1B[2J\x1B[H"</span>, self-&gt;promptbuf, self-&gt;inbuf, <span class="org-constant">NULL</span>);
+        <span class="org-keyword">break</span>;
 
-        <span style="color: #595959;">/* </span><span style="color: #595959;">all other chars</span><span style="color: #595959;"> */</span>
-        <span style="color: brightblack;">case</span> <span style="color: brightblack;">'\t'</span>:
-            ch = <span style="color: brightblack;">' '</span>;
-        <span style="color: brightblack;">default</span>:
-            <span style="color: brightblack;">if</span> ((ch &gt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">' '</span> &amp;&amp; ch &lt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">'\x7e'</span>)
-                            || ch &gt;= (<span style="color: #cccccc;">uint8_t</span>)<span style="color: brightblack;">'\xa0'</span>) {
-                <span style="color: #595959;">// </span><span style="color: #595959;">printable</span>
-                <span style="color: brightblack;">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
-                    <span style="color: #595959;">// </span><span style="color: #595959;">in bounds (-2 is for ch, -1 is for '\0')</span>
+        <span class="org-comment-delimiter">/* </span><span class="org-comment">all other chars</span><span class="org-comment-delimiter"> */</span>
+        <span class="org-keyword">case</span> <span class="org-string">'\t'</span>:
+            ch = <span class="org-string">' '</span>;
+        <span class="org-keyword">default</span>:
+            <span class="org-keyword">if</span> ((ch &gt;= (<span class="org-type">uint8_t</span>)<span class="org-string">' '</span> &amp;&amp; ch &lt;= (<span class="org-type">uint8_t</span>)<span class="org-string">'\x7e'</span>)
+                            || ch &gt;= (<span class="org-type">uint8_t</span>)<span class="org-string">'\xa0'</span>) {
+                <span class="org-comment-delimiter">// </span><span class="org-comment">printable</span>
+                <span class="org-keyword">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
+                    <span class="org-comment-delimiter">// </span><span class="org-comment">in bounds (-2 is for ch, -1 is for '\0')</span>
                     self-&gt;inbuf[self-&gt;inpos++] = ch;
                     self-&gt;inbuf[self-&gt;inpos] = 0;
-                    _SETRESP(self, self-&gt;inbuf + (self-&gt;inpos-1), <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
-                } <span style="color: brightblack;">else</span> {
-                    _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+                    _SETRESP(self, self-&gt;inbuf + (self-&gt;inpos-1), <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
+                } <span class="org-keyword">else</span> {
+                    _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
                 }
-            } <span style="color: brightblack;">else</span> {
-                <span style="color: #595959;">// </span><span style="color: #595959;">non-printable</span>
-                _SETRESP(self, <span style="color: brightblack;">"\a"</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>, <span style="color: #7fffd4;">NULL</span>);
+            } <span class="org-keyword">else</span> {
+                <span class="org-comment-delimiter">// </span><span class="org-comment">non-printable</span>
+                _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
             }
-        <span style="color: brightblack;">break</span>;
+        <span class="org-keyword">break</span>;
     }
 }
 </pre>

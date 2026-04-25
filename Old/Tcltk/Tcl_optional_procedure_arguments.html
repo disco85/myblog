@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl: optional procedure arguments</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,18 +194,18 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl: optional procedure arguments</h1>
-<div id="outline-container-orgcf68e46" class="outline-2">
-<h2 id="orgcf68e46">Tcl: optional procedure arguments</h2>
-<div class="outline-text-2" id="text-orgcf68e46">
+<div id="outline-container-orgf078f63" class="outline-2">
+<h2 id="orgf078f63">Tcl: optional procedure arguments</h2>
+<div class="outline-text-2" id="text-orgf078f63">
 <p>
 They are very usable in many language. For example in Python:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">f</span>(a, b=0, **kw):
-  <span style="color: #b3b3b3;">print</span> kw
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">f</span>(a, b<span class="org-operator">=</span>0, <span class="org-operator">**</span>kw):
+  <span class="org-builtin">print</span> kw
 
-f(1, 2, x=10, y=20)
+f(1, 2, x<span class="org-operator">=</span>10, y<span class="org-operator">=</span>20)
 </pre>
 </div>
 
@@ -93,76 +218,76 @@ For Tcl it's easy to write procedure for processing keyword arguments (like geto
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">getargs</span> {argsName kwArgsName arguments} {
-<span style="color: #595959;"># </span><span style="color: #595959;">like getopt for proc/method, ex:</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">1) argsName may be ""|{} - to avoid positional args saving</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">2) if no value of keyword argument, then it's value will be "Y"</span>
+<pre class="src src-tcl"><span class="org-keyword">proc</span> <span class="org-function-name">getargs</span> {argsName kwArgsName arguments} {
+<span class="org-comment-delimiter"># </span><span class="org-comment">like getopt for proc/method, ex:</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">1) argsName may be ""|{} - to avoid positional args saving</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">2) if no value of keyword argument, then it's value will be "Y"</span>
 
-    <span style="color: #cccccc;">upvar</span> 1 $<span style="color: #b3b3b3;">kwArgsName</span> kwargs
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">posargs</span> {}
+    <span class="org-type">upvar</span> 1 $<span class="org-variable-name">kwArgsName</span> kwargs
+    <span class="org-builtin">set</span> <span class="org-variable-name">posargs</span> {}
 
-    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">isKw</span> opt {
-        <span style="color: brightblack;">return</span> [<span style="color: #b3b3b3;">expr</span> {<span style="color: brightblack;">"-"</span> eq [<span style="color: #b3b3b3;">string</span> index $<span style="color: #b3b3b3;">opt</span> 0]}]
+    <span class="org-keyword">proc</span> <span class="org-function-name">isKw</span> opt {
+        <span class="org-keyword">return</span> [<span class="org-builtin">expr</span> {<span class="org-string">"-"</span> eq [<span class="org-builtin">string</span> index $<span class="org-variable-name">opt</span> 0]}]
     }
-    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">setPosArg</span> opt {
-        <span style="color: #cccccc;">upvar</span> 1 posargs posargs
-        <span style="color: #b3b3b3;">lappend</span> posargs $<span style="color: #b3b3b3;">opt</span>
+    <span class="org-keyword">proc</span> <span class="org-function-name">setPosArg</span> opt {
+        <span class="org-type">upvar</span> 1 posargs posargs
+        <span class="org-builtin">lappend</span> posargs $<span class="org-variable-name">opt</span>
     }
-    <span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">setKwArg</span> {name val} {
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">ret</span> <span style="color: brightblack;">"@NOMORE"</span>; <span style="color: #595959;"># used or not $val, it's possible positional opt</span>
-        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">name</span> ne <span style="color: brightblack;">""</span>} {
-            <span style="color: #cccccc;">upvar</span> 1 kwargs kwargs
-            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">defaultValue</span> [<span style="color: #b3b3b3;">lindex</span> [<span style="color: #b3b3b3;">array</span> get kwargs $<span style="color: #b3b3b3;">name</span>] end]
-            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">defaultValue</span> <span style="color: brightblack;">in</span> {<span style="color: brightblack;">"Y"</span> <span style="color: brightblack;">"N"</span>}} {
-                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">val</span> eq <span style="color: brightblack;">""</span>} {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">val</span> <span style="color: brightblack;">"Y"</span>
-                } <span style="color: brightblack;">elseif</span> {$<span style="color: #b3b3b3;">val</span> ni {<span style="color: brightblack;">"Y"</span> <span style="color: brightblack;">"N"</span>}} {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">ret</span> $<span style="color: #b3b3b3;">val</span>
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">val</span> <span style="color: brightblack;">"Y"</span>
+    <span class="org-keyword">proc</span> <span class="org-function-name">setKwArg</span> {name val} {
+        <span class="org-builtin">set</span> <span class="org-variable-name">ret</span> <span class="org-string">"@NOMORE"</span>; <span class="org-comment"># used or not $val, it's possible positional opt</span>
+        <span class="org-keyword">if</span> {$<span class="org-variable-name">name</span> ne <span class="org-string">""</span>} {
+            <span class="org-type">upvar</span> 1 kwargs kwargs
+            <span class="org-builtin">set</span> <span class="org-variable-name">defaultValue</span> [<span class="org-builtin">lindex</span> [<span class="org-builtin">array</span> get kwargs $<span class="org-variable-name">name</span>] end]
+            <span class="org-keyword">if</span> {$<span class="org-variable-name">defaultValue</span> <span class="org-keyword">in</span> {<span class="org-string">"Y"</span> <span class="org-string">"N"</span>}} {
+                <span class="org-keyword">if</span> {$<span class="org-variable-name">val</span> eq <span class="org-string">""</span>} {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">val</span> <span class="org-string">"Y"</span>
+                } <span class="org-keyword">elseif</span> {$<span class="org-variable-name">val</span> ni {<span class="org-string">"Y"</span> <span class="org-string">"N"</span>}} {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">ret</span> $<span class="org-variable-name">val</span>
+                    <span class="org-builtin">set</span> <span class="org-variable-name">val</span> <span class="org-string">"Y"</span>
                 }
             }
-            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">kwargs</span>($<span style="color: #b3b3b3;">name</span>) $<span style="color: #b3b3b3;">val</span>
+            <span class="org-builtin">set</span> <span class="org-variable-name">kwargs</span>($<span class="org-variable-name">name</span>) $<span class="org-variable-name">val</span>
         }
-        <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">ret</span>
+        <span class="org-keyword">return</span> $<span class="org-variable-name">ret</span>
     }
 
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">kw</span> <span style="color: brightblack;">""</span>
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">state</span> OPT; <span style="color: #595959;"># OPT|VAL|END</span>
-    <span style="color: #b3b3b3;">lappend</span> arguments <span style="color: brightblack;">"@EOO"</span>
-    <span style="color: brightblack;">foreach</span> opt $<span style="color: #b3b3b3;">arguments</span> {
-        <span style="color: brightblack;">switch</span> -- $<span style="color: #b3b3b3;">state</span> {
+    <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> <span class="org-string">""</span>
+    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> OPT; <span class="org-comment"># OPT|VAL|END</span>
+    <span class="org-builtin">lappend</span> arguments <span class="org-string">"@EOO"</span>
+    <span class="org-keyword">foreach</span> opt $<span class="org-variable-name">arguments</span> {
+        <span class="org-keyword">switch</span> -- $<span class="org-variable-name">state</span> {
             OPT {
-                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">opt</span> eq <span style="color: brightblack;">"@EOO"</span>} {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">state</span> END
-                } <span style="color: brightblack;">elseif</span> {[isKw $<span style="color: #b3b3b3;">opt</span>]} {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">kw</span> $<span style="color: #b3b3b3;">opt</span>
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">state</span> VAL
-                } <span style="color: brightblack;">else</span> {
-                    setPosArg $<span style="color: #b3b3b3;">opt</span>
+                <span class="org-keyword">if</span> {$<span class="org-variable-name">opt</span> eq <span class="org-string">"@EOO"</span>} {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> END
+                } <span class="org-keyword">elseif</span> {[isKw $<span class="org-variable-name">opt</span>]} {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> $<span class="org-variable-name">opt</span>
+                    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> VAL
+                } <span class="org-keyword">else</span> {
+                    setPosArg $<span class="org-variable-name">opt</span>
                 }
             }
 
             VAL {
-                <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">opt</span> eq <span style="color: brightblack;">"@EOO"</span>} {
-                    setKwArg $<span style="color: #b3b3b3;">kw</span> <span style="color: brightblack;">""</span>
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">state</span> END
-                } <span style="color: brightblack;">elseif</span> {[isKw $<span style="color: #b3b3b3;">opt</span>]} {
-                    setKwArg $<span style="color: #b3b3b3;">kw</span> <span style="color: brightblack;">""</span>
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">kw</span> $<span style="color: #b3b3b3;">opt</span>
-                } <span style="color: brightblack;">else</span> {
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">maybePos</span> [setKwArg $<span style="color: #b3b3b3;">kw</span> $<span style="color: #b3b3b3;">opt</span>]
-                    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">maybePos</span> ne <span style="color: brightblack;">"@NOMORE"</span>} { setPosArg $<span style="color: #b3b3b3;">maybePos</span> }
-                    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">state</span> OPT
+                <span class="org-keyword">if</span> {$<span class="org-variable-name">opt</span> eq <span class="org-string">"@EOO"</span>} {
+                    setKwArg $<span class="org-variable-name">kw</span> <span class="org-string">""</span>
+                    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> END
+                } <span class="org-keyword">elseif</span> {[isKw $<span class="org-variable-name">opt</span>]} {
+                    setKwArg $<span class="org-variable-name">kw</span> <span class="org-string">""</span>
+                    <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> $<span class="org-variable-name">opt</span>
+                } <span class="org-keyword">else</span> {
+                    <span class="org-builtin">set</span> <span class="org-variable-name">maybePos</span> [setKwArg $<span class="org-variable-name">kw</span> $<span class="org-variable-name">opt</span>]
+                    <span class="org-keyword">if</span> {$<span class="org-variable-name">maybePos</span> ne <span class="org-string">"@NOMORE"</span>} { setPosArg $<span class="org-variable-name">maybePos</span> }
+                    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> OPT
                 }
             }
 
-            END { <span style="color: brightblack;">break</span>; }
+            END { <span class="org-keyword">break</span>; }
         }
     }
 
-    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">argsName</span> ne <span style="color: brightblack;">""</span>} {
-        <span style="color: #cccccc;">upvar</span> 1 $<span style="color: #b3b3b3;">argsName</span> _posargs
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">_posargs</span> $<span style="color: #b3b3b3;">posargs</span>
+    <span class="org-keyword">if</span> {$<span class="org-variable-name">argsName</span> ne <span class="org-string">""</span>} {
+        <span class="org-type">upvar</span> 1 $<span class="org-variable-name">argsName</span> _posargs
+        <span class="org-builtin">set</span> <span class="org-variable-name">_posargs</span> $<span class="org-variable-name">posargs</span>
     }
 }
 </pre>
@@ -173,14 +298,14 @@ Here is the example how to use:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">args</span> {}; <span style="color: #595959;"># positional args</span>
-<span style="color: #b3b3b3;">array</span> <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">kw</span> {-a 1 -b 2}; <span style="color: #595959;"># default kw-args</span>
-<span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">inputArgs</span> {-a 20 -c 30 zzz -q -v xxx yyy}
-getargs args kw $<span style="color: #b3b3b3;">inputArgs</span>
-<span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"Args:\n $args"</span>
-<span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"KW Args:"</span>
-<span style="color: brightblack;">foreach</span> {k v} [<span style="color: #b3b3b3;">array</span> get kw] {
-    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">" $k = $v"</span>
+<pre class="src src-tcl"><span class="org-builtin">set</span> <span class="org-variable-name">args</span> {}; <span class="org-comment"># positional args</span>
+<span class="org-builtin">array</span> <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> {-a 1 -b 2}; <span class="org-comment"># default kw-args</span>
+<span class="org-builtin">set</span> <span class="org-variable-name">inputArgs</span> {-a 20 -c 30 zzz -q -v xxx yyy}
+getargs args kw $<span class="org-variable-name">inputArgs</span>
+<span class="org-builtin">puts</span> <span class="org-string">"Args:\n $args"</span>
+<span class="org-builtin">puts</span> <span class="org-string">"KW Args:"</span>
+<span class="org-keyword">foreach</span> {k v} [<span class="org-builtin">array</span> get kw] {
+    <span class="org-builtin">puts</span> <span class="org-string">" $k = $v"</span>
 }
 </pre>
 </div>

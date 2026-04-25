@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>WinAVR: software SPI</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">WinAVR: software SPI</h1>
-<div id="outline-container-org469d96a" class="outline-2">
-<h2 id="org469d96a">WinAVR: software SPI</h2>
-<div class="outline-text-2" id="text-org469d96a">
+<div id="outline-container-org36f5f10" class="outline-2">
+<h2 id="org36f5f10">WinAVR: software SPI</h2>
+<div class="outline-text-2" id="text-org36f5f10">
 <p>
 Sometimes you need software SPI MASTER (in my case it was needed to test one chip) implementation. It supports all SPI modes (0, 1, 2, 3), and clock dividers (but so it's software "SPI", that timing is not exact!), but sends only in MSBFIRST bit order (it's easy to add LSBFIRST support).
 See the code.
@@ -94,14 +219,14 @@ The example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_MOSI_PORT</span> PORTB
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_MOSI_PIN</span> PB3
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_MISO_PORT</span> PINB
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_MISO_PIN</span> PB4
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_SCLK_PORT</span> PORTB
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_SCLK_PIN</span> PB5
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_MODE</span> SPI_MODE0
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SWSPI_DIV</span> SPI_CLOCK_DIV2
+<pre class="src src-cpp"><span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_MOSI_PORT</span> PORTB
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_MOSI_PIN</span> PB3
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_MISO_PORT</span> PINB
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_MISO_PIN</span> PB4
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_SCLK_PORT</span> PORTB
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_SCLK_PIN</span> PB5
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_MODE</span> SPI_MODE0
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SWSPI_DIV</span> SPI_CLOCK_DIV2
 </pre>
 </div>
 
@@ -122,45 +247,45 @@ Here is the code. The .h file:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#if</span><span style="color: #b3b3b3;">n</span><span style="color: #b3b3b3;">def</span> _COMMON_SWSPI_H
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">_COMMON_SWSPI_H</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _COMMON_SWSPI_H
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">_COMMON_SWSPI_H</span>
 
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;avr/io.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;util/delay.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdint.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;avr/io.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;util/delay.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdint.h&gt;</span>
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV4</span> 4
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV16</span> 16
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV64</span> 64
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV128</span> 128
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV2</span> 2
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV8</span> 8
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV32</span> 32
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_CLOCK_DIV64_2</span> 64
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV4</span> 4
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV16</span> 16
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV64</span> 64
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV128</span> 128
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV2</span> 2
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV8</span> 8
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV32</span> 32
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_CLOCK_DIV64_2</span> 64
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_MODE0</span> 0
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_MODE1</span> 1
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_MODE2</span> 2
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">SPI_MODE3</span> 3
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_MODE0</span> 0
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_MODE1</span> 1
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_MODE2</span> 2
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">SPI_MODE3</span> 3
 
-<span style="color: #cccccc;">uint8_t</span> <span style="color: #a52a2a;">spi_transfer</span>(<span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">data</span>);
-<span style="color: #cccccc;">uint8_t</span> <span style="color: #a52a2a;">spi_ntransfer</span>(<span style="color: brightblack;">const</span> <span style="color: #cccccc;">uint8_t</span> *<span style="color: #b3b3b3;">req</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">reqlen</span>, <span style="color: #cccccc;">uint8_t</span> *<span style="color: #b3b3b3;">resp</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">resplen</span>);
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">spi_interrupt_on</span>()
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">spi_interrupt_off</span>()
+<span class="org-type">uint8_t</span> <span class="org-function-name">spi_transfer</span>(<span class="org-type">uint8_t</span> <span class="org-variable-name">data</span>);
+<span class="org-type">uint8_t</span> <span class="org-function-name">spi_ntransfer</span>(<span class="org-keyword">const</span> <span class="org-type">uint8_t</span> *<span class="org-variable-name">req</span>, <span class="org-type">int</span> <span class="org-variable-name">reqlen</span>, <span class="org-type">uint8_t</span> *<span class="org-variable-name">resp</span>, <span class="org-type">int</span> <span class="org-variable-name">resplen</span>);
+<span class="org-preprocessor">#define</span> <span class="org-function-name">spi_interrupt_on</span>()
+<span class="org-preprocessor">#define</span> <span class="org-function-name">spi_interrupt_off</span>()
 
-<span style="color: #595959;">// </span><span style="color: #595959;">for nCS (nSEL) select of device before sending</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">BEGIN_SPI_SENDING</span>(<span style="color: #b3b3b3;">PORT</span>, <span style="color: #b3b3b3;">PIN</span>) <span style="color: brightblack;">do</span> { \
+<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) select of device before sending</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">BEGIN_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
         (PORT) &amp;= ~_BV(PIN); \
         _delay_loop_1(4); \
-} <span style="color: brightblack;">while</span> (0)
+} <span class="org-keyword">while</span> (0)
 
-<span style="color: #595959;">// </span><span style="color: #595959;">for nCS (nSEL) unselect of device after sending</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">END_SPI_SENDING</span>(<span style="color: #b3b3b3;">PORT</span>, <span style="color: #b3b3b3;">PIN</span>) <span style="color: brightblack;">do</span> { \
+<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) unselect of device after sending</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">END_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
         _delay_loop_1(4); \
         (PORT) |= _BV(PIN); \
-} <span style="color: brightblack;">while</span> (0)
+} <span class="org-keyword">while</span> (0)
 
-<span style="color: #b3b3b3;">#endif</span> <span style="color: #595959;">/* </span><span style="color: #595959;">!_COMMON_SWSPI_H</span><span style="color: #595959;">*/</span>
+<span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/* </span><span class="org-comment">!_COMMON_SWSPI_H</span><span class="org-comment-delimiter">*/</span>
 </pre>
 </div>
 
@@ -169,44 +294,44 @@ and the .c file (swspi.c):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"swspi.h"</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;util/delay_basic.h&gt;</span>
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">"swspi.h"</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;util/delay_basic.h&gt;</span>
 
-<span style="color: #b3b3b3;">#if</span> !<span style="color: #b3b3b3;">defined</span>(SWSPI_MOSI_PORT) || !<span style="color: #b3b3b3;">defined</span>(SWSPI_MOSI_PIN) || \
-    !<span style="color: #b3b3b3;">defined</span>(SWSPI_MISO_PORT) || !<span style="color: #b3b3b3;">defined</span>(SWSPI_MISO_PIN) || \
-    !<span style="color: #b3b3b3;">defined</span>(SWSPI_SCLK_PORT) || !<span style="color: #b3b3b3;">defined</span>(SWSPI_SCLK_PIN) || \
-    !<span style="color: #b3b3b3;">defined</span>(SWSPI_MODE)
-<span style="color: #b3b3b3;">#  error</span> <span style="color: brightblack;">Software SPI not configured! SWSPI_* should be configured!</span>
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-preprocessor">#if</span> <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_MOSI_PORT) || <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_MOSI_PIN) || \
+    <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_MISO_PORT) || <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_MISO_PIN) || \
+    <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_SCLK_PORT) || <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_SCLK_PIN) || \
+    <span class="org-negation-char">!</span><span class="org-preprocessor">defined</span>(SWSPI_MODE)
+<span class="org-preprocessor">#  error</span> <span class="org-string">Software SPI not configured! SWSPI_* should be configured!</span>
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">setbit</span>(<span style="color: #b3b3b3;">P</span>, <span style="color: #b3b3b3;">B</span>) ((P) |= (_BV(B)))
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">clibit</span>(<span style="color: #b3b3b3;">P</span>, <span style="color: #b3b3b3;">B</span>) ((P) &amp;= ~(_BV(B)))
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">getbit</span>(<span style="color: #b3b3b3;">P</span>, <span style="color: #b3b3b3;">B</span>) (((P) &amp; (_BV(B)))? 1:0)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">setbit</span>(<span class="org-variable-name">P</span>, <span class="org-variable-name">B</span>) ((P) |= (_BV(B)))
+<span class="org-preprocessor">#define</span> <span class="org-function-name">clibit</span>(<span class="org-variable-name">P</span>, <span class="org-variable-name">B</span>) ((P) &amp;= ~(_BV(B)))
+<span class="org-preprocessor">#define</span> <span class="org-function-name">getbit</span>(<span class="org-variable-name">P</span>, <span class="org-variable-name">B</span>) (((P) &amp; (_BV(B)))? 1:0)
 
-<span style="color: #b3b3b3;">#ifdef</span> SWSPI_DIV
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #b3b3b3;">SPIDELAYTIME</span> ((SWSPI_DIV)/2)
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #b3b3b3;">SPIDELAYTIME</span> 1
-<span style="color: #b3b3b3;">#endif</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">SPIHALFDELAY</span>() _delay_loop_1(SPIDELAYTIME) <span style="color: #595959;">// </span><span style="color: #595959;">half of tact (bit transfer) - min 1 CPU tact</span>
+<span class="org-preprocessor">#ifdef</span> SWSPI_DIV
+<span class="org-preprocessor">#  define</span> <span class="org-variable-name">SPIDELAYTIME</span> ((SWSPI_DIV)/2)
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#  define</span> <span class="org-variable-name">SPIDELAYTIME</span> 1
+<span class="org-preprocessor">#endif</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">SPIHALFDELAY</span>() _delay_loop_1(SPIDELAYTIME) <span class="org-comment-delimiter">// </span><span class="org-comment">half of tact (bit transfer) - min 1 CPU tact</span>
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">SETMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">CLIMOSI</span>() clibit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">NOMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">SETMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">CLIMOSI</span>() clibit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
+<span class="org-preprocessor">#define</span> <span class="org-function-name">NOMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
 
-<span style="color: #595959;">// </span><span style="color: #595959;">instead of PORTX may be PINX?</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">READMISO</span>() getbit(SWSPI_MISO_PORT, SWSPI_MISO_PIN)
+<span class="org-comment-delimiter">// </span><span class="org-comment">instead of PORTX may be PINX?</span>
+<span class="org-preprocessor">#define</span> <span class="org-function-name">READMISO</span>() getbit(SWSPI_MISO_PORT, SWSPI_MISO_PIN)
 
-<span style="color: #b3b3b3;">#if</span> (2 &amp; SWSPI_MODE)
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">ONSCLK</span>() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">OFFSCLK</span>() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">ONSCLK</span>() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">OFFSCLK</span>() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
-<span style="color: #b3b3b3;">#endif</span>
+<span class="org-preprocessor">#if</span> (2 &amp; SWSPI_MODE)
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">ONSCLK</span>() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">OFFSCLK</span>() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">ONSCLK</span>() setbit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">OFFSCLK</span>() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #b3b3b3;">#if</span> (1 &amp; SWSPI_MODE)
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">SHIFTBIT</span>(<span style="color: #b3b3b3;">outbyte</span>, <span style="color: #b3b3b3;">inbyte</span>) <span style="color: brightblack;">do</span> { \
+<span class="org-preprocessor">#if</span> (1 &amp; SWSPI_MODE)
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">SHIFTBIT</span>(<span class="org-variable-name">outbyte</span>, <span class="org-variable-name">inbyte</span>) <span class="org-keyword">do</span> { \
         (outbyte) &amp; 0x80 ? (SETMOSI()) : (CLIMOSI()); \
         (outbyte) &lt;&lt;= 1; \
         ONSCLK(); \
@@ -215,9 +340,9 @@ and the .c file (swspi.c):
         (inbyte) |= READMISO(); \
         OFFSCLK(); \
         SPIHALFDELAY(); \
-} <span style="color: brightblack;">while</span> (0)
-<span style="color: #b3b3b3;">#else</span>
-<span style="color: #b3b3b3;">#  define</span> <span style="color: #a52a2a;">SHIFTBIT</span>(<span style="color: #b3b3b3;">outbyte</span>, <span style="color: #b3b3b3;">inbyte</span>) <span style="color: brightblack;">do</span> { \
+} <span class="org-keyword">while</span> (0)
+<span class="org-preprocessor">#else</span>
+<span class="org-preprocessor">#  define</span> <span class="org-function-name">SHIFTBIT</span>(<span class="org-variable-name">outbyte</span>, <span class="org-variable-name">inbyte</span>) <span class="org-keyword">do</span> { \
         (outbyte) &amp; 0x80 ? (SETMOSI()) : (CLIMOSI()); \
         (outbyte) &lt;&lt;= 1; \
         SPIHALFDELAY(); \
@@ -226,53 +351,53 @@ and the .c file (swspi.c):
         (inbyte) &lt;&lt;=1; \
         (inbyte) |= READMISO(); \
         OFFSCLK(); \
-} <span style="color: brightblack;">while</span> (0)
-<span style="color: #b3b3b3;">#endif</span>
+} <span class="org-keyword">while</span> (0)
+<span class="org-preprocessor">#endif</span>
 
-<span style="color: #cccccc;">uint8_t</span>
-<span style="color: #a52a2a;">spi_transfer</span>(<span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">data</span>) {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">nbit</span>;
-        <span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">res</span> = 0;
-        <span style="color: brightblack;">for</span> (nbit=0; nbit&lt;8; nbit++) {
+<span class="org-type">uint8_t</span>
+<span class="org-function-name">spi_transfer</span>(<span class="org-type">uint8_t</span> <span class="org-variable-name">data</span>) {
+        <span class="org-type">int</span> <span class="org-variable-name">nbit</span>;
+        <span class="org-type">uint8_t</span> <span class="org-variable-name">res</span> = 0;
+        <span class="org-keyword">for</span> (nbit=0; nbit&lt;8; nbit++) {
                 SHIFTBIT(data, res);
         }
         NOMOSI();
-        <span style="color: brightblack;">return</span> (res);
+        <span class="org-keyword">return</span> (res);
 }
 
-<span style="color: #595959;">/* </span><span style="color: #595959;">resp - responce from slave device; resplen - max. expected resp. len (buf. size);</span>
-<span style="color: #595959;"> * if resp is NULL, not saved. Returns always the last byte of the response.</span>
-<span style="color: #595959;"> */</span>
-<span style="color: #cccccc;">uint8_t</span>
-<span style="color: #a52a2a;">spi_ntransfer</span>(<span style="color: brightblack;">const</span> <span style="color: #cccccc;">uint8_t</span> *<span style="color: #b3b3b3;">req</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">reqlen</span>, <span style="color: #cccccc;">uint8_t</span> *<span style="color: #b3b3b3;">resp</span>, <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">resplen</span>) {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">nbit</span>;
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">nbyte</span>;
-        <span style="color: brightblack;">register</span> <span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">outbyte</span>;
-        <span style="color: #cccccc;">uint8_t</span> <span style="color: #b3b3b3;">inbyte</span> = 0;
-        <span style="color: brightblack;">for</span> (nbyte=0; nbyte&lt;reqlen; nbyte++) {
+<span class="org-comment-delimiter">/* </span><span class="org-comment">resp - responce from slave device; resplen - max. expected resp. len (buf. size);</span>
+<span class="org-comment"> * if resp is NULL, not saved. Returns always the last byte of the response.</span>
+<span class="org-comment-delimiter"> */</span>
+<span class="org-type">uint8_t</span>
+<span class="org-function-name">spi_ntransfer</span>(<span class="org-keyword">const</span> <span class="org-type">uint8_t</span> *<span class="org-variable-name">req</span>, <span class="org-type">int</span> <span class="org-variable-name">reqlen</span>, <span class="org-type">uint8_t</span> *<span class="org-variable-name">resp</span>, <span class="org-type">int</span> <span class="org-variable-name">resplen</span>) {
+        <span class="org-type">int</span> <span class="org-variable-name">nbit</span>;
+        <span class="org-type">int</span> <span class="org-variable-name">nbyte</span>;
+        <span class="org-keyword">register</span> <span class="org-type">uint8_t</span> <span class="org-variable-name">outbyte</span>;
+        <span class="org-type">uint8_t</span> <span class="org-variable-name">inbyte</span> = 0;
+        <span class="org-keyword">for</span> (nbyte=0; nbyte&lt;reqlen; nbyte++) {
                 outbyte = req[nbyte];
                 inbyte = 0;
-                <span style="color: brightblack;">for</span> (nbit=0; nbit&lt;8; nbit++) {
+                <span class="org-keyword">for</span> (nbit=0; nbit&lt;8; nbit++) {
                         SHIFTBIT(outbyte, inbyte);
                 }
-                <span style="color: brightblack;">if</span> (<span style="color: #cccccc;">resp</span> &amp;&amp; <span style="color: #b3b3b3;">nbyte</span> &lt; resplen) {
+                <span class="org-keyword">if</span> (<span class="org-type">resp</span> &amp;&amp; <span class="org-variable-name">nbyte</span> &lt; resplen) {
                         resp[nbyte] = inbyte;
                 }
         }
         NOMOSI();
-        <span style="color: brightblack;">return</span> (inbyte);
+        <span class="org-keyword">return</span> (inbyte);
 }
 
-<span style="color: #b3b3b3;">#undef</span> ONSCLK
-<span style="color: #b3b3b3;">#undef</span> OFFSCLK
-<span style="color: #b3b3b3;">#undef</span> SETMOSI
-<span style="color: #b3b3b3;">#undef</span> CLIMOSI
-<span style="color: #b3b3b3;">#undef</span> NOMOSI
-<span style="color: #b3b3b3;">#undef</span> READMISO
-<span style="color: #b3b3b3;">#undef</span> SPIHALFDELAY
-<span style="color: #b3b3b3;">#undef</span> SPIDELAYTIME
-<span style="color: #b3b3b3;">#undef</span> SHIFTBIT
-<span style="color: #b3b3b3;">#undef</span> SHIFT0
+<span class="org-preprocessor">#undef</span> ONSCLK
+<span class="org-preprocessor">#undef</span> OFFSCLK
+<span class="org-preprocessor">#undef</span> SETMOSI
+<span class="org-preprocessor">#undef</span> CLIMOSI
+<span class="org-preprocessor">#undef</span> NOMOSI
+<span class="org-preprocessor">#undef</span> READMISO
+<span class="org-preprocessor">#undef</span> SPIHALFDELAY
+<span class="org-preprocessor">#undef</span> SPIDELAYTIME
+<span class="org-preprocessor">#undef</span> SHIFTBIT
+<span class="org-preprocessor">#undef</span> SHIFT0
 </pre>
 </div>
 

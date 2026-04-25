@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tags generation for ASF project</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 <script>
@@ -101,43 +226,43 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Tags generation for ASF project</h1>
-<div id="outline-container-orgeacf48f" class="outline-2">
-<h2 id="orgeacf48f">Tags generation for ASF project</h2>
-<div class="outline-text-2" id="text-orgeacf48f">
+<div id="outline-container-org23844ea" class="outline-2">
+<h2 id="org23844ea">Tags generation for ASF project</h2>
+<div class="outline-text-2" id="text-org23844ea">
 <p>
 If you use Atmel Software Framework you can generate tags (with ctags|GNU Global) for your Vim/Emacs environment in such way (in Makefile):
 </p>
 
 <div class="org-src-container">
-<pre class="src src-makefile"><span style="color: #b3b3b3;">ctags</span> = c:/Program Files/ctags.exe
-<span style="color: #b3b3b3;">gtags</span> = c:/global/bin/gtags.exe
-<span style="color: #b3b3b3;">sed</span> = c:/MinGW/msys/1.0/bin/sed.exe
-<span style="color: #b3b3b3;">find</span> = c:/MinGW/msys/1.0/bin/find.exe
+<pre class="src src-makefile"><span class="org-variable-name">ctags</span> = c:/Program Files/ctags.exe
+<span class="org-variable-name">gtags</span> = c:/global/bin/gtags.exe
+<span class="org-variable-name">sed</span> = c:/MinGW/msys/1.0/bin/sed.exe
+<span class="org-variable-name">find</span> = c:/MinGW/msys/1.0/bin/find.exe
 
-<span style="color: #b3b3b3;">GTAGS_FILES</span> = GTAGS GPATH GRTAGS
-<span style="color: #595959;"># </span><span style="color: #595959;">Global can not parse out of c:/prj/PRJ1/src</span>
-<span style="color: #b3b3b3;">TAGS_DIRS</span> = <span style="color: brightblack;">'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include'</span> \
+<span class="org-variable-name">GTAGS_FILES</span> = GTAGS GPATH GRTAGS
+<span class="org-comment-delimiter"># </span><span class="org-comment">Global can not parse out of c:/prj/PRJ1/src</span>
+<span class="org-variable-name">TAGS_DIRS</span> = <span class="org-string">'c:/Program Files/Atmel/Atmel Studio 6.0/extensions/Atmel/AVRGCC/3.3.2.31/AVRToolchain/avr32/include'</span> \
    c:/prj/PRJ1/src/asf-3.0.1 \
    c:/prj/PRJ1/src/PRJ1
 
-<span style="color: #a52a2a;">tags.files</span>: force
- $(<span style="color: #b3b3b3;">find</span>) $(<span style="color: #b3b3b3;">TAGS_DIRS</span>) -type f -name *.S -or -name *.h -or -name *.c|$(<span style="color: #b3b3b3;">sed</span>) <span style="color: brightblack;">'s/c:\/prj\/PRJ1\/src/./g'</span> &gt;tags.files
+<span class="org-makefile-targets">tags.files</span>: force
+ $(<span class="org-variable-name">find</span>) $(<span class="org-variable-name">TAGS_DIRS</span>) -type f -name *.S -or -name *.h -or -name *.c|$(<span class="org-variable-name">sed</span>) <span class="org-string">'s/c:\/prj\/PRJ1\/src/./g'</span> &gt;tags.files
 
-<span style="color: #a52a2a;">$(</span><span style="color: #a52a2a;">GTAGS_FILES</span><span style="color: #a52a2a;">)</span>: tags.files
- $(<span style="color: #b3b3b3;">gtags</span>) -f tags.files
+<span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">GTAGS_FILES</span></span><span class="org-makefile-targets">)</span>: tags.files
+ $(<span class="org-variable-name">gtags</span>) -f tags.files
 
-<span style="color: #a52a2a;">.PHONY</span>: global_tags
-<span style="color: #a52a2a;">global_tags</span>: $(<span style="color: #b3b3b3;">GTAGS_FILES</span>)
+<span class="org-makefile-targets">.PHONY</span>: global_tags
+<span class="org-makefile-targets">global_tags</span>: $(<span class="org-variable-name">GTAGS_FILES</span>)
 
-<span style="color: #a52a2a;">tags</span>: tags.files
- $(<span style="color: #b3b3b3;">ctags</span>) -L tags.files
+<span class="org-makefile-targets">tags</span>: tags.files
+ $(<span class="org-variable-name">ctags</span>) -L tags.files
 
-<span style="color: #a52a2a;">.PHONY</span>: all_tags
-<span style="color: #a52a2a;">all_tags</span>: tags global_tags
+<span class="org-makefile-targets">.PHONY</span>: all_tags
+<span class="org-makefile-targets">all_tags</span>: tags global_tags
 
-<span style="color: #a52a2a;">.PHONY</span>: clean_tags
-<span style="color: #a52a2a;">clean_tags</span>:
- rm -f $(<span style="color: #b3b3b3;">GTAGS_FILES</span>) tags
+<span class="org-makefile-targets">.PHONY</span>: clean_tags
+<span class="org-makefile-targets">clean_tags</span>:
+ rm -f $(<span class="org-variable-name">GTAGS_FILES</span>) tags
 </pre>
 </div>
 

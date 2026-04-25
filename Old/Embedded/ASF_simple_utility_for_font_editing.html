@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: simple utility for font editing</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,104 +194,104 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">ASF: simple utility for font editing</h1>
-<div id="outline-container-org231a47b" class="outline-2">
-<h2 id="org231a47b">ASF: simple utility for font editing</h2>
-<div class="outline-text-2" id="text-org231a47b">
+<div id="outline-container-orgc6546a9" class="outline-2">
+<h2 id="orgc6546a9">ASF: simple utility for font editing</h2>
+<div class="outline-text-2" id="text-orgc6546a9">
 <p>
 Used fonts in Atmel Software Framework are simple: each glyph is described with array of bytes - each set bit is pixel, no bit - no pixel :)
 Next is the very-very simple Tcl utility to convert glyph bytes into console image of symbol and vice-verse.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span style="color: #595959;"># </span><span style="color: #595959;">parsing and loading font</span>
-<span style="color: #595959;">#</span><span style="color: #595959;">------------------------------------------------------------------------------</span>
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">parsesymb</span> str {
-    <span style="color: #595959;"># Parse one symbol in notation like:</span>
-    <span style="color: #595959;"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"</span>
+<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">parsing and loading font</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">------------------------------------------------------------------------------</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">parsesymb</span> str {
+    <span class="org-comment"># Parse one symbol in notation like:</span>
+    <span class="org-comment"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"</span>
 
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">bytes</span> [<span style="color: #b3b3b3;">regexp</span> -all -inline {0[xX][0-9a-fA-F]{2}} $<span style="color: #b3b3b3;">str</span>]
-    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">bytes</span>
+    <span class="org-builtin">set</span> <span class="org-variable-name">bytes</span> [<span class="org-builtin">regexp</span> -all -inline {0[xX][0-9a-fA-F]{2}} $<span class="org-variable-name">str</span>]
+    <span class="org-keyword">return</span> $<span class="org-variable-name">bytes</span>
 }
 
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">putsymbline</span> byte {
-    <span style="color: #595959;"># put on screen one line of a symbol</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">putsymbline</span> byte {
+    <span class="org-comment"># put on screen one line of a symbol</span>
 
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">mask</span> 0b10000000
-    <span style="color: brightblack;">for</span> {<span style="color: #b3b3b3;">set</span> i 0} {$<span style="color: #b3b3b3;">i</span>&lt;8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="<span style="color: #b3b3b3;">expr</span>" data-blogger-escaped-i="i" data-blogger-escaped-incr="<span style="color: #b3b3b3;">incr</span>" data-blogger-escaped-mask="mask" data-blogger-escaped-set="<span style="color: #b3b3b3;">set</span>"&gt;&gt;1}]
-        <span style="color: brightblack;">if</span> $<span style="color: #b3b3b3;">bit</span> {
-            <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">"#"</span>
-        } <span style="color: brightblack;">else</span> {
-            <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">" "</span>
+    <span class="org-builtin">set</span> <span class="org-variable-name">mask</span> 0b10000000
+    <span class="org-keyword">for</span> {<span class="org-builtin">set</span> i 0} {$<span class="org-variable-name">i</span>&lt;8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="<span class="org-builtin">expr</span>" data-blogger-escaped-i="i" data-blogger-escaped-incr="<span class="org-builtin">incr</span>" data-blogger-escaped-mask="mask" data-blogger-escaped-set="<span class="org-builtin">set</span>"&gt;&gt;1}]
+        <span class="org-keyword">if</span> $<span class="org-variable-name">bit</span> {
+            <span class="org-builtin">puts</span> -nonewline <span class="org-string">"#"</span>
+        } <span class="org-keyword">else</span> {
+            <span class="org-builtin">puts</span> -nonewline <span class="org-string">" "</span>
         }
     }
 }
 
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">putsymb</span> symb_bytes {
-    <span style="color: #595959;"># put on screen all symbol (all it's lines)</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">putsymb</span> symb_bytes {
+    <span class="org-comment"># put on screen all symbol (all it's lines)</span>
 
-    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"+--------+"</span>
-    <span style="color: brightblack;">foreach</span> sb $<span style="color: #b3b3b3;">symb_bytes</span> {
-        <span style="color: #b3b3b3;">puts</span> -nonewline <span style="color: brightblack;">"|"</span>
-        putsymbline $<span style="color: #b3b3b3;">sb</span>
-        <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"|"</span>
+    <span class="org-builtin">puts</span> <span class="org-string">"+--------+"</span>
+    <span class="org-keyword">foreach</span> sb $<span class="org-variable-name">symb_bytes</span> {
+        <span class="org-builtin">puts</span> -nonewline <span class="org-string">"|"</span>
+        putsymbline $<span class="org-variable-name">sb</span>
+        <span class="org-builtin">puts</span> <span class="org-string">"|"</span>
     }
-    <span style="color: #b3b3b3;">puts</span> <span style="color: brightblack;">"+--------+"</span>
+    <span class="org-builtin">puts</span> <span class="org-string">"+--------+"</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Compile glyphs to font in C format</span>
-<span style="color: #595959;">#</span><span style="color: #595959;">-------------------------------------------------------------------------------</span>
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">compsymbline</span> line {
-    <span style="color: #595959;"># Compile line like "# # # # " to 0xAA</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Compile glyphs to font in C format</span>
+<span class="org-comment-delimiter">#</span><span class="org-comment">-------------------------------------------------------------------------------</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">compsymbline</span> line {
+    <span class="org-comment"># Compile line like "# # # # " to 0xAA</span>
 
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">bits</span> [<span style="color: #b3b3b3;">string</span> map { <span style="color: brightblack;">" "</span> 0 # 1} $<span style="color: #b3b3b3;">line</span>]
-    <span style="color: brightblack;">return</span> [<span style="color: #b3b3b3;">format</span> 0x%02X <span style="color: brightblack;">"0b$bits"</span>]
+    <span class="org-builtin">set</span> <span class="org-variable-name">bits</span> [<span class="org-builtin">string</span> map { <span class="org-string">" "</span> 0 # 1} $<span class="org-variable-name">line</span>]
+    <span class="org-keyword">return</span> [<span class="org-builtin">format</span> 0x%02X <span class="org-string">"0b$bits"</span>]
 }
 
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">compsymb</span> symb_lines {
-    <span style="color: #595959;"># Compile lines of symbol (what out 'putsymb')</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">compsymb</span> symb_lines {
+    <span class="org-comment"># Compile lines of symbol (what out 'putsymb')</span>
 
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">read</span> 0
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">res</span> {}
-    <span style="color: brightblack;">foreach</span> line $<span style="color: #b3b3b3;">symb_lines</span> {
-        <span style="color: brightblack;">if</span> {0 == $<span style="color: #b3b3b3;">read</span>} {
-            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">line</span> eq <span style="color: brightblack;">"+--------+"</span>} {
-                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">read</span> 1
+    <span class="org-builtin">set</span> <span class="org-builtin">read</span> 0
+    <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
+    <span class="org-keyword">foreach</span> line $<span class="org-variable-name">symb_lines</span> {
+        <span class="org-keyword">if</span> {0 == $<span class="org-variable-name">read</span>} {
+            <span class="org-keyword">if</span> {$<span class="org-variable-name">line</span> eq <span class="org-string">"+--------+"</span>} {
+                <span class="org-builtin">set</span> <span class="org-builtin">read</span> 1
             }
-        } <span style="color: brightblack;">else</span> {
-            <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">line</span> eq <span style="color: brightblack;">"+--------+"</span>} {
-                <span style="color: brightblack;">break</span>
-            } <span style="color: brightblack;">else</span> {
-                <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">line</span> [<span style="color: #b3b3b3;">string</span> trim $<span style="color: #b3b3b3;">line</span> <span style="color: brightblack;">"|"</span>]
-                <span style="color: #b3b3b3;">lappend</span> res [compsymbline $<span style="color: #b3b3b3;">line</span>]
+        } <span class="org-keyword">else</span> {
+            <span class="org-keyword">if</span> {$<span class="org-variable-name">line</span> eq <span class="org-string">"+--------+"</span>} {
+                <span class="org-keyword">break</span>
+            } <span class="org-keyword">else</span> {
+                <span class="org-builtin">set</span> <span class="org-variable-name">line</span> [<span class="org-builtin">string</span> trim $<span class="org-variable-name">line</span> <span class="org-string">"|"</span>]
+                <span class="org-builtin">lappend</span> res [compsymbline $<span class="org-variable-name">line</span>]
             }
         }
     }
-    <span style="color: brightblack;">return</span> [<span style="color: #b3b3b3;">join</span> $<span style="color: #b3b3b3;">res</span> <span style="color: brightblack;">","</span>]
+    <span class="org-keyword">return</span> [<span class="org-builtin">join</span> $<span class="org-variable-name">res</span> <span class="org-string">","</span>]
 }
 
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">getlines</span> {} {
-    <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">lines</span> {}
-    <span style="color: brightblack;">while</span> {[<span style="color: #b3b3b3;">gets</span> stdin line] &gt;= 0} {
-        <span style="color: #b3b3b3;">lappend</span> lines $<span style="color: #b3b3b3;">line</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">getlines</span> {} {
+    <span class="org-builtin">set</span> <span class="org-variable-name">lines</span> {}
+    <span class="org-keyword">while</span> {[<span class="org-builtin">gets</span> stdin line] &gt;= 0} {
+        <span class="org-builtin">lappend</span> lines $<span class="org-variable-name">line</span>
     }
-    <span style="color: brightblack;">return</span> $<span style="color: #b3b3b3;">lines</span>
+    <span class="org-keyword">return</span> $<span class="org-variable-name">lines</span>
 }
 
-<span style="color: brightblack;">proc</span> <span style="color: #a52a2a;">main</span> args {
-    <span style="color: #cccccc;">global</span> argc argv
-    <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">argc</span>} {
-        <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">argv0</span> [<span style="color: #b3b3b3;">lindex</span> $<span style="color: #b3b3b3;">argv</span> 0]
-        <span style="color: brightblack;">if</span> {$<span style="color: #b3b3b3;">argv0</span> eq <span style="color: brightblack;">"comp"</span>} {
-            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">lines</span> [getlines]
-            <span style="color: #b3b3b3;">puts</span> [compsymb $<span style="color: #b3b3b3;">lines</span>]
-            <span style="color: brightblack;">return</span>
-        } <span style="color: brightblack;">elseif</span> {$<span style="color: #b3b3b3;">argv0</span> eq <span style="color: brightblack;">"put"</span>} {
-            <span style="color: #b3b3b3;">set</span> <span style="color: #b3b3b3;">line</span> [<span style="color: #b3b3b3;">gets</span> stdin]
-            <span style="color: #b3b3b3;">puts</span> [putsymb [parsesymb $<span style="color: #b3b3b3;">line</span>]]
-            <span style="color: brightblack;">return</span>
+<span class="org-keyword">proc</span> <span class="org-function-name">main</span> args {
+    <span class="org-type">global</span> argc argv
+    <span class="org-keyword">if</span> {$<span class="org-variable-name">argc</span>} {
+        <span class="org-builtin">set</span> <span class="org-variable-name">argv0</span> [<span class="org-builtin">lindex</span> $<span class="org-variable-name">argv</span> 0]
+        <span class="org-keyword">if</span> {$<span class="org-variable-name">argv0</span> eq <span class="org-string">"comp"</span>} {
+            <span class="org-builtin">set</span> <span class="org-variable-name">lines</span> [getlines]
+            <span class="org-builtin">puts</span> [compsymb $<span class="org-variable-name">lines</span>]
+            <span class="org-keyword">return</span>
+        } <span class="org-keyword">elseif</span> {$<span class="org-variable-name">argv0</span> eq <span class="org-string">"put"</span>} {
+            <span class="org-builtin">set</span> <span class="org-variable-name">line</span> [<span class="org-builtin">gets</span> stdin]
+            <span class="org-builtin">puts</span> [putsymb [parsesymb $<span class="org-variable-name">line</span>]]
+            <span class="org-keyword">return</span>
         }
     }
-    <span style="color: #b3b3b3;">puts</span> {<span style="color: brightblack;">\</span>
+    <span class="org-builtin">puts</span> {<span class="org-tcl-escaped-newline">\</span>
 Syntax on Linux:
     1. cat file|PRG comp
     2. cat file|PRG put
@@ -175,8 +300,8 @@ Syntax on Windows:
     2. more file|PRG put
 
 This means:
-    1. Compile glyph image into C hex <span style="color: #b3b3b3;">array</span>
-    2. Put glyph hex <span style="color: #b3b3b3;">array</span> on the screen as glyph image
+    1. Compile glyph image into C hex <span class="org-builtin">array</span>
+    2. Put glyph hex <span class="org-builtin">array</span> on the screen as glyph image
 
 Glyph images and its' hex arrays are inverse}
 }
@@ -191,15 +316,15 @@ Example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">$<span style="color: #b3b3b3;">echo</span> 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
+<pre class="src src-bash">$<span class="org-variable-name">echo</span> 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
 +--------+
-|  <span style="color: #595959;">#     </span><span style="color: #595959;">|</span>
-| <span style="color: #595959;">####   </span><span style="color: #595959;">|</span>
-|<span style="color: #595959;"># </span><span style="color: #595959;">#     |</span>
-| <span style="color: #595959;">###    </span><span style="color: #595959;">|</span>
-|  <span style="color: #595959;"># </span><span style="color: #595959;">#   |</span>
-|<span style="color: #595959;">####    </span><span style="color: #595959;">|</span>
-|  <span style="color: #595959;">#     </span><span style="color: #595959;">|</span>
+|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|</span>
+| <span class="org-comment-delimiter">####   </span><span class="org-comment">|</span>
+|<span class="org-comment-delimiter"># </span><span class="org-comment">#     |</span>
+| <span class="org-comment-delimiter">###    </span><span class="org-comment">|</span>
+|  <span class="org-comment-delimiter"># </span><span class="org-comment">#   |</span>
+|<span class="org-comment-delimiter">####    </span><span class="org-comment">|</span>
+|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|</span>
 |        |
 +--------+
 </pre>
@@ -210,7 +335,7 @@ This is the "$" symbol. It's bytes I get from et024006dhu.c (see const unsigned 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">$<span style="color: #b3b3b3;">cat</span> somefile.txt|tclkitsh font.tcl comp
+<pre class="src src-bash">$<span class="org-variable-name">cat</span> somefile.txt|tclkitsh font.tcl comp
 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00
 </pre>
 </div>

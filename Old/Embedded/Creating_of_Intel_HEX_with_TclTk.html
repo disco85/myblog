@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Creating of Intel HEX with Tcl/Tk</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Creating of Intel HEX with Tcl/Tk</h1>
-<div id="outline-container-orgaf3fbef" class="outline-2">
-<h2 id="orgaf3fbef">Creating of Intel HEX with Tcl/Tk</h2>
-<div class="outline-text-2" id="text-orgaf3fbef">
+<div id="outline-container-org92f28a9" class="outline-2">
+<h2 id="org92f28a9">Creating of Intel HEX with Tcl/Tk</h2>
+<div class="outline-text-2" id="text-org92f28a9">
 <p>
 <a href="http://en.wikipedia.org/wiki/Intel_HEX">Intel HEX format</a> is the simple ASCII format usually used to program different devices (it's flash and EEPROM memories). To create such data records, I use this code:
 </p>
@@ -79,117 +204,117 @@ th, td {
 <div class="org-src-container">
 <pre class="src src-cpp">package provide ihex 1.0
 
-<span style="color: brightblack;">namespace</span> <span style="color: #7fffd4;">eval</span> ihex {
-    <span style="color: brightblack;">namespace</span> <span style="color: brightblack;">export</span> <span style="color: #7fffd4;">data</span> EOF eraser
-    set EOF <span style="color: brightblack;">":00000001FF"</span>
+<span class="org-keyword">namespace</span> <span class="org-constant">eval</span> ihex {
+    <span class="org-keyword">namespace</span> <span class="org-keyword">export</span> <span class="org-constant">data</span> EOF eraser
+    set EOF <span class="org-string">":00000001FF"</span>
 
     proc verint {type value} {
-<span style="color: #b3b3b3;">        # Verify</span> that value is in the type range. Known types are b (byte),
-<span style="color: #b3b3b3;">        # w</span> (word), d (doubleword), q (quadword). If is out-of-range, then
-<span style="color: #b3b3b3;">        # raise</span> will be callen
-        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">absvalue</span> [::<span style="color: #7fffd4;">tcl</span>::<span style="color: #7fffd4;">mathfunc</span>::abs $value]
+<span class="org-preprocessor">        # Verify</span> that value is in the type range. Known types are b (byte),
+<span class="org-preprocessor">        # w</span> (word), d (doubleword), q (quadword). If is out-of-range, then
+<span class="org-preprocessor">        # raise</span> will be callen
+        <span class="org-type">set</span> <span class="org-variable-name">absvalue</span> [::<span class="org-constant">tcl</span>::<span class="org-constant">mathfunc</span>::abs $value]
 
         proc raise {t v} {
-<span style="color: #b3b3b3;">            # Raise</span> error message. t is type name, such as <span style="color: brightblack;">"word"</span> <span style="color: brightblack;">or</span> <span style="color: brightblack;">"quadword"</span>
-            error [format <span style="color: brightblack;">"Value 0x%X is not a %s"</span> $v $t]
+<span class="org-preprocessor">            # Raise</span> error message. t is type name, such as <span class="org-string">"word"</span> <span class="org-keyword">or</span> <span class="org-string">"quadword"</span>
+            error [format <span class="org-string">"Value 0x%X is not a %s"</span> $v $t]
         }
 
-        <span style="color: brightblack;">switch</span> -- $type {
-            b { <span style="color: brightblack;">if</span> {$absvalue &gt; 255} {raise byte $absvalue} }
-            w { <span style="color: brightblack;">if</span> {$absvalue &gt; 65536} {raise word $absvalue} }
-            d { <span style="color: brightblack;">if</span> {$absvalue &gt; 4294967296} {raise doubleword $absvalue} }
-            q { <span style="color: brightblack;">if</span> {$absvalue &gt; 18446744073709551616} {raise quadword $absvalue} }
+        <span class="org-keyword">switch</span> -- $type {
+            b { <span class="org-keyword">if</span> {$absvalue &gt; 255} {raise byte $absvalue} }
+            w { <span class="org-keyword">if</span> {$absvalue &gt; 65536} {raise word $absvalue} }
+            d { <span class="org-keyword">if</span> {$absvalue &gt; 4294967296} {raise doubleword $absvalue} }
+            q { <span class="org-keyword">if</span> {$absvalue &gt; 18446744073709551616} {raise quadword $absvalue} }
         }
-        <span style="color: brightblack;">return</span> 1
+        <span class="org-keyword">return</span> 1
     }
 
-    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">args2bytes</span> {args} {
-<span style="color: #b3b3b3;">        # Converts</span> args to list of bytes (binary form of args). See
+    <span class="org-type">proc</span> <span class="org-variable-name">args2bytes</span> {args} {
+<span class="org-preprocessor">        # Converts</span> args to list of bytes (binary form of args). See
         # &gt;&gt;&gt; args2bytes b1 w4A
-<span style="color: #b3b3b3;">        # 01</span> 00 4A
+<span class="org-preprocessor">        # 01</span> 00 4A
         #
-<span style="color: #b3b3b3;">        # Each</span> arg is integer prefixed by b|w|d|q <span style="color: brightblack;">and</span> is in hex-form.
+<span class="org-preprocessor">        # Each</span> arg is integer prefixed by b|w|d|q <span class="org-keyword">and</span> is in hex-form.
         set bytes [list]
         foreach arg $args {
             set r [scan $arg %1s%x argtype argvalue]
-            <span style="color: brightblack;">if</span> {$r != 2} {
-<span style="color: #b3b3b3;">                #puts</span> <span style="color: brightblack;">"some string..."</span>
-                <span style="color: brightblack;">continue</span>
-            } <span style="color: brightblack;">else</span> {
-<span style="color: #b3b3b3;">                # verify</span> value of argvalue (in type bounds)
+            <span class="org-keyword">if</span> {$r != 2} {
+<span class="org-preprocessor">                #puts</span> <span class="org-string">"some string..."</span>
+                <span class="org-keyword">continue</span>
+            } <span class="org-keyword">else</span> {
+<span class="org-preprocessor">                # verify</span> value of argvalue (in type bounds)
                 verint $argtype $argvalue
-<span style="color: #b3b3b3;">                # format</span> argvalue into string
-                <span style="color: brightblack;">switch</span> -- $argtype {
+<span class="org-preprocessor">                # format</span> argvalue into string
+                <span class="org-keyword">switch</span> -- $argtype {
                     b {set fmt %02X}
                     w {set fmt %04X}
                     d {set fmt %08X}
                     q {set fmt %016X}
                 }
-                <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">sarg</span> [format $fmt $argvalue]
-                set argbytes [regexp -all -<span style="color: brightblack;">inline</span> .. $sarg]
+                <span class="org-type">set</span> <span class="org-variable-name">sarg</span> [format $fmt $argvalue]
+                set argbytes [regexp -all -<span class="org-keyword">inline</span> .. $sarg]
                 set bytes [concat $bytes $argbytes]
             }
         }
-        <span style="color: brightblack;">return</span> $bytes
+        <span class="org-keyword">return</span> $bytes
     }
 
-    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">crc</span> {bytes} {
-<span style="color: #b3b3b3;">        # Calculate</span> Intel-hex CRC <span style="color: brightblack;">for</span> list of bytes (usual numbers in hex format
-<span style="color: #b3b3b3;">        # but</span> without prefixes like b|w|d|q)
+    <span class="org-type">proc</span> <span class="org-variable-name">crc</span> {bytes} {
+<span class="org-preprocessor">        # Calculate</span> Intel-hex CRC <span class="org-keyword">for</span> list of bytes (usual numbers in hex format
+<span class="org-preprocessor">        # but</span> without prefixes like b|w|d|q)
         set sum 0
         foreach b $bytes {
             incr sum 0x$b
         }
-        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">sum</span> [expr {(1 + ~$sum) &amp; 0xFF}] ;# bcb
-        <span style="color: brightblack;">return</span> $sum
+        <span class="org-type">set</span> <span class="org-variable-name">sum</span> [expr {(1 + ~$sum) &amp; 0xFF}] ;# bcb
+        <span class="org-keyword">return</span> $sum
     }
 
-    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">data</span> {address args} {
-<span style="color: #b3b3b3;">        # Returns</span> data record <span style="color: brightblack;">for</span> Intel hex format. args are list of integers such
-<span style="color: #b3b3b3;">        # b23</span> wAE... - byte 0x23, word 0x00AE
-        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">bytes</span> [args2bytes {*}$args]
+    <span class="org-type">proc</span> <span class="org-variable-name">data</span> {address args} {
+<span class="org-preprocessor">        # Returns</span> data record <span class="org-keyword">for</span> Intel hex format. args are list of integers such
+<span class="org-preprocessor">        # b23</span> wAE... - byte 0x23, word 0x00AE
+        <span class="org-type">set</span> <span class="org-variable-name">bytes</span> [args2bytes {*}$args]
         set len [args2bytes [format b%X [llength $bytes]]]
         set address [args2bytes $address]
         set type 00
         set cc [crc [concat {} $len $address $type $bytes]]
 
-<span style="color: #b3b3b3;">        # Prepare</span> output line
-        set head :$len[join $address <span style="color: brightblack;">""</span>]$type
-        set tail [join $bytes <span style="color: brightblack;">""</span>][format %02X $cc]
-        <span style="color: brightblack;">return</span> $head$tail
+<span class="org-preprocessor">        # Prepare</span> output line
+        set head :$len[join $address <span class="org-string">""</span>]$type
+        set tail [join $bytes <span class="org-string">""</span>][format %02X $cc]
+        <span class="org-keyword">return</span> $head$tail
     }
 
-    <span style="color: #cccccc;">proc</span> <span style="color: #b3b3b3;">join_eep</span> {args} {
-<span style="color: #b3b3b3;">        # Join</span> eep data records (<span style="color: brightblack;">":LLAAAA00..."</span> strings) into one data record with size &lt;= 256.
-<span style="color: #b3b3b3;">        # Does</span> <span style="color: brightblack;">not</span> check CRC of input records!
-        set MAXSZ 256 ; # DONT USE &gt; 256!!!
-<span style="color: #b3b3b3;">        # In</span> the mem will be 256 <span style="color: brightblack;">"00 00 00..."</span>
-        <span style="color: brightblack;">for</span> {set i 0} {$i &lt; $MAXSZ} {incr i} { lappend mem 00 }
+    <span class="org-type">proc</span> <span class="org-variable-name">join_eep</span> {args} {
+<span class="org-preprocessor">        # Join</span> eep data records (<span class="org-string">":LLAAAA00..."</span> strings) into one data record with size &lt;= 256.
+<span class="org-preprocessor">        # Does</span> <span class="org-keyword">not</span> check CRC of input records<span class="org-negation-char">!</span>
+        set MAXSZ 256 ; # DONT USE &gt; 256<span class="org-negation-char">!</span>!<span class="org-negation-char">!</span>
+<span class="org-preprocessor">        # In</span> the mem will be 256 <span class="org-string">"00 00 00..."</span>
+        <span class="org-keyword">for</span> {set i 0} {$i &lt; $MAXSZ} {incr i} { lappend mem 00 }
         set last_index 0
         foreach rec $args {
-            <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">len</span> [string range $rec 1 2]
+            <span class="org-type">set</span> <span class="org-variable-name">len</span> [string range $rec 1 2]
             set address [string range $rec 3 6]
             set type [string range $rec 7 8]
-            <span style="color: brightblack;">if</span> {<span style="color: brightblack;">"0x$type"</span> != 0} { <span style="color: brightblack;">continue</span> } ;# skip <span style="color: brightblack;">not</span> data records
+            <span class="org-keyword">if</span> {<span class="org-string">"0x$type"</span> != 0} { <span class="org-keyword">continue</span> } ;# skip <span class="org-keyword">not</span> data records
             set bytes [string range $rec 9 end-2]
-            set bytes [regexp -all -<span style="color: brightblack;">inline</span> .. $bytes]
-<span style="color: #b3b3b3;">            #set</span> ev [eval <span style="color: brightblack;">"expr {0x$address + 0x$len - 1}"</span>]
-            set from <span style="color: brightblack;">"0x$address"</span>; <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">to</span> [expr {<span style="color: brightblack;">"0x$address"</span> + <span style="color: brightblack;">"0x$len"</span> - 1}]
-            set last_index [::<span style="color: #7fffd4;">tcl</span>::<span style="color: #7fffd4;">mathfunc</span>::max $last_index $to]
-            set replacing <span style="color: brightblack;">"lreplace \$mem $from $to $bytes"</span>
+            set bytes [regexp -all -<span class="org-keyword">inline</span> .. $bytes]
+<span class="org-preprocessor">            #set</span> ev [eval <span class="org-string">"expr {0x$address + 0x$len - 1}"</span>]
+            set from <span class="org-string">"0x$address"</span>; <span class="org-type">set</span> <span class="org-variable-name">to</span> [expr {<span class="org-string">"0x$address"</span> + <span class="org-string">"0x$len"</span> - 1}]
+            set last_index [::<span class="org-constant">tcl</span>::<span class="org-constant">mathfunc</span>::max $last_index $to]
+            set replacing <span class="org-string">"lreplace \$mem $from $to $bytes"</span>
             set mem [eval $replacing]
         }
-        <span style="color: #cccccc;">set</span> <span style="color: #b3b3b3;">len</span> [format b%X [expr {$last_index + 1}]]
+        <span class="org-type">set</span> <span class="org-variable-name">len</span> [format b%X [expr {$last_index + 1}]]
         set len [args2bytes $len]
-        set address <span style="color: brightblack;">"00 00"</span>
+        set address <span class="org-string">"00 00"</span>
         set type 00
         set mem [lrange $mem 0 $last_index]
         set cc [crc [concat {} $len $address $type $mem]]
 
-<span style="color: #b3b3b3;">        # Prepare</span> output line
-        set head :$len[join $address <span style="color: brightblack;">""</span>]$type
-        set tail [join $mem <span style="color: brightblack;">""</span>][format %02X $cc]
-        <span style="color: brightblack;">return</span> $head$tail
+<span class="org-preprocessor">        # Prepare</span> output line
+        set head :$len[join $address <span class="org-string">""</span>]$type
+        set tail [join $mem <span class="org-string">""</span>][format %02X $cc]
+        <span class="org-keyword">return</span> $head$tail
     }
 }
 </pre>

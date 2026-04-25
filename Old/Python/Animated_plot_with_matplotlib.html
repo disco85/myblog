@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Animated plot with matplotlib</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,128 +194,128 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Animated plot with matplotlib</h1>
-<div id="outline-container-orge95e800" class="outline-2">
-<h2 id="orge95e800">Animated plot with matplotlib</h2>
-<div class="outline-text-2" id="text-orge95e800">
+<div id="outline-container-org47482b7" class="outline-2">
+<h2 id="org47482b7">Animated plot with matplotlib</h2>
+<div class="outline-text-2" id="text-org47482b7">
 <p>
 This is the components of auto-scrolled plots with matplotlib:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">class</span> <span style="color: #cccccc;">Plot</span>:
-    <span style="color: brightblack;">"""Base attributes of an any plot"""</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>,
-            fig=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">matplotlib Figure</span>
-            canvas=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">matplotlib Canvas</span>
-            tkw=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">Tk widget</span>
-            title=<span style="color: brightblack;">""</span>, <span style="color: #595959;">#</span>
-            xdata=[], <span style="color: #595959;"># </span><span style="color: #595959;">x data</span>
-            ydata=[], <span style="color: #595959;"># </span><span style="color: #595959;">y data</span>
-            xmin=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">left xlim:datetime (chages in scroll with set_xlim)</span>
-            xmax=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">right xlim:datetime (chages in scroll with set_xlim)</span>
-            tdelta=<span style="color: #7fffd4;">None</span>, <span style="color: #595959;"># </span><span style="color: #595959;">step (period of polling of sensors, etc.):timedelta</span>
-            ylabel=<span style="color: brightblack;">""</span>, <span style="color: #595959;"># </span><span style="color: #595959;">y label</span>
-            lnc=<span style="color: brightblack;">"red"</span>, <span style="color: #595959;"># </span><span style="color: #595959;">line color</span>
-            lnpt=<span style="color: brightblack;">"-"</span>, <span style="color: #595959;"># </span><span style="color: #595959;">line point type</span>
-            lnw=1, <span style="color: #595959;"># </span><span style="color: #595959;">line width</span>
-            intc=<span style="color: brightblack;">"#707070"</span>, <span style="color: #595959;"># </span><span style="color: #595959;">internal rect. color</span>
-            outc=<span style="color: brightblack;">"#9E9E9E"</span>, <span style="color: #595959;"># </span><span style="color: #595959;">outter rect. color</span>
-            ylimpad=10, <span style="color: #595959;"># </span><span style="color: #595959;">padding around y axis limit (ylim is +/- ylimpad)</span>
+<pre class="src src-python"><span class="org-keyword">class</span> <span class="org-type">Plot</span>:
+    <span class="org-doc">"""Base attributes of an any plot"""</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>,
+            fig<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">matplotlib Figure</span>
+            canvas<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">matplotlib Canvas</span>
+            tkw<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">Tk widget</span>
+            title<span class="org-operator">=</span><span class="org-string">""</span>, <span class="org-comment-delimiter">#</span>
+            xdata<span class="org-operator">=</span>[], <span class="org-comment-delimiter"># </span><span class="org-comment">x data</span>
+            ydata<span class="org-operator">=</span>[], <span class="org-comment-delimiter"># </span><span class="org-comment">y data</span>
+            xmin<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">left xlim:datetime (chages in scroll with set_xlim)</span>
+            xmax<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">right xlim:datetime (chages in scroll with set_xlim)</span>
+            tdelta<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">step (period of polling of sensors, etc.):timedelta</span>
+            ylabel<span class="org-operator">=</span><span class="org-string">""</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">y label</span>
+            lnc<span class="org-operator">=</span><span class="org-string">"red"</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">line color</span>
+            lnpt<span class="org-operator">=</span><span class="org-string">"-"</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">line point type</span>
+            lnw<span class="org-operator">=</span>1, <span class="org-comment-delimiter"># </span><span class="org-comment">line width</span>
+            intc<span class="org-operator">=</span><span class="org-string">"#707070"</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">internal rect. color</span>
+            outc<span class="org-operator">=</span><span class="org-string">"#9E9E9E"</span>, <span class="org-comment-delimiter"># </span><span class="org-comment">outter rect. color</span>
+            ylimpad<span class="org-operator">=</span>10, <span class="org-comment-delimiter"># </span><span class="org-comment">padding around y axis limit (ylim is +/- ylimpad)</span>
             ):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">fig</span> = fig
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">canvas</span> = canvas
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">tkw</span> = tkw
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">title</span> = title
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">xdata</span> = xdata
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">ydata</span> = ydata
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">xmin</span> = xmin
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">xmax</span> = xmax
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">tdelta</span> = tdelta
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">xband</span> = <span style="color: brightblack;">self</span>.xmax - <span style="color: brightblack;">self</span>.xmin <span style="color: #595959;"># </span><span style="color: #595959;">width of axe 0x (timedelta)</span>
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">ylabel</span> = ylabel
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lnc</span> = lnc
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lnpt</span> = lnpt
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">lnw</span> = lnw
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">intc</span> = intc
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">outc</span> = outc
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">ylimpad</span> = ylimpad
+        <span class="org-keyword">self</span>.<span class="org-variable-name">fig</span> <span class="org-operator">=</span> fig
+        <span class="org-keyword">self</span>.<span class="org-variable-name">canvas</span> <span class="org-operator">=</span> canvas
+        <span class="org-keyword">self</span>.<span class="org-variable-name">tkw</span> <span class="org-operator">=</span> tkw
+        <span class="org-keyword">self</span>.<span class="org-variable-name">title</span> <span class="org-operator">=</span> title
+        <span class="org-keyword">self</span>.<span class="org-variable-name">xdata</span> <span class="org-operator">=</span> xdata
+        <span class="org-keyword">self</span>.<span class="org-variable-name">ydata</span> <span class="org-operator">=</span> ydata
+        <span class="org-keyword">self</span>.<span class="org-variable-name">xmin</span> <span class="org-operator">=</span> xmin
+        <span class="org-keyword">self</span>.<span class="org-variable-name">xmax</span> <span class="org-operator">=</span> xmax
+        <span class="org-keyword">self</span>.<span class="org-variable-name">tdelta</span> <span class="org-operator">=</span> tdelta
+        <span class="org-keyword">self</span>.<span class="org-variable-name">xband</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.xmax <span class="org-operator">-</span> <span class="org-keyword">self</span>.xmin <span class="org-comment-delimiter"># </span><span class="org-comment">width of axe 0x (timedelta)</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">ylabel</span> <span class="org-operator">=</span> ylabel
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lnc</span> <span class="org-operator">=</span> lnc
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lnpt</span> <span class="org-operator">=</span> lnpt
+        <span class="org-keyword">self</span>.<span class="org-variable-name">lnw</span> <span class="org-operator">=</span> lnw
+        <span class="org-keyword">self</span>.<span class="org-variable-name">intc</span> <span class="org-operator">=</span> intc
+        <span class="org-keyword">self</span>.<span class="org-variable-name">outc</span> <span class="org-operator">=</span> outc
+        <span class="org-keyword">self</span>.<span class="org-variable-name">ylimpad</span> <span class="org-operator">=</span> ylimpad
 
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">ymin</span> = 0
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">ymax</span> = 0
+        <span class="org-keyword">self</span>.<span class="org-variable-name">ymin</span> <span class="org-operator">=</span> 0
+        <span class="org-keyword">self</span>.<span class="org-variable-name">ymax</span> <span class="org-operator">=</span> 0
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">AnimPlot</span>(Frame):
-    <span style="color: brightblack;">"""One-line plot in own frame"""</span>
-    <span style="color: #595959;"># </span><span style="color: #ffa500; font-weight: bold;">TODO</span><span style="color: #595959;">: blit not used</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, master, app, blit=<span style="color: #7fffd4;">False</span>, title=<span style="color: brightblack;">""</span>, npoints=60, ylabel=<span style="color: brightblack;">""</span>, lnc=<span style="color: brightblack;">"red"</span>, lnpt=<span style="color: brightblack;">"-"</span>, lnw=1, intc=<span style="color: brightblack;">"#707070"</span>, outc=<span style="color: brightblack;">"#9E9E9E"</span>, ylimpad=10, period=1, *a, **kw):
-        Frame.__init__(<span style="color: brightblack;">self</span>, master, *a, **kw)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">app</span> = app
+<span class="org-keyword">class</span> <span class="org-type">AnimPlot</span>(Frame):
+    <span class="org-doc">"""One-line plot in own frame"""</span>
+    <span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: blit not used</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, master, app, blit<span class="org-operator">=</span><span class="org-constant">False</span>, title<span class="org-operator">=</span><span class="org-string">""</span>, npoints<span class="org-operator">=</span>60, ylabel<span class="org-operator">=</span><span class="org-string">""</span>, lnc<span class="org-operator">=</span><span class="org-string">"red"</span>, lnpt<span class="org-operator">=</span><span class="org-string">"-"</span>, lnw<span class="org-operator">=</span>1, intc<span class="org-operator">=</span><span class="org-string">"#707070"</span>, outc<span class="org-operator">=</span><span class="org-string">"#9E9E9E"</span>, ylimpad<span class="org-operator">=</span>10, period<span class="org-operator">=</span>1, <span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
+        Frame.__init__(<span class="org-keyword">self</span>, master, <span class="org-operator">*</span>a, <span class="org-operator">**</span>kw)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">app</span> <span class="org-operator">=</span> app
 
-        <span style="color: #b3b3b3;">xmin</span> = <span style="color: brightblack;">self</span>.app.begin
-        <span style="color: #b3b3b3;">xmax</span> = xmin + timedelta(seconds=npoints*period) <span style="color: #595959;"># </span><span style="color: #595959;">period is secs</span>
-        <span style="color: #b3b3b3;">tdelta</span> = timedelta(seconds=period)
+        <span class="org-variable-name">xmin</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.app.begin
+        <span class="org-variable-name">xmax</span> <span class="org-operator">=</span> xmin <span class="org-operator">+</span> timedelta(seconds<span class="org-operator">=</span>npoints<span class="org-operator">*</span>period) <span class="org-comment-delimiter"># </span><span class="org-comment">period is secs</span>
+        <span class="org-variable-name">tdelta</span> <span class="org-operator">=</span> timedelta(seconds<span class="org-operator">=</span>period)
 
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">p</span> = Plot(title=title, ylabel=ylabel, lnc=lnc, lnpt=lnpt, lnw=lnw, intc=intc, outc=outc, xdata=deque(maxlen=npoints), ydata=deque(maxlen=npoints), xmin=xmin, xmax=xmax, tdelta=tdelta, ylimpad=ylimpad)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">blit</span> = blit <span style="color: #595959;"># </span><span style="color: #595959;">use double-buffering?</span>
-        <span style="color: brightblack;">self</span>._create_matplot()
-        <span style="color: brightblack;">self</span>.p.tkw.pack()
+        <span class="org-keyword">self</span>.<span class="org-variable-name">p</span> <span class="org-operator">=</span> Plot(title<span class="org-operator">=</span>title, ylabel<span class="org-operator">=</span>ylabel, lnc<span class="org-operator">=</span>lnc, lnpt<span class="org-operator">=</span>lnpt, lnw<span class="org-operator">=</span>lnw, intc<span class="org-operator">=</span>intc, outc<span class="org-operator">=</span>outc, xdata<span class="org-operator">=</span>deque(maxlen<span class="org-operator">=</span>npoints), ydata<span class="org-operator">=</span>deque(maxlen<span class="org-operator">=</span>npoints), xmin<span class="org-operator">=</span>xmin, xmax<span class="org-operator">=</span>xmax, tdelta<span class="org-operator">=</span>tdelta, ylimpad<span class="org-operator">=</span>ylimpad)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">blit</span> <span class="org-operator">=</span> blit <span class="org-comment-delimiter"># </span><span class="org-comment">use double-buffering?</span>
+        <span class="org-keyword">self</span>._create_matplot()
+        <span class="org-keyword">self</span>.p.tkw.pack()
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_create_matplot</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">"""Creates of matplotlib plot and changes</span>
-<span style="color: brightblack;">        self.p"""</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">_create_matplot</span>(<span class="org-keyword">self</span>):
+        <span class="org-doc">"""Creates of matplotlib plot and changes</span>
+<span class="org-doc">        self.p"""</span>
 
-        <span style="color: #595959;"># </span><span style="color: #595959;">calculate plot size in inches; dpi is the pixels count per inch</span>
-        <span style="color: #b3b3b3;">dpi</span> = 75.
-        <span style="color: #b3b3b3;">figh</span> = <span style="color: brightblack;">self</span>.winfo_screenheight()
-        <span style="color: #b3b3b3;">figh</span> = figh/dpi - 1 <span style="color: #595959;"># </span><span style="color: #595959;">1 for menu bar</span>
-        <span style="color: #b3b3b3;">figh</span> = figh/2 <span style="color: #595959;"># </span><span style="color: #595959;">two plots</span>
-        <span style="color: #b3b3b3;">figw</span> = figh*2.5 <span style="color: #595959;"># </span><span style="color: #595959;">aspect</span>
-        <span style="color: #b3b3b3;">fig</span> = Figure(figsize=(figw, figh), dpi=dpi)
+        <span class="org-comment-delimiter"># </span><span class="org-comment">calculate plot size in inches; dpi is the pixels count per inch</span>
+        <span class="org-variable-name">dpi</span> <span class="org-operator">=</span> 75.
+        <span class="org-variable-name">figh</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.winfo_screenheight()
+        <span class="org-variable-name">figh</span> <span class="org-operator">=</span> figh<span class="org-operator">/</span>dpi <span class="org-operator">-</span> 1 <span class="org-comment-delimiter"># </span><span class="org-comment">1 for menu bar</span>
+        <span class="org-variable-name">figh</span> <span class="org-operator">=</span> figh<span class="org-operator">/</span>2 <span class="org-comment-delimiter"># </span><span class="org-comment">two plots</span>
+        <span class="org-variable-name">figw</span> <span class="org-operator">=</span> figh<span class="org-operator">*</span>2.5 <span class="org-comment-delimiter"># </span><span class="org-comment">aspect</span>
+        <span class="org-variable-name">fig</span> <span class="org-operator">=</span> Figure(figsize<span class="org-operator">=</span>(figw, figh), dpi<span class="org-operator">=</span>dpi)
 
-        fig.patch.set_facecolor(<span style="color: brightblack;">self</span>.p.outc)
-        <span style="color: #b3b3b3;">ax</span> = fig.add_subplot(111)
-        ax.patch.set_facecolor(<span style="color: brightblack;">self</span>.p.intc)
-        ax.set_title(<span style="color: brightblack;">self</span>.p.title)
-        ax.grid(<span style="color: #7fffd4;">True</span>)
-        ax.set_ylabel(<span style="color: brightblack;">self</span>.p.ylabel)
+        fig.patch.set_facecolor(<span class="org-keyword">self</span>.p.outc)
+        <span class="org-variable-name">ax</span> <span class="org-operator">=</span> fig.add_subplot(111)
+        ax.patch.set_facecolor(<span class="org-keyword">self</span>.p.intc)
+        ax.set_title(<span class="org-keyword">self</span>.p.title)
+        ax.grid(<span class="org-constant">True</span>)
+        ax.set_ylabel(<span class="org-keyword">self</span>.p.ylabel)
 
-        ax.plot_date([], [], <span style="color: brightblack;">self</span>.p.lnpt, color=<span style="color: brightblack;">self</span>.p.lnc, lw=<span style="color: brightblack;">self</span>.p.lnw)
-        ax.set_xlim(mdates.date2num(<span style="color: brightblack;">self</span>.p.xmin), mdates.date2num(<span style="color: brightblack;">self</span>.p.xmax))
+        ax.plot_date([], [], <span class="org-keyword">self</span>.p.lnpt, color<span class="org-operator">=</span><span class="org-keyword">self</span>.p.lnc, lw<span class="org-operator">=</span><span class="org-keyword">self</span>.p.lnw)
+        ax.set_xlim(mdates.date2num(<span class="org-keyword">self</span>.p.xmin), mdates.date2num(<span class="org-keyword">self</span>.p.xmax))
 
-        ax.xaxis.set_major_formatter(mdates.DateFormatter(<span style="color: brightblack;">'%H:%M:%S'</span>, utils.tzinfo()))
-        ax.<span style="color: #b3b3b3;">fmt_xdata</span> = mdates.DateFormatter(<span style="color: brightblack;">'%H:%M:%S'</span>, utils.tzinfo())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="org-string">'%H:%M:%S'</span>, utils.tzinfo()))
+        ax.<span class="org-variable-name">fmt_xdata</span> <span class="org-operator">=</span> mdates.DateFormatter(<span class="org-string">'%H:%M:%S'</span>, utils.tzinfo())
 
-        <span style="color: #b3b3b3;">canvas</span> = FigureCanvas(fig, master=<span style="color: brightblack;">self</span>)
-        <span style="color: #b3b3b3;">tkw</span> = canvas.get_tk_widget()
-        tkw.config(relief=FLAT, bd=0, takefocus=0, highlightthickness=0)
-        <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">fig</span> = fig
-        <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">canvas</span> = canvas
-        <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">tkw</span> = tkw
+        <span class="org-variable-name">canvas</span> <span class="org-operator">=</span> FigureCanvas(fig, master<span class="org-operator">=</span><span class="org-keyword">self</span>)
+        <span class="org-variable-name">tkw</span> <span class="org-operator">=</span> canvas.get_tk_widget()
+        tkw.config(relief<span class="org-operator">=</span>FLAT, bd<span class="org-operator">=</span>0, takefocus<span class="org-operator">=</span>0, highlightthickness<span class="org-operator">=</span>0)
+        <span class="org-keyword">self</span>.p.<span class="org-variable-name">fig</span> <span class="org-operator">=</span> fig
+        <span class="org-keyword">self</span>.p.<span class="org-variable-name">canvas</span> <span class="org-operator">=</span> canvas
+        <span class="org-keyword">self</span>.p.<span class="org-variable-name">tkw</span> <span class="org-operator">=</span> tkw
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">_redraw</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">"""Redraws plot with data from self.p automatically after append of the new data"""</span>
-        <span style="color: #b3b3b3;">ax</span> = <span style="color: brightblack;">self</span>.p.fig.axes[0]
-        <span style="color: #b3b3b3;">line</span> = ax.lines[0]
+    <span class="org-keyword">def</span> <span class="org-function-name">_redraw</span>(<span class="org-keyword">self</span>):
+        <span class="org-doc">"""Redraws plot with data from self.p automatically after append of the new data"""</span>
+        <span class="org-variable-name">ax</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.p.fig.axes[0]
+        <span class="org-variable-name">line</span> <span class="org-operator">=</span> ax.lines[0]
 
-        line.set_xdata(<span style="color: brightblack;">self</span>.p.xdata)
-        line.set_ydata(<span style="color: brightblack;">self</span>.p.ydata)
+        line.set_xdata(<span class="org-keyword">self</span>.p.xdata)
+        line.set_ydata(<span class="org-keyword">self</span>.p.ydata)
 
-        <span style="color: #b3b3b3;">x1</span> = <span style="color: brightblack;">self</span>.p.xdata[-1]
-        <span style="color: #b3b3b3;">tm0</span> = mdates.num2date(x1) - <span style="color: brightblack;">self</span>.p.xband + <span style="color: brightblack;">self</span>.p.tdelta
-        <span style="color: #b3b3b3;">x0</span> = mdates.date2num(tm0)
+        <span class="org-variable-name">x1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.p.xdata[<span class="org-operator">-</span>1]
+        <span class="org-variable-name">tm0</span> <span class="org-operator">=</span> mdates.num2date(x1) <span class="org-operator">-</span> <span class="org-keyword">self</span>.p.xband <span class="org-operator">+</span> <span class="org-keyword">self</span>.p.tdelta
+        <span class="org-variable-name">x0</span> <span class="org-operator">=</span> mdates.date2num(tm0)
         ax.set_xlim(x0, x1)
 
-        <span style="color: #b3b3b3;">y0</span> = 0
-        <span style="color: #b3b3b3;">y1</span> = <span style="color: brightblack;">self</span>.p.ymax
-        ax.set_ylim(y0 - <span style="color: brightblack;">self</span>.p.ylimpad, y1 + <span style="color: brightblack;">self</span>.p.ylimpad)
-        <span style="color: brightblack;">self</span>.p.canvas.draw()
+        <span class="org-variable-name">y0</span> <span class="org-operator">=</span> 0
+        <span class="org-variable-name">y1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.p.ymax
+        ax.set_ylim(y0 <span class="org-operator">-</span> <span class="org-keyword">self</span>.p.ylimpad, y1 <span class="org-operator">+</span> <span class="org-keyword">self</span>.p.ylimpad)
+        <span class="org-keyword">self</span>.p.canvas.draw()
 
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">appendy</span>(<span style="color: brightblack;">self</span>, y):
-        <span style="color: #b3b3b3;">tm</span> = utils.now()
-        <span style="color: #b3b3b3;">tm</span> = mdates.date2num(tm)
-        <span style="color: brightblack;">self</span>.p.xdata.append(tm)
-        <span style="color: brightblack;">self</span>.p.<span style="color: #b3b3b3;">ymax</span> = <span style="color: #b3b3b3;">max</span>(<span style="color: brightblack;">self</span>.p.ymax, y)
-        <span style="color: brightblack;">self</span>.p.ydata.append(y)
-        <span style="color: brightblack;">self</span>._redraw()
+    <span class="org-keyword">def</span> <span class="org-function-name">appendy</span>(<span class="org-keyword">self</span>, y):
+        <span class="org-variable-name">tm</span> <span class="org-operator">=</span> utils.now()
+        <span class="org-variable-name">tm</span> <span class="org-operator">=</span> mdates.date2num(tm)
+        <span class="org-keyword">self</span>.p.xdata.append(tm)
+        <span class="org-keyword">self</span>.p.<span class="org-variable-name">ymax</span> <span class="org-operator">=</span> <span class="org-builtin">max</span>(<span class="org-keyword">self</span>.p.ymax, y)
+        <span class="org-keyword">self</span>.p.ydata.append(y)
+        <span class="org-keyword">self</span>._redraw()
 </pre>
 </div>
 
@@ -199,11 +324,11 @@ Here is an example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #b3b3b3;">aplt1</span> = AnimPlot(<span style="color: brightblack;">self</span>.pltfr, app=<span style="color: brightblack;">self</span>.app, name=<span style="color: brightblack;">"tpm200plot1"</span>, lnc=<span style="color: brightblack;">"red"</span>, lnw=2, title=u<span style="color: brightblack;">"Sensor PV1"</span>, ylabel=u<span style="color: brightblack;">"C"</span>, period=3)
-aplt1.pack(side=TOP, expand=YES, fill=Y)
-<span style="color: #595959;"># </span><span style="color: #595959;">...</span>
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">onpolling</span>():
-    <span style="color: #b3b3b3;">val</span> = read_sensor()
+<pre class="src src-python"><span class="org-variable-name">aplt1</span> <span class="org-operator">=</span> AnimPlot(<span class="org-keyword">self</span>.pltfr, app<span class="org-operator">=</span><span class="org-keyword">self</span>.app, name<span class="org-operator">=</span><span class="org-string">"tpm200plot1"</span>, lnc<span class="org-operator">=</span><span class="org-string">"red"</span>, lnw<span class="org-operator">=</span>2, title<span class="org-operator">=</span>u<span class="org-string">"Sensor PV1"</span>, ylabel<span class="org-operator">=</span>u<span class="org-string">"C"</span>, period<span class="org-operator">=</span>3)
+aplt1.pack(side<span class="org-operator">=</span>TOP, expand<span class="org-operator">=</span>YES, fill<span class="org-operator">=</span>Y)
+<span class="org-comment-delimiter"># </span><span class="org-comment">...</span>
+<span class="org-keyword">def</span> <span class="org-function-name">onpolling</span>():
+    <span class="org-variable-name">val</span> <span class="org-operator">=</span> read_sensor()
     aplt1.appendy(pv1)
 </pre>
 </div>

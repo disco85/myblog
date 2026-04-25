@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Small tricks in shell</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Small tricks in shell</h1>
-<div id="outline-container-org5e246be" class="outline-2">
-<h2 id="org5e246be">Small tricks in shell</h2>
-<div class="outline-text-2" id="text-org5e246be">
+<div id="outline-container-orgd837eb4" class="outline-2">
+<h2 id="orgd837eb4">Small tricks in shell</h2>
+<div class="outline-text-2" id="text-orgd837eb4">
 <p>
 !Directories tree view
 </p>
@@ -81,8 +206,8 @@ Set it to your <code>.bashrc</code> and run as <code>tree [DIR]</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #a52a2a;">tree</span>() {
-find <span style="color: brightblack;">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span style="color: brightblack;">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span style="color: #b3b3b3;">FS</span>=<span style="color: brightblack;">'/'</span>
+<pre class="src src-bash"><span class="org-function-name">tree</span>() {
+find <span class="org-string">"${1:-.}"</span> -type d -print 2&gt;/dev/null|awk <span class="org-string">'!/\.$/ {for (i=1;i&lt;NF;i++){d=length($i);if ( d &lt; 5  &amp;&amp; i != 1 )d=5;printf("%"d"s","|")}print "---"$NF}'</span>  <span class="org-variable-name">FS</span>=<span class="org-string">'/'</span>
 }
 </pre>
 </div>
@@ -97,7 +222,7 @@ If you have big patch file with many files there, to patch only one
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash">filterdiff -i <span style="color: brightblack;">'*filename.py'</span> patch.diff | patch -pN
+<pre class="src src-bash">filterdiff -i <span class="org-string">'*filename.py'</span> patch.diff | patch -pN
 </pre>
 </div>
 
@@ -137,14 +262,14 @@ This script run one of available command:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/bin/</span><span style="color: brightblack;">sh</span>
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
 
-<span style="color: #a52a2a;">trycmd</span>() {
-    <span style="color: #b3b3b3;">a0</span>=$<span style="color: #b3b3b3;">1</span>; <span style="color: #b3b3b3;">shift</span>
-    <span style="color: brightblack;">for</span> c<span style="color: brightblack;"> in</span> $<span style="color: #b3b3b3;">*</span>; <span style="color: brightblack;">do</span> $<span style="color: #b3b3b3;">c</span> $<span style="color: #b3b3b3;">a0</span> 2&gt;/dev/null &amp;&amp; <span style="color: brightblack;">break</span>; <span style="color: brightblack;">done</span>
+<span class="org-function-name">trycmd</span>() {
+    <span class="org-variable-name">a0</span>=$<span class="org-variable-name">1</span>; <span class="org-builtin">shift</span>
+    <span class="org-keyword">for</span> c<span class="org-keyword"> in</span> $<span class="org-variable-name">*</span>; <span class="org-keyword">do</span> $<span class="org-variable-name">c</span> $<span class="org-variable-name">a0</span> 2&gt;/dev/null &amp;&amp; <span class="org-keyword">break</span>; <span class="org-keyword">done</span>
 }
 
-<span style="color: #595959;"># </span><span style="color: #595959;">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">usage: run one of: pipx|pip0|pip1|pip3|pip with arg: list</span>
 trycmd list pipx pip0 pip1 pip3 pip
 </pre>
 </div>

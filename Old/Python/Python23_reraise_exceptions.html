@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python2,3: re-raise exceptions</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,20 +194,20 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Python2,3: re-raise exceptions</h1>
-<div id="outline-container-orgf9d5d73" class="outline-2">
-<h2 id="orgf9d5d73">Python2,3: re-raise exceptions</h2>
-<div class="outline-text-2" id="text-orgf9d5d73">
+<div id="outline-container-org6ee8b72" class="outline-2">
+<h2 id="org6ee8b72">Python2,3: re-raise exceptions</h2>
+<div class="outline-text-2" id="text-org6ee8b72">
 <p>
 Good practice is to keep original traceback (stack-trace) when you re-raise modified exception. In Python 2 it's simple:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">        <span style="color: brightblack;">try</span>:
-            <span style="color: brightblack;">return</span> buggy()
-        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span> <span style="color: brightblack;">as</span> x:
-            <span style="color: #b3b3b3;">cls</span>,<span style="color: #b3b3b3;">obj</span>,<span style="color: #b3b3b3;">tb</span> = sys.exc_info()
-            <span style="color: #595959;"># </span><span style="color: #595959;">modify obj OR create new the same class (cls), like here</span>
-            <span style="color: brightblack;">raise</span> cls, SOME_ARGS, tb
+<pre class="src src-python">        <span class="org-keyword">try</span>:
+            <span class="org-keyword">return</span> buggy()
+        <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+            <span class="org-variable-name">cls</span>,<span class="org-variable-name">obj</span>,<span class="org-variable-name">tb</span> <span class="org-operator">=</span> sys.exc_info()
+            <span class="org-comment-delimiter"># </span><span class="org-comment">modify obj OR create new the same class (cls), like here</span>
+            <span class="org-keyword">raise</span> cls, SOME_ARGS, tb
 </pre>
 </div>
 
@@ -91,12 +216,12 @@ In Python 3 it's simple too, but now there is a special <code>BaseException</cod
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python">        <span style="color: brightblack;">try</span>:
-            <span style="color: brightblack;">return</span> buggy()
-        <span style="color: brightblack;">except</span> <span style="color: #cccccc;">Exception</span> <span style="color: brightblack;">as</span> x:
-            <span style="color: #b3b3b3;">cls</span>,<span style="color: #b3b3b3;">obj</span>,<span style="color: #b3b3b3;">tb</span> = sys.exc_info()
-            <span style="color: #595959;"># </span><span style="color: #595959;">modify obj OR create new the same class (cls), like here</span>
-            <span style="color: brightblack;">raise</span> cls(SOME_ARGS).with_traceback(tb)
+<pre class="src src-python">        <span class="org-keyword">try</span>:
+            <span class="org-keyword">return</span> buggy()
+        <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+            <span class="org-variable-name">cls</span>,<span class="org-variable-name">obj</span>,<span class="org-variable-name">tb</span> <span class="org-operator">=</span> sys.exc_info()
+            <span class="org-comment-delimiter"># </span><span class="org-comment">modify obj OR create new the same class (cls), like here</span>
+            <span class="org-keyword">raise</span> cls(SOME_ARGS).with_traceback(tb)
 </pre>
 </div>
 
@@ -105,8 +230,8 @@ Now to make common code compatible with Python 2 and 3 we SHOULD save it in DIFF
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">def</span> <span style="color: #a52a2a;">reraise</span>(exc, msg, tb):
-    <span style="color: brightblack;">raise</span> exc, msg, tb
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">reraise</span>(exc, msg, tb):
+    <span class="org-keyword">raise</span> exc, msg, tb
 </pre>
 </div>
 
@@ -115,12 +240,12 @@ and similar in 'comp3.py' but with with<sub>traceback</sub>() usage. Now use it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">import</span> sys
-<span style="color: #b3b3b3;">_PY23</span> = 3 <span style="color: brightblack;">if</span> sys.version_info.major &gt; 2 <span style="color: brightblack;">else</span> 2
-<span style="color: brightblack;">if</span> _PY23 == 2:
-    <span style="color: brightblack;">from</span> comp2 <span style="color: brightblack;">import</span> *
-<span style="color: brightblack;">elif</span> _PY23 == 3:
-    <span style="color: brightblack;">from</span> comp3 <span style="color: brightblack;">import</span> *
+<pre class="src src-python"><span class="org-keyword">import</span> sys
+<span class="org-variable-name">_PY23</span> <span class="org-operator">=</span> 3 <span class="org-keyword">if</span> sys.version_info.major <span class="org-operator">&gt;</span> 2 <span class="org-keyword">else</span> 2
+<span class="org-keyword">if</span> _PY23 <span class="org-operator">==</span> 2:
+    <span class="org-keyword">from</span> comp2 <span class="org-keyword">import</span> <span class="org-operator">*</span>
+<span class="org-keyword">elif</span> _PY23 <span class="org-operator">==</span> 3:
+    <span class="org-keyword">from</span> comp3 <span class="org-keyword">import</span> <span class="org-operator">*</span>
 </pre>
 </div>
 </div>

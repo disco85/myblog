@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Build of SBCL projects</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -74,73 +199,73 @@ I switched from <a href="https://roswell.github.io/">Roswell</a> to <a href="htt
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span style="color: #595959;">#</span><span style="color: #595959;">!/usr/bin/</span><span style="color: brightblack;">env</span><span style="color: #595959;"> bash</span>
-<span style="color: #b3b3b3;">set</span> -euo pipefail
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/</span><span class="org-keyword">env</span><span class="org-comment"> bash</span>
+<span class="org-builtin">set</span> -euo pipefail
 
-<span style="color: #b3b3b3;">SCRIPT_DIR</span>=<span style="color: brightblack;">"$(</span><span style="color: #fa8072;">cd -- "$(dirname -- "$0"</span><span style="color: brightblack;">)" &amp;&amp; pwd)"</span>
-<span style="color: #b3b3b3;">PROJECT</span>=<span style="color: brightblack;">"$(</span><span style="color: #fa8072;">basename "$SCRIPT_DIR"</span><span style="color: brightblack;">)"</span>
-<span style="color: #b3b3b3;">PROJECT_L</span>=<span style="color: brightblack;">"$(</span><span style="color: #fa8072;">printf '%s' "$PROJECT" | tr '[:upper:]' '[:lower:]'</span><span style="color: brightblack;">)"</span>
-<span style="color: #b3b3b3;">PROJECT_U</span>=<span style="color: brightblack;">"$(</span><span style="color: #fa8072;">printf '%s' "$PROJECT" | tr '[:lower:]' '[:upper:]'</span><span style="color: brightblack;">)"</span>
+<span class="org-variable-name">SCRIPT_DIR</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">cd -- "$(dirname -- "$0"</span><span class="org-string">)" &amp;&amp; pwd)"</span>
+<span class="org-variable-name">PROJECT</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">basename "$SCRIPT_DIR"</span><span class="org-string">)"</span>
+<span class="org-variable-name">PROJECT_L</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">printf '%s' "$PROJECT" | tr '[:upper:]' '[:lower:]'</span><span class="org-string">)"</span>
+<span class="org-variable-name">PROJECT_U</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">printf '%s' "$PROJECT" | tr '[:lower:]' '[:upper:]'</span><span class="org-string">)"</span>
 
-<span style="color: #b3b3b3;">LISP_CMD</span>=${<span style="color: #b3b3b3;">1</span>:-qlot exec sbcl}
-<span style="color: #b3b3b3;">LOGFILE</span>=build.log
-: &gt; <span style="color: brightblack;">"$LOGFILE"</span>
+<span class="org-variable-name">LISP_CMD</span>=${<span class="org-variable-name">1</span>:-qlot exec sbcl}
+<span class="org-variable-name">LOGFILE</span>=build.log
+: &gt; <span class="org-string">"$LOGFILE"</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Increase heap if your image is large (adjust MB)</span>
-<span style="color: #b3b3b3;">DYNAMIC_SPACE</span>=${<span style="color: #b3b3b3;">DYNAMIC_SPACE</span>:-4096}
-<span style="color: #595959;"># </span><span style="color: #595959;">runtime vs lisp options</span>
-<span style="color: #b3b3b3;">SBCL_RUNTIME_OPTS</span>=(--dynamic-space-size <span style="color: brightblack;">"$DYNAMIC_SPACE"</span>)
-<span style="color: #b3b3b3;">SBCL_LISP_OPTS</span>=(--noinform --no-sysinit --noprint)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Increase heap if your image is large (adjust MB)</span>
+<span class="org-variable-name">DYNAMIC_SPACE</span>=${<span class="org-variable-name">DYNAMIC_SPACE</span>:-4096}
+<span class="org-comment-delimiter"># </span><span class="org-comment">runtime vs lisp options</span>
+<span class="org-variable-name">SBCL_RUNTIME_OPTS</span>=(--dynamic-space-size <span class="org-string">"$DYNAMIC_SPACE"</span>)
+<span class="org-variable-name">SBCL_LISP_OPTS</span>=(--noinform --no-sysinit --noprint)
 
-<span style="color: brightblack;">if</span> [[ <span style="color: brightblack;">"${RELEASE+x}"</span> = x ]]; <span style="color: brightblack;">then</span>
-  <span style="color: #b3b3b3;">SBCL_LISP_OPTS</span>+=(--disable-debugger)
-  <span style="color: #b3b3b3;">SAVE_EXTRA</span>=<span style="color: brightblack;">":purify t :compression t"</span>
-<span style="color: brightblack;">else</span>
-  <span style="color: #b3b3b3;">SBCL_LISP_OPTS</span>+=() <span style="color: #595959;">#</span><span style="color: #595959;">--debug 3)</span>
-  <span style="color: #b3b3b3;">SAVE_EXTRA</span>=<span style="color: brightblack;">""</span>
-<span style="color: brightblack;">fi</span>
+<span class="org-keyword">if</span> [[ <span class="org-string">"${RELEASE+x}"</span> = x ]]; <span class="org-keyword">then</span>
+  <span class="org-variable-name">SBCL_LISP_OPTS</span>+=(--disable-debugger)
+  <span class="org-variable-name">SAVE_EXTRA</span>=<span class="org-string">":purify t :compression t"</span>
+<span class="org-keyword">else</span>
+  <span class="org-variable-name">SBCL_LISP_OPTS</span>+=() <span class="org-comment-delimiter">#</span><span class="org-comment">--debug 3)</span>
+  <span class="org-variable-name">SAVE_EXTRA</span>=<span class="org-string">""</span>
+<span class="org-keyword">fi</span>
 
-<span style="color: #b3b3b3;">read</span> -r -d <span style="color: brightblack;">''</span> LISP_CODE &lt;&lt;EOF || true
-<span style="color: #ffff00; font-weight: bold;">(progn</span>
-<span style="color: #ffff00; font-weight: bold;">  (require :asdf)</span>
-<span style="color: #ffff00; font-weight: bold;">  (defun write-log (s)</span>
-<span style="color: #ffff00; font-weight: bold;">    (with-open-file (out "${LOGFILE}"</span>
-<span style="color: #ffff00; font-weight: bold;">                         :direction :output</span>
-<span style="color: #ffff00; font-weight: bold;">                         :if-exists :append</span>
-<span style="color: #ffff00; font-weight: bold;">                         :if-does-not-exist :create)</span>
-<span style="color: #ffff00; font-weight: bold;">      (format out "~A~%" s) (finish-output)))</span>
-<span style="color: #ffff00; font-weight: bold;">  (write-log "=== build started ===")</span>
-<span style="color: #ffff00; font-weight: bold;">  (write-log (format nil "cwd: ~A" (uiop:getcwd)))</span>
+<span class="org-builtin">read</span> -r -d <span class="org-string">''</span> LISP_CODE &lt;&lt;EOF || true
+<span class="org-sh-heredoc">(progn</span>
+<span class="org-sh-heredoc">  (require :asdf)</span>
+<span class="org-sh-heredoc">  (defun write-log (s)</span>
+<span class="org-sh-heredoc">    (with-open-file (out "${LOGFILE}"</span>
+<span class="org-sh-heredoc">                         :direction :output</span>
+<span class="org-sh-heredoc">                         :if-exists :append</span>
+<span class="org-sh-heredoc">                         :if-does-not-exist :create)</span>
+<span class="org-sh-heredoc">      (format out "~A~%" s) (finish-output)))</span>
+<span class="org-sh-heredoc">  (write-log "=== build started ===")</span>
+<span class="org-sh-heredoc">  (write-log (format nil "cwd: ~A" (uiop:getcwd)))</span>
 
-<span style="color: #ffff00; font-weight: bold;">  (write-log "about to asdf:load-system :${PROJECT_L}")</span>
-<span style="color: #ffff00; font-weight: bold;">;  (load "${PROJECT_L}.asd")</span>
-<span style="color: #ffff00; font-weight: bold;">  (asdf:load-system :${PROJECT_L})</span>
-<span style="color: #ffff00; font-weight: bold;">;  (write-log "asdf:load-system returned")</span>
-<span style="color: #ffff00; font-weight: bold;">  (write-log (format nil "asdf search path: ~A" (asdf:system-source-directory :asdf)))</span>
-<span style="color: #ffff00; font-weight: bold;">  (write-log (format nil "find-system: ~S" (asdf:find-system :${PROJECT_L})))</span>
-<span style="color: #ffff00; font-weight: bold;">  (let ((toplevel-sym (or (find-symbol "MAIN" "${PROJECT_U}")</span>
-<span style="color: #ffff00; font-weight: bold;">                          (intern "MAIN" "${PROJECT_U}"))))</span>
-<span style="color: #ffff00; font-weight: bold;">    (write-log (format nil "toplevel symbol: ~S" toplevel-sym))</span>
-<span style="color: #ffff00; font-weight: bold;">    (write-log "about to save-lisp-and-die")</span>
-<span style="color: #ffff00; font-weight: bold;">    (write-log "=== build ended ===")</span>
-<span style="color: #ffff00; font-weight: bold;">    (sb-ext:save-lisp-and-die "${PROJECT_L}"</span>
-<span style="color: #ffff00; font-weight: bold;">      :executable t</span>
-<span style="color: #ffff00; font-weight: bold;">      :save-runtime-options t</span>
-<span style="color: #ffff00; font-weight: bold;">      :toplevel toplevel-sym</span>
-<span style="color: #ffff00; font-weight: bold;">      SAVE-EXTRA)))</span>
-<span style="color: #ffff00; font-weight: bold;">EOF</span>
+<span class="org-sh-heredoc">  (write-log "about to asdf:load-system :${PROJECT_L}")</span>
+<span class="org-sh-heredoc">;  (load "${PROJECT_L}.asd")</span>
+<span class="org-sh-heredoc">  (asdf:load-system :${PROJECT_L})</span>
+<span class="org-sh-heredoc">;  (write-log "asdf:load-system returned")</span>
+<span class="org-sh-heredoc">  (write-log (format nil "asdf search path: ~A" (asdf:system-source-directory :asdf)))</span>
+<span class="org-sh-heredoc">  (write-log (format nil "find-system: ~S" (asdf:find-system :${PROJECT_L})))</span>
+<span class="org-sh-heredoc">  (let ((toplevel-sym (or (find-symbol "MAIN" "${PROJECT_U}")</span>
+<span class="org-sh-heredoc">                          (intern "MAIN" "${PROJECT_U}"))))</span>
+<span class="org-sh-heredoc">    (write-log (format nil "toplevel symbol: ~S" toplevel-sym))</span>
+<span class="org-sh-heredoc">    (write-log "about to save-lisp-and-die")</span>
+<span class="org-sh-heredoc">    (write-log "=== build ended ===")</span>
+<span class="org-sh-heredoc">    (sb-ext:save-lisp-and-die "${PROJECT_L}"</span>
+<span class="org-sh-heredoc">      :executable t</span>
+<span class="org-sh-heredoc">      :save-runtime-options t</span>
+<span class="org-sh-heredoc">      :toplevel toplevel-sym</span>
+<span class="org-sh-heredoc">      SAVE-EXTRA)))</span>
+<span class="org-sh-heredoc">EOF</span>
 
-<span style="color: #b3b3b3;">LISP_CODE</span>=<span style="color: brightblack;">"${LISP_CODE//SAVE-EXTRA/$SAVE_EXTRA}"</span>
+<span class="org-variable-name">LISP_CODE</span>=<span class="org-string">"${LISP_CODE//SAVE-EXTRA/$SAVE_EXTRA}"</span>
 
-<span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"---- Lisp code to be evaluated ----"</span> | tee -a <span style="color: brightblack;">"$LOGFILE"</span>
-<span style="color: #b3b3b3;">printf</span> <span style="color: brightblack;">'%s\n'</span> <span style="color: brightblack;">"$LISP_CODE"</span> | tee -a <span style="color: brightblack;">"$LOGFILE"</span>
-<span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"---- end of code ----"</span> | tee -a <span style="color: brightblack;">"$LOGFILE"</span>
+<span class="org-builtin">echo</span> <span class="org-string">"---- Lisp code to be evaluated ----"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
+<span class="org-builtin">printf</span> <span class="org-string">'%s\n'</span> <span class="org-string">"$LISP_CODE"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
+<span class="org-builtin">echo</span> <span class="org-string">"---- end of code ----"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
 
-<span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"$LISP_CODE"</span> &gt; <span style="color: brightblack;">"/tmp/${PROJECT_L}-build.lisp"</span>
+<span class="org-builtin">echo</span> <span class="org-string">"$LISP_CODE"</span> &gt; <span class="org-string">"/tmp/${PROJECT_L}-build.lisp"</span>
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Run under qlot exec if you rely on qlot local projects</span>
-<span style="color: #b3b3b3;">echo</span> <span style="color: brightblack;">"About to run $LISP_CMD ${SBCL_RUNTIME_OPTS[@]} ${SBCL_LISP_OPTS[@]} --load /tmp/${PROJECT_L}-build.lisp"</span> | tee -a <span style="color: brightblack;">"$LOGFILE"</span>
-$<span style="color: #b3b3b3;">LISP_CMD</span> <span style="color: brightblack;">"${SBCL_RUNTIME_OPTS[@]}"</span> <span style="color: brightblack;">"${SBCL_LISP_OPTS[@]}"</span> --load <span style="color: brightblack;">"/tmp/${PROJECT_L}-build.lisp"</span> |tee -a <span style="color: brightblack;">"$LOGFILE"</span> 2&gt;&amp;1
+<span class="org-comment-delimiter"># </span><span class="org-comment">Run under qlot exec if you rely on qlot local projects</span>
+<span class="org-builtin">echo</span> <span class="org-string">"About to run $LISP_CMD ${SBCL_RUNTIME_OPTS[@]} ${SBCL_LISP_OPTS[@]} --load /tmp/${PROJECT_L}-build.lisp"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
+$<span class="org-variable-name">LISP_CMD</span> <span class="org-string">"${SBCL_RUNTIME_OPTS[@]}"</span> <span class="org-string">"${SBCL_LISP_OPTS[@]}"</span> --load <span class="org-string">"/tmp/${PROJECT_L}-build.lisp"</span> |tee -a <span class="org-string">"$LOGFILE"</span> 2&gt;&amp;1
 </pre>
 </div>
 
@@ -151,7 +276,7 @@ define environment variable <code>RELEASE</code> then it will be compressed (usu
 </p>
 
 <div class="org-src-container">
-<pre class="src src-shell">  <span style="color: #b3b3b3;">RELEASE</span>= qlot exec ./build.sh
+<pre class="src src-shell">  <span class="org-variable-name">RELEASE</span>= qlot exec ./build.sh
 </pre>
 </div>
 

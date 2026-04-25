@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Segmential search</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Segmential search</h1>
-<div id="outline-container-org11414e9" class="outline-2">
-<h2 id="org11414e9">Segmential search</h2>
-<div class="outline-text-2" id="text-org11414e9">
+<div id="outline-container-org96fc366" class="outline-2">
+<h2 id="org96fc366">Segmential search</h2>
+<div class="outline-text-2" id="text-org96fc366">
 <p>
 It's something close to segments tree, but a list is used (+binary search on it) instead of a tree.
 </p>
@@ -89,114 +214,114 @@ We find the segment contained the point with binary search. Then we find the off
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">import</span> random
-<span style="color: brightblack;">import</span> functools
+<pre class="src src-python"><span class="org-keyword">import</span> random
+<span class="org-keyword">import</span> functools
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">swap</span>(x, y): <span style="color: brightblack;">return</span> (y, x)
+<span class="org-keyword">def</span> <span class="org-function-name">swap</span>(x, y): <span class="org-keyword">return</span> (y, x)
 
-<span style="color: #cccccc;">@functools.total_ordering</span>
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">Seg</span>:
-    <span style="color: brightblack;">'''Normalized segment'''</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, a, b=<span style="color: #7fffd4;">None</span>):
-        <span style="color: brightblack;">if</span> b <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>: <span style="color: #cccccc;">b</span> = a
-        <span style="color: brightblack;">if</span> a &gt; <span style="color: #b3b3b3;">b</span>: <span style="color: #cccccc;">a</span>, <span style="color: #cccccc;">b</span> = swap(a, b)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">a</span> = a
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">b</span> = b
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__contains__</span>(<span style="color: brightblack;">self</span>, pt):
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.a &lt;= pt &lt;= <span style="color: brightblack;">self</span>.b
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__len__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.b - <span style="color: brightblack;">self</span>.a + 1
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__eq__</span>(<span style="color: brightblack;">self</span>, oth):
-        <span style="color: brightblack;">assert</span> <span style="color: #b3b3b3;">type</span>(oth) <span style="color: brightblack;">is</span> <span style="color: #b3b3b3;">type</span>(<span style="color: brightblack;">self</span>)
-        <span style="color: brightblack;">self</span>.a == oth.a <span style="color: brightblack;">and</span> <span style="color: brightblack;">self</span>.b == oth.b
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__lt__</span>(<span style="color: brightblack;">self</span>, oth):
-        <span style="color: brightblack;">assert</span> <span style="color: #b3b3b3;">type</span>(oth) <span style="color: brightblack;">is</span> <span style="color: #b3b3b3;">type</span>(<span style="color: brightblack;">self</span>)
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>.a &lt; oth.a
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__repr__</span>(<span style="color: brightblack;">self</span>): <span style="color: brightblack;">return</span> f<span style="color: brightblack;">'</span>{<span style="color: brightblack;">self</span>.a}<span style="color: brightblack;">..</span>{<span style="color: brightblack;">self</span>.b}<span style="color: brightblack;">'</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">cmp_pt</span>(<span style="color: brightblack;">self</span>, pt):
-        <span style="color: brightblack;">if</span> pt &lt; <span style="color: brightblack;">self</span>.a: <span style="color: brightblack;">return</span> 1
-        <span style="color: brightblack;">elif</span> pt &gt; <span style="color: brightblack;">self</span>.b: <span style="color: brightblack;">return</span> -1
-        <span style="color: brightblack;">else</span>: <span style="color: brightblack;">return</span> 0
+<span class="org-type">@functools.total_ordering</span>
+<span class="org-keyword">class</span> <span class="org-type">Seg</span>:
+    <span class="org-doc">'''Normalized segment'''</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, a, b<span class="org-operator">=</span><span class="org-constant">None</span>):
+        <span class="org-keyword">if</span> b <span class="org-keyword">is</span> <span class="org-constant">None</span>: <span class="org-type">b</span> <span class="org-operator">=</span> a
+        <span class="org-keyword">if</span> a <span class="org-operator">&gt;</span> <span class="org-variable-name">b</span>: <span class="org-type">a</span>, <span class="org-type">b</span> <span class="org-operator">=</span> swap(a, b)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">a</span> <span class="org-operator">=</span> a
+        <span class="org-keyword">self</span>.<span class="org-variable-name">b</span> <span class="org-operator">=</span> b
+    <span class="org-keyword">def</span> <span class="org-function-name">__contains__</span>(<span class="org-keyword">self</span>, pt):
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>.a <span class="org-operator">&lt;=</span> pt <span class="org-operator">&lt;=</span> <span class="org-keyword">self</span>.b
+    <span class="org-keyword">def</span> <span class="org-function-name">__len__</span>(<span class="org-keyword">self</span>):
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>.b <span class="org-operator">-</span> <span class="org-keyword">self</span>.a <span class="org-operator">+</span> 1
+    <span class="org-keyword">def</span> <span class="org-function-name">__eq__</span>(<span class="org-keyword">self</span>, oth):
+        <span class="org-keyword">assert</span> <span class="org-builtin">type</span>(oth) <span class="org-keyword">is</span> <span class="org-builtin">type</span>(<span class="org-keyword">self</span>)
+        <span class="org-keyword">self</span>.a <span class="org-operator">==</span> oth.a <span class="org-keyword">and</span> <span class="org-keyword">self</span>.b <span class="org-operator">==</span> oth.b
+    <span class="org-keyword">def</span> <span class="org-function-name">__lt__</span>(<span class="org-keyword">self</span>, oth):
+        <span class="org-keyword">assert</span> <span class="org-builtin">type</span>(oth) <span class="org-keyword">is</span> <span class="org-builtin">type</span>(<span class="org-keyword">self</span>)
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>.a <span class="org-operator">&lt;</span> oth.a
+    <span class="org-keyword">def</span> <span class="org-function-name">__repr__</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> f<span class="org-string">'</span>{<span class="org-keyword">self</span>.a}<span class="org-string">..</span>{<span class="org-keyword">self</span>.b}<span class="org-string">'</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">cmp_pt</span>(<span class="org-keyword">self</span>, pt):
+        <span class="org-keyword">if</span> pt <span class="org-operator">&lt;</span> <span class="org-keyword">self</span>.a: <span class="org-keyword">return</span> 1
+        <span class="org-keyword">elif</span> pt <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.b: <span class="org-keyword">return</span> <span class="org-operator">-</span>1
+        <span class="org-keyword">else</span>: <span class="org-keyword">return</span> 0
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">segs_from_points</span>(pts):
-    <span style="color: #b3b3b3;">seg</span> = <span style="color: #7fffd4;">None</span>
-    <span style="color: #b3b3b3;">d</span> = 0
-    <span style="color: brightblack;">for</span> pt <span style="color: brightblack;">in</span> pts:
-        <span style="color: brightblack;">if</span> seg <span style="color: brightblack;">is</span> <span style="color: #7fffd4;">None</span>:
-            <span style="color: #b3b3b3;">seg</span> = Seg(pt)
-        <span style="color: brightblack;">else</span>:
-            <span style="color: #b3b3b3;">d</span> = pt - seg.b
-            <span style="color: brightblack;">if</span> 0 &gt; d:
-                <span style="color: brightblack;">raise</span> <span style="color: #cccccc;">ValueError</span>(<span style="color: brightblack;">'Unordered points'</span>)
-            <span style="color: brightblack;">elif</span> 0 == d:
-                <span style="color: brightblack;">pass</span>
-            <span style="color: brightblack;">elif</span> 1 == d:
-                seg.<span style="color: #b3b3b3;">b</span> += 1
-            <span style="color: brightblack;">elif</span> 1 &lt; d:
-                <span style="color: brightblack;">yield</span> seg
-                <span style="color: #b3b3b3;">seg</span> = Seg(pt)
+<span class="org-keyword">def</span> <span class="org-function-name">segs_from_points</span>(pts):
+    <span class="org-variable-name">seg</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+    <span class="org-variable-name">d</span> <span class="org-operator">=</span> 0
+    <span class="org-keyword">for</span> pt <span class="org-keyword">in</span> pts:
+        <span class="org-keyword">if</span> seg <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+            <span class="org-variable-name">seg</span> <span class="org-operator">=</span> Seg(pt)
+        <span class="org-keyword">else</span>:
+            <span class="org-variable-name">d</span> <span class="org-operator">=</span> pt <span class="org-operator">-</span> seg.b
+            <span class="org-keyword">if</span> 0 <span class="org-operator">&gt;</span> d:
+                <span class="org-keyword">raise</span> <span class="org-type">ValueError</span>(<span class="org-string">'Unordered points'</span>)
+            <span class="org-keyword">elif</span> 0 <span class="org-operator">==</span> d:
+                <span class="org-keyword">pass</span>
+            <span class="org-keyword">elif</span> 1 <span class="org-operator">==</span> d:
+                seg.<span class="org-variable-name">b</span> <span class="org-operator">+=</span> 1
+            <span class="org-keyword">elif</span> 1 <span class="org-operator">&lt;</span> d:
+                <span class="org-keyword">yield</span> seg
+                <span class="org-variable-name">seg</span> <span class="org-operator">=</span> Seg(pt)
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Usual binary search but of the point in segments,</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">so cmp_pt() is used</span>
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">find_seg</span>(segs, pt):
-    <span style="color: #b3b3b3;">start</span> = 0
-    <span style="color: #b3b3b3;">end</span> = <span style="color: #b3b3b3;">len</span>(segs) - 1
-    <span style="color: brightblack;">while</span> start &lt;= end:
-        <span style="color: #b3b3b3;">mid</span> = (start + end) // 2
-        <span style="color: #b3b3b3;">mid_el</span> = segs[mid]
-        <span style="color: #b3b3b3;">d</span> = mid_el.cmp_pt(pt)
-        <span style="color: brightblack;">if</span> d &gt; 0:
-            <span style="color: #b3b3b3;">end</span> = mid - 1
-        <span style="color: brightblack;">elif</span> d &lt; 0:
-            <span style="color: #b3b3b3;">start</span> = mid + 1
-        <span style="color: brightblack;">else</span>:
-            <span style="color: brightblack;">return</span> mid
-    <span style="color: brightblack;">return</span> -1
+<span class="org-comment-delimiter"># </span><span class="org-comment">Usual binary search but of the point in segments,</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">so cmp_pt() is used</span>
+<span class="org-keyword">def</span> <span class="org-function-name">find_seg</span>(segs, pt):
+    <span class="org-variable-name">start</span> <span class="org-operator">=</span> 0
+    <span class="org-variable-name">end</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(segs) <span class="org-operator">-</span> 1
+    <span class="org-keyword">while</span> start <span class="org-operator">&lt;=</span> end:
+        <span class="org-variable-name">mid</span> <span class="org-operator">=</span> (start <span class="org-operator">+</span> end) <span class="org-operator">//</span> 2
+        <span class="org-variable-name">mid_el</span> <span class="org-operator">=</span> segs[mid]
+        <span class="org-variable-name">d</span> <span class="org-operator">=</span> mid_el.cmp_pt(pt)
+        <span class="org-keyword">if</span> d <span class="org-operator">&gt;</span> 0:
+            <span class="org-variable-name">end</span> <span class="org-operator">=</span> mid <span class="org-operator">-</span> 1
+        <span class="org-keyword">elif</span> d <span class="org-operator">&lt;</span> 0:
+            <span class="org-variable-name">start</span> <span class="org-operator">=</span> mid <span class="org-operator">+</span> 1
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">return</span> mid
+    <span class="org-keyword">return</span> <span class="org-operator">-</span>1
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">find</span>(segs, pt):
-    <span style="color: #b3b3b3;">segi</span> = find_seg(ACCESS(segs, _cap=<span style="color: brightblack;">'seg'</span>), pt)
-    <span style="color: brightblack;">if</span> segi &gt;= 0:
-        <span style="color: #b3b3b3;">seg</span> = segs[segi]
-        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Found seg: </span>{seg}<span style="color: brightblack;">"</span>)
-        <span style="color: #b3b3b3;">off_in_seg</span> = pt - seg.a
-        <span style="color: #b3b3b3;">fnd</span> = 0
-        <span style="color: brightblack;">for</span> i <span style="color: brightblack;">in</span> <span style="color: #b3b3b3;">range</span>(segi):
-            <span style="color: #b3b3b3;">fnd</span> += <span style="color: #b3b3b3;">len</span>(segs[i])
-        <span style="color: #b3b3b3;">fnd</span> += off_in_seg
-        <span style="color: brightblack;">return</span> fnd
-    <span style="color: brightblack;">else</span>:
-        <span style="color: brightblack;">return</span> -1
+<span class="org-keyword">def</span> <span class="org-function-name">find</span>(segs, pt):
+    <span class="org-variable-name">segi</span> <span class="org-operator">=</span> find_seg(ACCESS(segs, _cap<span class="org-operator">=</span><span class="org-string">'seg'</span>), pt)
+    <span class="org-keyword">if</span> segi <span class="org-operator">&gt;=</span> 0:
+        <span class="org-variable-name">seg</span> <span class="org-operator">=</span> segs[segi]
+        <span class="org-builtin">print</span>(f<span class="org-string">"Found seg: </span>{seg}<span class="org-string">"</span>)
+        <span class="org-variable-name">off_in_seg</span> <span class="org-operator">=</span> pt <span class="org-operator">-</span> seg.a
+        <span class="org-variable-name">fnd</span> <span class="org-operator">=</span> 0
+        <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(segi):
+            <span class="org-variable-name">fnd</span> <span class="org-operator">+=</span> <span class="org-builtin">len</span>(segs[i])
+        <span class="org-variable-name">fnd</span> <span class="org-operator">+=</span> off_in_seg
+        <span class="org-keyword">return</span> fnd
+    <span class="org-keyword">else</span>:
+        <span class="org-keyword">return</span> <span class="org-operator">-</span>1
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">partiallyrandomdata</span>(num, ratio=0.5):
-    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">list</span>(<span style="color: #b3b3b3;">range</span>(num))
-    <span style="color: #b3b3b3;">i</span> = 0
-    <span style="color: #b3b3b3;">cnt</span> = <span style="color: #b3b3b3;">min</span>(num, num*ratio)
-    <span style="color: brightblack;">while</span> i &lt; cnt:
-        <span style="color: #b3b3b3;">r</span> = random.randint(num, num + cnt - 1)
-        <span style="color: #b3b3b3;">res</span>[r - num] = r
-        <span style="color: #b3b3b3;">i</span> += 1
-    <span style="color: #b3b3b3;">res</span> = <span style="color: #b3b3b3;">sorted</span>(res)
-    <span style="color: brightblack;">return</span> (res, random.choice(res))
+<span class="org-keyword">def</span> <span class="org-function-name">partiallyrandomdata</span>(num, ratio<span class="org-operator">=</span>0.5):
+    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(<span class="org-builtin">range</span>(num))
+    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0
+    <span class="org-variable-name">cnt</span> <span class="org-operator">=</span> <span class="org-builtin">min</span>(num, num<span class="org-operator">*</span>ratio)
+    <span class="org-keyword">while</span> i <span class="org-operator">&lt;</span> cnt:
+        <span class="org-variable-name">r</span> <span class="org-operator">=</span> random.randint(num, num <span class="org-operator">+</span> cnt <span class="org-operator">-</span> 1)
+        <span class="org-variable-name">res</span>[r <span class="org-operator">-</span> num] <span class="org-operator">=</span> r
+        <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
+    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">sorted</span>(res)
+    <span class="org-keyword">return</span> (res, random.choice(res))
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">ACCESS</span>(<span style="color: #b3b3b3;">list</span>):
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, *a, **kw):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">cap</span> = kw.pop(<span style="color: brightblack;">'_cap'</span>, <span style="color: brightblack;">''</span>)
-        <span style="color: brightblack;">if</span> <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">cap</span>: <span style="color: brightblack;">self</span>.<span style="color: #cccccc;">cap</span> += <span style="color: brightblack;">' '</span>
-        <span style="color: #b3b3b3;">super</span>().__init__(*a, **kw)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> = 0
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__getitem__</span>(<span style="color: brightblack;">self</span>, i):
-        <span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"</span>{<span style="color: brightblack;">self</span>.cap}{<span style="color: brightblack;">self</span>._access}<span style="color: brightblack;">: get </span>{i}<span style="color: brightblack;">"</span>)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">_access</span> += 1
-        <span style="color: brightblack;">return</span> <span style="color: #b3b3b3;">super</span>().__getitem__(i)
+<span class="org-keyword">class</span> <span class="org-type">ACCESS</span>(<span class="org-builtin">list</span>):
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, <span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">cap</span> <span class="org-operator">=</span> kw.pop(<span class="org-string">'_cap'</span>, <span class="org-string">''</span>)
+        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.<span class="org-variable-name">cap</span>: <span class="org-keyword">self</span>.<span class="org-type">cap</span> <span class="org-operator">+=</span> <span class="org-string">' '</span>
+        <span class="org-builtin">super</span>().__init__(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_access</span> <span class="org-operator">=</span> 0
+    <span class="org-keyword">def</span> <span class="org-function-name">__getitem__</span>(<span class="org-keyword">self</span>, i):
+        <span class="org-builtin">print</span>(f<span class="org-string">"</span>{<span class="org-keyword">self</span>.cap}{<span class="org-keyword">self</span>._access}<span class="org-string">: get </span>{i}<span class="org-string">"</span>)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_access</span> <span class="org-operator">+=</span> 1
+        <span class="org-keyword">return</span> <span class="org-builtin">super</span>().__getitem__(i)
 
 
-<span style="color: #b3b3b3;">NUM</span> = 10000
-<span style="color: #b3b3b3;">arr</span>, <span style="color: #b3b3b3;">x</span> = partiallyrandomdata(NUM, 0.5)
-<span style="color: #b3b3b3;">segs</span> = <span style="color: #b3b3b3;">list</span>(segs_from_points(arr))
-<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Look for </span>{x}<span style="color: brightblack;"> in </span>{arr}<span style="color: brightblack;">"</span>)
-<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Segs: </span>{segs}<span style="color: brightblack;">"</span>)
-<span style="color: #b3b3b3;">fnd</span> = find(segs, x)
-<span style="color: #b3b3b3;">print</span>(f<span style="color: brightblack;">"Looked for </span>{x}<span style="color: brightblack;"> and found </span>{arr[fnd]}<span style="color: brightblack;"> at </span>{fnd}<span style="color: brightblack;">"</span>)
+<span class="org-variable-name">NUM</span> <span class="org-operator">=</span> 10000
+<span class="org-variable-name">arr</span>, <span class="org-variable-name">x</span> <span class="org-operator">=</span> partiallyrandomdata(NUM, 0.5)
+<span class="org-variable-name">segs</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(segs_from_points(arr))
+<span class="org-builtin">print</span>(f<span class="org-string">"Look for </span>{x}<span class="org-string"> in </span>{arr}<span class="org-string">"</span>)
+<span class="org-builtin">print</span>(f<span class="org-string">"Segs: </span>{segs}<span class="org-string">"</span>)
+<span class="org-variable-name">fnd</span> <span class="org-operator">=</span> find(segs, x)
+<span class="org-builtin">print</span>(f<span class="org-string">"Looked for </span>{x}<span class="org-string"> and found </span>{arr[fnd]}<span class="org-string"> at </span>{fnd}<span class="org-string">"</span>)
 </pre>
 </div>
 </div>

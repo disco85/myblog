@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simplest (and fastest) allocator in C</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,62 +194,62 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Simplest (and fastest) allocator in C</h1>
-<div id="outline-container-orgca8806d" class="outline-2">
-<h2 id="orgca8806d">Simplest (and fastest) allocator in C</h2>
-<div class="outline-text-2" id="text-orgca8806d">
+<div id="outline-container-org4a1ee22" class="outline-2">
+<h2 id="org4a1ee22">Simplest (and fastest) allocator in C</h2>
+<div class="outline-text-2" id="text-org4a1ee22">
 <p>
 I need to allocate strings (in UI) with the same length in my MCU program, so I can use: 1) static local buffer in functions or use 2) common buffer. 1) cons: implicit memory "eating" 2) cons: funcs are not reenterable. I use next simple (simplest!) and fast allocator - it allocate strings with the same length. It has only to necessary functions in it's API: allocate and free. Here is the code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">&lt;stdint.h&gt;</span>
-<span style="color: #b3b3b3;">#include</span> <span style="color: brightblack;">"bset.h"</span>
-<span style="color: brightblack;">/** string count */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">GUI_TMPSTR_N</span> 3
-<span style="color: brightblack;">/** max string length */</span>
-<span style="color: #b3b3b3;">#define</span> <span style="color: #b3b3b3;">GUI_TMPSTR_MAXLEN</span> 64
-<span style="color: #595959;">/// </span><span style="color: #595959;">block of temporary strings with the same length</span>
-<span style="color: brightblack;">typedef</span> <span style="color: brightblack;">struct</span> <span style="color: #cccccc;">gui_tmpstr_buf_t</span> {
-        <span style="color: #cccccc;">bset_t</span> <span style="color: #b3b3b3;">pool</span>;
-        <span style="color: #cccccc;">char</span> <span style="color: #b3b3b3;">buf</span>[GUI_TMPSTR_N][GUI_TMPSTR_MAXLEN];
-} <span style="color: #cccccc;">gui_tmpstr_buf_t</span>;
+<pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdint.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"bset.h"</span>
+<span class="org-doc">/** string count */</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">GUI_TMPSTR_N</span> 3
+<span class="org-doc">/** max string length */</span>
+<span class="org-preprocessor">#define</span> <span class="org-variable-name">GUI_TMPSTR_MAXLEN</span> 64
+<span class="org-comment-delimiter">/// </span><span class="org-comment">block of temporary strings with the same length</span>
+<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">gui_tmpstr_buf_t</span> {
+        <span class="org-type">bset_t</span> <span class="org-variable-name">pool</span>;
+        <span class="org-type">char</span> <span class="org-variable-name">buf</span>[GUI_TMPSTR_N][GUI_TMPSTR_MAXLEN];
+} <span class="org-type">gui_tmpstr_buf_t</span>;
 
-<span style="color: #b3b3b3;">#define</span> <span style="color: #a52a2a;">GUI_TMPSTR_BUF_INITIALIZER</span>() { \
+<span class="org-preprocessor">#define</span> <span class="org-function-name">GUI_TMPSTR_BUF_INITIALIZER</span>() { \
         .pool = BSET_INITIALIZER(), \
         .buf = {0} \
 }
 
-<span style="color: #595959;">// </span><span style="color: #595959;">global blocks for allocation</span>
-<span style="color: #cccccc;">gui_tmpstr_buf_t</span> <span style="color: #b3b3b3;">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
+<span class="org-comment-delimiter">// </span><span class="org-comment">global blocks for allocation</span>
+<span class="org-type">gui_tmpstr_buf_t</span> <span class="org-variable-name">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
 
-<span style="color: #595959;">/// </span><span style="color: #595959;">allocate temporary string</span>
-<span style="color: #cccccc;">char</span>*
-<span style="color: #a52a2a;">gui_tmpstr_alloc</span>(<span style="color: #cccccc;">void</span>) {
-        <span style="color: #cccccc;">int</span> <span style="color: #b3b3b3;">i</span>;
+<span class="org-comment-delimiter">/// </span><span class="org-comment">allocate temporary string</span>
+<span class="org-type">char</span>*
+<span class="org-function-name">gui_tmpstr_alloc</span>(<span class="org-type">void</span>) {
+        <span class="org-type">int</span> <span class="org-variable-name">i</span>;
         BSET_FORCLR(i, &amp;_tmpstrbuf.pool) {
-                <span style="color: brightblack;">if</span> (i &gt;= GUI_TMPSTR_N)
-                        <span style="color: brightblack;">break</span>;
+                <span class="org-keyword">if</span> (i &gt;= GUI_TMPSTR_N)
+                        <span class="org-keyword">break</span>;
                 BSET_SET(i, &amp;_tmpstrbuf.pool);
-                <span style="color: brightblack;">return</span> (_tmpstrbuf.buf[i]);
+                <span class="org-keyword">return</span> (_tmpstrbuf.buf[i]);
         }
-        <span style="color: brightblack;">return</span> (<span style="color: #7fffd4;">NULL</span>);
+        <span class="org-keyword">return</span> (<span class="org-constant">NULL</span>);
 }
 
-<span style="color: #595959;">/// </span><span style="color: #595959;">free allocated tmp. string</span>
-<span style="color: #cccccc;">void</span>
-<span style="color: #a52a2a;">gui_tmpstr_free</span>(<span style="color: #cccccc;">char</span>* <span style="color: #b3b3b3;">ptr</span>) {
-        <span style="color: #cccccc;">intptr_t</span> <span style="color: #b3b3b3;">i</span> = ((<span style="color: #cccccc;">intptr_t</span>)ptr - (<span style="color: #cccccc;">intptr_t</span>)_tmpstrbuf.buf);
-        <span style="color: brightblack;">if</span> (i &lt;= 0) {
-                <span style="color: #595959;">// </span><span style="color: #595959;">ptr is BEFORE base addr (buf)</span>
-                <span style="color: brightblack;">return</span>;
+<span class="org-comment-delimiter">/// </span><span class="org-comment">free allocated tmp. string</span>
+<span class="org-type">void</span>
+<span class="org-function-name">gui_tmpstr_free</span>(<span class="org-type">char</span>* <span class="org-variable-name">ptr</span>) {
+        <span class="org-type">intptr_t</span> <span class="org-variable-name">i</span> = ((<span class="org-type">intptr_t</span>)ptr - (<span class="org-type">intptr_t</span>)_tmpstrbuf.buf);
+        <span class="org-keyword">if</span> (i &lt;= 0) {
+                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is BEFORE base addr (buf)</span>
+                <span class="org-keyword">return</span>;
         }
-        <span style="color: brightblack;">if</span> (i % GUI_TMPSTR_MAXLEN) {
-                <span style="color: #595959;">// </span><span style="color: #595959;">ptr is not align on GUI_TMPSTR_MAXLEN</span>
-                <span style="color: brightblack;">return</span>;
+        <span class="org-keyword">if</span> (i % GUI_TMPSTR_MAXLEN) {
+                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is not align on GUI_TMPSTR_MAXLEN</span>
+                <span class="org-keyword">return</span>;
         }
         i /= GUI_TMPSTR_MAXLEN;
-        <span style="color: brightblack;">if</span> (BSET_ISSET(i, &amp;_tmpstrbuf.pool)) {
-                <span style="color: #595959;">// </span><span style="color: #595959;">free in pool</span>
+        <span class="org-keyword">if</span> (BSET_ISSET(i, &amp;_tmpstrbuf.pool)) {
+                <span class="org-comment-delimiter">// </span><span class="org-comment">free in pool</span>
                 BSET_CLR(i, &amp;_tmpstrbuf.pool);
         }
 }
@@ -148,11 +273,11 @@ Little example:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span style="color: #cccccc;">char</span>* <span style="color: #b3b3b3;">ptr</span> = gui_tmpstr_alloc();
-<span style="color: brightblack;">if</span> (ptr) {
-  <span style="color: #595959;">// </span><span style="color: #595959;">USAGE of ptr</span>
+<pre class="src src-cpp"><span class="org-type">char</span>* <span class="org-variable-name">ptr</span> = gui_tmpstr_alloc();
+<span class="org-keyword">if</span> (ptr) {
+  <span class="org-comment-delimiter">// </span><span class="org-comment">USAGE of ptr</span>
   ...
-  <span style="color: #595959;">// </span><span style="color: #595959;">free:</span>
+  <span class="org-comment-delimiter">// </span><span class="org-comment">free:</span>
   gui_tmpstr_free(ptr);
 }
 </pre>

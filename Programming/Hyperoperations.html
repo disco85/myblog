@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 10:28 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hyperoperations</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 <script>
@@ -105,15 +230,15 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfd06bf4">Basic idea</a></li>
-<li><a href="#orgebb3623">Properties</a></li>
-<li><a href="#org6e81c55">CL implementation</a></li>
+<li><a href="#orgac9d025">Basic idea</a></li>
+<li><a href="#org9853be1">Properties</a></li>
+<li><a href="#org34f035a">CL implementation</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgfd06bf4" class="outline-2">
-<h2 id="orgfd06bf4">Basic idea</h2>
-<div class="outline-text-2" id="text-orgfd06bf4">
+<div id="outline-container-orgac9d025" class="outline-2">
+<h2 id="orgac9d025">Basic idea</h2>
+<div class="outline-text-2" id="text-orgac9d025">
 <p>
 Donald Knuth introduced a notation of Ackermann function called Knuth's arrows. These
 ideas are generalization (one common algorithm) for basic arithmetic operations like
@@ -138,7 +263,7 @@ etc.
 So, +, *, power and so on can be represented as recursive function, its definition is:
 </p>
 
-<div class="figure" id="org317309d">
+<div class="figure" id="org825823c">
 <p class="verse">
 H<sub>n</sub>(a,b) =<br />
 &#xa0;&#xa0;| n = 0          =  b + 1<br />
@@ -155,9 +280,9 @@ H<sub>n</sub>(a,b) =<br />
 </p>
 </div>
 </div>
-<div id="outline-container-orgebb3623" class="outline-2">
-<h2 id="orgebb3623">Properties</h2>
-<div class="outline-text-2" id="text-orgebb3623">
+<div id="outline-container-org9853be1" class="outline-2">
+<h2 id="org9853be1">Properties</h2>
+<div class="outline-text-2" id="text-org9853be1">
 <p>
 We see that arithmetic operations follow similar scheme (remidining monoids,
 but not exactly) and they are not limited with first 3 or 4 operations, but
@@ -279,7 +404,7 @@ we must show that:
 \[
 H_{n+1}(a,1) = a.
 \]
-is also true for such <code>n</code>. From this <a href="#org317309d">definition</a> considering \( b=1 \) we see:
+is also true for such <code>n</code>. From this <a href="#org825823c">definition</a> considering \( b=1 \) we see:
 \[
 H_{n+1}(a,1) = H_{n}(a,H_{n+1}(a,0))
 \]
@@ -324,9 +449,9 @@ the order 1 is a real group, and only order 0 is unary operation.
 </p>
 </div>
 </div>
-<div id="outline-container-org6e81c55" class="outline-2">
-<h2 id="org6e81c55">CL implementation</h2>
-<div class="outline-text-2" id="text-org6e81c55">
+<div id="outline-container-org34f035a" class="outline-2">
+<h2 id="org34f035a">CL implementation</h2>
+<div class="outline-text-2" id="text-org34f035a">
 <p>
 This idea has different notations though, see the Wikipedia article, you can invent your own,
 for example, a number in a circle, eg, <code>2⑤3</code>
@@ -337,25 +462,25 @@ Naive implementation of first 4 hyperoperations can look as:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-0</span> (a b) (1+ b))
+<pre class="src src-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">hyper-0</span> (a b) (1+ b))
 
-(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-1</span> (a b)
-  (<span style="color: #531ab6;">if</span> (= b 0)
+(<span class="org-keyword">defun</span> <span class="org-function-name">hyper-1</span> (a b)
+  (<span class="org-keyword">if</span> (= b 0)
       a
       (hyper-0 a (hyper-1 a (1- b)))))
 
-(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-2</span> (a b)
-  (<span style="color: #531ab6;">if</span> (= b 0)
+(<span class="org-keyword">defun</span> <span class="org-function-name">hyper-2</span> (a b)
+  (<span class="org-keyword">if</span> (= b 0)
       0
       (hyper-1 a (hyper-2 a (1- b)))))
 
-(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-3</span> (a b)
-  (<span style="color: #531ab6;">if</span> (= b 0)
+(<span class="org-keyword">defun</span> <span class="org-function-name">hyper-3</span> (a b)
+  (<span class="org-keyword">if</span> (= b 0)
       1
       (hyper-2 a (hyper-3 a (1- b)))))
 
-(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-4</span> (a b)
-  (<span style="color: #531ab6;">if</span> (= b 0)
+(<span class="org-keyword">defun</span> <span class="org-function-name">hyper-4</span> (a b)
+  (<span class="org-keyword">if</span> (= b 0)
       1
       (hyper-3 a (hyper-4 a (1- b)))))
 </pre>
@@ -366,8 +491,8 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper</span> (n a b)
-  (<span style="color: #531ab6;">cond</span> ((= n 0) (1+ b))
+<pre class="src src-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">hyper</span> (n a b)
+  (<span class="org-keyword">cond</span> ((= n 0) (1+ b))
         ((and (= n 1) (= b 0)) a)
         ((and (= n 2) (= b 0)) 0)
         ((and (&gt;= n 3) (= b 0)) 1)
@@ -379,7 +504,7 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 And the neutral elements are really:
 </p>
 
-<pre class="example" id="org60c686d">
+<pre class="example" id="orga9b213a">
 CL-USER&gt; (hyper 3 2000 1)
 2000 (11 bits, #x7D0)
 CL-USER&gt; (hyper 2 2000 1)

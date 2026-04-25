@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Bakefile: Makefile's generator</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Bakefile: Makefile's generator</h1>
-<div id="outline-container-org473c1dd" class="outline-2">
-<h2 id="org473c1dd">Bakefile: Makefile's generator</h2>
-<div class="outline-text-2" id="text-org473c1dd">
+<div id="outline-container-orga31d8f5" class="outline-2">
+<h2 id="orga31d8f5">Bakefile: Makefile's generator</h2>
+<div class="outline-text-2" id="text-orga31d8f5">
 <p>
 It's known problem - general way of making the project. There are many tools for this task: CMake, automake/autoconf, ant (usual for Java) and many-many other. But some of them use own build system and very few uses standard way of Makefile (i.e. generates Makefiles). This method is based on some input format which is translated to Makefile for target compiler. For example, automake/autoconf, Premake (with Lua scripting) and Bakefile (written in Python and is crossplatform, like Premake and many other). It's authors are Vaclav Slavik, Francesco Montorsi.
 </p>
@@ -110,15 +235,15 @@ It's input file looks like:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-xml">&lt;<span style="color: #a52a2a;">exe</span> <span style="color: #b3b3b3;">id</span>=<span style="color: brightblack;">"test_sockets"</span>&gt;
-        &lt;<span style="color: #a52a2a;">cflags</span>&gt;-fpack-struct&lt;/<span style="color: #a52a2a;">cflags</span>&gt;
-        &lt;<span style="color: #a52a2a;">sources</span>&gt;test_sockets.c&lt;/<span style="color: #a52a2a;">sources</span>&gt;
-        &lt;<span style="color: #a52a2a;">sources</span>&gt;socks.c&lt;/<span style="color: #a52a2a;">sources</span>&gt;
-        &lt;<span style="color: #a52a2a;">sys-lib</span>&gt;pthread&lt;/<span style="color: #a52a2a;">sys-lib</span>&gt;
-        &lt;<span style="color: #a52a2a;">if</span> <span style="color: #b3b3b3;">cond</span>=<span style="color: brightblack;">"TOOLSET=='win32'"</span>&gt;
-            &lt;<span style="color: #a52a2a;">sys-lib</span>&gt;wsock32&lt;/<span style="color: #a52a2a;">sys-lib</span>&gt;
-        &lt;/<span style="color: #a52a2a;">if</span>&gt;
-&lt;/<span style="color: #a52a2a;">exe</span>&gt;
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">exe</span> <span class="org-nxml-attribute-local-name">id</span>=<span class="org-string">"test_sockets"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">cflags</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">-fpack-struct</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">cflags</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">sources</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">test_sockets.c</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">sources</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">sources</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">socks.c</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">sources</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">sys-lib</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">pthread</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">sys-lib</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">if</span> <span class="org-nxml-attribute-local-name">cond</span>=<span class="org-string">"TOOLSET=='win32'"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">sys-lib</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">wsock32</span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">sys-lib</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">if</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">exe</span><span class="org-nxml-tag-delimiter">&gt;</span>
 </pre>
 </div>
 
@@ -131,23 +256,23 @@ Another example of custom tag:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-xml">&lt;<span style="color: #a52a2a;">include</span> <span style="color: #b3b3b3;">file</span>=<span style="color: brightblack;">"presets/simple.bkl"</span>&gt;
-    &lt;<span style="color: #a52a2a;">define-tag</span> <span style="color: #b3b3b3;">name</span>=<span style="color: brightblack;">"lit"</span> <span style="color: #b3b3b3;">rules</span>=<span style="color: brightblack;">"action"</span>&gt;
-        &lt;<span style="color: #a52a2a;">if</span> <span style="color: #b3b3b3;">cond</span>=<span style="color: brightblack;">"TOOLSET=='unix'"</span>&gt;
-            &lt;<span style="color: #a52a2a;">command</span>&gt;&lt;/<span style="color: #a52a2a;">command</span>&gt;pyweb.py -s $(attributes['web']).w
-            &lt;<span style="color: #a52a2a;">command</span>&gt;&lt;/<span style="color: #a52a2a;">command</span>&gt;rst2html.py $(attributes['web']).rst $(attributes['web']).html
-        &lt;/<span style="color: #a52a2a;">if</span>&gt;
-        &lt;<span style="color: #a52a2a;">if</span> <span style="color: #b3b3b3;">cond</span>=<span style="color: brightblack;">"TOOLSET=='win32'"</span>&gt;
-            &lt;<span style="color: #a52a2a;">command</span>&gt;&lt;/<span style="color: #a52a2a;">command</span>&gt;cmd /C pyweb.py -s $(attributes['web']).w
-            &lt;<span style="color: #a52a2a;">command</span>&gt;&lt;/<span style="color: #a52a2a;">command</span>&gt;cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html
-        &lt;/<span style="color: #a52a2a;">if</span>&gt;
-    &lt;/<span style="color: #a52a2a;">define-tag</span>&gt;
+<pre class="src src-xml"><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">include</span> <span class="org-nxml-attribute-local-name">file</span>=<span class="org-string">"presets/simple.bkl"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">define-tag</span> <span class="org-nxml-attribute-local-name">name</span>=<span class="org-string">"lit"</span> <span class="org-nxml-attribute-local-name">rules</span>=<span class="org-string">"action"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">if</span> <span class="org-nxml-attribute-local-name">cond</span>=<span class="org-string">"TOOLSET=='unix'"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">pyweb.py -s $(attributes['web']).w</span>
+<span class="org-nxml-text">            </span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">rst2html.py $(attributes['web']).rst $(attributes['web']).html</span>
+<span class="org-nxml-text">        </span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">if</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">if</span> <span class="org-nxml-attribute-local-name">cond</span>=<span class="org-string">"TOOLSET=='win32'"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+            <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">cmd /C pyweb.py -s $(attributes['web']).w</span>
+<span class="org-nxml-text">            </span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">command</span><span class="org-nxml-tag-delimiter">&gt;</span><span class="org-nxml-text">cmd /C rst2html.py $(attributes['web']).rst $(attributes['web']).html</span>
+<span class="org-nxml-text">        </span><span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">if</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">define-tag</span><span class="org-nxml-tag-delimiter">&gt;</span>
 
-    &lt;<span style="color: #a52a2a;">action</span> <span style="color: #b3b3b3;">id</span>=<span style="color: brightblack;">"lit"</span>&gt;
-        &lt;<span style="color: #a52a2a;">lit</span> <span style="color: #b3b3b3;">web</span>=<span style="color: brightblack;">"maintest"</span>&gt;
-        &lt;<span style="color: #a52a2a;">lit</span> <span style="color: #b3b3b3;">web</span>=<span style="color: brightblack;">"socks"</span>&gt;
-    &lt;/<span style="color: #a52a2a;">lit</span>&gt;&lt;/<span style="color: #a52a2a;">lit</span>&gt;&lt;/<span style="color: #a52a2a;">action</span>&gt;
-&lt;/<span style="color: #a52a2a;">include</span>&gt;
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">action</span> <span class="org-nxml-attribute-local-name">id</span>=<span class="org-string">"lit"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">lit</span> <span class="org-nxml-attribute-local-name">web</span>=<span class="org-string">"maintest"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+        <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-element-local-name">lit</span> <span class="org-nxml-attribute-local-name">web</span>=<span class="org-string">"socks"</span><span class="org-nxml-tag-delimiter">&gt;</span>
+    <span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">lit</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">lit</span><span class="org-nxml-tag-delimiter">&gt;&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">action</span><span class="org-nxml-tag-delimiter">&gt;</span>
+<span class="org-nxml-tag-delimiter">&lt;</span><span class="org-nxml-tag-slash">/</span><span class="org-nxml-element-local-name">include</span><span class="org-nxml-tag-delimiter">&gt;</span>
 </pre>
 </div>
 

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Internationalization in the Bottle</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -73,15 +198,15 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org91e0f62">Internationalization in the Bottle</a></li>
-<li><a href="#org333fcbb">i18n for messages (strings)</a></li>
-<li><a href="#org572284c">i18n for static text big pies (in the templates)</a></li>
+<li><a href="#org9d1a559">Internationalization in the Bottle</a></li>
+<li><a href="#org95b0104">i18n for messages (strings)</a></li>
+<li><a href="#org399a25b">i18n for static text big pies (in the templates)</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org91e0f62" class="outline-2">
-<h2 id="org91e0f62">Internationalization in the Bottle</h2>
-<div class="outline-text-2" id="text-org91e0f62">
+<div id="outline-container-org9d1a559" class="outline-2">
+<h2 id="org9d1a559">Internationalization in the Bottle</h2>
+<div class="outline-text-2" id="text-org9d1a559">
 <p>
 This approach is very limited! In serious sites you have to support Web-robots, links with language code&#x2026; I use it for small (embedded Web console) projects only.
 </p>
@@ -91,12 +216,12 @@ I18N in the Bottle Python framework is easy. I prefer to do i18n for 2 different
 </p>
 </div>
 </div>
-<div id="outline-container-org333fcbb" class="outline-2">
-<h2 id="org333fcbb">i18n for messages (strings)</h2>
+<div id="outline-container-org95b0104" class="outline-2">
+<h2 id="org95b0104">i18n for messages (strings)</h2>
 </div>
-<div id="outline-container-org572284c" class="outline-2">
-<h2 id="org572284c">i18n for static text big pies (in the templates)</h2>
-<div class="outline-text-2" id="text-org572284c">
+<div id="outline-container-org399a25b" class="outline-2">
+<h2 id="org399a25b">i18n for static text big pies (in the templates)</h2>
+<div class="outline-text-2" id="text-org399a25b">
 <p>
 I use gettext mechanism. In my application folder I have folders:
 </p>
@@ -148,74 +273,74 @@ So, my Bottle application have to know current language (preferred by user) and 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #595959;"># </span><span style="color: #595959;">to test, change language in the browser (see priority of them!). Then</span>
-<span style="color: #595959;"># </span><span style="color: #595959;">refresh page - you should see text in different language</span>
-<span style="color: #b3b3b3;">_LANGS</span> = {}
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">initi18n</span>():
-    <span style="color: brightblack;">"""Init internationalization of UI</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: brightblack;">import</span> __builtin__
-    <span style="color: brightblack;">global</span> _LANGS
-    <span style="color: brightblack;">for</span> l <span style="color: brightblack;">in</span> (<span style="color: brightblack;">"bg"</span>,<span style="color: brightblack;">"ru"</span>): <span style="color: #595959;"># </span><span style="color: #595959;">list of supported language</span>
-        <span style="color: #b3b3b3;">trans</span> = gettext.translation(I18N_DOMAIN, LOCALEDIR, languages=[l])
-        <span style="color: #b3b3b3;">_LANGS</span>[l] = trans
-    <span style="color: #595959;"># </span><span style="color: #595959;">default translator (i.e. _())</span>
-    __builtin__.<span style="color: #b3b3b3;">__dict__</span>[<span style="color: brightblack;">"_"</span>] = <span style="color: #b3b3b3;">unicode</span>
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">to test, change language in the browser (see priority of them!). Then</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">refresh page - you should see text in different language</span>
+<span class="org-variable-name">_LANGS</span> <span class="org-operator">=</span> {}
+<span class="org-keyword">def</span> <span class="org-function-name">initi18n</span>():
+    <span class="org-doc">"""Init internationalization of UI</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">import</span> __builtin__
+    <span class="org-keyword">global</span> _LANGS
+    <span class="org-keyword">for</span> l <span class="org-keyword">in</span> (<span class="org-string">"bg"</span>,<span class="org-string">"ru"</span>): <span class="org-comment-delimiter"># </span><span class="org-comment">list of supported language</span>
+        <span class="org-variable-name">trans</span> <span class="org-operator">=</span> gettext.translation(I18N_DOMAIN, LOCALEDIR, languages<span class="org-operator">=</span>[l])
+        <span class="org-variable-name">_LANGS</span>[l] <span class="org-operator">=</span> trans
+    <span class="org-comment-delimiter"># </span><span class="org-comment">default translator (i.e. _())</span>
+    __builtin__.<span class="org-builtin">__dict__</span>[<span class="org-string">"_"</span>] <span class="org-operator">=</span> <span class="org-builtin">unicode</span>
 
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">request_lang</span>(req):
-    <span style="color: brightblack;">"""Determine preferred language of the user from WSGI environment</span>
-<span style="color: brightblack;">    variable HTTP_ACCEPT_LANGUAGE. Default is 'en'</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: #595959;"># </span><span style="color: #595959;">if cfg module overrides user language</span>
-    <span style="color: brightblack;">if</span> cfg.LANG != <span style="color: brightblack;">"default"</span>:
-        <span style="color: brightblack;">return</span> cfg.LANG
+<span class="org-keyword">def</span> <span class="org-function-name">request_lang</span>(req):
+    <span class="org-doc">"""Determine preferred language of the user from WSGI environment</span>
+<span class="org-doc">    variable HTTP_ACCEPT_LANGUAGE. Default is 'en'</span>
+<span class="org-doc">    """</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">if cfg module overrides user language</span>
+    <span class="org-keyword">if</span> cfg.LANG <span class="org-operator">!=</span> <span class="org-string">"default"</span>:
+        <span class="org-keyword">return</span> cfg.LANG
 
-    <span style="color: brightblack;">try</span>:
-        <span style="color: brightblack;">return</span> req.environ.get(<span style="color: brightblack;">"HTTP_ACCEPT_LANGUAGE"</span>, <span style="color: brightblack;">""</span>).split(<span style="color: brightblack;">";"</span>)[0].split(<span style="color: brightblack;">"-"</span>)[0]
-    <span style="color: brightblack;">except</span>:
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">"en"</span>
-
-
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">switch_lang</span>(lang):
-    <span style="color: brightblack;">"""Select language for output VIA GETTEXT</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: brightblack;">import</span> __builtin__
-    <span style="color: #b3b3b3;">trans</span> = _LANGS.get(lang, <span style="color: #7fffd4;">None</span>)
-    <span style="color: brightblack;">if</span> trans:
-        trans.install(<span style="color: #b3b3b3;">unicode</span>=<span style="color: #7fffd4;">True</span>)
-    <span style="color: brightblack;">else</span>:
-        __builtin__.<span style="color: #b3b3b3;">__dict__</span>[<span style="color: brightblack;">"_"</span>] = <span style="color: #b3b3b3;">unicode</span>
+    <span class="org-keyword">try</span>:
+        <span class="org-keyword">return</span> req.environ.get(<span class="org-string">"HTTP_ACCEPT_LANGUAGE"</span>, <span class="org-string">""</span>).split(<span class="org-string">";"</span>)[0].split(<span class="org-string">"-"</span>)[0]
+    <span class="org-keyword">except</span>:
+        <span class="org-keyword">return</span> <span class="org-string">"en"</span>
 
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">templatei18n</span>(name, lang=<span style="color: #7fffd4;">None</span>, **kw):
-    <span style="color: brightblack;">"""Like bottle template() but render for current language</span>
-<span style="color: brightblack;">    from os.environ["LANGUAGE"]. And not like bottle's template,</span>
-<span style="color: brightblack;">    doesn't support source, only name (not path!) as 1st arg!</span>
-<span style="color: brightblack;">    If no lang, it will be selected from request</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> lang:
-        <span style="color: #b3b3b3;">lang</span> = request_lang(request)
-    <span style="color: #b3b3b3;">tplpath</span> = <span style="color: brightblack;">"%s/%s/TEMPLATES/%s"</span> % (LOCALEDIR, lang, name)
-    <span style="color: #b3b3b3;">tplpath</span> = os.path.abspath(tplpath) + <span style="color: brightblack;">".tpl"</span>
-    <span style="color: brightblack;">if</span> <span style="color: brightblack;">not</span> os.path.exists(tplpath):
-        <span style="color: #b3b3b3;">tplpath</span> = name
-    <span style="color: brightblack;">return</span> template(tplpath, **kw)
+<span class="org-keyword">def</span> <span class="org-function-name">switch_lang</span>(lang):
+    <span class="org-doc">"""Select language for output VIA GETTEXT</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">import</span> __builtin__
+    <span class="org-variable-name">trans</span> <span class="org-operator">=</span> _LANGS.get(lang, <span class="org-constant">None</span>)
+    <span class="org-keyword">if</span> trans:
+        trans.install(<span class="org-builtin">unicode</span><span class="org-operator">=</span><span class="org-constant">True</span>)
+    <span class="org-keyword">else</span>:
+        __builtin__.<span class="org-builtin">__dict__</span>[<span class="org-string">"_"</span>] <span class="org-operator">=</span> <span class="org-builtin">unicode</span>
 
 
-<span style="color: brightblack;">def</span> <span style="color: #a52a2a;">i18n</span>(templ):
-    <span style="color: brightblack;">"""Decorator for template rendering using current</span>
-<span style="color: brightblack;">    language (i18n support)</span>
-<span style="color: brightblack;">    """</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">decor</span>(view):
-        <span style="color: #cccccc;">@functools.wraps</span>(view)
-        <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">w</span>(*a, **kw):
-            <span style="color: #b3b3b3;">lang</span> = request_lang(request)
+<span class="org-keyword">def</span> <span class="org-function-name">templatei18n</span>(name, lang<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-operator">**</span>kw):
+    <span class="org-doc">"""Like bottle template() but render for current language</span>
+<span class="org-doc">    from os.environ["LANGUAGE"]. And not like bottle's template,</span>
+<span class="org-doc">    doesn't support source, only name (not path!) as 1st arg!</span>
+<span class="org-doc">    If no lang, it will be selected from request</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> lang:
+        <span class="org-variable-name">lang</span> <span class="org-operator">=</span> request_lang(request)
+    <span class="org-variable-name">tplpath</span> <span class="org-operator">=</span> <span class="org-string">"%s/%s/TEMPLATES/%s"</span> <span class="org-operator">%</span> (LOCALEDIR, lang, name)
+    <span class="org-variable-name">tplpath</span> <span class="org-operator">=</span> os.path.abspath(tplpath) <span class="org-operator">+</span> <span class="org-string">".tpl"</span>
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> os.path.exists(tplpath):
+        <span class="org-variable-name">tplpath</span> <span class="org-operator">=</span> name
+    <span class="org-keyword">return</span> template(tplpath, <span class="org-operator">**</span>kw)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">i18n</span>(templ):
+    <span class="org-doc">"""Decorator for template rendering using current</span>
+<span class="org-doc">    language (i18n support)</span>
+<span class="org-doc">    """</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">decor</span>(view):
+        <span class="org-type">@functools.wraps</span>(view)
+        <span class="org-keyword">def</span> <span class="org-function-name">w</span>(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
+            <span class="org-variable-name">lang</span> <span class="org-operator">=</span> request_lang(request)
             switch_lang(lang)
-            <span style="color: #b3b3b3;">d</span> = view(*a, **kw)
-            <span style="color: brightblack;">return</span> templatei18n(templ, lang=lang, **d)
-        <span style="color: brightblack;">return</span> w
-    <span style="color: brightblack;">return</span> decor
+            <span class="org-variable-name">d</span> <span class="org-operator">=</span> view(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw)
+            <span class="org-keyword">return</span> templatei18n(templ, lang<span class="org-operator">=</span>lang, <span class="org-operator">**</span>d)
+        <span class="org-keyword">return</span> w
+    <span class="org-keyword">return</span> decor
 </pre>
 </div>
 
@@ -224,16 +349,16 @@ I use <code>initi18n()</code> before application starting and use <code>@i18n</c
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp">@i18n(<span style="color: brightblack;">"tasks"</span>) # name of the <span style="color: brightblack;">template</span>
+<pre class="src src-cpp">@i18n(<span class="org-string">"tasks"</span>) # name of the <span class="org-keyword">template</span>
 def tasks_list(self):
-    <span style="color: brightblack;">""</span><span style="color: #ffc0cb; font-weight: bold;">"</span><span style="color: brightblack;">Show table of tasks</span>
-    <span style="color: brightblack;">""</span><span style="color: #ffc0cb; font-weight: bold;">"</span>
+    <span class="org-string">""</span><span class="org-warning">"</span><span class="org-string">Show table of tasks</span>
+    <span class="org-string">""</span><span class="org-warning">"</span>
     ps = tasks_info()
-    <span style="color: brightblack;">for</span> taskname in ps:
-        msg = self.runres.get(taskname, <span style="color: brightblack;">""</span>) <span style="color: brightblack;">or</span> ps[taskname][<span style="color: brightblack;">"msg"</span>]
-        ps[taskname][<span style="color: brightblack;">"msg"</span>] = msg
-        self.runres[taskname] = <span style="color: brightblack;">""</span>
-    <span style="color: brightblack;">return</span> dict(ps=ps)
+    <span class="org-keyword">for</span> taskname in ps:
+        msg = self.runres.get(taskname, <span class="org-string">""</span>) <span class="org-keyword">or</span> ps[taskname][<span class="org-string">"msg"</span>]
+        ps[taskname][<span class="org-string">"msg"</span>] = msg
+        self.runres[taskname] = <span class="org-string">""</span>
+    <span class="org-keyword">return</span> dict(ps=ps)
 </pre>
 </div>
 

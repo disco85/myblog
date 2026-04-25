@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 16:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Redirect file descriptors</title>
@@ -13,42 +13,53 @@
 <style>
 :root {
   color-scheme: dark;
-  --stroke-color: #FF8000; }
+  --stroke-color: #FF8000;
+}
+svg {
+  background: transparent !important;
+  color: #FF8000;
+}
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
   color: #FF8000;
-  background-color: black; }
-h1, h2 {
-  display: inline-block;      /* so the underline fits the text width */
+  background-color: black;
+}
+h1, h2, h3, h4 {
+  display: inline-block;
   border-bottom: 2px dashed #FF8000;
-  padding-bottom: 0.1em; }
-a:link {
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
   color: #FF8000;
-  text-decoration: underlined; }
-a:visited { color: #DD7000; }
+  text-decoration: underlined;
+}
 div {
   padding: 0;
-  margin: 0; }
+  margin: 0;
+}
 code {
   background-color: #FF8000;
   border: 1px solid #FF8000;
   color: black;
   padding: 2px;
-  font-family: monospace; }
+  font-family: monospace;
+}
 pre, .verse {
   display: inline-block;
   border: 1px solid #FF8000;
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace; }
+  font-family: monospace;
+}
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
 .verse::before {
   content: "";
   display: block;
-  margin-top: -1lh; /* better than -1em if supported */ }
+  margin-top: -1lh; /* better than -1em if supported */
+}
 table {
   border-collapse: collapse;
   border: 1px solid #FF8000;
@@ -56,6 +67,120 @@ table {
 th, td {
   border: 1px solid #FF8000;
   padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: #FF8000;
+  color: black;
+}
+.org-builtin {
+  color: #00FFFF;
+}
+.org-comment {
+  color: grey;
+}
+.org-doc {
+  color: grey;
+  font-style: italic;
+}
+.org-function-name {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-keyword {
+  color: #FF8000;
+  font-weight: bold;
+}
+.org-string {
+  color: fuchsia;
+}
+.org-type {
+  color: #00FFFF;
+}
+.org-variable-name {
+  color: #FF8000;
+}
+.org-constant {
+  color: #00FFFF;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
 }
 </style>
 </head>
@@ -69,9 +194,9 @@ th, td {
 </div>
 <div id="content" class="content">
 <h1 class="title">Redirect file descriptors</h1>
-<div id="outline-container-orgaebbee6" class="outline-2">
-<h2 id="orgaebbee6">Redirect file descriptors</h2>
-<div class="outline-text-2" id="text-orgaebbee6">
+<div id="outline-container-org6f8c58d" class="outline-2">
+<h2 id="org6f8c58d">Redirect file descriptors</h2>
+<div class="outline-text-2" id="text-org6f8c58d">
 <p>
 This is a Python trick with supressing of console output. Actually implementation
 does not supresses anything, but maps (dups) "source" file descriptors to "destination"
@@ -90,38 +215,38 @@ you can "mask" its descriptors (redirect them somewhere).
 
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: brightblack;">import</span> os, sys
-<span style="color: brightblack;">from</span> itertools <span style="color: brightblack;">import</span> zip_longest
+<pre class="src src-python"><span class="org-keyword">import</span> os, sys
+<span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> zip_longest
 
-<span style="color: brightblack;">class</span> <span style="color: #cccccc;">FdRedir</span>:
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__init__</span>(<span style="color: brightblack;">self</span>, srcfd, dstfd):
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">src</span> = srcfd
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">dst</span> = dstfd
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">null</span> = os.<span style="color: #b3b3b3;">open</span>(os.devnull, os.O_RDWR)
-        <span style="color: brightblack;">self</span>.<span style="color: #b3b3b3;">dups</span> = [os.dup(f) <span style="color: brightblack;">for</span> f <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.src]
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__enter__</span>(<span style="color: brightblack;">self</span>):
-        <span style="color: #b3b3b3;">homo</span> = zip_longest(<span style="color: brightblack;">self</span>.src, <span style="color: brightblack;">self</span>.dst, fillvalue=<span style="color: brightblack;">self</span>.null)
-        <span style="color: brightblack;">for</span> t, f <span style="color: brightblack;">in</span> homo:
+<span class="org-keyword">class</span> <span class="org-type">FdRedir</span>:
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, srcfd, dstfd):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">src</span> <span class="org-operator">=</span> srcfd
+        <span class="org-keyword">self</span>.<span class="org-variable-name">dst</span> <span class="org-operator">=</span> dstfd
+        <span class="org-keyword">self</span>.<span class="org-variable-name">null</span> <span class="org-operator">=</span> os.<span class="org-builtin">open</span>(os.devnull, os.O_RDWR)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">dups</span> <span class="org-operator">=</span> [os.dup(f) <span class="org-keyword">for</span> f <span class="org-keyword">in</span> <span class="org-keyword">self</span>.src]
+    <span class="org-keyword">def</span> <span class="org-function-name">__enter__</span>(<span class="org-keyword">self</span>):
+        <span class="org-variable-name">homo</span> <span class="org-operator">=</span> zip_longest(<span class="org-keyword">self</span>.src, <span class="org-keyword">self</span>.dst, fillvalue<span class="org-operator">=</span><span class="org-keyword">self</span>.null)
+        <span class="org-keyword">for</span> t, f <span class="org-keyword">in</span> homo:
             os.dup2(f, t)
-        <span style="color: brightblack;">return</span> <span style="color: brightblack;">self</span>
-    <span style="color: brightblack;">def</span> <span style="color: #a52a2a;">__exit__</span>(<span style="color: brightblack;">self</span>, xtyp, xval, xtb):
-        <span style="color: #b3b3b3;">iso</span> = <span style="color: #b3b3b3;">zip</span>(<span style="color: brightblack;">self</span>.dups, <span style="color: brightblack;">self</span>.src)
-        <span style="color: brightblack;">for</span> f, t <span style="color: brightblack;">in</span> iso:
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__exit__</span>(<span class="org-keyword">self</span>, xtyp, xval, xtb):
+        <span class="org-variable-name">iso</span> <span class="org-operator">=</span> <span class="org-builtin">zip</span>(<span class="org-keyword">self</span>.dups, <span class="org-keyword">self</span>.src)
+        <span class="org-keyword">for</span> f, t <span class="org-keyword">in</span> iso:
             os.dup2(f, t)
-        <span style="color: brightblack;">for</span> f <span style="color: brightblack;">in</span> <span style="color: brightblack;">self</span>.dups:
+        <span class="org-keyword">for</span> f <span class="org-keyword">in</span> <span class="org-keyword">self</span>.dups:
             os.close(f)
-        os.close(<span style="color: brightblack;">self</span>.null)
+        os.close(<span class="org-keyword">self</span>.null)
 
-<span style="color: #595959;"># </span><span style="color: #595959;">Example of usage</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Example of usage</span>
 
-<span style="color: brightblack;">with</span> FdRedir((1, 2), ()) <span style="color: brightblack;">as</span> fr:
-    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'hidden'</span>)
-    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'hidden'</span>, <span style="color: #b3b3b3;">file</span>=sys.stderr)
-    <span style="color: brightblack;">with</span> FdRedir([1], [fr.dups[0]]):
-        <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'visible tmp'</span>)
-        <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'hidden'</span>, <span style="color: #b3b3b3;">file</span>=sys.stderr)
-    <span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'hidden'</span>)
-<span style="color: #b3b3b3;">print</span>(<span style="color: brightblack;">'visible end'</span>)
+<span class="org-keyword">with</span> FdRedir((1, 2), ()) <span class="org-keyword">as</span> fr:
+    <span class="org-builtin">print</span>(<span class="org-string">'hidden'</span>)
+    <span class="org-builtin">print</span>(<span class="org-string">'hidden'</span>, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stderr)
+    <span class="org-keyword">with</span> FdRedir([1], [fr.dups[0]]):
+        <span class="org-builtin">print</span>(<span class="org-string">'visible tmp'</span>)
+        <span class="org-builtin">print</span>(<span class="org-string">'hidden'</span>, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stderr)
+    <span class="org-builtin">print</span>(<span class="org-string">'hidden'</span>)
+<span class="org-builtin">print</span>(<span class="org-string">'visible end'</span>)
 </pre>
 </div>
 
