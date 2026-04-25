@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 20:06 -->
+<!-- 2026-04-24 Fri 21:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: Qtouch sensors input</title>
@@ -62,8 +62,9 @@ th, td {
 <body>
 <div id="preamble" class="status">
 <nav>
+[<a href="../../cv.html">CV</a>]
 [<a href="../../index.html">Sitemap</a>]
-[<a href="https://github.com/disco85/">My&nbsp;Github</a>]
+[<a href="https://github.com/disco85/">Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
@@ -72,30 +73,30 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org16501f0">ASF: Qtouch sensors input</a></li>
-<li><a href="#org57175c6">fix random (false) signals (splashes or BOUNCE)</a></li>
-<li><a href="#orgf91b04b">detecting PRESS state</a></li>
-<li><a href="#orga3282b7">detecting long "pressing" (touching) - sticking of key.</a></li>
+<li><a href="#org971313e">ASF: Qtouch sensors input</a></li>
+<li><a href="#orgfa74718">fix random (false) signals (splashes or BOUNCE)</a></li>
+<li><a href="#orgd579104">detecting PRESS state</a></li>
+<li><a href="#org4aba33e">detecting long "pressing" (touching) - sticking of key.</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org16501f0" class="outline-2">
-<h2 id="org16501f0">ASF: Qtouch sensors input</h2>
-<div class="outline-text-2" id="text-org16501f0">
+<div id="outline-container-org971313e" class="outline-2">
+<h2 id="org971313e">ASF: Qtouch sensors input</h2>
+<div class="outline-text-2" id="text-org971313e">
 <p>
 There are several tasks when we try to process Qtouch input (Qtouch 60168):
 </p>
 </div>
 </div>
-<div id="outline-container-org57175c6" class="outline-2">
-<h2 id="org57175c6">fix random (false) signals (splashes or BOUNCE)</h2>
+<div id="outline-container-orgfa74718" class="outline-2">
+<h2 id="orgfa74718">fix random (false) signals (splashes or BOUNCE)</h2>
 </div>
-<div id="outline-container-orgf91b04b" class="outline-2">
-<h2 id="orgf91b04b">detecting PRESS state</h2>
+<div id="outline-container-orgd579104" class="outline-2">
+<h2 id="orgd579104">detecting PRESS state</h2>
 </div>
-<div id="outline-container-orga3282b7" class="outline-2">
-<h2 id="orga3282b7">detecting long "pressing" (touching) - sticking of key.</h2>
-<div class="outline-text-2" id="text-orga3282b7">
+<div id="outline-container-org4aba33e" class="outline-2">
+<h2 id="org4aba33e">detecting long "pressing" (touching) - sticking of key.</h2>
+<div class="outline-text-2" id="text-org4aba33e">
 <ol class="org-ol">
 <li>means: really signal from Qt is not 000..0 or 111..1 but something like 000001000000&#x2026; - with error '1' in sequence of '0' (and vise verse) because of signal bouncing, so it should be 'filtered' 2) means: we should detect when touch sensor is "pressed" 3) means: when user touches screen for long time we should detect this state as 'hold key' (like you can see in old mobile phones or key sticking in Windows) and call some special routine (callback) for processing such event.</li>
 </ol>
