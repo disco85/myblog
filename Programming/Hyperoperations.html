@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 16:12 -->
+<!-- 2026-04-25 Sat 16:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hyperoperations</title>
@@ -121,6 +121,7 @@ th, td {
     fill: black !important;
     color: black;
   }
+  nav { display: none; }
   body {
     font-family: monospace,  sans-serif;
     color-scheme: light;
@@ -230,15 +231,15 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgac9d025">Basic idea</a></li>
-<li><a href="#org9853be1">Properties</a></li>
-<li><a href="#org34f035a">CL implementation</a></li>
+<li><a href="#org882907e">Basic idea</a></li>
+<li><a href="#orgf134171">Properties</a></li>
+<li><a href="#orge82e602">CL implementation</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgac9d025" class="outline-2">
-<h2 id="orgac9d025">Basic idea</h2>
-<div class="outline-text-2" id="text-orgac9d025">
+<div id="outline-container-org882907e" class="outline-2">
+<h2 id="org882907e">Basic idea</h2>
+<div class="outline-text-2" id="text-org882907e">
 <p>
 Donald Knuth introduced a notation of Ackermann function called Knuth's arrows. These
 ideas are generalization (one common algorithm) for basic arithmetic operations like
@@ -263,7 +264,7 @@ etc.
 So, +, *, power and so on can be represented as recursive function, its definition is:
 </p>
 
-<div class="figure" id="org825823c">
+<div class="figure" id="orga61dd58">
 <p class="verse">
 H<sub>n</sub>(a,b) =<br />
 &#xa0;&#xa0;| n = 0          =  b + 1<br />
@@ -280,9 +281,9 @@ H<sub>n</sub>(a,b) =<br />
 </p>
 </div>
 </div>
-<div id="outline-container-org9853be1" class="outline-2">
-<h2 id="org9853be1">Properties</h2>
-<div class="outline-text-2" id="text-org9853be1">
+<div id="outline-container-orgf134171" class="outline-2">
+<h2 id="orgf134171">Properties</h2>
+<div class="outline-text-2" id="text-orgf134171">
 <p>
 We see that arithmetic operations follow similar scheme (remidining monoids,
 but not exactly) and they are not limited with first 3 or 4 operations, but
@@ -404,7 +405,7 @@ we must show that:
 \[
 H_{n+1}(a,1) = a.
 \]
-is also true for such <code>n</code>. From this <a href="#org825823c">definition</a> considering \( b=1 \) we see:
+is also true for such <code>n</code>. From this <a href="#orga61dd58">definition</a> considering \( b=1 \) we see:
 \[
 H_{n+1}(a,1) = H_{n}(a,H_{n+1}(a,0))
 \]
@@ -449,9 +450,9 @@ the order 1 is a real group, and only order 0 is unary operation.
 </p>
 </div>
 </div>
-<div id="outline-container-org34f035a" class="outline-2">
-<h2 id="org34f035a">CL implementation</h2>
-<div class="outline-text-2" id="text-org34f035a">
+<div id="outline-container-orge82e602" class="outline-2">
+<h2 id="orge82e602">CL implementation</h2>
+<div class="outline-text-2" id="text-orge82e602">
 <p>
 This idea has different notations though, see the Wikipedia article, you can invent your own,
 for example, a number in a circle, eg, <code>2⑤3</code>
@@ -504,7 +505,7 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 And the neutral elements are really:
 </p>
 
-<pre class="example" id="orga9b213a">
+<pre class="example" id="org22dc737">
 CL-USER&gt; (hyper 3 2000 1)
 2000 (11 bits, #x7D0)
 CL-USER&gt; (hyper 2 2000 1)
