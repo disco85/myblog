@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-24 Fri 21:01 -->
+<!-- 2026-04-25 Sat 10:28 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hyperoperations</title>
@@ -337,25 +337,25 @@ Naive implementation of first 4 hyperoperations can look as:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-0</span> (a b) (1+ b))
+<pre class="src src-lisp">(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-0</span> (a b) (1+ b))
 
-(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-1</span> (a b)
-  (<span style="color: brightblack;">if</span> (= b 0)
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-1</span> (a b)
+  (<span style="color: #531ab6;">if</span> (= b 0)
       a
       (hyper-0 a (hyper-1 a (1- b)))))
 
-(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-2</span> (a b)
-  (<span style="color: brightblack;">if</span> (= b 0)
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-2</span> (a b)
+  (<span style="color: #531ab6;">if</span> (= b 0)
       0
       (hyper-1 a (hyper-2 a (1- b)))))
 
-(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-3</span> (a b)
-  (<span style="color: brightblack;">if</span> (= b 0)
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-3</span> (a b)
+  (<span style="color: #531ab6;">if</span> (= b 0)
       1
       (hyper-2 a (hyper-3 a (1- b)))))
 
-(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper-4</span> (a b)
-  (<span style="color: brightblack;">if</span> (= b 0)
+(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper-4</span> (a b)
+  (<span style="color: #531ab6;">if</span> (= b 0)
       1
       (hyper-3 a (hyper-4 a (1- b)))))
 </pre>
@@ -366,8 +366,8 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 </p>
 
 <div class="org-src-container">
-<pre class="src src-lisp">(<span style="color: brightblack;">defun</span> <span style="color: #a52a2a;">hyper</span> (n a b)
-  (<span style="color: brightblack;">cond</span> ((= n 0) (1+ b))
+<pre class="src src-lisp">(<span style="color: #531ab6;">defun</span> <span style="color: #721045;">hyper</span> (n a b)
+  (<span style="color: #531ab6;">cond</span> ((= n 0) (1+ b))
         ((and (= n 1) (= b 0)) a)
         ((and (= n 2) (= b 0)) 0)
         ((and (&gt;= n 3) (= b 0)) 1)
@@ -379,7 +379,7 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 And the neutral elements are really:
 </p>
 
-<pre class="example" id="org1163202">
+<pre class="example" id="org60c686d">
 CL-USER&gt; (hyper 3 2000 1)
 2000 (11 bits, #x7D0)
 CL-USER&gt; (hyper 2 2000 1)
@@ -457,6 +457,11 @@ How quickly?
 <tr>
 <td class="org-right">6</td>
 <td class="org-left">2<sup>65536</sup>=?</td>
+</tr>
+
+<tr>
+<td class="org-right">7</td>
+<td class="org-left">2^? = ?!</td>
 </tr>
 </tbody>
 </table>
