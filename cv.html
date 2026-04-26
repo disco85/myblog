@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-26 Sun 18:53 -->
+<!-- 2026-04-26 Sun 19:15 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Current CV</title>
@@ -33,7 +33,7 @@
   --syn-variable-name-color: #FF8000;
   --syn-constant-color: #00FFFF;
 }
-body.light {
+html.light {
   color-scheme: light;
   --stroke-color: black;
   /* theme attributes: */
@@ -57,7 +57,7 @@ body.light {
 }
 body {
   font-family: monospace,  sans-serif;
-  color-scheme: dark;
+  color-scheme: light dark;
   color: var(--color);
   background-color: var(--background-color);
 }
@@ -65,7 +65,7 @@ body {
   /*float: right;*/
   cursor: pointer;
   user-select: none;
-  font-size: 2em;
+  font-size: 1.2em;
   margin-left: 10px;
 }
 svg {
@@ -233,31 +233,26 @@ th, td {
 </style>
 <!-- Theme support... -->
 <script>
-function applyTheme(theme) {
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
   if (theme === "light") {
-    document.body.classList.add("light");
-  } else {
-    document.body.classList.remove("light");
+    document.documentElement.classList.add("light");
   }
-}
+})();
 function toggleTheme() {
-  const isLight = document.body.classList.toggle("light");
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
-/* run on every page load */
-(function () {
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-})();
 </script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
 [<a href="cv.html">CV</a>]
 [<a href="index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
-<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -266,26 +261,26 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgfa48496">Skills</a>
+<li><a href="#org932d80f">Skills</a>
 <ul>
-<li><a href="#org2f2765a">In the past</a></li>
+<li><a href="#org14ae830">In the past</a></li>
 </ul>
 </li>
-<li><a href="#orgbd53455">Highlights</a>
+<li><a href="#org464c08b">Highlights</a>
 <ul>
-<li><a href="#org1d9200b">In the past</a></li>
+<li><a href="#org507d7ce">In the past</a></li>
 </ul>
 </li>
-<li><a href="#orgb597095">Some domains, time periods</a></li>
+<li><a href="#org53a29bd">Some domains, time periods</a></li>
 </ul>
 </div>
 </div>
 <p>
 Technical university degree (1995-2000), software developer since 1997. My experience includes:
 </p>
-<div id="outline-container-orgfa48496" class="outline-2">
-<h2 id="orgfa48496">Skills</h2>
-<div class="outline-text-2" id="text-orgfa48496">
+<div id="outline-container-org932d80f" class="outline-2">
+<h2 id="org932d80f">Skills</h2>
+<div class="outline-text-2" id="text-org932d80f">
 <ul class="org-ul">
 <li><i>Programming</i>: Python, Haskell, C, Java (J2ME, J2SE), Common Lisp, (in the past: <i>Tcl​/Tk, VBA, i386 asm</i>)</li>
 <li><i>Scripting</i>: Python, Bourne Shell, Awk, Makefile, (in the past: <i>Tcl​/Tk, NewLisp, m4</i>)</li>
@@ -297,9 +292,9 @@ Technical university degree (1995-2000), software developer since 1997. My exper
 <li><i>CI</i>: Gitlab, Jenkins</li>
 </ul>
 </div>
-<div id="outline-container-org2f2765a" class="outline-3">
-<h3 id="org2f2765a">In the past</h3>
-<div class="outline-text-3" id="text-org2f2765a">
+<div id="outline-container-org14ae830" class="outline-3">
+<h3 id="org14ae830">In the past</h3>
+<div class="outline-text-3" id="text-org14ae830">
 <ul class="org-ul">
 <li><i>Embedded</i>: AVR​/AVR32, DSP (Hexagon), SPI, I2C, RF, ADC​/DAC, LCD, Qtouch, Gyro​/Compass​/Accelerometer, UART...</li>
 <li><i>4GL</i>: LabView</li>
@@ -311,9 +306,9 @@ Technical university degree (1995-2000), software developer since 1997. My exper
 </div>
 </div>
 </div>
-<div id="outline-container-orgbd53455" class="outline-2">
-<h2 id="orgbd53455">Highlights</h2>
-<div class="outline-text-2" id="text-orgbd53455">
+<div id="outline-container-org464c08b" class="outline-2">
+<h2 id="org464c08b">Highlights</h2>
+<div class="outline-text-2" id="text-org464c08b">
 <p>
 <code>Python experience about 25 years</code> on wide area projects:
 </p>
@@ -345,9 +340,9 @@ Technical university degree (1995-2000), software developer since 1997. My exper
 <li>Unit tests, property tests, load tests</li>
 </ul>
 </div>
-<div id="outline-container-org1d9200b" class="outline-3">
-<h3 id="org1d9200b">In the past</h3>
-<div class="outline-text-3" id="text-org1d9200b">
+<div id="outline-container-org507d7ce" class="outline-3">
+<h3 id="org507d7ce">In the past</h3>
+<div class="outline-text-3" id="text-org507d7ce">
 <p>
 <code>C skills about 15 years</code> (on MSDOS, Windows, SunOS, Linux, BSD, QNX, bare-metal):
 </p>
@@ -387,10 +382,10 @@ Technical university degree (1995-2000), software developer since 1997. My exper
 </div>
 </div>
 </div>
-<div id="outline-container-orgb597095" class="outline-2">
-<h2 id="orgb597095">Some domains, time periods</h2>
-<div class="outline-text-2" id="text-orgb597095">
-<pre class="example" id="orge7bffed">
+<div id="outline-container-org53a29bd" class="outline-2">
+<h2 id="org53a29bd">Some domains, time periods</h2>
+<div class="outline-text-2" id="text-org53a29bd">
+<pre class="example" id="orge151f82">
                  E
                  M           N
                  B   S       E       D
@@ -406,9 +401,9 @@ Technical university degree (1995-2000), software developer since 1997. My exper
 2003_▓_______▓_______▓___▓___▓_____________
 2005_▓_______________▓___▓___▓___▓_________
 2007_▓_______________▓___▓___▓___▓_________
-2009_▓___▓___________▓___▓___▓___▓_________
-2011_____▓___________▓___▓___▓___▓_________
-2013_____▓___________▓___▓___▓_____________
+2009_▓___▓_______▓___▓___▓___▓___▓_________
+2011_____▓_______▓___▓___▓___▓___▓_________
+2013_____▓_______▓___▓___▓___▓_____________
 2015_________________▓___▓___▓___▓_________
 2017_____________________▓___▓_______▓_____
 2019_____________________▓___▓_______▓_____

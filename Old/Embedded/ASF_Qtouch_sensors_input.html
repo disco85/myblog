@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-26 Sun 18:53 -->
+<!-- 2026-04-26 Sun 19:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: Qtouch sensors input</title>
@@ -33,7 +33,7 @@
   --syn-variable-name-color: #FF8000;
   --syn-constant-color: #00FFFF;
 }
-body.light {
+html.light {
   color-scheme: light;
   --stroke-color: black;
   /* theme attributes: */
@@ -57,7 +57,7 @@ body.light {
 }
 body {
   font-family: monospace,  sans-serif;
-  color-scheme: dark;
+  color-scheme: light dark;
   color: var(--color);
   background-color: var(--background-color);
 }
@@ -65,7 +65,7 @@ body {
   /*float: right;*/
   cursor: pointer;
   user-select: none;
-  font-size: 2em;
+  font-size: 1.2em;
   margin-left: 10px;
 }
 svg {
@@ -233,31 +233,26 @@ th, td {
 </style>
 <!-- Theme support... -->
 <script>
-function applyTheme(theme) {
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
   if (theme === "light") {
-    document.body.classList.add("light");
-  } else {
-    document.body.classList.remove("light");
+    document.documentElement.classList.add("light");
   }
-}
+})();
 function toggleTheme() {
-  const isLight = document.body.classList.toggle("light");
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
-/* run on every page load */
-(function () {
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-})();
 </script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
 [<a href="../../cv.html">CV</a>]
 [<a href="../../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
-<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -266,30 +261,30 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org2290960">ASF: Qtouch sensors input</a></li>
-<li><a href="#org61fe0b1">fix random (false) signals (splashes or BOUNCE)</a></li>
-<li><a href="#orgaf955e2">detecting PRESS state</a></li>
-<li><a href="#org31c0736">detecting long "pressing" (touching) - sticking of key.</a></li>
+<li><a href="#orgefb251c">ASF: Qtouch sensors input</a></li>
+<li><a href="#org0d05032">fix random (false) signals (splashes or BOUNCE)</a></li>
+<li><a href="#orgfa030b1">detecting PRESS state</a></li>
+<li><a href="#org05ebea0">detecting long "pressing" (touching) - sticking of key.</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org2290960" class="outline-2">
-<h2 id="org2290960">ASF: Qtouch sensors input</h2>
-<div class="outline-text-2" id="text-org2290960">
+<div id="outline-container-orgefb251c" class="outline-2">
+<h2 id="orgefb251c">ASF: Qtouch sensors input</h2>
+<div class="outline-text-2" id="text-orgefb251c">
 <p>
 There are several tasks when we try to process Qtouch input (Qtouch 60168):
 </p>
 </div>
 </div>
-<div id="outline-container-org61fe0b1" class="outline-2">
-<h2 id="org61fe0b1">fix random (false) signals (splashes or BOUNCE)</h2>
+<div id="outline-container-org0d05032" class="outline-2">
+<h2 id="org0d05032">fix random (false) signals (splashes or BOUNCE)</h2>
 </div>
-<div id="outline-container-orgaf955e2" class="outline-2">
-<h2 id="orgaf955e2">detecting PRESS state</h2>
+<div id="outline-container-orgfa030b1" class="outline-2">
+<h2 id="orgfa030b1">detecting PRESS state</h2>
 </div>
-<div id="outline-container-org31c0736" class="outline-2">
-<h2 id="org31c0736">detecting long "pressing" (touching) - sticking of key.</h2>
-<div class="outline-text-2" id="text-org31c0736">
+<div id="outline-container-org05ebea0" class="outline-2">
+<h2 id="org05ebea0">detecting long "pressing" (touching) - sticking of key.</h2>
+<div class="outline-text-2" id="text-org05ebea0">
 <ol class="org-ol">
 <li>means: really signal from Qt is not 000..0 or 111..1 but something like 000001000000&#x2026; - with error '1' in sequence of '0' (and vise verse) because of signal bouncing, so it should be 'filtered' 2) means: we should detect when touch sensor is "pressed" 3) means: when user touches screen for long time we should detect this state as 'hold key' (like you can see in old mobile phones or key sticking in Windows) and call some special routine (callback) for processing such event.</li>
 </ol>

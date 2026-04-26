@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-26 Sun 18:53 -->
+<!-- 2026-04-26 Sun 19:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gravity compensation for accelerometer</title>
@@ -33,7 +33,7 @@
   --syn-variable-name-color: #FF8000;
   --syn-constant-color: #00FFFF;
 }
-body.light {
+html.light {
   color-scheme: light;
   --stroke-color: black;
   /* theme attributes: */
@@ -57,7 +57,7 @@ body.light {
 }
 body {
   font-family: monospace,  sans-serif;
-  color-scheme: dark;
+  color-scheme: light dark;
   color: var(--color);
   background-color: var(--background-color);
 }
@@ -65,7 +65,7 @@ body {
   /*float: right;*/
   cursor: pointer;
   user-select: none;
-  font-size: 2em;
+  font-size: 1.2em;
   margin-left: 10px;
 }
 svg {
@@ -233,44 +233,39 @@ th, td {
 </style>
 <!-- Theme support... -->
 <script>
-function applyTheme(theme) {
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
   if (theme === "light") {
-    document.body.classList.add("light");
-  } else {
-    document.body.classList.remove("light");
+    document.documentElement.classList.add("light");
   }
-}
+})();
 function toggleTheme() {
-  const isLight = document.body.classList.toggle("light");
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
-/* run on every page load */
-(function () {
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-})();
 </script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
 [<a href="../../cv.html">CV</a>]
 [<a href="../../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
-<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Gravity compensation for accelerometer</h1>
-<div id="outline-container-org47a211f" class="outline-2">
-<h2 id="org47a211f">Gravity compensation for accelerometer</h2>
-<div class="outline-text-2" id="text-org47a211f">
+<div id="outline-container-orgea6f666" class="outline-2">
+<h2 id="orgea6f666">Gravity compensation for accelerometer</h2>
+<div class="outline-text-2" id="text-orgea6f666">
 <p>
 This solution is only for normal mount of sensor package, see figure:
 </p>
 
 
-<div id="orgc598eef" class="figure">
+<div id="org4779136" class="figure">
 <p><img src="../../assets/Gravity1.svg" alt="Gravity1.svg" class="org-svg" />
 </p>
 </div>
@@ -288,7 +283,7 @@ The figure shows normal mount of the sensor and it's axis. First let's remove gr
 </p>
 
 
-<div id="org609f25b" class="figure">
+<div id="org3b0f56b" class="figure">
 <p><img src="../../assets/Gravity2.svg" alt="Gravity2.svg" class="org-svg" />
 </p>
 </div>
@@ -302,7 +297,7 @@ So, <code>gx = g / cos (90° - p) = g / sin p</code>. Let's define gravity compo
 </p>
 
 
-<div id="org38fb054" class="figure">
+<div id="orgea8eed1" class="figure">
 <p><img src="../../assets/Gravity3.svg" alt="Gravity3.svg" class="org-svg" />
 </p>
 </div>

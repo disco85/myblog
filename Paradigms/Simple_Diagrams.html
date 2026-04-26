@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-26 Sun 18:53 -->
+<!-- 2026-04-26 Sun 19:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple Diagrams</title>
@@ -33,7 +33,7 @@
   --syn-variable-name-color: #FF8000;
   --syn-constant-color: #00FFFF;
 }
-body.light {
+html.light {
   color-scheme: light;
   --stroke-color: black;
   /* theme attributes: */
@@ -57,7 +57,7 @@ body.light {
 }
 body {
   font-family: monospace,  sans-serif;
-  color-scheme: dark;
+  color-scheme: light dark;
   color: var(--color);
   background-color: var(--background-color);
 }
@@ -65,7 +65,7 @@ body {
   /*float: right;*/
   cursor: pointer;
   user-select: none;
-  font-size: 2em;
+  font-size: 1.2em;
   margin-left: 10px;
 }
 svg {
@@ -233,31 +233,26 @@ th, td {
 </style>
 <!-- Theme support... -->
 <script>
-function applyTheme(theme) {
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
   if (theme === "light") {
-    document.body.classList.add("light");
-  } else {
-    document.body.classList.remove("light");
+    document.documentElement.classList.add("light");
   }
-}
+})();
 function toggleTheme() {
-  const isLight = document.body.classList.toggle("light");
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
-/* run on every page load */
-(function () {
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-})();
 </script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
 [<a href="../cv.html">CV</a>]
 [<a href="../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
-<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -266,21 +261,21 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org60bef4f">My simplification of existing diagrams</a></li>
-<li><a href="#org33fd45f">Structural diagram</a></li>
-<li><a href="#orga0216ae">Conceptual structural diagram</a></li>
-<li><a href="#org34da529">Variations</a></li>
-<li><a href="#org17edb3d">Important: the main idea of the structural diagrams</a></li>
-<li><a href="#org6b1c056">Algorithmic diagrams</a></li>
-<li><a href="#org6372fce">Grafcet-like diagrams</a></li>
-<li><a href="#org56d20fb">Examples of usage</a></li>
-<li><a href="#org72878bc">Why do we need diagrams?</a></li>
+<li><a href="#orgcbeb195">My simplification of existing diagrams</a></li>
+<li><a href="#org0d30c2b">Structural diagram</a></li>
+<li><a href="#org4be7a5c">Conceptual structural diagram</a></li>
+<li><a href="#org4d5dae4">Variations</a></li>
+<li><a href="#orgb9a015d">Important: the main idea of the structural diagrams</a></li>
+<li><a href="#org7697450">Algorithmic diagrams</a></li>
+<li><a href="#orgc3934a4">Grafcet-like diagrams</a></li>
+<li><a href="#org71a7410">Examples of usage</a></li>
+<li><a href="#org72f27cf">Why do we need diagrams?</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org60bef4f" class="outline-2">
-<h2 id="org60bef4f">My simplification of existing diagrams</h2>
-<div class="outline-text-2" id="text-org60bef4f">
+<div id="outline-container-orgcbeb195" class="outline-2">
+<h2 id="orgcbeb195">My simplification of existing diagrams</h2>
+<div class="outline-text-2" id="text-orgcbeb195">
 <p>
 There are many diagramming standards. Different diagrams serve
 different purposes.  Diagrams are a language, albeit a visual
@@ -334,9 +329,9 @@ path.
 </p>
 </div>
 </div>
-<div id="outline-container-org33fd45f" class="outline-2">
-<h2 id="org33fd45f">Structural diagram</h2>
-<div class="outline-text-2" id="text-org33fd45f">
+<div id="outline-container-org0d30c2b" class="outline-2">
+<h2 id="org0d30c2b">Structural diagram</h2>
+<div class="outline-text-2" id="text-org0d30c2b">
 <p>
 It depicts concepts in rectangles. In a program, these could be
 classes, structures, records. Concepts depend on each other; they are
@@ -389,9 +384,9 @@ Here's the diagram:
 </p>
 </div>
 </div>
-<div id="outline-container-orga0216ae" class="outline-2">
-<h2 id="orga0216ae">Conceptual structural diagram</h2>
-<div class="outline-text-2" id="text-orga0216ae">
+<div id="outline-container-org4be7a5c" class="outline-2">
+<h2 id="org4be7a5c">Conceptual structural diagram</h2>
+<div class="outline-text-2" id="text-org4be7a5c">
 <p>
 Another type of structure diagram is the conceptual structure
 diagram. It's very similar to the previous one, but it hides
@@ -443,9 +438,9 @@ that it's typical for any car.
 </p>
 </div>
 </div>
-<div id="outline-container-org34da529" class="outline-2">
-<h2 id="org34da529">Variations</h2>
-<div class="outline-text-2" id="text-org34da529">
+<div id="outline-container-org4d5dae4" class="outline-2">
+<h2 id="org4d5dae4">Variations</h2>
+<div class="outline-text-2" id="text-org4d5dae4">
 <p>
 If there is a bidirectional relation, name of it from one side and
 another one can be different, it can be represented as <code>A | B</code> or
@@ -517,9 +512,9 @@ Another option is to write a type of the relation in math sense
 </p>
 </div>
 </div>
-<div id="outline-container-org17edb3d" class="outline-2">
-<h2 id="org17edb3d">Important: the main idea of the structural diagrams</h2>
-<div class="outline-text-2" id="text-org17edb3d">
+<div id="outline-container-orgb9a015d" class="outline-2">
+<h2 id="orgb9a015d">Important: the main idea of the structural diagrams</h2>
+<div class="outline-text-2" id="text-orgb9a015d">
 <p>
 In essence, <b>these diagrams are a distillation of semantic networks
 and ERD diagrams</b>. Try to see it as a knowledge map that leads you
@@ -535,9 +530,9 @@ a salary.
 </p>
 </div>
 </div>
-<div id="outline-container-org6b1c056" class="outline-2">
-<h2 id="org6b1c056">Algorithmic diagrams</h2>
-<div class="outline-text-2" id="text-org6b1c056">
+<div id="outline-container-org7697450" class="outline-2">
+<h2 id="org7697450">Algorithmic diagrams</h2>
+<div class="outline-text-2" id="text-org7697450">
 <p>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -660,9 +655,9 @@ to learn them - compare it with UML!
 </p>
 </div>
 </div>
-<div id="outline-container-org6372fce" class="outline-2">
-<h2 id="org6372fce">Grafcet-like diagrams</h2>
-<div class="outline-text-2" id="text-org6372fce">
+<div id="outline-container-orgc3934a4" class="outline-2">
+<h2 id="orgc3934a4">Grafcet-like diagrams</h2>
+<div class="outline-text-2" id="text-orgc3934a4">
 <p>
 These algorithmic diagrams can be used also in <a href="https://fr.wikipedia.org/wiki/Grafcet">Grafcet</a> style:
 </p>
@@ -719,18 +714,18 @@ Petri nets.
 </p>
 </div>
 </div>
-<div id="outline-container-org56d20fb" class="outline-2">
-<h2 id="org56d20fb">Examples of usage</h2>
-<div class="outline-text-2" id="text-org56d20fb">
+<div id="outline-container-org71a7410" class="outline-2">
+<h2 id="org71a7410">Examples of usage</h2>
+<div class="outline-text-2" id="text-org71a7410">
 <ul class="org-ul">
 <li><a href="./Simple_Diagrams_For_Logic.html">Logical reasoning: induction, deduction</a></li>
 <li><a href="./Simple_Diagrams_For_Easytree.html">Easytree tool</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org72878bc" class="outline-2">
-<h2 id="org72878bc">Why do we need diagrams?</h2>
-<div class="outline-text-2" id="text-org72878bc">
+<div id="outline-container-org72f27cf" class="outline-2">
+<h2 id="org72f27cf">Why do we need diagrams?</h2>
+<div class="outline-text-2" id="text-org72f27cf">
 <p>
 Try starting your algorithm development with a diagram: you'll spot
 all the errors right from the start, and the implemented algorithm

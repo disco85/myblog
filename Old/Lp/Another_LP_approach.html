@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-26 Sun 18:53 -->
+<!-- 2026-04-26 Sun 19:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Another LP approach</title>
@@ -33,7 +33,7 @@
   --syn-variable-name-color: #FF8000;
   --syn-constant-color: #00FFFF;
 }
-body.light {
+html.light {
   color-scheme: light;
   --stroke-color: black;
   /* theme attributes: */
@@ -57,7 +57,7 @@ body.light {
 }
 body {
   font-family: monospace,  sans-serif;
-  color-scheme: dark;
+  color-scheme: light dark;
   color: var(--color);
   background-color: var(--background-color);
 }
@@ -65,7 +65,7 @@ body {
   /*float: right;*/
   cursor: pointer;
   user-select: none;
-  font-size: 2em;
+  font-size: 1.2em;
   margin-left: 10px;
 }
 svg {
@@ -233,38 +233,33 @@ th, td {
 </style>
 <!-- Theme support... -->
 <script>
-function applyTheme(theme) {
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
   if (theme === "light") {
-    document.body.classList.add("light");
-  } else {
-    document.body.classList.remove("light");
+    document.documentElement.classList.add("light");
   }
-}
+})();
 function toggleTheme() {
-  const isLight = document.body.classList.toggle("light");
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
-/* run on every page load */
-(function () {
-  const saved = localStorage.getItem("theme") || "dark";
-  applyTheme(saved);
-})();
 </script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
 [<a href="../../cv.html">CV</a>]
 [<a href="../../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
-<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">Another LP approach</h1>
-<div id="outline-container-orge0d5966" class="outline-2">
-<h2 id="orge0d5966">Another LP approach</h2>
-<div class="outline-text-2" id="text-orge0d5966">
+<div id="outline-container-org5194b3c" class="outline-2">
+<h2 id="org5194b3c">Another LP approach</h2>
+<div class="outline-text-2" id="text-org5194b3c">
 <p>
 Another approach is to use reStructuredText document generator system (see docutils). How to? It's easy: instead of embedding into source code the hyper-text formatting, images, links, you can write your program like story (in usual LP style), use RST syntax (like WiKi) for images embedding and various styles - your code is Literate Programming story as before. But now you can embed code fragments where you need with "include" directive of docutils. This directive requires "startd-after" and "end-before" options for this case. These options defines line (string fragment) the code starts after, and line - the code ends before. I use for this lines Vim foldering lines. See:
 </p>
