@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 16:22 -->
+<!-- 2026-04-26 Sun 18:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simple Diagrams</title>
@@ -14,24 +14,71 @@
 :root {
   color-scheme: dark;
   --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
 }
-svg {
-  background: transparent !important;
-  color: #FF8000;
+body.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
 }
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
-  color: #FF8000;
-  background-color: black;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
 }
 h1, h2, h3, h4 {
   display: inline-block;
-  border-bottom: 2px dashed #FF8000;
+  border-bottom: 2px dashed var(--border-color);
   padding-bottom: 0.1em;
 }
 a:link, a:visited {
-  color: #FF8000;
+  color: var(--link-color);
   text-decoration: underlined;
 }
 div {
@@ -39,15 +86,15 @@ div {
   margin: 0;
 }
 code {
-  background-color: #FF8000;
-  border: 1px solid #FF8000;
-  color: black;
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
   padding: 2px;
   font-family: monospace;
 }
 pre, .verse {
   display: inline-block;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
@@ -62,10 +109,10 @@ pre, .verse {
 }
 table {
   border-collapse: collapse;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
 }
 th, td {
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 5px;
 }
 .org-src-name {
@@ -75,38 +122,38 @@ th, td {
 }
 /* SYNTAX HIGHLIGHT */
 ::selection {
-  background: #FF8000;
-  color: black;
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
 }
 .org-builtin {
-  color: #00FFFF;
+  color: var(--syn-builtin-color);
 }
 .org-comment {
-  color: grey;
+  color: var(--syn-comment-color);
 }
 .org-doc {
-  color: grey;
+  color: var(--syn-doc-color);
   font-style: italic;
 }
 .org-function-name {
-  color: #FF8000;
+  color: var(--syn-function-name-color);
   font-weight: bold;
 }
 .org-keyword {
-  color: #FF8000;
+  color: var(--syn-keyword-color);
   font-weight: bold;
 }
 .org-string {
-  color: fuchsia;
+  color: var(--syn-string-color);
 }
 .org-type {
-  color: #00FFFF;
+  color: var(--syn-type-color);
 }
 .org-variable-name {
-  color: #FF8000;
+  color: var(--syn-variable-name-color);
 }
 .org-constant {
-  color: #00FFFF;
+  color: var(--syn-constant-color);
 }
 /* STYLES FOR PRINTING */
 @media print {
@@ -184,6 +231,25 @@ th, td {
   }
 }
 </style>
+<!-- Theme support... -->
+<script>
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("light");
+  } else {
+    document.body.classList.remove("light");
+  }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+/* run on every page load */
+(function () {
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+})();
+</script>
 </head>
 <body>
 <div id="preamble" class="status">
@@ -191,6 +257,7 @@ th, td {
 [<a href="../cv.html">CV</a>]
 [<a href="../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
+<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -199,21 +266,21 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0549d49">My simplification of existing diagrams</a></li>
-<li><a href="#org1ba7b91">Structural diagram</a></li>
-<li><a href="#orgef1e81c">Conceptual structural diagram</a></li>
-<li><a href="#orgc485395">Variations</a></li>
-<li><a href="#org988bbb5">Important: the main idea of the structural diagrams</a></li>
-<li><a href="#org7750315">Algorithmic diagrams</a></li>
-<li><a href="#org8b368dd">Grafcet-like diagrams</a></li>
-<li><a href="#org692744e">Examples of usage</a></li>
-<li><a href="#orgdd63380">Why do we need diagrams?</a></li>
+<li><a href="#org60bef4f">My simplification of existing diagrams</a></li>
+<li><a href="#org33fd45f">Structural diagram</a></li>
+<li><a href="#orga0216ae">Conceptual structural diagram</a></li>
+<li><a href="#org34da529">Variations</a></li>
+<li><a href="#org17edb3d">Important: the main idea of the structural diagrams</a></li>
+<li><a href="#org6b1c056">Algorithmic diagrams</a></li>
+<li><a href="#org6372fce">Grafcet-like diagrams</a></li>
+<li><a href="#org56d20fb">Examples of usage</a></li>
+<li><a href="#org72878bc">Why do we need diagrams?</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org0549d49" class="outline-2">
-<h2 id="org0549d49">My simplification of existing diagrams</h2>
-<div class="outline-text-2" id="text-org0549d49">
+<div id="outline-container-org60bef4f" class="outline-2">
+<h2 id="org60bef4f">My simplification of existing diagrams</h2>
+<div class="outline-text-2" id="text-org60bef4f">
 <p>
 There are many diagramming standards. Different diagrams serve
 different purposes.  Diagrams are a language, albeit a visual
@@ -267,9 +334,9 @@ path.
 </p>
 </div>
 </div>
-<div id="outline-container-org1ba7b91" class="outline-2">
-<h2 id="org1ba7b91">Structural diagram</h2>
-<div class="outline-text-2" id="text-org1ba7b91">
+<div id="outline-container-org33fd45f" class="outline-2">
+<h2 id="org33fd45f">Structural diagram</h2>
+<div class="outline-text-2" id="text-org33fd45f">
 <p>
 It depicts concepts in rectangles. In a program, these could be
 classes, structures, records. Concepts depend on each other; they are
@@ -322,9 +389,9 @@ Here's the diagram:
 </p>
 </div>
 </div>
-<div id="outline-container-orgef1e81c" class="outline-2">
-<h2 id="orgef1e81c">Conceptual structural diagram</h2>
-<div class="outline-text-2" id="text-orgef1e81c">
+<div id="outline-container-orga0216ae" class="outline-2">
+<h2 id="orga0216ae">Conceptual structural diagram</h2>
+<div class="outline-text-2" id="text-orga0216ae">
 <p>
 Another type of structure diagram is the conceptual structure
 diagram. It's very similar to the previous one, but it hides
@@ -376,9 +443,9 @@ that it's typical for any car.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc485395" class="outline-2">
-<h2 id="orgc485395">Variations</h2>
-<div class="outline-text-2" id="text-orgc485395">
+<div id="outline-container-org34da529" class="outline-2">
+<h2 id="org34da529">Variations</h2>
+<div class="outline-text-2" id="text-org34da529">
 <p>
 If there is a bidirectional relation, name of it from one side and
 another one can be different, it can be represented as <code>A | B</code> or
@@ -450,9 +517,9 @@ Another option is to write a type of the relation in math sense
 </p>
 </div>
 </div>
-<div id="outline-container-org988bbb5" class="outline-2">
-<h2 id="org988bbb5">Important: the main idea of the structural diagrams</h2>
-<div class="outline-text-2" id="text-org988bbb5">
+<div id="outline-container-org17edb3d" class="outline-2">
+<h2 id="org17edb3d">Important: the main idea of the structural diagrams</h2>
+<div class="outline-text-2" id="text-org17edb3d">
 <p>
 In essence, <b>these diagrams are a distillation of semantic networks
 and ERD diagrams</b>. Try to see it as a knowledge map that leads you
@@ -468,9 +535,9 @@ a salary.
 </p>
 </div>
 </div>
-<div id="outline-container-org7750315" class="outline-2">
-<h2 id="org7750315">Algorithmic diagrams</h2>
-<div class="outline-text-2" id="text-org7750315">
+<div id="outline-container-org6b1c056" class="outline-2">
+<h2 id="org6b1c056">Algorithmic diagrams</h2>
+<div class="outline-text-2" id="text-org6b1c056">
 <p>
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -593,9 +660,9 @@ to learn them - compare it with UML!
 </p>
 </div>
 </div>
-<div id="outline-container-org8b368dd" class="outline-2">
-<h2 id="org8b368dd">Grafcet-like diagrams</h2>
-<div class="outline-text-2" id="text-org8b368dd">
+<div id="outline-container-org6372fce" class="outline-2">
+<h2 id="org6372fce">Grafcet-like diagrams</h2>
+<div class="outline-text-2" id="text-org6372fce">
 <p>
 These algorithmic diagrams can be used also in <a href="https://fr.wikipedia.org/wiki/Grafcet">Grafcet</a> style:
 </p>
@@ -652,18 +719,18 @@ Petri nets.
 </p>
 </div>
 </div>
-<div id="outline-container-org692744e" class="outline-2">
-<h2 id="org692744e">Examples of usage</h2>
-<div class="outline-text-2" id="text-org692744e">
+<div id="outline-container-org56d20fb" class="outline-2">
+<h2 id="org56d20fb">Examples of usage</h2>
+<div class="outline-text-2" id="text-org56d20fb">
 <ul class="org-ul">
 <li><a href="./Simple_Diagrams_For_Logic.html">Logical reasoning: induction, deduction</a></li>
 <li><a href="./Simple_Diagrams_For_Easytree.html">Easytree tool</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgdd63380" class="outline-2">
-<h2 id="orgdd63380">Why do we need diagrams?</h2>
-<div class="outline-text-2" id="text-orgdd63380">
+<div id="outline-container-org72878bc" class="outline-2">
+<h2 id="org72878bc">Why do we need diagrams?</h2>
+<div class="outline-text-2" id="text-org72878bc">
 <p>
 Try starting your algorithm development with a diagram: you'll spot
 all the errors right from the start, and the implemented algorithm

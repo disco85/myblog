@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 16:23 -->
+<!-- 2026-04-26 Sun 18:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simulation idea details</title>
@@ -14,24 +14,71 @@
 :root {
   color-scheme: dark;
   --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
 }
-svg {
-  background: transparent !important;
-  color: #FF8000;
+body.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
 }
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
-  color: #FF8000;
-  background-color: black;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
 }
 h1, h2, h3, h4 {
   display: inline-block;
-  border-bottom: 2px dashed #FF8000;
+  border-bottom: 2px dashed var(--border-color);
   padding-bottom: 0.1em;
 }
 a:link, a:visited {
-  color: #FF8000;
+  color: var(--link-color);
   text-decoration: underlined;
 }
 div {
@@ -39,15 +86,15 @@ div {
   margin: 0;
 }
 code {
-  background-color: #FF8000;
-  border: 1px solid #FF8000;
-  color: black;
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
   padding: 2px;
   font-family: monospace;
 }
 pre, .verse {
   display: inline-block;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
@@ -62,10 +109,10 @@ pre, .verse {
 }
 table {
   border-collapse: collapse;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
 }
 th, td {
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 5px;
 }
 .org-src-name {
@@ -75,38 +122,38 @@ th, td {
 }
 /* SYNTAX HIGHLIGHT */
 ::selection {
-  background: #FF8000;
-  color: black;
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
 }
 .org-builtin {
-  color: #00FFFF;
+  color: var(--syn-builtin-color);
 }
 .org-comment {
-  color: grey;
+  color: var(--syn-comment-color);
 }
 .org-doc {
-  color: grey;
+  color: var(--syn-doc-color);
   font-style: italic;
 }
 .org-function-name {
-  color: #FF8000;
+  color: var(--syn-function-name-color);
   font-weight: bold;
 }
 .org-keyword {
-  color: #FF8000;
+  color: var(--syn-keyword-color);
   font-weight: bold;
 }
 .org-string {
-  color: fuchsia;
+  color: var(--syn-string-color);
 }
 .org-type {
-  color: #00FFFF;
+  color: var(--syn-type-color);
 }
 .org-variable-name {
-  color: #FF8000;
+  color: var(--syn-variable-name-color);
 }
 .org-constant {
-  color: #00FFFF;
+  color: var(--syn-constant-color);
 }
 /* STYLES FOR PRINTING */
 @media print {
@@ -184,6 +231,25 @@ th, td {
   }
 }
 </style>
+<!-- Theme support... -->
+<script>
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("light");
+  } else {
+    document.body.classList.remove("light");
+  }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+/* run on every page load */
+(function () {
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+})();
+</script>
 </head>
 <body>
 <div id="preamble" class="status">
@@ -191,6 +257,7 @@ th, td {
 [<a href="../cv.html">CV</a>]
 [<a href="../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
+<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -199,20 +266,20 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgdbf62d0">About the idea of simulation</a></li>
-<li><a href="#org2eda701">Inexplicable Concepts</a></li>
-<li><a href="#orgd6370ed">Other Levels</a></li>
-<li><a href="#orgc3888f6">Islam and the Upper World</a></li>
-<li><a href="#org418b097">All variants</a></li>
-<li><a href="#org1163131">So what is the truth?</a></li>
-<li><a href="#org12d69a7">Gross Material Worlds and the World of Amber</a></li>
-<li><a href="#org3bc4862">Terminology</a></li>
+<li><a href="#org5ba410e">About the idea of simulation</a></li>
+<li><a href="#org207cbc7">Inexplicable Concepts</a></li>
+<li><a href="#org2b908ab">Other Levels</a></li>
+<li><a href="#org5ede645">Islam and the Upper World</a></li>
+<li><a href="#org33d223c">All variants</a></li>
+<li><a href="#org93471a5">So what is the truth?</a></li>
+<li><a href="#orgb95f7fb">Gross Material Worlds and the World of Amber</a></li>
+<li><a href="#org92171cd">Terminology</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgdbf62d0" class="outline-2">
-<h2 id="orgdbf62d0">About the idea of simulation</h2>
-<div class="outline-text-2" id="text-orgdbf62d0">
+<div id="outline-container-org5ba410e" class="outline-2">
+<h2 id="org5ba410e">About the idea of simulation</h2>
+<div class="outline-text-2" id="text-org5ba410e">
 <p>
 In a computer game, no character can affect pixels (or the conductive
 rubber that controls them, or voltage) -- they can only affect a group
@@ -271,9 +338,9 @@ material world is immaterial, informational.
 </p>
 </div>
 </div>
-<div id="outline-container-org2eda701" class="outline-2">
-<h2 id="org2eda701">Inexplicable Concepts</h2>
-<div class="outline-text-2" id="text-org2eda701">
+<div id="outline-container-org207cbc7" class="outline-2">
+<h2 id="org207cbc7">Inexplicable Concepts</h2>
+<div class="outline-text-2" id="text-org207cbc7">
 <p>
 For example, space is such an unimaginable category. It is impossible
 to imagine such a thing without resorting to mathematics and its
@@ -283,9 +350,9 @@ of matter. And so on (time, etc.).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd6370ed" class="outline-2">
-<h2 id="orgd6370ed">Other Levels</h2>
-<div class="outline-text-2" id="text-orgd6370ed">
+<div id="outline-container-org2b908ab" class="outline-2">
+<h2 id="org2b908ab">Other Levels</h2>
+<div class="outline-text-2" id="text-org2b908ab">
 <p>
 When scientists think about the world outside the simulation, they
 imagine a world like ours, with computers and creatures running our
@@ -344,9 +411,9 @@ If we accept this, we automatically come to religion.
 </p>
 </div>
 </div>
-<div id="outline-container-orgc3888f6" class="outline-2">
-<h2 id="orgc3888f6">Islam and the Upper World</h2>
-<div class="outline-text-2" id="text-orgc3888f6">
+<div id="outline-container-org5ede645" class="outline-2">
+<h2 id="org5ede645">Islam and the Upper World</h2>
+<div class="outline-text-2" id="text-org5ede645">
 <p>
 Islam embraces the concept of tanzīh - transcendence: God is not
 located in any one place or moment in time, nor is He extended in
@@ -403,9 +470,9 @@ example, "opening."
 </p>
 </div>
 </div>
-<div id="outline-container-org418b097" class="outline-2">
-<h2 id="org418b097">All variants</h2>
-<div class="outline-text-2" id="text-org418b097">
+<div id="outline-container-org33d223c" class="outline-2">
+<h2 id="org33d223c">All variants</h2>
+<div class="outline-text-2" id="text-org33d223c">
 <div class="org-src-container">
 <pre class="src src-nil">?
 |
@@ -431,9 +498,9 @@ paradoxes and aporias because it is magical.
 </p>
 </div>
 </div>
-<div id="outline-container-org1163131" class="outline-2">
-<h2 id="org1163131">So what is the truth?</h2>
-<div class="outline-text-2" id="text-org1163131">
+<div id="outline-container-org93471a5" class="outline-2">
+<h2 id="org93471a5">So what is the truth?</h2>
+<div class="outline-text-2" id="text-org93471a5">
 <p>
 I just read an interesting statement: "If everything around us is
 'unreal,' immaterial, just fields and electrical signals, then why do
@@ -451,9 +518,9 @@ incomplete?
 </p>
 </div>
 </div>
-<div id="outline-container-org12d69a7" class="outline-2">
-<h2 id="org12d69a7">Gross Material Worlds and the World of Amber</h2>
-<div class="outline-text-2" id="text-org12d69a7">
+<div id="outline-container-orgb95f7fb" class="outline-2">
+<h2 id="orgb95f7fb">Gross Material Worlds and the World of Amber</h2>
+<div class="outline-text-2" id="text-orgb95f7fb">
 <p>
 If we accept the simulation hypothesis, then the necessity of
 accepting the multiplicity of worlds is automatic -- there are at least
@@ -478,9 +545,9 @@ entire system.
 </p>
 </div>
 </div>
-<div id="outline-container-org3bc4862" class="outline-2">
-<h2 id="org3bc4862">Terminology</h2>
-<div class="outline-text-2" id="text-org3bc4862">
+<div id="outline-container-org92171cd" class="outline-2">
+<h2 id="org92171cd">Terminology</h2>
+<div class="outline-text-2" id="text-org92171cd">
 <p>
 We can even introduce terminology:
 </p>

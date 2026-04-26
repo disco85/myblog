@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 16:22 -->
+<!-- 2026-04-26 Sun 18:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Hyperoperations</title>
@@ -14,24 +14,71 @@
 :root {
   color-scheme: dark;
   --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
 }
-svg {
-  background: transparent !important;
-  color: #FF8000;
+body.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
 }
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
-  color: #FF8000;
-  background-color: black;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
 }
 h1, h2, h3, h4 {
   display: inline-block;
-  border-bottom: 2px dashed #FF8000;
+  border-bottom: 2px dashed var(--border-color);
   padding-bottom: 0.1em;
 }
 a:link, a:visited {
-  color: #FF8000;
+  color: var(--link-color);
   text-decoration: underlined;
 }
 div {
@@ -39,15 +86,15 @@ div {
   margin: 0;
 }
 code {
-  background-color: #FF8000;
-  border: 1px solid #FF8000;
-  color: black;
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
   padding: 2px;
   font-family: monospace;
 }
 pre, .verse {
   display: inline-block;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
@@ -62,10 +109,10 @@ pre, .verse {
 }
 table {
   border-collapse: collapse;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
 }
 th, td {
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 5px;
 }
 .org-src-name {
@@ -75,38 +122,38 @@ th, td {
 }
 /* SYNTAX HIGHLIGHT */
 ::selection {
-  background: #FF8000;
-  color: black;
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
 }
 .org-builtin {
-  color: #00FFFF;
+  color: var(--syn-builtin-color);
 }
 .org-comment {
-  color: grey;
+  color: var(--syn-comment-color);
 }
 .org-doc {
-  color: grey;
+  color: var(--syn-doc-color);
   font-style: italic;
 }
 .org-function-name {
-  color: #FF8000;
+  color: var(--syn-function-name-color);
   font-weight: bold;
 }
 .org-keyword {
-  color: #FF8000;
+  color: var(--syn-keyword-color);
   font-weight: bold;
 }
 .org-string {
-  color: fuchsia;
+  color: var(--syn-string-color);
 }
 .org-type {
-  color: #00FFFF;
+  color: var(--syn-type-color);
 }
 .org-variable-name {
-  color: #FF8000;
+  color: var(--syn-variable-name-color);
 }
 .org-constant {
-  color: #00FFFF;
+  color: var(--syn-constant-color);
 }
 /* STYLES FOR PRINTING */
 @media print {
@@ -184,6 +231,25 @@ th, td {
   }
 }
 </style>
+<!-- Theme support... -->
+<script>
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("light");
+  } else {
+    document.body.classList.remove("light");
+  }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+/* run on every page load */
+(function () {
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+})();
+</script>
 <script>
   window.MathJax = {
     tex: {
@@ -223,6 +289,7 @@ th, td {
 [<a href="../cv.html">CV</a>]
 [<a href="../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
+<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
@@ -231,15 +298,15 @@ th, td {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org882907e">Basic idea</a></li>
-<li><a href="#orgf134171">Properties</a></li>
-<li><a href="#orge82e602">CL implementation</a></li>
+<li><a href="#orgdf7733d">Basic idea</a></li>
+<li><a href="#orga539528">Properties</a></li>
+<li><a href="#org71f4ce6">CL implementation</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org882907e" class="outline-2">
-<h2 id="org882907e">Basic idea</h2>
-<div class="outline-text-2" id="text-org882907e">
+<div id="outline-container-orgdf7733d" class="outline-2">
+<h2 id="orgdf7733d">Basic idea</h2>
+<div class="outline-text-2" id="text-orgdf7733d">
 <p>
 Donald Knuth introduced a notation of Ackermann function called Knuth's arrows. These
 ideas are generalization (one common algorithm) for basic arithmetic operations like
@@ -264,7 +331,7 @@ etc.
 So, +, *, power and so on can be represented as recursive function, its definition is:
 </p>
 
-<div class="figure" id="orga61dd58">
+<div class="figure" id="org7999043">
 <p class="verse">
 H<sub>n</sub>(a,b) =<br />
 &#xa0;&#xa0;| n = 0          =  b + 1<br />
@@ -281,9 +348,9 @@ H<sub>n</sub>(a,b) =<br />
 </p>
 </div>
 </div>
-<div id="outline-container-orgf134171" class="outline-2">
-<h2 id="orgf134171">Properties</h2>
-<div class="outline-text-2" id="text-orgf134171">
+<div id="outline-container-orga539528" class="outline-2">
+<h2 id="orga539528">Properties</h2>
+<div class="outline-text-2" id="text-orga539528">
 <p>
 We see that arithmetic operations follow similar scheme (remidining monoids,
 but not exactly) and they are not limited with first 3 or 4 operations, but
@@ -405,7 +472,7 @@ we must show that:
 \[
 H_{n+1}(a,1) = a.
 \]
-is also true for such <code>n</code>. From this <a href="#orga61dd58">definition</a> considering \( b=1 \) we see:
+is also true for such <code>n</code>. From this <a href="#org7999043">definition</a> considering \( b=1 \) we see:
 \[
 H_{n+1}(a,1) = H_{n}(a,H_{n+1}(a,0))
 \]
@@ -450,9 +517,9 @@ the order 1 is a real group, and only order 0 is unary operation.
 </p>
 </div>
 </div>
-<div id="outline-container-orge82e602" class="outline-2">
-<h2 id="orge82e602">CL implementation</h2>
-<div class="outline-text-2" id="text-orge82e602">
+<div id="outline-container-org71f4ce6" class="outline-2">
+<h2 id="org71f4ce6">CL implementation</h2>
+<div class="outline-text-2" id="text-org71f4ce6">
 <p>
 This idea has different notations though, see the Wikipedia article, you can invent your own,
 for example, a number in a circle, eg, <code>2⑤3</code>
@@ -505,7 +572,7 @@ Having the definition of <code>H(n,a,b)</code> operation, we can write the gener
 And the neutral elements are really:
 </p>
 
-<pre class="example" id="org22dc737">
+<pre class="example" id="org1ed8fcd">
 CL-USER&gt; (hyper 3 2000 1)
 2000 (11 bits, #x7D0)
 CL-USER&gt; (hyper 2 2000 1)

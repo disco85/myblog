@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-25 Sat 16:22 -->
+<!-- 2026-04-26 Sun 18:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF/AVR32: et024006_PutPixmap() format</title>
@@ -14,24 +14,71 @@
 :root {
   color-scheme: dark;
   --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
 }
-svg {
-  background: transparent !important;
-  color: #FF8000;
+body.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
 }
 body {
   font-family: monospace,  sans-serif;
   color-scheme: dark;
-  color: #FF8000;
-  background-color: black;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
 }
 h1, h2, h3, h4 {
   display: inline-block;
-  border-bottom: 2px dashed #FF8000;
+  border-bottom: 2px dashed var(--border-color);
   padding-bottom: 0.1em;
 }
 a:link, a:visited {
-  color: #FF8000;
+  color: var(--link-color);
   text-decoration: underlined;
 }
 div {
@@ -39,15 +86,15 @@ div {
   margin: 0;
 }
 code {
-  background-color: #FF8000;
-  border: 1px solid #FF8000;
-  color: black;
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
   padding: 2px;
   font-family: monospace;
 }
 pre, .verse {
   display: inline-block;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 10px;
   margin: 0;
   white-space: pre-wrap;
@@ -62,10 +109,10 @@ pre, .verse {
 }
 table {
   border-collapse: collapse;
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
 }
 th, td {
-  border: 1px solid #FF8000;
+  border: 1px solid var(--border-color);
   padding: 5px;
 }
 .org-src-name {
@@ -75,38 +122,38 @@ th, td {
 }
 /* SYNTAX HIGHLIGHT */
 ::selection {
-  background: #FF8000;
-  color: black;
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
 }
 .org-builtin {
-  color: #00FFFF;
+  color: var(--syn-builtin-color);
 }
 .org-comment {
-  color: grey;
+  color: var(--syn-comment-color);
 }
 .org-doc {
-  color: grey;
+  color: var(--syn-doc-color);
   font-style: italic;
 }
 .org-function-name {
-  color: #FF8000;
+  color: var(--syn-function-name-color);
   font-weight: bold;
 }
 .org-keyword {
-  color: #FF8000;
+  color: var(--syn-keyword-color);
   font-weight: bold;
 }
 .org-string {
-  color: fuchsia;
+  color: var(--syn-string-color);
 }
 .org-type {
-  color: #00FFFF;
+  color: var(--syn-type-color);
 }
 .org-variable-name {
-  color: #FF8000;
+  color: var(--syn-variable-name-color);
 }
 .org-constant {
-  color: #00FFFF;
+  color: var(--syn-constant-color);
 }
 /* STYLES FOR PRINTING */
 @media print {
@@ -184,6 +231,25 @@ th, td {
   }
 }
 </style>
+<!-- Theme support... -->
+<script>
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("light");
+  } else {
+    document.body.classList.remove("light");
+  }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+/* run on every page load */
+(function () {
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+})();
+</script>
 </head>
 <body>
 <div id="preamble" class="status">
@@ -191,13 +257,14 @@ th, td {
 [<a href="../../cv.html">CV</a>]
 [<a href="../../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
+<span id="theme-toggle" onclick="toggleTheme()">◒</span>
 </nav>
 </div>
 <div id="content" class="content">
 <h1 class="title">ASF/AVR32: et024006<sub>PutPixmap</sub>() format</h1>
-<div id="outline-container-org1c72661" class="outline-2">
-<h2 id="org1c72661">ASF/AVR32: et024006<sub>PutPixmap</sub>() format</h2>
-<div class="outline-text-2" id="text-org1c72661">
+<div id="outline-container-orgbc71dea" class="outline-2">
+<h2 id="orgbc71dea">ASF/AVR32: et024006<sub>PutPixmap</sub>() format</h2>
+<div class="outline-text-2" id="text-orgbc71dea">
 <p>
 How to use bitmap on ET024006 with ASF (Atmel Software Framework)? Format of bitmap file, used in et024006<sub>PutPixmap</sub>(), is the R5G6B5, you can create image in the GIMP, then export to 'C source file' (select 'save as RGB 565 16 bits', and uncheck 'Use Glib types') and get something like this:
 </p>
