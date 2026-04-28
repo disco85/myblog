@@ -1,0 +1,278 @@
+#+title: Factorial geometry
+#+description: Math
+#+keywords: Math
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Math
+#+date: <2026-04-26 Sun 22:04>
+
+** How to introduce the concept of factorial
+
+How many different ~n~-digit numbers can be written from ~n~ *different* digits?
+For example, using 1 digit - "1", we can write only one 1-digit number: "1".
+But using 2 digits: 1,2 - we can write 12 and 21, ie, 2 numbers.
+
+It's classical question from [[https://en.wikipedia.org/wiki/Combinatorics][combinatorics]] and the answer is ~Vertexes factorial~
+and factorial of ~4~, for example, is defined as: ~4! = 4*3*2*1 = 24~.
+
+** Geometric metaphor
+
+But we can see this formulae in geometry. Look at the picture:
+
+[[inline:../../assets/Factorial_geom.svg]]
+
+Imagine that "different numbers" means different combinations getting from traversing
+of digits placed on some surface. Let's put them in a way that they will form some
+well-known geometric figures, for instance, 3 digits are placed to form a triangle.
+"Different numbers", in the case, are formed by traversing of digits - vertexes:
+we visit every vertex (every!) and at the end - we "collect" the number.
+
+Now imagine that they are residents of some small villages, and these residents often
+visit each other. How many "routes" do they walk? For example, the first resident see from
+his window that 2 other residents visit each other in 2 different routes only: either 2
+visit 3 or 3 visit 2. How many routes do exist in that village then? If to ask every
+resident, he/she will say: 2, total number of routes is ~3 residents * 2 routes = 6
+routes~.
+
+"Routes" means that a resident visit *ALL* his neighbors (but that one which is observing
+them, well, actually they are visits each other, but we we decompose the situation into a
+sum of small). Imagine order of visiting of neighbors - this is the key idea, actually
+permutations: we can visit John, Alex and Alice. But also we can visit first Alex, then
+Alice and John, also the order ("route", "walk") can be: Alice, John, Alex and so on.
+
+If the village is little bit bigger, and we have 4 residents, then the situation is
+similar: 1th resident observes from his window other 3 residents and the number of their
+routes is already known from the previous village: 6 routes! For total routes we ask
+every resident again and summarize them: ~4 * 6 = 24 routes~
+
+In the case of 5 residents metropolis the logic is the same: 1st resident sees his
+4 neighbors, they made 24 routes - we know it from the previous, middle size village!
+All 5 inhabitants of this metropolis could report in sum: ~5 * 24 = 120 routes~.
+
+We see tendency: every larger village hides among its secrets the number of routes that
+can be easy found: ~the number of residents * the number of routes of the smaller village~.
+
+For the case of 5 residents village it is: ~5 * (4 * (3 * 2))~. This is the factorial.
+
+Why did you draw [[https://en.wikipedia.org/wiki/Regular_polygon][regular polygons]]? Just for better visualization of our metaphor. But
+we could use another metaphor, for example, bees collecting honey from flowers: our
+houses (vertexes) will be flowers, residents - bees.
+
+So, the number of "routes" is the number of combinations of digits in the original
+question and it is always multiplied by ~number-of-residents~ with each step - entering
+the next village, ie, we always multiply the routes number in the smaller village
+to the size of the current village, ie, ~*2, *3, *4, *5, ...~:
+
+| residents | 1 | 2 | 3 |  4 |   5 |   6 | ... |
+|-----------+---+---+---+----+-----+-----+-----|
+| routes    | 1 | 2 | 6 | 24 | 120 | 720 | ... |
+
+Village residents visit each other following external/outside edges and inner diagonals:
+the number of inner diagonals also depends on the village size. Their number is always
+adding the ~number-of-residents minus 2~ to the diagonals number of the smaller village:
++3, +4, +5, +6, ..., the number of diagonals:
+
+| residents | 1 | 2 | 3 | 4 | 5 | 6 | ... |
+|-----------+---+---+---+---+---+---+-----|
+| diagonals | 0 | 0 | 0 | 2 | 5 | 9 | ... |
+
+The formulae for diagonals number is:
+
+\[
+\forall n>2, diagonals = \frac{1}{2} n (n - 3)
+\]
+
+It is like the number of routes, but we start from 0 (not 1) and we add (not multiply).
+
+** Colored permutations
+
+If to write all permutations of 1, 2, 3 (123, 132, 312, 321, ...) and to choose first 2
+numbers as 2D-coordinates and the 3rd number as a color (we can do it in GNU Octave) and
+to draw the result, we see that the result figure is symmetrical with respect to the
+central bisector ~(1,1), (3, 3)~ (but if to forget about colors - then with respect to the
+line ~(3,1), (1,3)~ too).
+
+#+caption: Colored 2D representation of permutations of [1 2 3], GNU Octave
+#+begin_src octave :eval yes :results none :var dir=(expand-file-name myblog-assets-base-directory)
+file = fullfile(dir, "Factorial_perm1.svg");
+% Generate permutations
+P = perms([1 2 3]);
+% Colors
+colors = [
+  1 1 0;
+  1 0 1;
+  1 0 0
+];
+xy = P(:,1:2);
+cidx = P(:,3);
+c = colors(cidx, :);
+% Create smaller figure
+fig = figure('position', [0, 0, 350, 350]); % width, height in pixels
+ax = axes(fig);
+scatter(ax, xy(:,1), xy(:,2), 120, c, 'filled');
+hold(ax, 'on'); % don't removed already drawn
+plot(ax, xlim(ax), xlim(ax), 'k--', 'LineWidth', 1.5);
+axis(ax, 'equal');
+grid(ax, 'on');
+xlabel(ax, 'X');
+ylabel(ax, 'Y');
+title(ax, 'Permutations');
+% Styling for cleaner SVG ---
+set(ax, 'color', 'none');        % transparent axes background
+set(fig, 'color', 'none');       % transparent figure background
+% Try to improve SVG output consistency
+set(ax, 'box', 'off');
+% Export as SVG
+print(fig, file, '-dsvg', '-painters');
+#+end_src
+
+[[inline:../../assets/Factorial_perm1.svg,flt-octave-2d-svg]]
+
+We select 2D coordinates and the color index with:
+
+#+begin_src octave
+xy = P(:,1:2);
+cidx = P(:,3);
+#+end_src
+
+** Symmetric group
+
+But if to select for 2D coordinates 2nd and 3rd numbers and for the color - the 1st
+number - the resulting figure will be the same. Because all digits/positions get
+all three possible values. Order will be different, but it does not matter for
+our figure:
+
+#+caption: Slices are equal, GNU Octave
+#+begin_src octave :eval yes-export :exports both :results output verbatim
+P = perms([1 2 3]);
+p1 = P(:,1:2);
+p2 = P(:,2:3);
+s1 = sortrows(sort(p1, 2));
+s2 = sortrows(sort(p2, 2));
+all(s1(:) == s2(:))   % ARE ALL TRUE?
+#+end_src
+
+Here we have several symmetric groups. Let's consider the color reflection symmetry:
+why do we see this symmetry (colored reflection over bisector line)? Points in every
+part of the bisector represent unique combinations of digits, look at the bottom half
+of the figure:
+
+| x | y | color   |
+|---+---+---------|
+| 2 | 1 | red     |
+| 3 | 1 | magenta |
+| 3 | 2 | yellow  |
+
+if to ignore order - these are unique combinations, everything else repeats them. And pay
+attention - we work with 3 digits (so ~3!~) but here we are considering pairs, ie, mapping
+because two digits restrict the third possible one (they are ~determinants~ uniquely
+determined the whole row: ~X -> Y -> Color~ or the value of the function). So, we draw it
+on 2D surface - we formed such a function: 2 coordinates and a dependent color!
+
+OK, so we have:
+
+- a symmetry in a shape and also
+- a symmetry in colors (color reflection)
+
+*** Color symmetry
+
+It is explained easy, 2 coordinates determine the third digit (represented as a color), so
+obviously swapping of those 2 coordinates lead to the same color (third digit), now we see
+that this function is commutative (symmetric relation):
+
+\[
+X \cdot Y = Y \cdot X = C
+\]
+
+\[
+x \cdot y = y \cdot x = samecolor
+\]
+
+eg, ~2, 1 -> red~ and ~1, 2 -> red~ - only "red" index (of 3 numbers) is free and used for
+a color. This swapping/commutation of 2 args lead to symmetry over the main bisector.
+
+Our "color" relations:
+
+[[inline:../../assets/Factorial_relations.svg,flt-octave-2d-svg]]
+
+If to ignore colors then we see a lot of symmetries.
+
+*** Shape symmetry
+
+It is explained in a similar way: we take into accounts only 2 digits and they form only
+one unique set of permutations: ~[2 1; 3 1; 3 2]~ others repeat them swapping coordinates,
+the third is not drawn as a point (it's a color).
+
+** Intuition of factorial
+
+Segmented N-digits form ~N!~ numbers, eg, ~[1 2 3 4]~ - their /permutations/ - wheels with
+discrete states, /degrees of freedom/, also /everyone with everyone, all are in the game,
+the order matters and we count the total state of the set/:
+
+#+begin_example
+█🯳▉🯴▉🯲▉🯱█
+#+end_example
+
+Imagine a different state (or color) of a set of items, every item has it's own individual state,
+but they all form common state of their set and every item has its own place, so we check them
+is some fixed order. The number of states of the whole set leads us to a factorial.
+
+Also:
+
+#+begin_quote
+If a configuration of a system is determined by the order in which n distinct items are
+arranged (or processed), and every order is possible, then the number of configurations is
+~n!~.
+#+end_quote
+
+Permutated numbers treated as 3D coordinates can be used to build 3D forms, they are
+called [[https://en.wikipedia.org/wiki/Permutohedron][permutohedrons]].
+
+
+# #+begin_src octave :eval yes :results none :var dir=(expand-file-name myblog-assets-base-directory)
+# # file = fullfile(dir, "Factorial_perm2__c.svg");
+# # % Generate permutations of [1 2 3 4]
+# # P = perms([1 2 3 4]);
+  
+# # % Use first 3 coordinates for 3D projection
+# # xyz = P(:,1:3);
+  
+# # x = xyz(:,1);
+# # y = xyz(:,2);
+# # z = xyz(:,3);
+  
+# # % Convex hull (now works in 3D)
+# # K = convhull(x, y, z);
+  
+# # % Create figure
+# # fig = figure('position', [0 0 300 300]);
+# # ax = axes(fig);
+  
+# # % Draw mesh
+# # trisurf(K, x, y, z, ...
+# #   'FaceColor', [0.7 0.8 1], ...
+# #   'EdgeColor', 'k');
+  
+# # hold on;
+  
+# # % Draw points
+# # scatter3(x, y, z, 40, 'k', 'filled');
+  
+# # axis equal;
+# # grid on;
+  
+# # xlabel('X'); ylabel('Y'); zlabel('Z');
+# # title('Permutations of [1 2 3 4] (3D projection)', 'fontsize', 10);
+  
+# # view(3);
+  
+# # % Make background transparent (best effort)
+# # set(fig, 'color', 'none');
+# # set(ax, 'color', 'none');
+# # set(ax, 'box', 'off');
+# # set(ax, 'fontsize', 6)
+  
+# # % Export SVG
+# # print(fig, file, '-dsvg', '-painters');
+# #+end_src

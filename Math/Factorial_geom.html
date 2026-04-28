@@ -1,0 +1,839 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-28 Tue 19:45 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Factorial geometry</title>
+<meta name="description" content="Math" />
+<meta name="keywords" content="Math" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 2px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 2px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Factorial geometry</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgf49f328">How to introduce the concept of factorial</a></li>
+<li><a href="#org6a6920f">Geometric metaphor</a></li>
+<li><a href="#org6ec6d31">Colored permutations</a></li>
+<li><a href="#orgce0d795">Symmetric group</a>
+<ul>
+<li><a href="#orgf11d0b5">Color symmetry</a></li>
+<li><a href="#org7864548">Shape symmetry</a></li>
+</ul>
+</li>
+<li><a href="#org2ee712f">Intuition of factorial</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf49f328" class="outline-2">
+<h2 id="orgf49f328">How to introduce the concept of factorial</h2>
+<div class="outline-text-2" id="text-orgf49f328">
+<p>
+How many different <code>n</code>-digit numbers can be written from <code>n</code> <b>different</b> digits?
+For example, using 1 digit - "1", we can write only one 1-digit number: "1".
+But using 2 digits: 1,2 - we can write 12 and 21, ie, 2 numbers.
+</p>
+
+<p>
+It's classical question from <a href="https://en.wikipedia.org/wiki/Combinatorics">combinatorics</a> and the answer is <code>Vertexes factorial</code>
+and factorial of <code>4</code>, for example, is defined as: <code>4! = 4*3*2*1 = 24</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org6a6920f" class="outline-2">
+<h2 id="org6a6920f">Geometric metaphor</h2>
+<div class="outline-text-2" id="text-org6a6920f">
+<p>
+But we can see this formulae in geometry. Look at the picture:
+</p>
+
+<p>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" style="background: transparent; background-color: transparent; color-scheme: light dark;" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="1056px" height="520px" viewBox="0 0 1056 520"><defs/><g><g data-cell-id="0"><g data-cell-id="1"><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-1"><g><path d="M 144 24 L 232 76 L 144 128 Z" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" transform="rotate(-90,188,76)" pointer-events="all" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-2"><g><path d="M 532 24 L 584 72 L 532 120 L 480 72 Z" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-3"><g><path d="M 880 24 L 932 59.52 L 911.2 120 L 848.8 120 L 828 59.52 Z" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-8"><g transform="translate(0.5,0.5)"><path d="M 162 128 L 208.91 128" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"><title>effect link (consumption or result)</title></path><path d="M 213.11 128 L 207.51 130.8 L 208.91 128 L 207.51 125.2 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, currentColor); stroke: light-dark(currentColor, currentColor);"><title>effect link (consumption or result)</title></path></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-9"><g transform="translate(0.5,0.5)"><rect x="164" y="0" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 15px; margin-left: 206px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="235" y="22" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-10"><g transform="translate(0.5,0.5)"><rect x="88" y="112" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 155px; margin-left: 111px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="140" y="162" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-11"><g transform="translate(0.5,0.5)"><rect x="232" y="112" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 155px; margin-left: 291px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="320" y="162" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-12"><g transform="translate(0.5,0.5)"><rect x="508" y="0" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 15px; margin-left: 636px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="665" y="22" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-13"><g transform="translate(0.5,0.5)"><rect x="432" y="60" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 90px; margin-left: 541px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="570" y="97" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-14"><g transform="translate(0.5,0.5)"><rect x="576" y="60" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 90px; margin-left: 721px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="750" y="97" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-15"><g transform="translate(0.5,0.5)"><rect x="508" y="120" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 165px; margin-left: 636px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">4</div></div></div></foreignObject><text x="665" y="172" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">4</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-16"><g transform="translate(0.5,0.5)"><rect x="856" y="0" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 15px; margin-left: 1071px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="1100" y="22" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-17"><g transform="translate(0.5,0.5)"><rect x="788" y="48" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 75px; margin-left: 986px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="1015" y="82" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-18"><g transform="translate(0.5,0.5)"><rect x="924" y="48" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 75px; margin-left: 1156px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="1185" y="82" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-19"><g transform="translate(0.5,0.5)"><rect x="812" y="120" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 165px; margin-left: 1016px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">4</div></div></div></foreignObject><text x="1045" y="172" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">4</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-20"><g transform="translate(0.5,0.5)"><rect x="900" y="120" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 165px; margin-left: 1126px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">5</div></div></div></foreignObject><text x="1155" y="172" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">5</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-21"><g><path d="M 480 72 L 584 72" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-22"><g><path d="M 532 120 L 532 24" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-24"><g><path d="M 829.25 60.19 L 932 60" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-25"><g><path d="M 911.51 119.04 L 879.79 25.25" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-26"><g><path d="M 850.67 119.33 L 879.48 25.25" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-27"><g><path d="M 910.58 119.33 L 827.06 59.23" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-28"><g><path d="M 850.05 119.71 L 932 60.48" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-31"><g transform="translate(0.5,0.5)"><path d="M 164.69 139.06 L 211.6 139.06" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"><title>effect link (consumption or result)</title></path><path d="M 160.49 139.06 L 166.09 136.26 L 164.69 139.06 L 166.09 141.86 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, currentColor); stroke: light-dark(currentColor, currentColor);"><title>effect link (consumption or result)</title></path></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-32"><g transform="translate(0.5,0.5)"><rect x="0" y="160" width="352" height="176" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 438px; height: 1px; padding-top: 207px; margin-left: 1px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Every resident obesrves 2<div>different routes how neinbours visit</div><div>each other.</div><div>All routes reported by 3 residents:</div><div>3 * 2 = 6, ie <b>3! = 6</b><br /><div><br /></div></div></div></div></div></foreignObject><text x="220" y="231" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">Every resident obesrves 2...</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-33"><g transform="translate(0.5,0.5)"><rect x="352" y="160" width="352" height="176" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 438px; height: 1px; padding-top: 207px; margin-left: 441px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Resident "1" observes 3 neighbours,<div>their visit routes are already known:</div><div>they are 6.</div><div>All routes reported by 4 residents:</div><div>4 * 6 = 24, ie, <b>4! = 24</b></div></div></div></div></foreignObject><text x="660" y="231" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">Resident "1" observes 3 neighbours,...</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-34"><g transform="translate(0.5,0.5)"><rect x="704" y="160" width="352" height="176" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 438px; height: 1px; padding-top: 207px; margin-left: 881px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">Resident "1" observes 4 neighbours,<div>their visit routes are already known:</div><div>they are 24.</div><div>All routes reported by 5 residents:</div><div>5 * 24 = 120, ie, <b>5! = 120</b></div></div></div></div></foreignObject><text x="1100" y="231" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">Resident "1" observes 4 neighbours,...</text></switch></g></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-35"><g><path d="M 488 344 L 576 344 L 592 396 L 576 448 L 488 448 L 472 396 Z" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-36"><g><path d="M 488 344 L 572.32 448.83" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-37"><g><path d="M 573.64 344.94 L 488.92 448.94" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-38"><g><path d="M 472 396 L 592 396" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-39"><g><path d="M 488 344 L 592 396" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-40"><g><path d="M 472 396 L 576 344" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-41"><g><path d="M 472 396 L 569.56 446.96" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-42"><g><path d="M 592 396 L 492.28 446.96" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-43"><g><path d="M 488.8 347.2 L 488.92 447.58" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="FMxy3eZNfXnOoqkCgU_e-44"><g><path d="M 574.24 344.31 L 573.64 450.91" fill="none" stroke="currentColor" stroke-width="1.57" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, currentColor);"/></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-1"><g transform="translate(0.5,0.5)"><rect x="456" y="312" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 405px; margin-left: 571px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="600" y="412" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-2"><g transform="translate(0.5,0.5)"><rect x="566.4" y="312" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 405px; margin-left: 709px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="738" y="412" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-3"><g transform="translate(0.5,0.5)"><rect x="590.4" y="384" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 495px; margin-left: 739px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">4</div></div></div></foreignObject><text x="768" y="502" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">4</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-4"><g transform="translate(0.5,0.5)"><rect x="424" y="384" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 495px; margin-left: 531px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="560" y="502" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-5"><g transform="translate(0.5,0.5)"><rect x="456" y="448" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 575px; margin-left: 571px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">5</div></div></div></foreignObject><text x="600" y="582" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">5</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-6"><g transform="translate(0.5,0.5)"><rect x="566.4" y="448" width="48" height="24" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 58px; height: 1px; padding-top: 575px; margin-left: 709px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">6</div></div></div></foreignObject><text x="738" y="582" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">6</text></switch></g></g></g><g data-cell-id="rbC4AbOnSSgKUewNviSD-7"><g transform="translate(0.5,0.5)"><rect x="80" y="344" width="352" height="176" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.8)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 438px; height: 1px; padding-top: 437px; margin-left: 101px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 24px; font-family: Helvetica; color: light-dark(currentColor, currentColor); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; "><div><div>And for hexagon village the</div></div><div>logic is the same:</div><div>all routes reported by 6 residents:</div><div>6 * 120 = 720, ie <b>6! = 720</b></div></div></div></div></foreignObject><text x="320" y="461" fill="light-dark(currentColor, currentColor)" font-family="Helvetica" font-size="24px" text-anchor="middle">And for hexagon village the...</text></switch></g></g></g></g></g></g></svg>
+</p>
+
+<p>
+Imagine that "different numbers" means different combinations getting from traversing
+of digits placed on some surface. Let's put them in a way that they will form some
+well-known geometric figures, for instance, 3 digits are placed to form a triangle.
+"Different numbers", in the case, are formed by traversing of digits - vertexes:
+we visit every vertex (every!) and at the end - we "collect" the number.
+</p>
+
+<p>
+Now imagine that they are residents of some small villages, and these residents often
+visit each other. How many "routes" do they walk? For example, the first resident see from
+his window that 2 other residents visit each other in 2 different routes only: either 2
+visit 3 or 3 visit 2. How many routes do exist in that village then? If to ask every
+resident, he/she will say: 2, total number of routes is <code>3 residents * 2 routes = 6
+routes</code>.
+</p>
+
+<p>
+"Routes" means that a resident visit <b>ALL</b> his neighbors (but that one which is observing
+them, well, actually they are visits each other, but we we decompose the situation into a
+sum of small). Imagine order of visiting of neighbors - this is the key idea, actually
+permutations: we can visit John, Alex and Alice. But also we can visit first Alex, then
+Alice and John, also the order ("route", "walk") can be: Alice, John, Alex and so on.
+</p>
+
+<p>
+If the village is little bit bigger, and we have 4 residents, then the situation is
+similar: 1th resident observes from his window other 3 residents and the number of their
+routes is already known from the previous village: 6 routes! For total routes we ask
+every resident again and summarize them: <code>4 * 6 = 24 routes</code>
+</p>
+
+<p>
+In the case of 5 residents metropolis the logic is the same: 1st resident sees his
+4 neighbors, they made 24 routes - we know it from the previous, middle size village!
+All 5 inhabitants of this metropolis could report in sum: <code>5 * 24 = 120 routes</code>.
+</p>
+
+<p>
+We see tendency: every larger village hides among its secrets the number of routes that
+can be easy found: <code>the number of residents * the number of routes of the smaller village</code>.
+</p>
+
+<p>
+For the case of 5 residents village it is: <code>5 * (4 * (3 * 2))</code>. This is the factorial.
+</p>
+
+<p>
+Why did you draw <a href="https://en.wikipedia.org/wiki/Regular_polygon">regular polygons</a>? Just for better visualization of our metaphor. But
+we could use another metaphor, for example, bees collecting honey from flowers: our
+houses (vertexes) will be flowers, residents - bees.
+</p>
+
+<p>
+So, the number of "routes" is the number of combinations of digits in the original
+question and it is always multiplied by <code>number-of-residents</code> with each step - entering
+the next village, ie, we always multiply the routes number in the smaller village
+to the size of the current village, ie, <code>*2, *3, *4, *5, ...</code>:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">residents</th>
+<th scope="col" class="org-right">1</th>
+<th scope="col" class="org-right">2</th>
+<th scope="col" class="org-right">3</th>
+<th scope="col" class="org-right">4</th>
+<th scope="col" class="org-right">5</th>
+<th scope="col" class="org-right">6</th>
+<th scope="col" class="org-left">...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">routes</td>
+<td class="org-right">1</td>
+<td class="org-right">2</td>
+<td class="org-right">6</td>
+<td class="org-right">24</td>
+<td class="org-right">120</td>
+<td class="org-right">720</td>
+<td class="org-left">...</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Village residents visit each other following external/outside edges and inner diagonals:
+the number of inner diagonals also depends on the village size. Their number is always
+adding the <code>number-of-residents minus 2</code> to the diagonals number of the smaller village:
++3, +4, +5, +6, ..., the number of diagonals:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">residents</th>
+<th scope="col" class="org-right">1</th>
+<th scope="col" class="org-right">2</th>
+<th scope="col" class="org-right">3</th>
+<th scope="col" class="org-right">4</th>
+<th scope="col" class="org-right">5</th>
+<th scope="col" class="org-right">6</th>
+<th scope="col" class="org-left">...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">diagonals</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-right">2</td>
+<td class="org-right">5</td>
+<td class="org-right">9</td>
+<td class="org-left">...</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The formulae for diagonals number is:
+</p>
+
+<p>
+\[
+\forall n>2, diagonals = \frac{1}{2} n (n - 3)
+\]
+</p>
+
+<p>
+It is like the number of routes, but we start from 0 (not 1) and we add (not multiply).
+</p>
+</div>
+</div>
+<div id="outline-container-org6ec6d31" class="outline-2">
+<h2 id="org6ec6d31">Colored permutations</h2>
+<div class="outline-text-2" id="text-org6ec6d31">
+<p>
+If to write all permutations of 1, 2, 3 (123, 132, 312, 321, ...) and to choose first 2
+numbers as 2D-coordinates and the 3rd number as a color (we can do it in GNU Octave) and
+to draw the result, we see that the result figure is symmetrical with respect to the
+central bisector <code>(1,1), (3, 3)</code> (but if to forget about colors - then with respect to the
+line <code>(3,1), (1,3)</code> too).
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Colored 2D representation of permutations of [1 2 3], GNU Octave</label><pre class="src src-octave">file <span class="org-builtin">=</span> fullfile(dir<span class="org-builtin">,</span> <span class="org-string">"Factorial_perm1.svg"</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Generate permutations</span>
+P <span class="org-builtin">=</span> perms([1 2 3])<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Colors</span>
+colors <span class="org-builtin">=</span> [
+  1 1 0<span class="org-builtin">;</span>
+  1 0 1<span class="org-builtin">;</span>
+  1 0 0
+]<span class="org-builtin">;</span>
+xy <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>1<span class="org-builtin">:</span>2)<span class="org-builtin">;</span>
+cidx <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>3)<span class="org-builtin">;</span>
+c <span class="org-builtin">=</span> colors(cidx<span class="org-builtin">,</span> <span class="org-builtin">:</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Create smaller figure</span>
+fig <span class="org-builtin">=</span> figure(<span class="org-string">'position'</span><span class="org-builtin">,</span> [0<span class="org-builtin">,</span> 0<span class="org-builtin">,</span> 350<span class="org-builtin">,</span> 350])<span class="org-builtin">;</span> <span class="org-comment">% width, height in pixels</span>
+ax <span class="org-builtin">=</span> axes(fig)<span class="org-builtin">;</span>
+scatter(ax<span class="org-builtin">,</span> xy(<span class="org-builtin">:,</span>1)<span class="org-builtin">,</span> xy(<span class="org-builtin">:,</span>2)<span class="org-builtin">,</span> 120<span class="org-builtin">,</span> c<span class="org-builtin">,</span> <span class="org-string">'filled'</span>)<span class="org-builtin">;</span>
+hold(ax<span class="org-builtin">,</span> <span class="org-string">'on'</span>)<span class="org-builtin">;</span> <span class="org-comment">% don't removed already drawn</span>
+plot(ax<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> <span class="org-string">'k--'</span><span class="org-builtin">,</span> <span class="org-string">'LineWidth'</span><span class="org-builtin">,</span> 1.5)<span class="org-builtin">;</span>
+axis(ax<span class="org-builtin">,</span> <span class="org-string">'equal'</span>)<span class="org-builtin">;</span>
+grid(ax<span class="org-builtin">,</span> <span class="org-string">'on'</span>)<span class="org-builtin">;</span>
+xlabel(ax<span class="org-builtin">,</span> <span class="org-string">'X'</span>)<span class="org-builtin">;</span>
+ylabel(ax<span class="org-builtin">,</span> <span class="org-string">'Y'</span>)<span class="org-builtin">;</span>
+title(ax<span class="org-builtin">,</span> <span class="org-string">'Permutations'</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Styling for cleaner SVG ---</span>
+set(ax<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>        <span class="org-comment">% transparent axes background</span>
+set(fig<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>       <span class="org-comment">% transparent figure background</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Try to improve SVG output consistency</span>
+set(ax<span class="org-builtin">,</span> <span class="org-string">'box'</span><span class="org-builtin">,</span> <span class="org-string">'off'</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Export as SVG</span>
+print(fig<span class="org-builtin">,</span> file<span class="org-builtin">,</span> <span class="org-string">'-dsvg'</span><span class="org-builtin">,</span> <span class="org-string">'-painters'</span>)<span class="org-builtin">;</span>
+</pre>
+</div>
+
+<p>
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<svg viewBox="0 0 262 262" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" height="262pt" width="262pt">
+ <title>Figure 1</title>
+ <desc>
+Creator: GL2PS 1.4.2, (C) 1999-2020 C. Geuzaine
+For: Octave
+CreationDate: Tue Apr 28 07:12:43 2026
+</desc>
+ <defs/>
+ <polygon fill="none" points="0,0 262,0 262,262 0,262"/>
+ <g>
+  <polygon shape-rendering="crispEdges" fill="none" points="0,262 262,262 262,0 0,0"/>
+  <clipPath id="cp00262262">
+   <polygon points="0,262 262,262 262,0 0,0"/>
+  </clipPath>
+  <g clip-path="url(#cp00262262)">
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,233.365 34.5905,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="85.3137,233.365 85.3137,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="136.037,233.365 136.037,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="186.76,233.365 186.76,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="237.483,233.365 237.483,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,233.365 34.5905,231.227" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="85.3137,233.365 85.3137,231.227" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="136.037,233.365 136.037,231.227" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="186.76,233.365 186.76,231.227" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="237.483,233.365 237.483,231.227" stroke-linejoin="miter"/>
+   <g font-weight="normal" font-style="normal" transform="translate(31.5905,248.877) rotate(-0,3,-8)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">1</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(77.8136,248.877) rotate(-0,7.5,-8)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 6 9 " y="-0">1.5</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(133.037,248.877) rotate(-0,3,-8)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">2</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(179.26,248.877) rotate(-0,7.5,-8)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 6 9 " y="-0">2.5</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(234.483,248.877) rotate(-0,3,-8)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">3</text>
+   </g>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,228.129 237.483,228.129" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,177.406 237.483,177.406" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,126.682 237.483,126.682" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,75.9591 237.483,75.9591" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-opacity="0.15" stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,25.2359 237.483,25.2359" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,228.129 36.723,228.129" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,177.406 36.723,177.406" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,126.682 36.723,126.682" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,75.9591 36.723,75.9591" stroke-linejoin="miter"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,25.2359 36.723,25.2359" stroke-linejoin="miter"/>
+   <g font-weight="normal" font-style="normal" transform="translate(23.5931,232.129) rotate(-0,6,-4)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">1</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(14.5931,181.406) rotate(-0,15,-4)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 6 9 " y="-0">1.5</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(23.5931,130.682) rotate(-0,6,-4)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">2</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(14.5931,79.9591) rotate(-0,15,-4)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 6 9 " y="-0">2.5</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(23.5931,29.2359) rotate(-0,6,-4)" xml:space="preserve" font-family="FreeSans" font-size="10">
+    <text fill="currentColor" x="0 " y="-0">3</text>
+   </g>
+   <polyline stroke-linecap="square" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,233.365 237.483,233.365" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <polyline stroke-linecap="square" fill="none" stroke-width="0.5" stroke="currentColor" points="34.5905,233.365 34.5905,20" stroke-linejoin="miter" stroke-dasharray="16,0"/>
+   <g font-weight="bold" font-style="normal" transform="translate(100.537,10) rotate(-0,35.5,0)" xml:space="preserve" font-family="FreeSans" font-size="11">
+    <text fill="currentColor" x="0 7 13 17 27 34 38 44 48 51 58 65 " y="-1">Permutations</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(6.0931,126.682) rotate(-90,3.5,0)" xml:space="preserve" font-family="FreeSans" font-size="11">
+    <text fill="currentColor" x="0 " y="-0">Y</text>
+   </g>
+   <g font-weight="normal" font-style="normal" transform="translate(132.537,262.877) rotate(-0,3.5,-9)" xml:space="preserve" font-family="FreeSans" font-size="11">
+    <text fill="currentColor" x="0 " y="-0">X</text>
+   </g>
+   <polygon shape-rendering="crispEdges" fill="#ffff00" points="242.63,128.556 241.679,130.203 240.222,131.426 238.434,132.076 236.532,132.076 234.745,131.426 233.287,130.203 232.336,128.556 232.006,126.682 232.336,124.809 233.287,123.162 234.745,121.939 236.532,121.288 238.434,121.288 240.222,121.939 241.679,123.162 242.63,124.809 242.96,126.682 242.96,126.682"/>
+   <polygon shape-rendering="crispEdges" fill="#ff00ff" points="242.63,230.002 241.679,231.649 240.222,232.872 238.434,233.523 236.532,233.523 234.745,232.872 233.287,231.649 232.336,230.002 232.006,228.129 232.336,226.255 233.287,224.608 234.745,223.385 236.532,222.735 238.434,222.735 240.222,223.385 241.679,224.608 242.63,226.255 242.96,228.129 242.96,228.129"/>
+   <polygon shape-rendering="crispEdges" fill="#ffff00" points="141.184,27.1093 140.233,28.7566 138.775,29.9794 136.988,30.63 135.086,30.63 133.298,29.9794 131.841,28.7566 130.89,27.1093 130.56,25.2359 130.89,23.3626 131.841,21.7153 133.298,20.4925 135.086,19.8419 136.988,19.8419 138.775,20.4925 140.233,21.7153 141.184,23.3626 141.514,25.2359 141.514,25.2359"/>
+   <polygon shape-rendering="crispEdges" fill="#ff0000" points="141.184,230.002 140.233,231.649 138.775,232.872 136.988,233.523 135.086,233.523 133.298,232.872 131.841,231.649 130.89,230.002 130.56,228.129 130.89,226.255 131.841,224.608 133.298,223.385 135.086,222.735 136.988,222.735 138.775,223.385 140.233,224.608 141.184,226.255 141.514,228.129 141.514,228.129"/>
+   <polygon shape-rendering="crispEdges" fill="#ff00ff" points="39.7374,27.1093 38.7863,28.7566 37.3291,29.9794 35.5416,30.63 33.6393,30.63 31.8518,29.9794 30.3947,28.7566 29.4436,27.1093 29.1132,25.2359 29.4436,23.3626 30.3947,21.7153 31.8518,20.4925 33.6393,19.8419 35.5416,19.8419 37.3291,20.4925 38.7863,21.7153 39.7374,23.3626 40.0677,25.2359 40.0677,25.2359"/>
+   <polygon shape-rendering="crispEdges" fill="#ff0000" points="39.7374,128.556 38.7863,130.203 37.3291,131.426 35.5416,132.076 33.6393,132.076 31.8518,131.426 30.3947,130.203 29.4436,128.556 29.1132,126.682 29.4436,124.809 30.3947,123.162 31.8518,121.939 33.6393,121.288 35.5416,121.288 37.3291,121.939 38.7863,123.162 39.7374,124.809 40.0677,126.682 40.0677,126.682"/>
+   <polyline stroke-linecap="butt" fill="none" stroke-width="1.5" stroke="currentColor" points="34.5905,228.129 237.483,25.2359" stroke-linejoin="round" stroke-dasharray="8,8,8,8"/>
+  </g>
+ </g>
+</svg>
+
+</p>
+
+<p>
+We select 2D coordinates and the color index with:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-octave">xy <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>1<span class="org-builtin">:</span>2)<span class="org-builtin">;</span>
+cidx <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>3)<span class="org-builtin">;</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgce0d795" class="outline-2">
+<h2 id="orgce0d795">Symmetric group</h2>
+<div class="outline-text-2" id="text-orgce0d795">
+<p>
+But if to select for 2D coordinates 2nd and 3rd numbers and for the color - the 1st
+number - the resulting figure will be the same. Because all digits/positions get
+all three possible values. Order will be different, but it does not matter for
+our figure:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>Slices are equal, GNU Octave</label><pre class="src src-octave">P <span class="org-builtin">=</span> perms([1 2 3])<span class="org-builtin">;</span>
+p1 <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>1<span class="org-builtin">:</span>2)<span class="org-builtin">;</span>
+p2 <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>2<span class="org-builtin">:</span>3)<span class="org-builtin">;</span>
+s1 <span class="org-builtin">=</span> sortrows(sort(p1<span class="org-builtin">,</span> 2))<span class="org-builtin">;</span>
+s2 <span class="org-builtin">=</span> sortrows(sort(p2<span class="org-builtin">,</span> 2))<span class="org-builtin">;</span>
+all(s1(<span class="org-builtin">:</span>) <span class="org-builtin">==</span> s2(<span class="org-builtin">:</span>))   <span class="org-comment">% ARE ALL TRUE?</span>
+</pre>
+</div>
+
+<pre class="example">
+ans = 1
+</pre>
+
+
+<p>
+Here we have several symmetric groups. Let's consider the color reflection symmetry:
+why do we see this symmetry (colored reflection over bisector line)? Points in every
+part of the bisector represent unique combinations of digits, look at the bottom half
+of the figure:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">x</th>
+<th scope="col" class="org-right">y</th>
+<th scope="col" class="org-left">color</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">2</td>
+<td class="org-right">1</td>
+<td class="org-left">red</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-right">1</td>
+<td class="org-left">magenta</td>
+</tr>
+
+<tr>
+<td class="org-right">3</td>
+<td class="org-right">2</td>
+<td class="org-left">yellow</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+if to ignore order - these are unique combinations, everything else repeats them. And pay
+attention - we work with 3 digits (so <code>3!</code>) but here we are considering pairs, ie, mapping
+because two digits restrict the third possible one (they are <code>determinants</code> uniquely
+determined the whole row: <code>X -&gt; Y -&gt; Color</code> or the value of the function). So, we draw it
+on 2D surface - we formed such a function: 2 coordinates and a dependent color!
+</p>
+
+<p>
+OK, so we have:
+</p>
+
+<ul class="org-ul">
+<li>a symmetry in a shape and also</li>
+<li>a symmetry in colors (color reflection)</li>
+</ul>
+</div>
+<div id="outline-container-orgf11d0b5" class="outline-3">
+<h3 id="orgf11d0b5">Color symmetry</h3>
+<div class="outline-text-3" id="text-orgf11d0b5">
+<p>
+It is explained easy, 2 coordinates determine the third digit (represented as a color), so
+obviously swapping of those 2 coordinates lead to the same color (third digit), now we see
+that this function is commutative (symmetric relation):
+</p>
+
+<p>
+\[
+X \cdot Y = Y \cdot X = C
+\]
+</p>
+
+<p>
+\[
+x \cdot y = y \cdot x = samecolor
+\]
+</p>
+
+<p>
+eg, <code>2, 1 -&gt; red</code> and <code>1, 2 -&gt; red</code> - only "red" index (of 3 numbers) is free and used for
+a color. This swapping/commutation of 2 args lead to symmetry over the main bisector.
+</p>
+
+<p>
+Our "color" relations:
+</p>
+
+<p>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" style="background: transparent; background-color: transparent; color-scheme: light dark;" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="265px" height="241px" viewBox="0 0 265 241"><defs/><g><g data-cell-id="0"><g data-cell-id="1"><g data-cell-id="g66ju5M1t0lHthJ80al1-21"><g transform="translate(0.5,0.5)"><path d="M 41.4 19.23 L 113.4 151.23 M 110.6 152.77 L 38.6 20.77 M 110.6 152.77" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-2"><g transform="translate(0.5,0.5)"><ellipse cx="20" cy="20" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 25px; margin-left: 1px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="25" y="30" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-17"><g transform="translate(0.5,0.5)"><path d="M 34.14 69.86 L 112 20" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-3"><g transform="translate(0.5,0.5)"><ellipse cx="20" cy="84" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 105px; margin-left: 1px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="25" y="110" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-19"><g transform="translate(0.5,0.5)"><path d="M 32.82 132.95 L 110.68 19.1 M 113.32 20.9 L 35.46 134.76 M 113.32 20.9" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-24"><g transform="translate(0.5,0.5)"><path d="M 40 148 L 117.86 98.14" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-4"><g transform="translate(0.5,0.5)"><ellipse cx="20" cy="148" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 185px; margin-left: 1px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="25" y="190" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-20"><g transform="translate(0.5,0.5)"><path d="M 153.06 18.8 L 225.06 82.8 M 222.94 85.2 L 150.94 21.2 M 222.94 85.2" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-5"><g transform="translate(0.5,0.5)"><ellipse cx="132" cy="20" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 25px; margin-left: 141px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="165" y="30" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-27"><g transform="translate(0.5,0.5)"><path d="M 148.84 94.12 L 219.55 133.52" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/><path d="M 223.22 135.56 L 216.96 135.28 L 219.55 133.52 L 219.69 130.39 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, none); stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-6"><g transform="translate(0.5,0.5)"><ellipse cx="132" cy="84" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 105px; margin-left: 141px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="165" y="110" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-22"><g transform="translate(0.5,0.5)"><path d="M 150.94 146.8 L 222.94 82.8 M 225.06 85.2 L 153.06 149.2 M 225.06 85.2" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-7"><g transform="translate(0.5,0.5)"><ellipse cx="132" cy="148" rx="20" ry="20" fill="none" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 185px; margin-left: 141px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="165" y="190" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-8"><g transform="translate(0.5,0.5)"><ellipse cx="244" cy="20" rx="20" ry="20" fill="#cccc00" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="fill: rgb(204, 204, 0); stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 25px; margin-left: 281px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">1</div></div></div></foreignObject><text x="305" y="30" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">1</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-9"><g transform="translate(0.5,0.5)"><ellipse cx="244" cy="84" rx="20" ry="20" fill="#990099" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="fill: rgb(153, 0, 153); stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 105px; margin-left: 281px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">2</div></div></div></foreignObject><text x="305" y="110" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">2</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-10"><g transform="translate(0.5,0.5)"><ellipse cx="244" cy="148" rx="20" ry="20" fill="#9e0700" stroke="currentColor" stroke-width="0.8" pointer-events="all" style="fill: rgb(158, 7, 0); stroke: light-dark(currentColor, none);"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 48px; height: 1px; padding-top: 185px; margin-left: 281px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 17px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">3</div></div></div></foreignObject><text x="305" y="190" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="17px" text-anchor="middle">3</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-13"><g transform="translate(0.5,0.5)"><path d="M 34.14 98.14 L 112 148" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-14"><g transform="translate(0.5,0.5)"><path d="M 152 148 L 222.13 33.94" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/><path d="M 224.33 30.36 L 223.78 36.6 L 222.13 33.94 L 219.01 33.67 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, none); stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-18"><g transform="translate(0.5,0.5)"><path d="M 152 20 L 221.34 133.26" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/><path d="M 223.53 136.84 L 218.22 133.52 L 221.34 133.26 L 223 130.6 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, none); stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-23"><g transform="translate(0.5,0.5)"><rect x="72" y="192" width="112" height="48" fill="none" stroke="none" pointer-events="all"/></g><g><g transform="scale(0.7999999999999999)"><switch><foreignObject style="overflow: visible; text-align: left;" pointer-events="none" width="125%" height="125%" requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"><div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 138px; height: 1px; padding-top: 270px; margin-left: 91px;"><div style="box-sizing: border-box; font-size: 0; text-align: center; color: currentColor; "><div style="display: inline-block; font-size: 18px; font-family: Helvetica; color: light-dark(currentColor, none); line-height: 1.2; pointer-events: all; white-space: normal; word-wrap: normal; ">6 arrows</div></div></div></foreignObject><text x="160" y="275" fill="light-dark(currentColor, none)" font-family="Helvetica" font-size="18px" text-anchor="middle">6 arrows</text></switch></g></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-25"><g transform="translate(0.5,0.5)"><path d="M 149.92 79.24 L 222.93 31.58" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/><path d="M 226.45 29.29 L 223.29 34.69 L 222.93 31.58 L 220.23 30 Z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(currentColor, none); stroke: light-dark(currentColor, none);"/></g></g><g data-cell-id="g66ju5M1t0lHthJ80al1-26"><g transform="translate(0.5,0.5)"><path d="M 40 20 L 113.52 73.72" fill="none" stroke="currentColor" stroke-width="0.8" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(currentColor, none);"/></g></g></g></g></g></svg>
+</p>
+
+<p>
+If to ignore colors then we see a lot of symmetries.
+</p>
+</div>
+</div>
+<div id="outline-container-org7864548" class="outline-3">
+<h3 id="org7864548">Shape symmetry</h3>
+<div class="outline-text-3" id="text-org7864548">
+<p>
+It is explained in a similar way: we take into accounts only 2 digits and they form only
+one unique set of permutations: <code>[2 1; 3 1; 3 2]</code> others repeat them swapping coordinates,
+the third is not drawn as a point (it's a color).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2ee712f" class="outline-2">
+<h2 id="org2ee712f">Intuition of factorial</h2>
+<div class="outline-text-2" id="text-org2ee712f">
+<p>
+Segmented N-digits form <code>N!</code> numbers, eg, <code>[1 2 3 4]</code> - their <i>permutations</i> - wheels with
+discrete states, <i>degrees of freedom</i>, also <i>everyone with everyone, all are in the game,
+the order matters and we count the total state of the set</i>:
+</p>
+
+<pre class="example" id="orgfbdf99b">
+█🯳▉🯴▉🯲▉🯱█
+</pre>
+
+<p>
+Imagine a different state (or color) of a set of items, every item has it's own individual state,
+but they all form common state of their set and every item has its own place, so we check them
+is some fixed order. The number of states of the whole set leads us to a factorial.
+</p>
+
+<p>
+Also:
+</p>
+
+<blockquote>
+<p>
+If a configuration of a system is determined by the order in which n distinct items are
+arranged (or processed), and every order is possible, then the number of configurations is
+<code>n!</code>.
+</p>
+</blockquote>
+
+<p>
+Permutated numbers treated as 3D coordinates can be used to build 3D forms, they are
+called <a href="https://en.wikipedia.org/wiki/Permutohedron">permutohedrons</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
