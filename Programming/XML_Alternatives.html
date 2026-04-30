@@ -6,9 +6,9 @@
 <!-- 2026-04-30 Thu 22:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>HFit - fitting algorithms in Haskell</title>
-<meta name="description" content="My Blog" />
-<meta name="keywords" content="tcl/tk, haskell, algorithms" />
+<title>XML alternative formats</title>
+<meta name="description" content="Alternative formats of XML" />
+<meta name="keywords" content="XML, alternative" />
 <meta name="generator" content="Org Mode" />
 <style>
 :root {
@@ -246,169 +246,158 @@ function toggleTheme() {
   localStorage.setItem("theme", isLight ? "light" : "dark");
 }
 </script>
-<script>
-  window.MathJax = {
-    tex: {
-      ams: {
-        multlineWidth: '85%'
-      },
-      tags: 'ams',
-      tagSide: 'right',
-      tagIndent: '.8em'
-    },
-    chtml: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    svg: {
-      scale: 1.0,
-      displayAlign: 'center',
-      displayIndent: '0em'
-    },
-    output: {
-      font: 'mathjax-modern',
-      displayOverflow: 'overflow'
-    }
-  };
-</script>
-
-<script
-  id="MathJax-script"
-  async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
 </head>
 <body>
 <div id="preamble" class="status">
 <nav>
 <span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
-[<a href="../../cv.html">CV</a>]
-[<a href="../../index.html">Sitemap</a>]
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
 [<a href="https://github.com/disco85/">Github</a>]
 </nav>
 </div>
 <div id="content" class="content">
-<h1 class="title">HFit - fitting algorithms in Haskell</h1>
-<div id="outline-container-org33d1090" class="outline-2">
-<h2 id="org33d1090">HFit - fitting algorithms in Haskell</h2>
-<div class="outline-text-2" id="text-org33d1090">
+<h1 class="title">XML alternative formats</h1>
+<div id="outline-container-orga9a497f" class="outline-2">
+<h2 id="orga9a497f">Rebol-like</h2>
+<div class="outline-text-2" id="text-orga9a497f">
 <p>
-It's very interesting class of tasks - fitting of some figure using several input points with noise. The simplest method is
-<a href="https://en.wikipedia.org/wiki/Least_squares">Least Squares Algorithm</a>.
+This alternative syntax reminds <a href="https://en.wikipedia.org/wiki/Rebol">Rebol language</a>. When attributes are missing, use "_".
+The symbols <code>[, ]</code> are chosen because typing of them does not require Shift pressing.
+If an attribute value contains spaces, use quotes.
 </p>
 
+<pre class="example" id="org510f04c">
+         not XML                          XML
 
-<div id="orgcfe072f" class="figure">
-<p><img src="../../assets/HFit1.svg" alt="HFit1.svg" class="org-svg" />
+countries _                   |  &lt;countries&gt;
+[                             |    &lt;country name="USA"&gt;
+  country [name=USA]          |       &lt;city name="New York"&gt;
+  [                           |         ...
+    city [name="New York"] [  |       &lt;/city&gt;
+      ...                     |       &lt;city name="Dalas"&gt;
+    ]                         |         ...
+    city [name=Dalas] [       |       &lt;/city&gt;
+      ...                     |    &lt;/country&gt;
+    ]                         |  &lt;/countries&gt;
+  ]                           |
+]                             |
+</pre>
+
+<p>
+By the way, this format also is simple for parsing and it's very extendible!
+</p>
+
+<p>
+<b><b>PROS: EASY CAN BE USED AS A LANGUAGE FOR DATA AND FOR LOGIC. MORE LOGIC ORIENTED</b></b>
 </p>
 </div>
-
-
+</div>
+<div id="outline-container-org19df673" class="outline-2">
+<h2 id="org19df673">.Reg-files like</h2>
+<div class="outline-text-2" id="text-org19df673">
 <p>
-Idea of algorithm is to find <code>a</code> and <code>b</code> of line equation <code>a*x + b</code> using
-sum's minimization of difference's squares: &amp;Sum;(y&lt;sub&gt;i&lt;/sub&gt; -
-(a*x&lt;sub&gt;i&lt;/sub&gt; + b))&lt;sup&gt;2&lt;/sup&gt;. Result is 2 formulas:
+This alternative syntax reminds classic <a href="https://en.wikipedia.org/wiki/.properties">Java properties</a> file. Or Windows
+<a href="https://en.wikipedia.org/wiki/Windows_Registry#.REG_files">.reg files</a>. Long lines continuations start not from the beginning of the line:
+their first symbols are used as the marker of the beginning, so you can start
+them with "   &gt; " for example, as well. Attributes start with "@".
 </p>
 
 <p>
-\[ a=\frac{n \sum\limits_{i=1}^n x_i y_i - \sum\limits_{i=1}^n x_i \sum\limits_{i=1}^n y_i}
-{n \sum\limits_{i=1}^n x_i^2 - ({\sum\limits_{i=1}^n x_i})^2} \]
+As a delimiter, "." can be used. Also "/". Or even ":".
 </p>
 
 <p>
-&lt;br&gt;
+<b><b>PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED</b></b>
 </p>
 
-<p>
-\[ b=\frac{\sum\limits_{i=1}^n y_i - a \sum\limits_{i=1}^n x_i} {n}
-\]
-</p>
-
-<p>
-&lt;br&gt;
-</p>
-
-<p>
-And when we know <code>a</code> and <code>b</code> we can generates <code>(x0, y0) (x1, y1)</code> points to
-create line&#x2026;
-</p>
-
-<p>
-<a href="https://github.com/bapcyk/hfit">Application</a> initializes Tcl/Tk UI via
-sending Tcl code to wish interpreter:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-haskell">...
-  mainTcl &lt;- readFile "ui.tcl"
-  (Just si, Just so, Just sx, ph) &lt;- createProcess (proc wish []) {
-    std_in=CreatePipe, std_out=CreatePipe, std_err=CreatePipe, close_fds=False}
-  hSetBuffering si NoBuffering
-  hSetBuffering so NoBuffering
-  hPutStrLn si mainTcl
-...
+<pre class="example" id="orgda7022d">
+             not XML                                  XML
+                                             
+countries.0.country.@name: USA             | &lt;countries&gt;
+countries.0.country.0.city.@name: New York |   &lt;country name="USA"&gt;
+countries.0.country.0.city: ...            |     &lt;city name="New York"&gt;
+ ...                                       |       ...
+countries.0.country.1.city.@name: Dalas    |     &lt;/city&gt;
+countries.0.country.1.city: ...            |     &lt;city name="Dalas"&gt;
+  ...                                      |       ...
+                                           |     &lt;/city&gt;
+                                           |   &lt;/country&gt;
+                                           | &lt;/countries&gt;
 </pre>
 </div>
-
-<p>
-Communication loop lives in separate process:
-</p>
-
-<div class="org-src-container">
-<pre class="src src-haskell">...
-  forkIO $ ioLoop si so
-  waitForProcess ph
-  putStrLn "bye."
-  where
-    ioLoop si so = forever $ do
-        resp &lt;- (hGetLine so) `catchIOError` (\_ -&gt; return "eof")
-        case resp of
-          "eof" -&gt; exitSuccess
-          _|resp `startsWith` "calc " -&gt;
-            putStrLn ("-&gt; " ++ resp) &gt;&gt; 
-            let res = calc resp in
-            putStrLn ("&lt;- " ++ res) &gt;&gt; hPutStrLn si res
-          _ -&gt; putStrLn resp &gt;&gt; return ()
-...
-</pre>
 </div>
-
+<div id="outline-container-org6d8b548" class="outline-2">
+<h2 id="org6d8b548">ROFF-like</h2>
+<div class="outline-text-2" id="text-org6d8b548">
 <p>
-and when new line is got from wish then it will be processed with <code>calc</code>
-function which gets request (here it's call <code>resp</code> from Wish, yep:) and parse
-coordinates like <code>"1 2 3 4", ie. x0 y0 x1 y1 ... xn yn</code> with <code>parsePt</code> (after
-splitting them into words):
+It reminds the old documentation system <a href="https://en.wikipedia.org/wiki/Roff_(software)">Roff</a>. Or even Python <a href="https://docs.python.org/3/library/pickle.html#module-pickle">pickle/shelve</a>.
+The idea is simple: every <code>single dot something</code> is an instruction for
+a small FSM. For example, <code>.e &lt;something&gt;</code> says to FSM to create an
+element (tag) <code>&lt;something&gt;</code>. And <code>.ee</code> - to close/complete/pop it.
+I.e., the format is a stream of instructions.
 </p>
 
-<div class="org-src-container">
-<pre class="src src-haskell">...
--- Parse ["12", "34", "56", "78"] to [(12, 34), (56, 78)]
-parsePt :: [String] -&gt; [Pt]
-parsePt [] = []
-parsePt (k:v:t) = (read k, read v) : parsePt t
-...
+<p>
+The instruction <code>.ee</code> can optionally have tag name - in general the rule is:
+parse as many arguments of an instruction, as you can recognize, any extending
+comes to the end of arguments.
+</p>
+
+<pre class="example" id="orgcfbebd3">
+       not XML                XML
+                                          
+.e countries      |  &lt;countries&gt;
+.e country        |    &lt;country name="USA"&gt;
+.a name USA       |      &lt;city name="New York"&gt;
+.e city           |        ...
+.a name New York  |      &lt;/city&gt;
+....              |      &lt;city name="Dalas"&gt;
+.ee               |        ...
+.e city           |      &lt;/city&gt;
+.a name Dalas     |    &lt;/country&gt;
+....              |  &lt;/countries&gt;
+.ee               |
+.ee               |
+.ee               |
 </pre>
-</div>
 
 <p>
-then done all calculation in <code>Double</code> domain. Result of calculation is Tcl
-command like <code>"takeCalc x0 y0 x1 y1"</code> with coordinates of found line 2 points:
+<b><b>PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED</b></b>
+</p>
+</div>
+</div>
+<div id="outline-container-orga43a499" class="outline-2">
+<h2 id="orga43a499">Markdown-like</h2>
+<div class="outline-text-2" id="text-orga43a499">
+<p>
+Very human-readable format, reminds Markfown, Org-files and&#x2026; Yaml.
+Lists (starts with "-") are for attributes only. Nesting leads to
+deeper section level (more stars "*").
 </p>
 
-<div class="org-src-container">
-<pre class="src src-bash">    -&gt; calc 119 285 194 235 379 64
-    &lt;- takeCalc 119  306  379  46
+<pre class="example" id="org4f4d7c1">
+     not XML                   XML
+                                            
+# Countries       |  &lt;countries&gt;
+## Country        |    &lt;country name="USA"&gt;
+- name: USA       |      &lt;city name="New York"&gt;
+### City          |        ...
+- name: New York  |      &lt;/city&gt;
+...               |      &lt;city name="Dalas"&gt;
+### City          |        ...
+- name: Dalas     |      &lt;/city&gt;
+...               |    &lt;/country&gt;
+                  |  &lt;/countries&gt;
 </pre>
-</div>
 
 <p>
-Wish will get this command and create line on canvas.
+All other XML elements like instructions, entities can be very easy added too.
+Only a conceptual idea is shown here
 </p>
 
 <p>
-Actually it's initial state, so needs many improvement, adding new algorithms,
-etc&#x2026;
+<b><b>PROS: HUMAN-READABLE AND ALSO DOCUMENTATION ORIENTED</b></b>
 </p>
 </div>
 </div>

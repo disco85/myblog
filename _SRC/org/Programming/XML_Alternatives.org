@@ -1,0 +1,121 @@
+#+title: XML alternative formats
+#+description: Alternative formats of XML
+#+keywords: XML, alternative
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t toc:nil
+#+tags: XML alternative
+#+date: <2026-04-30 Thu 20:48>
+
+** Rebol-like
+
+This alternative syntax reminds [[https://en.wikipedia.org/wiki/Rebol][Rebol language]]. When attributes are missing, use "_".
+The symbols ~[, ]~ are chosen because typing of them does not require Shift pressing.
+If an attribute value contains spaces, use quotes.
+
+#+caption: XML alternative, Rebol-like
+#+begin_example
+         not XML                          XML
+
+countries _                   |  <countries>
+[                             |    <country name="USA">
+  country [name=USA]          |       <city name="New York">
+  [                           |         ...
+    city [name="New York"] [  |       </city>
+      ...                     |       <city name="Dalas">
+    ]                         |         ...
+    city [name=Dalas] [       |       </city>
+      ...                     |    </country>
+    ]                         |  </countries>
+  ]                           |
+]                             |
+#+end_example
+
+By the way, this format also is simple for parsing and it's very extendible!
+
+**PROS: EASY CAN BE USED AS A LANGUAGE FOR DATA AND FOR LOGIC. MORE LOGIC ORIENTED**
+
+** .Reg-files like
+
+This alternative syntax reminds classic [[https://en.wikipedia.org/wiki/.properties][Java properties]] file. Or Windows
+[[https://en.wikipedia.org/wiki/Windows_Registry#.REG_files][.reg files]]. Long lines continuations start not from the beginning of the line:
+their first symbols are used as the marker of the beginning, so you can start
+them with "   > " for example, as well. Attributes start with "@".
+
+As a delimiter, "." can be used. Also "/". Or even ":".
+
+**PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED**
+
+#+caption: XML alternative, properties file
+#+begin_example
+             not XML                                  XML
+                                             
+countries.0.country.@name: USA             | <countries>
+countries.0.country.0.city.@name: New York |   <country name="USA">
+countries.0.country.0.city: ...            |     <city name="New York">
+ ...                                       |       ...
+countries.0.country.1.city.@name: Dalas    |     </city>
+countries.0.country.1.city: ...            |     <city name="Dalas">
+  ...                                      |       ...
+                                           |     </city>
+                                           |   </country>
+                                           | </countries>
+#+end_example
+
+** ROFF-like
+
+It reminds the old documentation system [[https://en.wikipedia.org/wiki/Roff_(software)][Roff]]. Or even Python [[https://docs.python.org/3/library/pickle.html#module-pickle][pickle/shelve]].
+The idea is simple: every ~single dot something~ is an instruction for
+a small FSM. For example, ~.e <something>~ says to FSM to create an
+element (tag) ~<something>~. And ~.ee~ - to close/complete/pop it.
+I.e., the format is a stream of instructions.
+
+The instruction ~.ee~ can optionally have tag name - in general the rule is:
+parse as many arguments of an instruction, as you can recognize, any extending
+comes to the end of arguments.
+
+#+caption: XML alternative, ROFF-like
+#+begin_example
+       not XML                XML
+                                          
+.e countries      |  <countries>
+.e country        |    <country name="USA">
+.a name USA       |      <city name="New York">
+.e city           |        ...
+.a name New York  |      </city>
+....              |      <city name="Dalas">
+.ee               |        ...
+.e city           |      </city>
+.a name Dalas     |    </country>
+....              |  </countries>
+.ee               |
+.ee               |
+.ee               |
+#+end_example
+
+**PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED**
+
+** Markdown-like
+
+Very human-readable format, reminds Markfown, Org-files and... Yaml.
+Lists (starts with "-") are for attributes only. Nesting leads to
+deeper section level (more stars "*").
+
+#+caption: XML alternative, Markdown-like
+#+begin_example
+     not XML                   XML
+                                            
+# Countries       |  <countries>
+## Country        |    <country name="USA">
+- name: USA       |      <city name="New York">
+### City          |        ...
+- name: New York  |      </city>
+...               |      <city name="Dalas">
+### City          |        ...
+- name: Dalas     |      </city>
+...               |    </country>
+                  |  </countries>
+#+end_example
+
+All other XML elements like instructions, entities can be very easy added too.
+Only a conceptual idea is shown here
+
+**PROS: HUMAN-READABLE AND ALSO DOCUMENTATION ORIENTED**
