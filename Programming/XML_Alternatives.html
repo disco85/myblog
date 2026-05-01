@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-04-30 Thu 22:23 -->
+<!-- 2026-05-01 Fri 08:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>XML alternative formats</title>
@@ -99,6 +99,12 @@ pre, .verse {
   margin: 0;
   white-space: pre-wrap;
   font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
 }
 #table-of-contents h2 { display: none; }
 .verse br { display: none; }
@@ -210,6 +216,12 @@ th, td {
     color: black !important;
     background-color:: white !important;
   }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
   #table-of-contents h2 { display: none; }
   .verse br { display: none; }
   .verse::before {
@@ -262,24 +274,28 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga9a497f">Rebol-like</a></li>
-<li><a href="#org19df673">.Reg-files like</a></li>
-<li><a href="#org6d8b548">ROFF-like</a></li>
-<li><a href="#orga43a499">Markdown-like</a></li>
+<li><a href="#org4edddec">Rebol-like</a></li>
+<li><a href="#orge100cfd">.Reg-files like</a>
+<ul>
+<li><a href="#org83d702b">Query without XQuery</a></li>
+</ul>
+</li>
+<li><a href="#org5130e2b">ROFF-like</a></li>
+<li><a href="#orga7d72e8">Markdown-like</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orga9a497f" class="outline-2">
-<h2 id="orga9a497f">Rebol-like</h2>
-<div class="outline-text-2" id="text-orga9a497f">
+<div id="outline-container-org4edddec" class="outline-2">
+<h2 id="org4edddec">Rebol-like</h2>
+<div class="outline-text-2" id="text-org4edddec">
 <p>
 This alternative syntax reminds <a href="https://en.wikipedia.org/wiki/Rebol">Rebol language</a>. When attributes are missing, use "_".
 The symbols <code>[, ]</code> are chosen because typing of them does not require Shift pressing.
 If an attribute value contains spaces, use quotes.
 </p>
 
-<pre class="example" id="orgde04ea3">
-         not XML                          XML
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>XML alternative, Rebol-like</label><pre class="src src-nil">         not XML                          XML
 
 countries _                   |  &lt;countries&gt;
 [                             |    &lt;country name="USA"&gt;
@@ -294,6 +310,7 @@ countries _                   |  &lt;countries&gt;
   ]                           |
 ]                             |
 </pre>
+</div>
 
 <p>
 By the way, this format also is simple for parsing and it's very extendible!
@@ -304,9 +321,9 @@ By the way, this format also is simple for parsing and it's very extendible!
 </p>
 </div>
 </div>
-<div id="outline-container-org19df673" class="outline-2">
-<h2 id="org19df673">.Reg-files like</h2>
-<div class="outline-text-2" id="text-org19df673">
+<div id="outline-container-orge100cfd" class="outline-2">
+<h2 id="orge100cfd">.Reg-files like</h2>
+<div class="outline-text-2" id="text-orge100cfd">
 <p>
 This alternative syntax reminds classic <a href="https://en.wikipedia.org/wiki/.properties">Java properties</a> file. Or Windows
 <a href="https://en.wikipedia.org/wiki/Windows_Registry#.REG_files">.reg files</a>. Long lines continuations start not from the beginning of the line:
@@ -319,11 +336,12 @@ As a delimiter, "." can be used. Also "/". Or even ":".
 </p>
 
 <p>
-<b>PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED</b>
+<b>PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED.
+PROBABLY ALLOWS VERY HIGH PARSING SPEED. ALSO - VERY AI FRIENDLY</b>
 </p>
 
-<pre class="example" id="org479906d">
-             not XML                                  XML
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 2: </span>XML alternative, properties file</label><pre class="src src-nil">             not XML                                  XML
                                              
 countries.0.country.@name: USA             | &lt;countries&gt;
 countries.0.country.0.city.@name: New York |   &lt;country name="USA"&gt;
@@ -338,9 +356,92 @@ countries.0.country.1.city: ...            |     &lt;city name="Dalas"&gt;
 </pre>
 </div>
 </div>
-<div id="outline-container-org6d8b548" class="outline-2">
-<h2 id="org6d8b548">ROFF-like</h2>
-<div class="outline-text-2" id="text-org6d8b548">
+<div id="outline-container-org83d702b" class="outline-3">
+<h3 id="org83d702b">Query without XQuery</h3>
+<div class="outline-text-3" id="text-org83d702b">
+<p>
+It is AI friendly as well, the next data was got with the prompt:
+</p>
+
+<blockquote>
+<p>
+A list of 5 countries with their capitals and the population of
+capitals in this format:
+</p>
+<pre class="example" id="org2b36e4a">
+countries.0.country.@name: USA
+countries.0.country.0.city.@name: New York 
+countries.0.country.0.city.@population: 123456789
+
+countries.0.country.1.city.@name: Dalas
+</pre>
+<p>
+etc, the same
+</p>
+</blockquote>
+
+<p>
+The data:
+</p>
+
+<pre class="example" id="org2178710">
+countries:0:country:@name:USA
+countries:0:country:0:city:@name:New York
+countries:0:country:0:city:@population:8580000
+
+countries:1:country:@name:France
+countries:1:country:0:city:@name:Paris
+countries:1:country:0:city:@population:2047602
+
+countries:2:country:@name:Japan
+countries:2:country:0:city:@name:Tokyo
+countries:2:country:0:city:@population:14260000
+
+countries:3:country:@name:Brazil
+countries:3:country:0:city:@name:Brasilia
+countries:3:country:0:city:@population:2817381
+
+countries:4:country:@name:Australia
+countries:4:country:0:city:@name:Canberra
+countries:4:country:0:city:@population:473860
+</pre>
+
+<p>
+You can run this AWK script on Linux, Windows, Mac, just pass it input data to its stdin:
+</p>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 3: </span>AWK query of cities (and countries) with a population smaller than some criteria</label><pre class="src src-awk">  <span class="org-keyword">BEGIN</span> { <span class="org-variable-name">FS</span>=<span class="org-string">":"</span>; criteria=3000000 }
+  <span class="org-string">/:country:@name:/</span> { country = $5 }
+  <span class="org-string">/:city:@name:/</span> { city = $7 }
+  <span class="org-string">/:city:@population:/</span> { <span class="org-keyword">if</span> ($7 &lt; criteria) { total+=1; <span class="org-preprocessor">printf</span>(<span class="org-string">"%s/%s &lt; (%d)\n"</span>, country, city, criteria, $7) }}
+  <span class="org-keyword">END</span> { <span class="org-preprocessor">print</span> <span class="org-string">"Total:"</span>, total }
+</pre>
+</div>
+
+<pre class="example">
+France/Paris &lt; (3000000)
+Brazil/Brasilia &lt; (3000000)
+Australia/Canberra &lt; (3000000)
+Total: 3
+</pre>
+
+
+<p>
+<a href="https://en.wikipedia.org/wiki/XQuery">XQuery</a> is perfect, but you need:
+</p>
+
+<ol class="org-ol">
+<li>To know it</li>
+<li>To have installed tools</li>
+<li>It's slower</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org5130e2b" class="outline-2">
+<h2 id="org5130e2b">ROFF-like</h2>
+<div class="outline-text-2" id="text-org5130e2b">
 <p>
 It reminds the old documentation system <a href="https://en.wikipedia.org/wiki/Roff_(software)">Roff</a>. Or even Python <a href="https://docs.python.org/3/library/pickle.html#module-pickle">pickle/shelve</a>.
 The idea is simple: every <code>single dot something</code> is an instruction for
@@ -352,10 +453,11 @@ I.e., the format is a stream of instructions.
 <p>
 The instruction <code>.ee</code> can optionally have tag name - in general the rule is:
 parse as many arguments of an instruction, as you can recognize, any extending
-comes to the end of arguments.
+comes to the end of arguments. Also all array-like data could have size argument
+in its opening instruction (like <code>.e countries 5</code>)
 </p>
 
-<pre class="example" id="org5984427">
+<pre class="example" id="org4bab8dd">
        not XML                XML
                                           
 .e countries      |  &lt;countries&gt;
@@ -374,20 +476,22 @@ comes to the end of arguments.
 </pre>
 
 <p>
-<b>PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED</b>
+<b>PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED.
+PROBABLY ALLOWS VERY HIGH PARSING SPEED AND WITH SIZE-ARGUMENTS GIVES
+THE LOWEST MEMORY FRAGMENTATION</b>
 </p>
 </div>
 </div>
-<div id="outline-container-orga43a499" class="outline-2">
-<h2 id="orga43a499">Markdown-like</h2>
-<div class="outline-text-2" id="text-orga43a499">
+<div id="outline-container-orga7d72e8" class="outline-2">
+<h2 id="orga7d72e8">Markdown-like</h2>
+<div class="outline-text-2" id="text-orga7d72e8">
 <p>
-Very human-readable format, reminds Markfown, Org-files and&#x2026; Yaml.
+Very human-readable format, reminds Markdown, Org-files and... Yaml.
 Lists (starts with "-") are for attributes only. Nesting leads to
 deeper section level (more stars "*").
 </p>
 
-<pre class="example" id="org9df7b5c">
+<pre class="example" id="org0bb1ed6">
      not XML                   XML
                                             
 # Countries       |  &lt;countries&gt;
@@ -404,7 +508,7 @@ deeper section level (more stars "*").
 
 <p>
 All other XML elements like instructions, entities can be very easy added too.
-Only a conceptual idea is shown here
+Only a conceptual idea is shown here.
 </p>
 
 <p>

@@ -1,7 +1,8 @@
 #+title: XML alternative formats
 #+description: Alternative formats of XML
 #+keywords: XML, alternative
-#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
 #+tags: XML alternative
 #+date: <2026-04-30 Thu 20:48>
 
@@ -12,7 +13,7 @@ The symbols ~[, ]~ are chosen because typing of them does not require Shift pres
 If an attribute value contains spaces, use quotes.
 
 #+caption: XML alternative, Rebol-like
-#+begin_example
+#+begin_src
          not XML                          XML
 
 countries _                   |  <countries>
@@ -27,7 +28,7 @@ countries _                   |  <countries>
     ]                         |  </countries>
   ]                           |
 ]                             |
-#+end_example
+#+end_src
 
 By the way, this format also is simple for parsing and it's very extendible!
 
@@ -42,10 +43,11 @@ them with "   > " for example, as well. Attributes start with "@".
 
 As a delimiter, "." can be used. Also "/". Or even ":".
 
-*PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED*
+*PROS: PERFECT FOR PARSING WITH SIMPLE TOOLS - SHELL, GREP, AWK. MORE DATA ORIENTED.
+PROBABLY ALLOWS VERY HIGH PARSING SPEED. ALSO - VERY AI FRIENDLY*
 
 #+caption: XML alternative, properties file
-#+begin_example
+#+begin_src
              not XML                                  XML
                                              
 countries.0.country.@name: USA             | <countries>
@@ -58,7 +60,67 @@ countries.0.country.1.city: ...            |     <city name="Dalas">
                                            |     </city>
                                            |   </country>
                                            | </countries>
+#+end_src
+
+*** Query without XQuery
+
+It is AI friendly as well, the next data was got with the prompt:
+
+#+begin_quote
+A list of 5 countries with their capitals and the population of
+capitals in this format:
+#+begin_example
+countries.0.country.@name: USA
+countries.0.country.0.city.@name: New York 
+countries.0.country.0.city.@population: 123456789
+
+countries.0.country.1.city.@name: Dalas
 #+end_example
+etc, the same
+#+end_quote
+
+The data:
+
+#+caption: Coutries, some cities (just one, for a smaller example) and their populations
+#+name: countries_data
+#+begin_example
+countries:0:country:@name:USA
+countries:0:country:0:city:@name:New York
+countries:0:country:0:city:@population:8580000
+
+countries:1:country:@name:France
+countries:1:country:0:city:@name:Paris
+countries:1:country:0:city:@population:2047602
+
+countries:2:country:@name:Japan
+countries:2:country:0:city:@name:Tokyo
+countries:2:country:0:city:@population:14260000
+
+countries:3:country:@name:Brazil
+countries:3:country:0:city:@name:Brasilia
+countries:3:country:0:city:@population:2817381
+
+countries:4:country:@name:Australia
+countries:4:country:0:city:@name:Canberra
+countries:4:country:0:city:@population:473860
+#+end_example
+
+You can run this AWK script on Linux, Windows, Mac, just pass it input data to its stdin:
+
+#+caption: AWK query of cities (and countries) with a population smaller than some criteria
+#+begin_src awk :stdin countries_data :eval yes-export :exports both :results output verbatim
+  BEGIN { FS=":"; criteria=3000000 }
+  /:country:@name:/ { country = $5 }
+  /:city:@name:/ { city = $7 }
+  /:city:@population:/ { if ($7 < criteria) { total+=1; printf("%s/%s < (%d)\n", country, city, criteria, $7) }}
+  END { print "Total:", total }
+#+end_src
+
+[[https://en.wikipedia.org/wiki/XQuery][XQuery]] is perfect, but you need:
+
+1. To know it
+2. To have installed tools
+3. It's slower
 
 ** ROFF-like
 
@@ -70,7 +132,8 @@ I.e., the format is a stream of instructions.
 
 The instruction ~.ee~ can optionally have tag name - in general the rule is:
 parse as many arguments of an instruction, as you can recognize, any extending
-comes to the end of arguments.
+comes to the end of arguments. Also all array-like data could have size argument
+in its opening instruction (like ~.e countries 5~)
 
 #+caption: XML alternative, ROFF-like
 #+begin_example
@@ -91,11 +154,13 @@ comes to the end of arguments.
 .ee               |
 #+end_example
 
-*PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED*
+*PROS: PERFECT FOR SIMPLE FSM-BASED PARSERS. DOCUMENTATION ORIENTED.
+PROBABLY ALLOWS VERY HIGH PARSING SPEED AND WITH SIZE-ARGUMENTS GIVES
+THE LOWEST MEMORY FRAGMENTATION*
 
 ** Markdown-like
 
-Very human-readable format, reminds Markfown, Org-files and... Yaml.
+Very human-readable format, reminds Markdown, Org-files and... Yaml.
 Lists (starts with "-") are for attributes only. Nesting leads to
 deeper section level (more stars "*").
 
@@ -116,6 +181,6 @@ deeper section level (more stars "*").
 #+end_example
 
 All other XML elements like instructions, entities can be very easy added too.
-Only a conceptual idea is shown here
+Only a conceptual idea is shown here.
 
 *PROS: HUMAN-READABLE AND ALSO DOCUMENTATION ORIENTED*
