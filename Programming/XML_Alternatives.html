@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:48 -->
+<!-- 2026-05-01 Fri 08:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>XML alternative formats</title>
@@ -368,7 +368,7 @@ It is AI friendly as well, the next data was got with the prompt:
 A list of 5 countries with their capitals and the population of
 capitals in this format:
 </p>
-<pre class="example" id="org2b36e4a">
+<pre class="example" id="orgbdcfccb">
 countries.0.country.@name: USA
 countries.0.country.0.city.@name: New York 
 countries.0.country.0.city.@population: 123456789
@@ -414,15 +414,15 @@ You can run this AWK script on Linux, Windows, Mac, just pass it input data to i
 <label class="org-src-name"><span class="listing-number">Listing 3: </span>AWK query of cities (and countries) with a population smaller than some criteria</label><pre class="src src-awk">  <span class="org-keyword">BEGIN</span> { <span class="org-variable-name">FS</span>=<span class="org-string">":"</span>; criteria=3000000 }
   <span class="org-string">/:country:@name:/</span> { country = $5 }
   <span class="org-string">/:city:@name:/</span> { city = $7 }
-  <span class="org-string">/:city:@population:/</span> { <span class="org-keyword">if</span> ($7 &lt; criteria) { total+=1; <span class="org-preprocessor">printf</span>(<span class="org-string">"%s/%s &lt; (%d)\n"</span>, country, city, criteria, $7) }}
+  <span class="org-string">/:city:@population:/</span> { <span class="org-keyword">if</span> ($7 &lt; criteria) { total+=1; <span class="org-preprocessor">printf</span>(<span class="org-string">"%s/%s &lt; %d (%d)\n"</span>, country, city, criteria, $7) }}
   <span class="org-keyword">END</span> { <span class="org-preprocessor">print</span> <span class="org-string">"Total:"</span>, total }
 </pre>
 </div>
 
 <pre class="example">
-France/Paris &lt; (3000000)
-Brazil/Brasilia &lt; (3000000)
-Australia/Canberra &lt; (3000000)
+France/Paris &lt; 3000000 (2047602)
+Brazil/Brasilia &lt; 3000000 (2817381)
+Australia/Canberra &lt; 3000000 (473860)
 Total: 3
 </pre>
 
@@ -457,7 +457,7 @@ comes to the end of arguments. Also all array-like data could have size argument
 in its opening instruction (like <code>.e countries 5</code>)
 </p>
 
-<pre class="example" id="org4bab8dd">
+<pre class="example" id="orgb30b6bf">
        not XML                XML
                                           
 .e countries      |  &lt;countries&gt;
@@ -491,7 +491,7 @@ Lists (starts with "-") are for attributes only. Nesting leads to
 deeper section level (more stars "*").
 </p>
 
-<pre class="example" id="org0bb1ed6">
+<pre class="example" id="org77f6aab">
      not XML                   XML
                                             
 # Countries       |  &lt;countries&gt;
