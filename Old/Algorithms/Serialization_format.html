@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Serialization format</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Serialization format</h1>
-<div id="outline-container-org4caf9c0" class="outline-2">
-<h2 id="org4caf9c0">Serialization format</h2>
-<div class="outline-text-2" id="text-org4caf9c0">
+<div id="outline-container-org5087386" class="outline-2">
+<h2 id="org5087386">Serialization format</h2>
+<div class="outline-text-2" id="text-org5087386">
 <p>
 Implementation of simple marshaling of nested data structures. Supports: int,
 float, string, nested lists. Serialized data is presented as string. It's not
@@ -280,16 +318,16 @@ difficult to serialize into binary&#x2026;
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">POSTPACK -- packing the data in postfix notation (nested typed items)</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Format: item '!' type,</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">where type may be 'i' (int), 'f' (float), 's' (string), 'l' (list),</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">num 'l' (list with num items)</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Example: 1!i2!i!l3!i4!i!2l =&gt; [[1, 2], [3, 4]]</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">To escape '!' '!' is used: 'Hello!!' =&gt; 'Hello!'</span>
-
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">POSTPACK -- packing the data in postfix notation (nested typed items)
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Format: item '!' type,
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">where type may be 'i' (int), 'f' (float), 's' (string), 'l' (list),
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">num 'l' (list with num items)
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Example: 1!i2!i!l3!i4!i!2l =&gt; [[1, 2], [3, 4]]
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">To escape '!' '!' is used: 'Hello!!' =&gt; 'Hello!'
+</span>
 <span class="org-keyword">from</span> __future__ <span class="org-keyword">import</span> print_function
 <span class="org-keyword">import</span> string
 
@@ -302,17 +340,17 @@ difficult to serialize into binary&#x2026;
         <span class="org-keyword">self</span>.fmt.update(fmt)
 
     <span class="org-keyword">def</span> <span class="org-function-name">decode</span>(<span class="org-keyword">self</span>, <span class="org-builtin">input</span>):
-        <span class="org-doc">''' Decodes input string into internal representation (list of items,</span>
-<span class="org-doc">        possible nested):</span>
+        <span class="org-doc">''' Decodes input string into internal representation (list of items,
+        possible nested):
 
-<span class="org-doc">        &gt;&gt;&gt; Postpack().decode("Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l")</span>
-<span class="org-doc">        [['Hello, world!!', 2.1], [[3, 4], 5]]</span>
-<span class="org-doc">        '''</span>
-        <span class="org-variable-name">buf</span> <span class="org-operator">=</span> <span class="org-string">""</span>        <span class="org-comment-delimiter"># </span><span class="org-comment">item chars buffer</span>
-        <span class="org-variable-name">instr</span> <span class="org-operator">=</span> <span class="org-string">""</span>      <span class="org-comment-delimiter"># </span><span class="org-comment">instruction chars buffer</span>
-        <span class="org-variable-name">items</span> <span class="org-operator">=</span> []      <span class="org-comment-delimiter"># </span><span class="org-comment">items</span>
-        <span class="org-variable-name">st</span> <span class="org-operator">=</span> <span class="org-string">"data"</span>     <span class="org-comment-delimiter"># </span><span class="org-comment">FSM state</span>
-        <span class="org-keyword">for</span> ch <span class="org-keyword">in</span> <span class="org-builtin">input</span>:
+        &gt;&gt;&gt; Postpack().decode("Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l")
+        [['Hello, world!!', 2.1], [[3, 4], 5]]
+        '''</span>
+        <span class="org-variable-name">buf</span> <span class="org-operator">=</span> <span class="org-string">""</span>        <span class="org-comment-delimiter"># </span><span class="org-comment">item chars buffer
+</span>        <span class="org-variable-name">instr</span> <span class="org-operator">=</span> <span class="org-string">""</span>      <span class="org-comment-delimiter"># </span><span class="org-comment">instruction chars buffer
+</span>        <span class="org-variable-name">items</span> <span class="org-operator">=</span> []      <span class="org-comment-delimiter"># </span><span class="org-comment">items
+</span>        <span class="org-variable-name">st</span> <span class="org-operator">=</span> <span class="org-string">"data"</span>     <span class="org-comment-delimiter"># </span><span class="org-comment">FSM state
+</span>        <span class="org-keyword">for</span> ch <span class="org-keyword">in</span> <span class="org-builtin">input</span>:
             <span class="org-keyword">if</span> st <span class="org-operator">==</span> <span class="org-string">"instr"</span>:
                 <span class="org-keyword">if</span> ch <span class="org-keyword">in</span> DIGITS:
                     <span class="org-variable-name">instr</span> <span class="org-operator">+=</span> ch
@@ -348,18 +386,18 @@ difficult to serialize into binary&#x2026;
 
     @<span class="org-builtin">staticmethod</span>
     <span class="org-keyword">def</span> <span class="org-function-name">escape</span>(s):
-        <span class="org-doc">'''</span>
-<span class="org-doc">        &gt;&gt;&gt; Postpack().escape('Qwe!rty!!')</span>
-<span class="org-doc">        'Qwe!!rty!!!!'</span>
-<span class="org-doc">        '''</span>
+        <span class="org-doc">'''
+        &gt;&gt;&gt; Postpack().escape('Qwe!rty!!')
+        'Qwe!!rty!!!!'
+        '''</span>
         <span class="org-keyword">return</span> s.replace(<span class="org-string">'!'</span>, <span class="org-string">'!!'</span>)
 
     <span class="org-keyword">def</span> <span class="org-function-name">encode</span>(<span class="org-keyword">self</span>, items):
-        <span class="org-doc">''' Encodes list of items (may be nested):</span>
+        <span class="org-doc">''' Encodes list of items (may be nested):
 
-<span class="org-doc">        &gt;&gt;&gt; Postpack(fmt={float: '%.1f'}).encode([['Hello, world!!', 2.1], [[3, 4], 5]])</span>
-<span class="org-doc">        'Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l'</span>
-<span class="org-doc">        '''</span>
+        &gt;&gt;&gt; Postpack(fmt={float: '%.1f'}).encode([['Hello, world!!', 2.1], [[3, 4], 5]])
+        'Hello, world!!!!!s2.1!f!2l3!i4!i!2l5!i!2l'
+        '''</span>
         <span class="org-variable-name">output</span> <span class="org-operator">=</span> <span class="org-string">""</span>
         <span class="org-keyword">for</span> it <span class="org-keyword">in</span> items:
             <span class="org-variable-name">ittype</span> <span class="org-operator">=</span> <span class="org-builtin">type</span>(it)
@@ -378,8 +416,8 @@ difficult to serialize into binary&#x2026;
 
 
 
-<span class="org-comment-delimiter">##############################################################################</span>
-<span class="org-keyword">if</span> <span class="org-builtin">__name__</span> <span class="org-operator">==</span> <span class="org-string">"__main__"</span>:
+<span class="org-comment-delimiter">##############################################################################</span><span class="org-comment">
+</span><span class="org-keyword">if</span> <span class="org-builtin">__name__</span> <span class="org-operator">==</span> <span class="org-string">"__main__"</span>:
     <span class="org-keyword">import</span> doctest
     doctest.testmod()
 </pre>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Debug messages support for C, ver 2</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Debug messages support for C, ver 2</h1>
-<div id="outline-container-org5f3fe7d" class="outline-2">
-<h2 id="org5f3fe7d">Debug messages support for C, ver 2</h2>
-<div class="outline-text-2" id="text-org5f3fe7d">
+<div id="outline-container-org86a13e2" class="outline-2">
+<h2 id="org86a13e2">Debug messages support for C, ver 2</h2>
+<div class="outline-text-2" id="text-org86a13e2">
 <p>
 This C module support debug/logging system with custom levels of messages. Suppressing of some level/levels are possible via <code>DBG_LEVEL</code> macro variable. Each custom level is created with <code>DBG_LEVEL_ALIAS()</code> macro. User can define own print/dump implementations via <code>DBG_PRN_IMPL~/~DBG_DUMP_IMPL</code>.
 </p>
@@ -352,8 +390,8 @@ This C module support debug/logging system with custom levels of messages. Suppr
 
 <span class="org-preprocessor">#endif</span>
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Print without level</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">DBG_PRN_UL</span>(<span class="org-variable-name">L</span>, <span class="org-variable-name">F</span>, ...) <span class="org-keyword">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(<span class="org-string">""</span>, <span class="org-string">"%s"</span> F, __VA_ARGS__)
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Print without level
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">DBG_PRN_UL</span>(<span class="org-variable-name">L</span>, <span class="org-variable-name">F</span>, ...) <span class="org-keyword">if</span> ((DBG_LEVEL) &amp; (L)) DBG_PRN_IMPL(<span class="org-string">""</span>, <span class="org-string">"%s"</span> F, __VA_ARGS__)
 
 <span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/* </span><span class="org-comment">EOF</span><span class="org-comment-delimiter"> */</span>
 </pre>
@@ -366,13 +404,13 @@ Usage:
 <div class="org-src-container">
 <pre class="src src-cpp"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;string.h&gt;</span>
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">use level name as 1st argument of out DBG_PRN_IMPL</span>
-<span class="org-preprocessor">#define</span> <span class="org-variable-name">DBG_LEVEL_IS_ARG</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">use level name as 1st argument of out DBG_PRN_IMPL
+</span><span class="org-preprocessor">#define</span> <span class="org-variable-name">DBG_LEVEL_IS_ARG</span>
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">DBG_LEVEL_FMT</span> <span class="org-string">"[%s] "</span>
 <span class="org-preprocessor">#include</span> <span class="org-string">"dbg.h"</span>
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">define levels</span>
-<span class="org-preprocessor">#define</span> <span class="org-variable-name">HARDWARE_LEVEL</span>   DBG_LEVEL_ALIAS(1)
+<span class="org-comment-delimiter">// </span><span class="org-comment">define levels
+</span><span class="org-preprocessor">#define</span> <span class="org-variable-name">HARDWARE_LEVEL</span>   DBG_LEVEL_ALIAS(1)
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">WRAPPER_LEVEL</span>   DBG_LEVEL_ALIAS(2)
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">APP_LEVEL</span>       DBG_LEVEL_ALIAS(3)
 

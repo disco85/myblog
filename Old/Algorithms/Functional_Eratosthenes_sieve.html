@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Functional Eratosthenes sieve</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Functional Eratosthenes sieve</h1>
-<div id="outline-container-orgaa66ef8" class="outline-2">
-<h2 id="orgaa66ef8">Functional Eratosthenes sieve</h2>
-<div class="outline-text-2" id="text-orgaa66ef8">
+<div id="outline-container-org5f0e683" class="outline-2">
+<h2 id="org5f0e683">Functional Eratosthenes sieve</h2>
+<div class="outline-text-2" id="text-org5f0e683">
 <p>
 Three implementations of subject on Python/Haskell/Ocaml
 </p>
@@ -282,21 +320,21 @@ Python version:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">coding: cp1251</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">j=2,3,4,5,6,7... Then we are searching next unchecked, check all.</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Each first unchecked is the prime number.</span>
-
-<span class="org-comment-delimiter">#####################################################</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">&#1057; tail recursion ;)</span>
-<span class="org-comment-delimiter">#####################################################</span>
-
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">coding: cp1251
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Idea: 2 is simple, so check in the list 2..m all 2, 4, 6... - 2*j,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">j=2,3,4,5,6,7... Then we are searching next unchecked, check all.
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Each first unchecked is the prime number.
+</span>
+<span class="org-comment-delimiter">#####################################################</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">&#1057; tail recursion ;)
+</span><span class="org-comment-delimiter">#####################################################</span><span class="org-comment">
+</span>
 <span class="org-keyword">def</span> <span class="org-function-name">tag2</span>(lst, n, m, j<span class="org-operator">=</span>2, i<span class="org-operator">=</span>1):
-    <span class="org-doc">''' Returns list with 0s - i.e. checked numbers in `lst` which</span>
-<span class="org-doc">    are multiple of n (m - max number, j - multiplier 2, 3, 4...,</span>
-<span class="org-doc">    i - serial number of our number :)</span>
-<span class="org-doc">    '''</span>
+    <span class="org-doc">''' Returns list with 0s - i.e. checked numbers in `lst` which
+    are multiple of n (m - max number, j - multiplier 2, 3, 4...,
+    i - serial number of our number :)
+    '''</span>
     <span class="org-keyword">if</span> <span class="org-keyword">not</span> lst: <span class="org-keyword">return</span> []
     <span class="org-keyword">elif</span> i <span class="org-operator">!=</span> n<span class="org-operator">*</span>j: <span class="org-keyword">return</span> lst[0:1] <span class="org-operator">+</span> tag2(lst[1:], n, m, j, i<span class="org-operator">+</span>1)
     <span class="org-keyword">else</span>: <span class="org-keyword">return</span> [0] <span class="org-operator">+</span> tag2(lst[1:], n, m, j<span class="org-operator">+</span>1, i<span class="org-operator">+</span>1)

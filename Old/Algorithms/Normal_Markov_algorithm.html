@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Normal Markov algorithm</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Normal Markov algorithm</h1>
-<div id="outline-container-org6d4ffee" class="outline-2">
-<h2 id="org6d4ffee">Normal Markov algorithm</h2>
-<div class="outline-text-2" id="text-org6d4ffee">
+<div id="outline-container-orge3aab87" class="outline-2">
+<h2 id="orge3aab87">Normal Markov algorithm</h2>
+<div class="outline-text-2" id="text-orge3aab87">
 <p>
 <a href="https://en.wikipedia.org/wiki/Markov_algorithm">Normal Markov algorithm</a> - is
 the abstract rewriting system or method of algorithms description/writing.
@@ -285,27 +323,27 @@ Refal.
 
 <span class="org-keyword">class</span> <span class="org-type">Rule</span>:
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, f, t, last<span class="org-operator">=</span>0):
-        <span class="org-keyword">self</span>.<span class="org-variable-name">f</span> <span class="org-operator">=</span> f  <span class="org-comment-delimiter"># </span><span class="org-comment">from</span>
-        <span class="org-keyword">self</span>.<span class="org-variable-name">t</span> <span class="org-operator">=</span> t  <span class="org-comment-delimiter"># </span><span class="org-comment">to</span>
-        <span class="org-keyword">self</span>.<span class="org-builtin">len</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(<span class="org-keyword">self</span>.f)
-        <span class="org-keyword">self</span>.<span class="org-variable-name">last</span> <span class="org-operator">=</span> last  <span class="org-comment-delimiter"># </span><span class="org-comment">last rule?</span>
-
+        <span class="org-keyword">self</span>.<span class="org-variable-name">f</span> <span class="org-operator">=</span> f  <span class="org-comment-delimiter"># </span><span class="org-comment">from
+</span>        <span class="org-keyword">self</span>.<span class="org-variable-name">t</span> <span class="org-operator">=</span> t  <span class="org-comment-delimiter"># </span><span class="org-comment">to
+</span>        <span class="org-keyword">self</span>.<span class="org-builtin">len</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(<span class="org-keyword">self</span>.f)
+        <span class="org-keyword">self</span>.<span class="org-variable-name">last</span> <span class="org-operator">=</span> last  <span class="org-comment-delimiter"># </span><span class="org-comment">last rule?
+</span>
     <span class="org-keyword">def</span> <span class="org-function-name">__str__</span>(<span class="org-keyword">self</span>):
         <span class="org-keyword">return</span> <span class="org-string">"&lt;Rule%s %s -&gt; %s&gt;"</span> <span class="org-operator">%</span> (<span class="org-string">'.'</span> <span class="org-keyword">if</span> <span class="org-keyword">self</span>.last <span class="org-keyword">else</span> <span class="org-string">''</span>, <span class="org-keyword">self</span>.f, <span class="org-keyword">self</span>.t)
 
     <span class="org-keyword">def</span> <span class="org-function-name">sub</span>(<span class="org-keyword">self</span>, text):
-        <span class="org-doc">""" Substitution:</span>
-<span class="org-doc">        &gt;&gt;&gt; Rule('a', 'b').sub('qweaaannn')</span>
-<span class="org-doc">        (1, 'qwebaannn')</span>
-<span class="org-doc">        &gt;&gt;&gt; Rule('a', 'b').sub('aaa')</span>
-<span class="org-doc">        (1, 'baa')</span>
-<span class="org-doc">        &gt;&gt;&gt; Rule('a', '').sub('qweaba')</span>
-<span class="org-doc">        (1, 'qweba')</span>
-<span class="org-doc">        &gt;&gt;&gt; Rule('', 'xyz').sub('qweaba')</span>
-<span class="org-doc">        (1, 'xyzqweaba')</span>
-<span class="org-doc">        &gt;&gt;&gt; Rule('', '').sub('qweaba')</span>
-<span class="org-doc">        (0, 'qweaba')</span>
-<span class="org-doc">        """</span>
+        <span class="org-doc">""" Substitution:
+        &gt;&gt;&gt; Rule('a', 'b').sub('qweaaannn')
+        (1, 'qwebaannn')
+        &gt;&gt;&gt; Rule('a', 'b').sub('aaa')
+        (1, 'baa')
+        &gt;&gt;&gt; Rule('a', '').sub('qweaba')
+        (1, 'qweba')
+        &gt;&gt;&gt; Rule('', 'xyz').sub('qweaba')
+        (1, 'xyzqweaba')
+        &gt;&gt;&gt; Rule('', '').sub('qweaba')
+        (0, 'qweaba')
+        """</span>
         <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.f <span class="org-keyword">and</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.t: <span class="org-keyword">return</span> (0, text)
         <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(0, <span class="org-builtin">len</span>(text)):
             <span class="org-variable-name">end</span> <span class="org-operator">=</span> i <span class="org-operator">+</span> <span class="org-keyword">self</span>.<span class="org-builtin">len</span>
@@ -316,39 +354,39 @@ Refal.
 
 
 <span class="org-keyword">class</span> <span class="org-type">NM</span>:
-    <span class="org-doc">""" Normal Markov's Algorithm</span>
-<span class="org-doc">    &gt;&gt;&gt; nm = NM([Rule("ba", "ab"),])</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('aababbbabababbaaa')</span>
-<span class="org-doc">    'aaaaaaaaabbbbbbbb'</span>
-<span class="org-doc">    &gt;&gt;&gt; nm = NM([Rule("c", ""), Rule("bb", "ddd", last=1)])</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('abbcabbca')</span>
-<span class="org-doc">    'adddabba'</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('dcacb')</span>
-<span class="org-doc">    'dab'</span>
-<span class="org-doc">    &gt;&gt;&gt; nm = NM([Rule("*a", "", last=1),</span>
-<span class="org-doc">    ...          Rule("*b", "", last=1),</span>
-<span class="org-doc">    ...          Rule("*", "", last=1),</span>
-<span class="org-doc">    ...          Rule("", "*"),</span>
-<span class="org-doc">    ... ])</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('bbaba')</span>
-<span class="org-doc">    'baba'</span>
-<span class="org-doc">    &gt;&gt;&gt; nm = NM([Rule("*0", "00*"),</span>
-<span class="org-doc">    ...          Rule("*1", "01*"),</span>
-<span class="org-doc">    ...          Rule("*2", "10*"),</span>
-<span class="org-doc">    ...          Rule("*3", "11*"),</span>
-<span class="org-doc">    ...          Rule("*", "", last=1),</span>
-<span class="org-doc">    ...          Rule("", "*"),</span>
-<span class="org-doc">    ... ])</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('0123')</span>
-<span class="org-doc">    '00011011'</span>
-<span class="org-doc">    &gt;&gt;&gt; nm = NM([Rule("*a", "a*"),</span>
-<span class="org-doc">    ...          Rule("*b", "b*"),</span>
-<span class="org-doc">    ...          Rule("*", "a", last=1),</span>
-<span class="org-doc">    ...          Rule("", "*"),</span>
-<span class="org-doc">    ... ])</span>
-<span class="org-doc">    &gt;&gt;&gt; nm('bbab')</span>
-<span class="org-doc">    'bbaba'</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">""" Normal Markov's Algorithm
+    &gt;&gt;&gt; nm = NM([Rule("ba", "ab"),])
+    &gt;&gt;&gt; nm('aababbbabababbaaa')
+    'aaaaaaaaabbbbbbbb'
+    &gt;&gt;&gt; nm = NM([Rule("c", ""), Rule("bb", "ddd", last=1)])
+    &gt;&gt;&gt; nm('abbcabbca')
+    'adddabba'
+    &gt;&gt;&gt; nm('dcacb')
+    'dab'
+    &gt;&gt;&gt; nm = NM([Rule("*a", "", last=1),
+    ...          Rule("*b", "", last=1),
+    ...          Rule("*", "", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    &gt;&gt;&gt; nm('bbaba')
+    'baba'
+    &gt;&gt;&gt; nm = NM([Rule("*0", "00*"),
+    ...          Rule("*1", "01*"),
+    ...          Rule("*2", "10*"),
+    ...          Rule("*3", "11*"),
+    ...          Rule("*", "", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    &gt;&gt;&gt; nm('0123')
+    '00011011'
+    &gt;&gt;&gt; nm = NM([Rule("*a", "a*"),
+    ...          Rule("*b", "b*"),
+    ...          Rule("*", "a", last=1),
+    ...          Rule("", "*"),
+    ... ])
+    &gt;&gt;&gt; nm('bbab')
+    'bbaba'
+    """</span>
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, rules):
         <span class="org-keyword">self</span>.<span class="org-variable-name">rules</span> <span class="org-operator">=</span> rules
 
@@ -358,8 +396,8 @@ Refal.
             <span class="org-keyword">for</span> rule <span class="org-keyword">in</span> <span class="org-keyword">self</span>.rules:
                 <span class="org-variable-name">oldtext</span> <span class="org-operator">=</span> text
                 <span class="org-variable-name">applied</span>, <span class="org-variable-name">text</span> <span class="org-operator">=</span> rule.sub(text)
-                <span class="org-comment-delimiter">#</span><span class="org-comment">print("%s -&gt; %s [by %s]" % (oldtext, text, rule))</span>
-                <span class="org-keyword">if</span> applied:
+                <span class="org-comment-delimiter">#</span><span class="org-comment">print("%s -&gt; %s [by %s]" % (oldtext, text, rule))
+</span>                <span class="org-keyword">if</span> applied:
                     <span class="org-variable-name">changed</span> <span class="org-operator">=</span> 1
                     <span class="org-keyword">if</span> rule.last: <span class="org-keyword">return</span> text
                     <span class="org-keyword">else</span>: <span class="org-keyword">break</span>

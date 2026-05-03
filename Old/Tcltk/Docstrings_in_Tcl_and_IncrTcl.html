@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Docstrings in Tcl (and IncrTcl)</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Docstrings in Tcl (and IncrTcl)</h1>
-<div id="outline-container-org8244003" class="outline-2">
-<h2 id="org8244003">Docstrings in Tcl (and IncrTcl)</h2>
-<div class="outline-text-2" id="text-org8244003">
+<div id="outline-container-org729609b" class="outline-2">
+<h2 id="org729609b">Docstrings in Tcl (and IncrTcl)</h2>
+<div class="outline-text-2" id="text-org729609b">
 <p>
 Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to include documentation into implementation (reverse LP). But in Tcl are can be usable to generate help of commands for user. Here is the listing of one (it support procs and Itcl methods):
 </p>
@@ -289,9 +327,9 @@ Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to incl
 <span class="org-keyword">proc</span> <span class="org-function-name">::mydoc::_docstring</span> {<span class="org-keyword">body</span>} {
     <span class="org-builtin">set</span> <span class="org-variable-name">body</span> [<span class="org-builtin">string</span> trim $<span class="org-variable-name">body</span>]
     <span class="org-builtin">set</span> <span class="org-variable-name">docstring</span> <span class="org-string">""</span>
-    <span class="org-comment"># without 1st '^' will match any FIRST docstring block even after</span>
-    <span class="org-comment"># commands!</span>
-    <span class="org-keyword">if</span> {[<span class="org-builtin">regexp</span> {^#\s*([^\n]+\n)+(\n\n)} $<span class="org-variable-name">body</span> docstring]} {
+    <span class="org-comment"># without 1st '^' will match any FIRST docstring block even after
+</span>    <span class="org-comment"># commands!
+</span>    <span class="org-keyword">if</span> {[<span class="org-builtin">regexp</span> {^#\s*([^\n]+\n)+(\n\n)} $<span class="org-variable-name">body</span> docstring]} {
         <span class="org-builtin">set</span> <span class="org-variable-name">docstring</span> [<span class="org-builtin">regsub</span> -all {\s*#\s?} $<span class="org-variable-name">docstring</span> \n]
         <span class="org-builtin">set</span> <span class="org-variable-name">docstring</span> [<span class="org-builtin">string</span> trim $<span class="org-variable-name">docstring</span>]
         <span class="org-keyword">return</span> $<span class="org-variable-name">docstring</span>
@@ -299,36 +337,36 @@ Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to incl
 }
 
 <span class="org-keyword">proc</span> <span class="org-function-name">::mydoc::doc</span> args {
-    <span class="org-comment"># Help on command: procedure or class method. Call:</span>
-    <span class="org-comment">#   doc some_object some_method</span>
-    <span class="org-comment">#   doc some_class some_method</span>
-    <span class="org-comment">#   doc some_proc</span>
-
+    <span class="org-comment"># Help on command: procedure or class method. Call:
+</span>    <span class="org-comment">#   doc some_object some_method
+</span>    <span class="org-comment">#   doc some_class some_method
+</span>    <span class="org-comment">#   doc some_proc
+</span>
 
     <span class="org-type">global</span> _NOHELPMSG
     <span class="org-builtin">set</span> <span class="org-variable-name">found</span> <span class="org-string">""</span>
     <span class="org-keyword">switch</span> -- [<span class="org-builtin">llength</span> $<span class="org-variable-name">args</span>] {
         1 {
-            <span class="org-comment"># args: proc</span>
-            <span class="org-builtin">set</span> <span class="org-variable-name">name</span> [<span class="org-builtin">lindex</span> $<span class="org-variable-name">args</span> 0]
+            <span class="org-comment"># args: proc
+</span>            <span class="org-builtin">set</span> <span class="org-variable-name">name</span> [<span class="org-builtin">lindex</span> $<span class="org-variable-name">args</span> 0]
             <span class="org-builtin">set</span> <span class="org-variable-name">arguments</span> [<span class="org-builtin">info</span> args $<span class="org-variable-name">name</span>]
             <span class="org-builtin">set</span> <span class="org-variable-name">body</span> [<span class="org-builtin">info</span> <span class="org-keyword">body</span> $<span class="org-variable-name">name</span>]
             <span class="org-builtin">set</span> <span class="org-variable-name">found</span> [_docstring $<span class="org-variable-name">body</span>]
         }
         2 {
-            <span class="org-comment"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> not optimal!</span>
-            <span class="org-comment"># args: object|class method</span>
-            lassign $<span class="org-variable-name">args</span> cls_obj meth
+            <span class="org-comment"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> not optimal!
+</span>            <span class="org-comment"># args: object|class method
+</span>            lassign $<span class="org-variable-name">args</span> cls_obj meth
             <span class="org-builtin">set</span> <span class="org-variable-name">objs</span> [itcl::find objects]
-            <span class="org-comment"># cls_obj may be object OR class. What is it?</span>
-            <span class="org-keyword">if</span> {-1 != [lsearch -regexp $<span class="org-variable-name">objs</span> :*$<span class="org-variable-name">cls_obj</span>]} {
-                <span class="org-comment"># this is the object</span>
-                <span class="org-builtin">set</span> <span class="org-variable-name">arguments</span> [$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> args $<span class="org-variable-name">meth</span>]
+            <span class="org-comment"># cls_obj may be object OR class. What is it?
+</span>            <span class="org-keyword">if</span> {-1 != [lsearch -regexp $<span class="org-variable-name">objs</span> :*$<span class="org-variable-name">cls_obj</span>]} {
+                <span class="org-comment"># this is the object
+</span>                <span class="org-builtin">set</span> <span class="org-variable-name">arguments</span> [$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> args $<span class="org-variable-name">meth</span>]
                 <span class="org-builtin">set</span> <span class="org-variable-name">body</span> [$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> <span class="org-keyword">body</span> $<span class="org-variable-name">meth</span>]
                 <span class="org-builtin">set</span> <span class="org-variable-name">found</span> [_docstring $<span class="org-variable-name">body</span>]
             } <span class="org-keyword">else</span> {
-                <span class="org-comment"># this is the class</span>
-                <span class="org-builtin">set</span> <span class="org-variable-name">arguments</span> [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> ::$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> args $<span class="org-variable-name">meth</span>]
+                <span class="org-comment"># this is the class
+</span>                <span class="org-builtin">set</span> <span class="org-variable-name">arguments</span> [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> ::$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> args $<span class="org-variable-name">meth</span>]
                 <span class="org-builtin">set</span> <span class="org-variable-name">body</span> [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> ::$<span class="org-variable-name">cls_obj</span> <span class="org-builtin">info</span> <span class="org-keyword">body</span> $<span class="org-variable-name">meth</span>]
                 <span class="org-builtin">set</span> <span class="org-variable-name">found</span> [_docstring $<span class="org-variable-name">body</span>]
             }
@@ -342,27 +380,27 @@ Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to incl
     }
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">txt is the string with \n, shifter is like '\t' or '\t\t'..</span>
-<span class="org-keyword">proc</span> <span class="org-function-name">mydoc::_shift_strings</span> {txt shifter} {
+<span class="org-comment-delimiter"># </span><span class="org-comment">txt is the string with \n, shifter is like '\t' or '\t\t'..
+</span><span class="org-keyword">proc</span> <span class="org-function-name">mydoc::_shift_strings</span> {txt shifter} {
     <span class="org-keyword">if</span> {$<span class="org-variable-name">txt</span> ne <span class="org-string">""</span>} {
         <span class="org-keyword">return</span> <span class="org-string">"$shifter[regsub -all \n $txt \n$shifter]"</span>
     }
 }
 
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Generate only for documented with docstrings</span>
-<span class="org-keyword">proc</span> <span class="org-function-name">mydoc::_genrst</span> {fname} {
+<span class="org-comment-delimiter"># </span><span class="org-comment">Generate only for documented with docstrings
+</span><span class="org-keyword">proc</span> <span class="org-function-name">mydoc::_genrst</span> {fname} {
     <span class="org-builtin">set</span> <span class="org-variable-name">result</span> {}
-    <span class="org-comment"># Collect help on objects and it's methods</span>
-    <span class="org-builtin">set</span> <span class="org-variable-name">clshelp</span> {}
+    <span class="org-comment"># Collect help on objects and it's methods
+</span>    <span class="org-builtin">set</span> <span class="org-variable-name">clshelp</span> {}
     <span class="org-keyword">foreach</span> cls [itcl::find classes] {
         <span class="org-builtin">set</span> <span class="org-variable-name">her</span> [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> $<span class="org-variable-name">cls</span> <span class="org-string">"info heritage"</span>]
 
         <span class="org-builtin">set</span> <span class="org-variable-name">varhelp</span> {}
         <span class="org-keyword">foreach</span> v [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> $<span class="org-variable-name">cls</span> <span class="org-builtin">info</span> variable] {
             <span class="org-builtin">catch</span> {
-                <span class="org-comment">#lappend varhelp [namespace eval $cls info variable $v -protection public]</span>
-                <span class="org-keyword">if</span> {[<span class="org-builtin">string</span> first <span class="org-string">"::_"</span> $<span class="org-variable-name">v</span>] == -1} {
+                <span class="org-comment">#lappend varhelp [namespace eval $cls info variable $v -protection public]
+</span>                <span class="org-keyword">if</span> {[<span class="org-builtin">string</span> first <span class="org-string">"::_"</span> $<span class="org-variable-name">v</span>] == -1} {
                     <span class="org-keyword">switch</span> -- [<span class="org-builtin">namespace</span> <span class="org-keyword">eval</span> $<span class="org-variable-name">cls</span> <span class="org-builtin">info</span> <span class="org-type">variable</span> $<span class="org-variable-name">v</span> -protection] {
                         <span class="org-type">public</span> { <span class="org-builtin">set</span> <span class="org-variable-name">vprot</span> <span class="org-string">"public"</span> }
                         <span class="org-type">protected</span> { <span class="org-builtin">set</span> <span class="org-variable-name">vprot</span> <span class="org-string">"protected"</span> }
@@ -394,10 +432,10 @@ Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to incl
             }
         }
         <span class="org-keyword">if</span> {$<span class="org-variable-name">methelp</span> ne <span class="org-string">""</span>} {
-            <span class="org-comment"># there are methods with docstrings!</span>
-            <span class="org-keyword">if</span> {[<span class="org-builtin">llength</span> $<span class="org-variable-name">her</span>] &gt; 1} {
-                <span class="org-comment"># there are base classes</span>
-                <span class="org-builtin">set</span> <span class="org-variable-name">bases</span> [<span class="org-builtin">lrange</span> $<span class="org-variable-name">her</span> 1 end]
+            <span class="org-comment"># there are methods with docstrings!
+</span>            <span class="org-keyword">if</span> {[<span class="org-builtin">llength</span> $<span class="org-variable-name">her</span>] &gt; 1} {
+                <span class="org-comment"># there are base classes
+</span>                <span class="org-builtin">set</span> <span class="org-variable-name">bases</span> [<span class="org-builtin">lrange</span> $<span class="org-variable-name">her</span> 1 end]
                 <span class="org-builtin">set</span> <span class="org-variable-name">her</span> <span class="org-string">"[lindex $her 0] (*extends ${bases}*)"</span>
             }
             <span class="org-builtin">lappend</span> clshelp <span class="org-string">"$her"</span>
@@ -418,8 +456,8 @@ Docstrings are very popular in Python, Lisp&#x2026; This is the easy way to incl
             <span class="org-builtin">lappend</span> clshelp {*}$<span class="org-variable-name">methelp</span>
         }
     }
-    <span class="org-comment"># Collect procs help</span>
-    <span class="org-builtin">set</span> <span class="org-variable-name">prochelp</span> {}
+    <span class="org-comment"># Collect procs help
+</span>    <span class="org-builtin">set</span> <span class="org-variable-name">prochelp</span> {}
     <span class="org-keyword">foreach</span> func [<span class="org-keyword">uplevel</span> #0 <span class="org-builtin">info</span> procs] {
         <span class="org-builtin">catch</span> {
             <span class="org-builtin">set</span> <span class="org-variable-name">body</span> [<span class="org-builtin">string</span> trim [<span class="org-keyword">uplevel</span> #0 <span class="org-builtin">info</span> <span class="org-keyword">body</span> $<span class="org-variable-name">func</span>]]
@@ -469,22 +507,22 @@ This mechanism supports not only interactive help system for user (doc proc) but
 
 <div class="org-src-container">
 <pre class="src src-tcl"><span class="org-keyword">proc</span> <span class="org-function-name">fun</span> {args} {
-  <span class="org-comment"># Do something. Syntax:</span>
-  <span class="org-comment">#  -one -- first action</span>
-  <span class="org-comment">#  -two -- second action</span>
-
+  <span class="org-comment"># Do something. Syntax:
+</span>  <span class="org-comment">#  -one -- first action
+</span>  <span class="org-comment">#  -two -- second action
+</span>
 
   .. code ..
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">OR</span>
-
+<span class="org-comment-delimiter"># </span><span class="org-comment">OR
+</span>
 itcl::class C {
   <span class="org-keyword">method</span> <span class="org-function-name">f</span> {args} {
-    <span class="org-comment"># My method. Syntax:</span>
-    <span class="org-comment">#  f one two -- do something</span>
-    <span class="org-comment">#  f three four -- do something else</span>
-
+    <span class="org-comment"># My method. Syntax:
+</span>    <span class="org-comment">#  f one two -- do something
+</span>    <span class="org-comment">#  f three four -- do something else
+</span>
 
     .. code ..
   }
@@ -551,9 +589,9 @@ Use tclkit.exe if you have Tk code (instead of tclkitsh.exe). Python and docutil
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">Generate hlp.rst file with references to all classes, its methods</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">and procedures with docstrings (see lib/mydoc.tcl)</span>
-<span class="org-builtin">package</span> require starkit
+<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">Generate hlp.rst file with references to all classes, its methods
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">and procedures with docstrings (see lib/mydoc.tcl)
+</span><span class="org-builtin">package</span> require starkit
 starkit::startup
 starkit::autoextend [<span class="org-builtin">file</span> <span class="org-builtin">join</span> $<span class="org-variable-name">starkit::topdir</span>]
 <span class="org-builtin">package</span> require myutl

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Random search</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Random search</h1>
-<div id="outline-container-org12d6656" class="outline-2">
-<h2 id="org12d6656">Random search</h2>
-<div class="outline-text-2" id="text-org12d6656">
+<div id="outline-container-org9740d4a" class="outline-2">
+<h2 id="org9740d4a">Random search</h2>
+<div class="outline-text-2" id="text-org9740d4a">
 <p>
 Random search ''does not require data to be ordered/sorted''.
 </p>
@@ -320,12 +358,12 @@ What does it mean "excluding from generating" for a range? We generate random in
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">exclude_pt</span>(rng, i):
-    <span class="org-comment-delimiter"># </span><span class="org-comment">Exclude the point (random index) from the range</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">BCS it is missing, so it should not participate</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">in random indexes generation more.</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">The result may be a new range(s) or no more</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">new range</span>
-    <span class="org-keyword">if</span> i <span class="org-operator">==</span> rng.i0:
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Exclude the point (random index) from the range
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BCS it is missing, so it should not participate
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">in random indexes generation more.
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">The result may be a new range(s) or no more
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">new range
+</span>    <span class="org-keyword">if</span> i <span class="org-operator">==</span> rng.i0:
         <span class="org-variable-name">res</span> <span class="org-operator">=</span> [Rng(rng.i0 <span class="org-operator">+</span> 1, rng.i1)]
         <span class="org-keyword">if</span> <span class="org-keyword">not</span> res[0].isnormal():
             <span class="org-variable-name">res</span> <span class="org-operator">=</span> []
@@ -348,8 +386,8 @@ What does it mean "excluding from generating" for a range? We generate random in
         <span class="org-variable-name">rng</span> <span class="org-operator">=</span> ranges[rngi]
         <span class="org-variable-name">i</span> <span class="org-operator">=</span> random.randint(rng.i0, rng.i1) <span class="org-keyword">if</span> <span class="org-builtin">len</span>(rng) <span class="org-keyword">else</span> rng.i0
 
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Assert that no repeated tests</span>
-        <span class="org-keyword">assert</span> i <span class="org-keyword">not</span> <span class="org-keyword">in</span> _tested, f<span class="org-string">'</span>{i}<span class="org-string"> already tested!'</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Assert that no repeated tests
+</span>        <span class="org-keyword">assert</span> i <span class="org-keyword">not</span> <span class="org-keyword">in</span> _tested, f<span class="org-string">'</span>{i}<span class="org-string"> already tested!'</span>
         _tested.add(i)
         
         <span class="org-keyword">if</span> arr[i] <span class="org-operator">==</span> target:
@@ -369,13 +407,13 @@ What does it mean "excluding from generating" for a range? We generate random in
                     <span class="org-keyword">del</span> ranges[rngi]
             <span class="org-keyword">else</span>:
                 <span class="org-keyword">del</span> ranges[rngi]
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Did we completed?</span>
-        <span class="org-keyword">if</span> <span class="org-builtin">len</span>(ranges) <span class="org-operator">==</span> 0:
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Did we completed?
+</span>        <span class="org-keyword">if</span> <span class="org-builtin">len</span>(ranges) <span class="org-operator">==</span> 0:
             <span class="org-keyword">return</span> <span class="org-operator">-</span>1
 
 
-<span class="org-comment-delimiter">#########################</span>
-<span class="org-keyword">class</span> <span class="org-type">ACCESS</span>(<span class="org-builtin">list</span>):
+<span class="org-comment-delimiter">#########################</span><span class="org-comment">
+</span><span class="org-keyword">class</span> <span class="org-type">ACCESS</span>(<span class="org-builtin">list</span>):
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, <span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
         <span class="org-builtin">super</span>().__init__(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw)
         <span class="org-keyword">self</span>.<span class="org-variable-name">_access</span> <span class="org-operator">=</span> 0

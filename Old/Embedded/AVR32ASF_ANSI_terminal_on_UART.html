@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR32/ASF: ANSI terminal on UART</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,26 +308,26 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR32/ASF: ANSI terminal on UART</h1>
-<div id="outline-container-org22a96c1" class="outline-2">
-<h2 id="org22a96c1">AVR32/ASF: ANSI terminal on UART</h2>
-<div class="outline-text-2" id="text-org22a96c1">
+<div id="outline-container-orga251f8d" class="outline-2">
+<h2 id="orga251f8d">AVR32/ASF: ANSI terminal on UART</h2>
+<div class="outline-text-2" id="text-orga251f8d">
 <p>
 It's good known goal - to run terminal (with some kind of shell) of one (or all) of the UARTs. This snippet shows how to process input byte from UART and to emulate ANSI terminal behavior:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span class="org-doc">/**</span>
-<span class="org-doc"> * Handle input byte via USART; process it to emulate edit line behaviour.</span>
-<span class="org-doc"> * After processing, sets self-&gt;response array to 4 possible responses (until</span>
-<span class="org-doc"> * one is NULL). </span><span class="org-doc"><span class="org-doc-markup">sh_task()</span></span><span class="org-doc"> will send these responses via UART...</span>
-<span class="org-doc"> * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user</span>
-<span class="org-doc"> * terminal should be in ANSI TERM mode. Supported:</span>
-<span class="org-doc"> * - BS/DEL - delete prev. char</span>
-<span class="org-doc"> * - ^U - delete entire line</span>
-<span class="org-doc"> * - ^L - clear screen but keep edited line</span>
-<span class="org-doc"> * - TAB - changed to SPACE</span>
-<span class="org-doc"> * On error sends BEL ('\7')</span>
-<span class="org-doc"> */</span>
+<pre class="src src-cpp"><span class="org-doc">/**
+ * Handle input byte via USART; process it to emulate edit line behaviour.
+ * After processing, sets self-&gt;response array to 4 possible responses (until
+ * one is NULL). </span><span class="org-doc"><span class="org-doc-markup">sh_task()</span></span><span class="org-doc"> will send these responses via UART...
+ * Each response can be usual ASCIIZ but also can be ANSI ESC codes, so user
+ * terminal should be in ANSI TERM mode. Supported:
+ * - BS/DEL - delete prev. char
+ * - ^U - delete entire line
+ * - ^L - clear screen but keep edited line
+ * - TAB - changed to SPACE
+ * On error sends BEL ('\7')
+ */</span>
 <span class="org-type">void</span> <span class="org-function-name">handle_input_byte</span>(<span class="org-type">sh_t</span> *<span class="org-variable-name">self</span>, <span class="org-type">uint8_t</span> <span class="org-variable-name">ch</span>)
 {
     <span class="org-keyword">switch</span> (ch) {
@@ -331,18 +369,18 @@ It's good known goal - to run terminal (with some kind of shell) of one (or all)
         <span class="org-keyword">default</span>:
             <span class="org-keyword">if</span> ((ch &gt;= (<span class="org-type">uint8_t</span>)<span class="org-string">' '</span> &amp;&amp; ch &lt;= (<span class="org-type">uint8_t</span>)<span class="org-string">'\x7e'</span>)
                             || ch &gt;= (<span class="org-type">uint8_t</span>)<span class="org-string">'\xa0'</span>) {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">printable</span>
-                <span class="org-keyword">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
-                    <span class="org-comment-delimiter">// </span><span class="org-comment">in bounds (-2 is for ch, -1 is for '\0')</span>
-                    self-&gt;inbuf[self-&gt;inpos++] = ch;
+                <span class="org-comment-delimiter">// </span><span class="org-comment">printable
+</span>                <span class="org-keyword">if</span> (self-&gt;inpos &lt; sizeofarray(self-&gt;inbuf) - 1) {
+                    <span class="org-comment-delimiter">// </span><span class="org-comment">in bounds (-2 is for ch, -1 is for '\0')
+</span>                    self-&gt;inbuf[self-&gt;inpos++] = ch;
                     self-&gt;inbuf[self-&gt;inpos] = 0;
                     _SETRESP(self, self-&gt;inbuf + (self-&gt;inpos-1), <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
                 } <span class="org-keyword">else</span> {
                     _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
                 }
             } <span class="org-keyword">else</span> {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">non-printable</span>
-                _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
+                <span class="org-comment-delimiter">// </span><span class="org-comment">non-printable
+</span>                _SETRESP(self, <span class="org-string">"\a"</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>, <span class="org-constant">NULL</span>);
             }
         <span class="org-keyword">break</span>;
     }

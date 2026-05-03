@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Logging library for Unix Shell</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,84 +308,84 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Logging library for Unix Shell</h1>
-<div id="outline-container-org9ed32d6" class="outline-2">
-<h2 id="org9ed32d6">Logging library for Unix Shell</h2>
-<div class="outline-text-2" id="text-org9ed32d6">
+<div id="outline-container-orga231529" class="outline-2">
+<h2 id="orga231529">Logging library for Unix Shell</h2>
+<div class="outline-text-2" id="text-orga231529">
 <p>
 This library is similar to Log library for Python or Java. Here its code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span><span class="org-comment">
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Simple logging facility for Unix /bin/sh
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">========================================
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Configuration
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">-------------
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">and log record
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_FMT : uses format similar to Python logging Lib
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#       </span><span class="org-comment">Available fields for _LOGGING_FMT are:
+</span><span class="org-comment-delimiter">#         </span><span class="org-comment">asctime, filename, levelname, levelno, message, name, pathname,
+</span><span class="org-comment-delimiter">#         </span><span class="org-comment">process, processName, user
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Example
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">-------
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg1
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg2
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg1 FileHandler /dev/stderr
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 ConsoleHandler
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile_copy
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">setLogLevel prg1 DEBUG
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_debug DebugMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_error ErrorMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">echo InfoMessage|prg2_info
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on STDERR console:
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on console:
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile:
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile_copy:
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">...
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: log levels per handlers
+</span>
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Simple logging facility for Unix /bin/sh</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">========================================</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Configuration</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">-------------</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">_LOGGING_DATEFMT, _LOGGING_FMT variables are used for format of datetime</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">and log record</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_DATEFMT : uses the same format as date(1) and Python Lib</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">* _LOGGING_FMT : uses format similar to Python logging Lib</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#       </span><span class="org-comment">Available fields for _LOGGING_FMT are:</span>
-<span class="org-comment-delimiter">#         </span><span class="org-comment">asctime, filename, levelname, levelno, message, name, pathname,</span>
-<span class="org-comment-delimiter">#         </span><span class="org-comment">process, processName, user</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Example</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">-------</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg1</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">getLogger prg2</span>
-<span class="org-comment-delimiter">#     </span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg1 FileHandler /dev/stderr</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 ConsoleHandler</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">addLogHandler prg2 FileHandler /var/log/somefile_copy</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">setLogLevel prg1 DEBUG</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_debug DebugMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">prg1_error ErrorMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">echo InfoMessage|prg2_info</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on STDERR console:</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 DEBUG DebugMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">will produces on console:</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg1 ERROR ErrorMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile:</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">and in /var/log/somefile_copy:</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">2014-07-18T17:09:52+0300 prg2 INFO InfoMessage</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">...</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: log levels per handlers</span>
-
-
-<span class="org-comment-delimiter">############################## </span><span class="org-comment">Settings #####################################</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">Global log record format and date format:</span>
-<span class="org-variable-name">_LOGGING_DATEFMT</span>=<span class="org-string">"%Y-%m-%dT%H:%M:%S%z"</span>
+<span class="org-comment-delimiter">############################## </span><span class="org-comment">Settings #####################################
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Global log record format and date format:
+</span><span class="org-variable-name">_LOGGING_DATEFMT</span>=<span class="org-string">"%Y-%m-%dT%H:%M:%S%z"</span>
 <span class="org-variable-name">_LOGGING_FMT</span>=<span class="org-string">"%asctime  %levelname %message"</span>
 
 
 
-<span class="org-comment-delimiter">################################### </span><span class="org-comment">Code #####################################</span>
-
+<span class="org-comment-delimiter">################################### </span><span class="org-comment">Code #####################################
+</span>
 <span class="org-variable-name">_log_SCRIPT</span>=<span class="org-sh-quoted-exec">`readlink -f $0`</span>
 
 <span class="org-function-name">_log_getLogAttr</span>() {
@@ -355,48 +393,48 @@ This library is similar to Log library for Python or Java. Here its code:
   <span class="org-builtin">eval</span> echo $<span class="org-sh-quoted-exec">`echo $attr`</span>
 }
 
-<span class="org-comment-delimiter">################################### </span><span class="org-comment">Handlers #################################</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: ...</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Nothing to do, all args are ignored</span>
-<span class="org-function-name">_log_NullHandler</span>() {
+<span class="org-comment-delimiter">################################### </span><span class="org-comment">Handlers #################################
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: ...
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Nothing to do, all args are ignored
+</span><span class="org-function-name">_log_NullHandler</span>() {
   :
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Logs $msg with $level via logger(1) utility</span>
-<span class="org-function-name">_log_SyslogHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Logs $msg with $level via logger(1) utility
+</span><span class="org-function-name">_log_SyslogHandler</span>() {
   <span class="org-builtin">local</span> name level msg syslog_level
   <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$3"</span>
   <span class="org-variable-name">syslog_level</span>=<span class="org-sh-quoted-exec">`_log_syslogLevel $level`</span>
   logger -p <span class="org-string">"local0.${syslog_level}"</span> -t $<span class="org-variable-name">name</span> <span class="org-string">"$msg"</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Logs message $msg on console</span>
-<span class="org-function-name">_log_ConsoleHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level $msg
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Logs message $msg on console
+</span><span class="org-function-name">_log_ConsoleHandler</span>() {
   <span class="org-builtin">local</span> name level msg
   <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$3"</span>
   <span class="org-builtin">echo</span> <span class="org-string">"$msg"</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $subject $address $msg</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">If mail(1) exists, call it to send $msg via EMail</span>
-<span class="org-function-name">_log_MailHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $subject $address $msg
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">If mail(1) exists, call it to send $msg via EMail
+</span><span class="org-function-name">_log_MailHandler</span>() {
   <span class="org-builtin">command</span> -v mail &gt;/dev/null 2&gt;&amp;1 || <span class="org-keyword">return</span> 1
   <span class="org-builtin">local</span> subj addr name level msg
   <span class="org-variable-name">subj</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">addr</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">name</span>=<span class="org-string">"$3"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$4"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$5"</span>
   <span class="org-builtin">echo</span> <span class="org-string">"$msg"</span>|mail -s <span class="org-string">"${subj}${level}: $name"</span> $<span class="org-variable-name">addr</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $filename $msg</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Append message $msg to file $filename</span>
-<span class="org-function-name">_log_FileHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $filename $msg
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Append message $msg to file $filename
+</span><span class="org-function-name">_log_FileHandler</span>() {
   <span class="org-builtin">local</span> filename name level msg
   <span class="org-variable-name">filename</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">name</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">level</span>=<span class="org-string">"$3"</span>; <span class="org-variable-name">msg</span>=<span class="org-string">"$4"</span>
   touch <span class="org-string">"$filename"</span>
@@ -463,25 +501,25 @@ This library is similar to Log library for Python or Java. Here its code:
   <span class="org-keyword">done</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $h [$args...]</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Adds handler $h for logger $name with possible arguments</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">(see handlers' implementations for concrete args)</span>
-<span class="org-function-name">addLogHandler</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $h [$args...]
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Adds handler $h for logger $name with possible arguments
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">(see handlers' implementations for concrete args)
+</span><span class="org-function-name">addLogHandler</span>() {
   <span class="org-builtin">local</span> name handler oldhandlers exthandler args oldargs
   <span class="org-variable-name">name</span>=$<span class="org-variable-name">1</span>; <span class="org-variable-name">exthandler</span>=<span class="org-string">"$2"</span>; <span class="org-variable-name">handler</span>=_log_<span class="org-string">"$exthandler"</span>; <span class="org-builtin">shift</span> 2; <span class="org-variable-name">args</span>=<span class="org-string">"$*"</span>
   <span class="org-variable-name">oldhandlers</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name handlers`</span>
   <span class="org-variable-name">oldargs</span>=<span class="org-sh-quoted-exec">`_log_getLogAttr $name ${handler}_handler_args`</span>
-  <span class="org-comment-delimiter"># </span><span class="org-comment">__COMMA__ is used to separate items in lists</span>
-  <span class="org-builtin">eval</span> <span class="org-string">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
+  <span class="org-comment-delimiter"># </span><span class="org-comment">__COMMA__ is used to separate items in lists
+</span>  <span class="org-builtin">eval</span> <span class="org-string">"${name}_handlers=${handler}__COMMA__${oldhandlers:-_log_NullHandler}"</span>
   <span class="org-builtin">eval</span> <span class="org-string">"${name}_${handler}_handler_args=\"$args\"__COMMA__$oldargs"</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name | $name $longname</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">No return and no output but setups logger for this $name. In 2nd form $longname</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">is used in message substitution</span>
-<span class="org-function-name">getLogger</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name | $name $longname
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">No return and no output but setups logger for this $name. In 2nd form $longname
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">is used in message substitution
+</span><span class="org-function-name">getLogger</span>() {
   <span class="org-builtin">local</span> asctime filename levelname levelno message name pathname process processName _lv user longname
 
   <span class="org-variable-name">asctime</span>=$<span class="org-variable-name">_LOGGING_DATEFMT</span>
@@ -499,38 +537,38 @@ This library is similar to Log library for Python or Java. Here its code:
     <span class="org-variable-name">levelname</span>=<span class="org-sh-quoted-exec">`echo -n $_lv|tr '[:lower:]' '[:upper:]'`</span>
     <span class="org-variable-name">levelno</span>=<span class="org-sh-quoted-exec">`_log_levelNo $levelname`</span>
 
-    <span class="org-variable-name">fmt</span>=<span class="org-sh-quoted-exec">`echo $_LOGGING_FMT | \</span>
-<span class="org-sh-quoted-exec">      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%filename/$filename/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%levelname/$levelname/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%levelno/$levelno/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%message/$message/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%pathname/$pathname/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%processName/$processName/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%process/$process/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s/%user/$user/g" | \</span>
-<span class="org-sh-quoted-exec">      sed "s//$longname/g"`</span>
+    <span class="org-variable-name">fmt</span>=<span class="org-sh-quoted-exec">`echo $_LOGGING_FMT | \
+      sed 's/%asctime/\`date +$_LOGGING_DATEFMT\`/g' | \
+      sed "s/%filename/$filename/g" | \
+      sed "s/%levelname/$levelname/g" | \
+      sed "s/%levelno/$levelno/g" | \
+      sed "s/%message/$message/g" | \
+      sed "s/%pathname/$pathname/g" | \
+      sed "s/%processName/$processName/g" | \
+      sed "s/%process/$process/g" | \
+      sed "s/%user/$user/g" | \
+      sed "s//$longname/g"`</span>
     <span class="org-builtin">eval</span> <span class="org-string">"${name}_${_lv} () { _log $name $levelname \"$fmt\"; }"</span>
   <span class="org-keyword">done</span>
   setLogLevel $<span class="org-variable-name">name</span> INFO
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">messages which are less severe than $level will be ignored.</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Default is INFO</span>
-<span class="org-function-name">setLogLevel</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS: $name $level
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Sets the threshold for $name logger to $level (INFO, ERROR, etc.). Logging
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">messages which are less severe than $level will be ignored.
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Default is INFO
+</span><span class="org-function-name">setLogLevel</span>() {
   <span class="org-builtin">local</span> name level levelno
   <span class="org-variable-name">name</span>=<span class="org-string">"$1"</span>; <span class="org-variable-name">level</span>=<span class="org-sh-quoted-exec">`echo -n $2|tr '[:lower:]' '[:upper:]'`</span>
   <span class="org-variable-name">levelno</span>=<span class="org-sh-quoted-exec">`_log_levelNo $level`</span>
   <span class="org-builtin">eval</span> <span class="org-string">"${name}_level=$levelno"</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS:</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Echos name of script</span>
-<span class="org-function-name">getScriptName</span>() {
+<span class="org-comment-delimiter"># </span><span class="org-comment">SYNOPSIS:
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Echos name of script
+</span><span class="org-function-name">getScriptName</span>() {
   <span class="org-builtin">echo</span> <span class="org-sh-quoted-exec">`basename "$_log_SCRIPT"`</span>
 }
 
@@ -542,8 +580,8 @@ Example of usage:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
-<span class="org-builtin">.</span> ./logging.sh
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span><span class="org-comment">
+</span><span class="org-builtin">.</span> ./logging.sh
 
 getLogger prg1 <span class="org-sh-quoted-exec">`getScriptName`</span>
 addLogHandler prg1 ConsoleHandler
@@ -553,9 +591,9 @@ setLogLevel prg1 DEBUG
 
 prg1_debug Debugggg
 prg1_error Errrrror
-<span class="org-builtin">echo</span> <span class="org-string">'Message-INFO!!!!</span>
-<span class="org-string">1111</span>
-<span class="org-string">2222'</span>|prg1_info
+<span class="org-builtin">echo</span> <span class="org-string">'Message-INFO!!!!
+1111
+2222'</span>|prg1_info
 
 </pre>
 </div>

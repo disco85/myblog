@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>WinAVR: software SPI</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">WinAVR: software SPI</h1>
-<div id="outline-container-org1f4e517" class="outline-2">
-<h2 id="org1f4e517">WinAVR: software SPI</h2>
-<div class="outline-text-2" id="text-org1f4e517">
+<div id="outline-container-org11b5525" class="outline-2">
+<h2 id="org11b5525">WinAVR: software SPI</h2>
+<div class="outline-text-2" id="text-org11b5525">
 <p>
 Sometimes you need software SPI MASTER (in my case it was needed to test one chip) implementation. It supports all SPI modes (0, 1, 2, 3), and clock dividers (but so it's software "SPI", that timing is not exact!), but sends only in MSBFIRST bit order (it's easy to add LSBFIRST support).
 See the code.
@@ -349,14 +387,14 @@ Here is the code. The .h file:
 <span class="org-preprocessor">#define</span> <span class="org-function-name">spi_interrupt_on</span>()
 <span class="org-preprocessor">#define</span> <span class="org-function-name">spi_interrupt_off</span>()
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) select of device before sending</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">BEGIN_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) select of device before sending
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">BEGIN_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
         (PORT) &amp;= ~_BV(PIN); \
         _delay_loop_1(4); \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) unselect of device after sending</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">END_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">// </span><span class="org-comment">for nCS (nSEL) unselect of device after sending
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">END_SPI_SENDING</span>(<span class="org-variable-name">PORT</span>, <span class="org-variable-name">PIN</span>) <span class="org-keyword">do</span> { \
         _delay_loop_1(4); \
         (PORT) |= _BV(PIN); \
 } <span class="org-keyword">while</span> (0)
@@ -389,14 +427,14 @@ and the .c file (swspi.c):
 <span class="org-preprocessor">#else</span>
 <span class="org-preprocessor">#  define</span> <span class="org-variable-name">SPIDELAYTIME</span> 1
 <span class="org-preprocessor">#endif</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">SPIHALFDELAY</span>() _delay_loop_1(SPIDELAYTIME) <span class="org-comment-delimiter">// </span><span class="org-comment">half of tact (bit transfer) - min 1 CPU tact</span>
-
+<span class="org-preprocessor">#define</span> <span class="org-function-name">SPIHALFDELAY</span>() _delay_loop_1(SPIDELAYTIME) <span class="org-comment-delimiter">// </span><span class="org-comment">half of tact (bit transfer) - min 1 CPU tact
+</span>
 <span class="org-preprocessor">#define</span> <span class="org-function-name">SETMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
 <span class="org-preprocessor">#define</span> <span class="org-function-name">CLIMOSI</span>() clibit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
 <span class="org-preprocessor">#define</span> <span class="org-function-name">NOMOSI</span>() setbit(SWSPI_MOSI_PORT, SWSPI_MOSI_PIN)
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">instead of PORTX may be PINX?</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">READMISO</span>() getbit(SWSPI_MISO_PORT, SWSPI_MISO_PIN)
+<span class="org-comment-delimiter">// </span><span class="org-comment">instead of PORTX may be PINX?
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">READMISO</span>() getbit(SWSPI_MISO_PORT, SWSPI_MISO_PIN)
 
 <span class="org-preprocessor">#if</span> (2 &amp; SWSPI_MODE)
 <span class="org-preprocessor">#  define</span> <span class="org-function-name">ONSCLK</span>() clibit(SWSPI_SCLK_PORT, SWSPI_SCLK_PIN)
@@ -441,9 +479,9 @@ and the .c file (swspi.c):
         <span class="org-keyword">return</span> (res);
 }
 
-<span class="org-comment-delimiter">/* </span><span class="org-comment">resp - responce from slave device; resplen - max. expected resp. len (buf. size);</span>
-<span class="org-comment"> * if resp is NULL, not saved. Returns always the last byte of the response.</span>
-<span class="org-comment-delimiter"> */</span>
+<span class="org-comment-delimiter">/* </span><span class="org-comment">resp - responce from slave device; resplen - max. expected resp. len (buf. size);
+ * if resp is NULL, not saved. Returns always the last byte of the response.
+</span><span class="org-comment-delimiter"> */</span>
 <span class="org-type">uint8_t</span>
 <span class="org-function-name">spi_ntransfer</span>(<span class="org-keyword">const</span> <span class="org-type">uint8_t</span> *<span class="org-variable-name">req</span>, <span class="org-type">int</span> <span class="org-variable-name">reqlen</span>, <span class="org-type">uint8_t</span> *<span class="org-variable-name">resp</span>, <span class="org-type">int</span> <span class="org-variable-name">resplen</span>) {
         <span class="org-type">int</span> <span class="org-variable-name">nbit</span>;

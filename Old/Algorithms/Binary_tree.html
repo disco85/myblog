@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Binary tree</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Binary tree</h1>
-<div id="outline-container-org14e0a04" class="outline-2">
-<h2 id="org14e0a04">Binary tree</h2>
-<div class="outline-text-2" id="text-org14e0a04">
+<div id="outline-container-org1e56f17" class="outline-2">
+<h2 id="org1e56f17">Binary tree</h2>
+<div class="outline-text-2" id="text-org1e56f17">
 <p>
 Binary tree is a container useful for a search of elements and their sorting. Each item has a left and a right branch and the whole structure has a special item - a root:
 </p>
@@ -420,12 +458,12 @@ But if <code>k</code> is equal to the parent's key <code>p.k</code> - it's more 
 <li>both children exist</li>
 </ul>
 </div>
-<div id="outline-container-org3f50d86" class="outline-3">
-<h3 id="org3f50d86">right child has not a left child</h3>
+<div id="outline-container-org8b4f147" class="outline-3">
+<h3 id="org8b4f147">right child has not a left child</h3>
 </div>
-<div id="outline-container-org3a9c0b6" class="outline-3">
-<h3 id="org3a9c0b6">right child has a left child</h3>
-<div class="outline-text-3" id="text-org3a9c0b6">
+<div id="outline-container-org70ea3f3" class="outline-3">
+<h3 id="org70ea3f3">right child has a left child</h3>
+<div class="outline-text-3" id="text-org70ea3f3">
 <ul class="org-ul">
 <li>there is only a left child</li>
 <li>there is only a right child</li>
@@ -797,11 +835,11 @@ Let's see the implementation:
 
 
 <span class="org-keyword">class</span> <span class="org-type">Walk</span>:
-    <span class="org-doc">'''Traverse way</span>
-<span class="org-doc">    INFIX   - inorder   - l, root, r  -  l (OP) r</span>
-<span class="org-doc">    PREFIX  - preorder  - root, l, r  -  (OP) l r</span>
-<span class="org-doc">    POSTFIX - postorder - l, r, root  -  l r (OP)</span>
-<span class="org-doc">    '''</span>
+    <span class="org-doc">'''Traverse way
+    INFIX   - inorder   - l, root, r  -  l (OP) r
+    PREFIX  - preorder  - root, l, r  -  (OP) l r
+    POSTFIX - postorder - l, r, root  -  l r (OP)
+    '''</span>
     <span class="org-variable-name">INFIX</span> <span class="org-operator">=</span> 1
     <span class="org-variable-name">PREFIX</span> <span class="org-operator">=</span> 2
     <span class="org-variable-name">POSTFIX</span> <span class="org-operator">=</span> 3
@@ -833,19 +871,19 @@ Let's see the implementation:
 
         
     <span class="org-keyword">def</span> <span class="org-function-name">inherit_node</span>(<span class="org-keyword">self</span>, node, <span class="org-operator">*</span>, r<span class="org-operator">=</span><span class="org-constant">False</span>, l<span class="org-operator">=</span><span class="org-constant">False</span>):
-        <span class="org-doc">'''Inherits some node data (node is removing and myself will keep all</span>
-<span class="org-doc">        node's data including its children). Flag arguments tell what optional</span>
-<span class="org-doc">        data must be inherit.</span>
-<span class="org-doc">        '''</span>
+        <span class="org-doc">'''Inherits some node data (node is removing and myself will keep all
+        node's data including its children). Flag arguments tell what optional
+        data must be inherit.
+        '''</span>
         <span class="org-keyword">self</span>.<span class="org-variable-name">root</span> <span class="org-operator">=</span> node.root
         <span class="org-keyword">if</span> <span class="org-variable-name">l</span>: <span class="org-keyword">self</span>.<span class="org-type">l</span> <span class="org-operator">=</span> node.l
         <span class="org-keyword">if</span> <span class="org-variable-name">r</span>: <span class="org-keyword">self</span>.<span class="org-type">r</span> <span class="org-operator">=</span> node.r
         <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> node.k
         <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> node.v
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Fix parent links in node left, right, they referred to the node early,</span>
-        <span class="org-comment-delimiter"># </span><span class="org-comment">now we (self) steal all node's data including its l,r children, so</span>
-        <span class="org-comment-delimiter"># </span><span class="org-comment">children must refer myself, not removed node</span>
-        <span class="org-keyword">if</span> node.<span class="org-variable-name">l</span>: <span class="org-type">node</span>.<span class="org-type">l</span>.<span class="org-type">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Fix parent links in node left, right, they referred to the node early,
+</span>        <span class="org-comment-delimiter"># </span><span class="org-comment">now we (self) steal all node's data including its l,r children, so
+</span>        <span class="org-comment-delimiter"># </span><span class="org-comment">children must refer myself, not removed node
+</span>        <span class="org-keyword">if</span> node.<span class="org-variable-name">l</span>: <span class="org-type">node</span>.<span class="org-type">l</span>.<span class="org-type">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
         <span class="org-keyword">if</span> node.<span class="org-variable-name">r</span>: <span class="org-type">node</span>.<span class="org-type">r</span>.<span class="org-type">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
         <span class="org-keyword">return</span> <span class="org-keyword">self</span>
 
@@ -867,8 +905,8 @@ Let's see the implementation:
 
     <span class="org-keyword">def</span> <span class="org-function-name">set_my_parent_slot</span>(<span class="org-keyword">self</span>, node):
         <span class="org-doc">"Sets the value in my slot in the parent to new `node` value"</span>
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Just try to find my slot in my parent and handle NILs</span>
-        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.p <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Just try to find my slot in my parent and handle NILs
+</span>        <span class="org-keyword">if</span> <span class="org-keyword">self</span>.p <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
             <span class="org-keyword">if</span> <span class="org-keyword">self</span>.p.r <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.p.r.k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
                 <span class="org-keyword">self</span>.p.<span class="org-variable-name">r</span> <span class="org-operator">=</span> node
             <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.p.l <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">self</span>.p.l.k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
@@ -908,8 +946,8 @@ Let's see the implementation:
 
 
     <span class="org-keyword">def</span> <span class="org-function-name">add</span>(<span class="org-keyword">self</span>, k, v):
-        <span class="org-doc">'''Returns added the node if still no such key.</span>
-<span class="org-doc">        '''</span>
+        <span class="org-doc">'''Returns added the node if still no such key.
+        '''</span>
         <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_empty:
             <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> k
             <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> v
@@ -963,16 +1001,16 @@ Let's see the implementation:
             <span class="org-keyword">if</span> <span class="org-keyword">self</span>.no_children:
                 <span class="org-builtin">print</span>(<span class="org-string">'case 4'</span>)
                 <span class="org-keyword">self</span>.set_my_parent_slot(<span class="org-constant">None</span>)
-                <span class="org-comment-delimiter"># </span><span class="org-comment">this is relevant mostly for the root (the last node), but it's required (!):</span>
-                <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
-                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+                <span class="org-comment-delimiter"># </span><span class="org-comment">this is relevant mostly for the root (the last node), but it's required (!):
+</span>                <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++
+</span>                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
             <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.both_children:
                 <span class="org-keyword">if</span> <span class="org-keyword">self</span>.r.no_left:
                     <span class="org-builtin">print</span>(<span class="org-string">'case 5'</span>)
                     <span class="org-variable-name">old_self_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
                     <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, r<span class="org-operator">=</span><span class="org-constant">True</span>)
-                    old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
-                    <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+                    old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++
+</span>                    <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
                 <span class="org-keyword">else</span>:
                     <span class="org-builtin">print</span>(<span class="org-string">'case 6'</span>)
                     <span class="org-keyword">self</span>.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r.l.k
@@ -984,26 +1022,26 @@ Let's see the implementation:
                 <span class="org-builtin">print</span>(<span class="org-string">'case 7'</span>)
                 <span class="org-variable-name">old_self_l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l
                 <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.l, l<span class="org-operator">=</span><span class="org-constant">True</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
-                old_self_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_l.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
-                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+                old_self_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_l.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++
+</span>                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
             <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_right:
                 <span class="org-builtin">print</span>(<span class="org-string">'case 8'</span>)
                 <span class="org-variable-name">old_self_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
                 <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, l<span class="org-operator">=</span><span class="org-constant">True</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
-                old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++</span>
-                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
+                old_self_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> old_self_r.<span class="org-variable-name">v</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">deallocation for non-root in C/C++
+</span>                <span class="org-keyword">self</span>.<span class="org-variable-name">size</span> <span class="org-operator">-=</span> 1
             <span class="org-keyword">return</span> (k, v)
         <span class="org-keyword">else</span>:
-            <span class="org-keyword">return</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">not found</span>
-
+            <span class="org-keyword">return</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">not found
+</span>
 
     <span class="org-keyword">def</span> <span class="org-function-name">get</span>(<span class="org-keyword">self</span>, k):
         <span class="org-doc">"Returns a node (not a value) by a key"</span>
         <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_empty:
             <span class="org-keyword">return</span> <span class="org-constant">None</span>
         <span class="org-keyword">elif</span> k <span class="org-operator">==</span> <span class="org-keyword">self</span>.k:
-            <span class="org-keyword">return</span> <span class="org-keyword">self</span>  <span class="org-comment-delimiter">#</span><span class="org-comment">.v</span>
-        <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_right <span class="org-keyword">and</span> k <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.k:
+            <span class="org-keyword">return</span> <span class="org-keyword">self</span>  <span class="org-comment-delimiter">#</span><span class="org-comment">.v
+</span>        <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_right <span class="org-keyword">and</span> k <span class="org-operator">&gt;</span> <span class="org-keyword">self</span>.k:
             <span class="org-keyword">return</span> <span class="org-keyword">self</span>.r.get(k)
         <span class="org-keyword">elif</span> <span class="org-keyword">self</span>.is_left <span class="org-keyword">and</span> k <span class="org-operator">&lt;</span> <span class="org-keyword">self</span>.k:
             <span class="org-keyword">return</span> <span class="org-keyword">self</span>.l.get(k)
@@ -1060,8 +1098,8 @@ Let's see the implementation:
 
 
     <span class="org-keyword">def</span> <span class="org-function-name">left_turn</span>(<span class="org-keyword">self</span>):
-        <span class="org-doc">'''Turns the subtree to the left</span>
-<span class="org-doc">        '''</span>
+        <span class="org-doc">'''Turns the subtree to the left
+        '''</span>
         <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
             <span class="org-variable-name">tmp</span> <span class="org-operator">=</span> BinTree().inherit_node(<span class="org-keyword">self</span>, l<span class="org-operator">=</span><span class="org-constant">True</span>)
             tmp.<span class="org-variable-name">size</span> <span class="org-operator">=</span> 1 <span class="org-operator">+</span> \
@@ -1072,9 +1110,9 @@ Let's see the implementation:
             tmp.<span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
             <span class="org-variable-name">my_old_r</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.r
             <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.r, r<span class="org-operator">=</span><span class="org-constant">True</span>)
-            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated (not needed in Python, sure). Alternative</span>
-            <span class="org-comment-delimiter"># </span><span class="org-comment">is to use this node instead of tmp</span>
-            my_old_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated (not needed in Python, sure). Alternative
+</span>            <span class="org-comment-delimiter"># </span><span class="org-comment">is to use this node instead of tmp
+</span>            my_old_r.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
             <span class="org-keyword">self</span>.<span class="org-variable-name">l</span> <span class="org-operator">=</span> tmp
             <span class="org-keyword">return</span> <span class="org-constant">True</span>
         <span class="org-keyword">else</span>:
@@ -1082,8 +1120,8 @@ Let's see the implementation:
 
 
     <span class="org-keyword">def</span> <span class="org-function-name">right_turn</span>(<span class="org-keyword">self</span>):
-        <span class="org-doc">'''Turns the subtree to the right</span>
-<span class="org-doc">        '''</span>
+        <span class="org-doc">'''Turns the subtree to the right
+        '''</span>
         <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
             <span class="org-variable-name">tmp</span> <span class="org-operator">=</span> BinTree().inherit_node(<span class="org-keyword">self</span>, r<span class="org-operator">=</span><span class="org-constant">True</span>)
             tmp.<span class="org-variable-name">size</span> <span class="org-operator">=</span> 1 <span class="org-operator">+</span> \
@@ -1094,8 +1132,8 @@ Let's see the implementation:
             tmp.<span class="org-variable-name">p</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>
             <span class="org-variable-name">my_old_l</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.l
             <span class="org-keyword">self</span>.inherit_node(<span class="org-keyword">self</span>.l, l<span class="org-operator">=</span><span class="org-constant">True</span>)
-            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated - see left_turn()</span>
-            my_old_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Just mark it as deallocated - see left_turn()
+</span>            my_old_l.<span class="org-variable-name">k</span> <span class="org-operator">=</span> <span class="org-constant">None</span>
             <span class="org-keyword">self</span>.<span class="org-variable-name">r</span> <span class="org-operator">=</span> tmp
             <span class="org-keyword">return</span> <span class="org-constant">True</span>
         <span class="org-keyword">else</span>:
@@ -1109,38 +1147,38 @@ Let's see the implementation:
 
     <span class="org-keyword">def</span> <span class="org-function-name">_balance</span>(<span class="org-keyword">self</span>):
         <span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-constant">False</span>
-        <span class="org-comment-delimiter">#</span><span class="org-comment">chsize = lambda child: 0 if child is None else child.size</span>
-        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
+        <span class="org-comment-delimiter">#</span><span class="org-comment">chsize = lambda child: 0 if child is None else child.size
+</span>        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.is_empty:
             <span class="org-variable-name">d</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
-            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self, d)</span>
-            <span class="org-keyword">if</span> d <span class="org-operator">&gt;=</span> 2:
+            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self, d)
+</span>            <span class="org-keyword">if</span> d <span class="org-operator">&gt;=</span> 2:
                 <span class="org-variable-name">r1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.left_turn()
-                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:</span>
-                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True</span>
-                <span class="org-keyword">if</span> r1:
+                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:
+</span>                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True
+</span>                <span class="org-keyword">if</span> r1:
                     <span class="org-variable-name">d1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
                     <span class="org-keyword">if</span> <span class="org-builtin">abs</span>(d1) <span class="org-operator">&lt;</span> 2 <span class="org-keyword">and</span> d1 <span class="org-operator">!=</span> <span class="org-operator">-</span>1<span class="org-operator">*</span>d:
-                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')</span>
-                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
-                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned {self}')</span>
-            <span class="org-keyword">elif</span> d <span class="org-operator">&lt;=</span> <span class="org-operator">-</span>2:
+                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')
+</span>                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
+                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned {self}')
+</span>            <span class="org-keyword">elif</span> d <span class="org-operator">&lt;=</span> <span class="org-operator">-</span>2:
                 <span class="org-variable-name">r2</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.right_turn()
-                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:</span>
-                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True</span>
-                <span class="org-keyword">if</span> r2:
+                <span class="org-comment-delimiter">#</span><span class="org-comment">if self.disbalance_factor() != -d:
+</span>                <span class="org-comment-delimiter">#    </span><span class="org-comment">r |= True
+</span>                <span class="org-keyword">if</span> r2:
                     <span class="org-variable-name">d1</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.disbalance_factor()
                     <span class="org-keyword">if</span> <span class="org-builtin">abs</span>(d1) <span class="org-operator">&lt;</span> 2 <span class="org-keyword">and</span> d1 <span class="org-operator">!=</span> <span class="org-operator">-</span>1<span class="org-operator">*</span>d:
-                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')</span>
-                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
-                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  right turned {self}')</span>
-
+                        <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  ...end on {self}')
+</span>                        <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-constant">True</span>
+                    <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  right turned {self}')
+</span>
             <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_left:
                 <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-keyword">self</span>.l._balance()
-                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned L {self.l}')</span>
-            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
+                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned L {self.l}')
+</span>            <span class="org-keyword">if</span> <span class="org-keyword">self</span>.is_right:
                 <span class="org-variable-name">r</span> <span class="org-operator">|=</span> <span class="org-keyword">self</span>.r._balance()
-                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned R {self.r}')</span>
-        
+                <span class="org-comment-delimiter">#</span><span class="org-comment">print(f'  left turned R {self.r}')
+</span>        
         <span class="org-keyword">return</span> r
 
 
@@ -1151,10 +1189,10 @@ Let's see the implementation:
                 <span class="org-builtin">print</span>(f<span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">Done for </span>{i}<span class="org-string"> steps'</span>)
                 <span class="org-keyword">break</span>
             <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
-            <span class="org-comment-delimiter">#</span><span class="org-comment">self._prn.walk(bt)</span>
-            <span class="org-comment-delimiter">#</span><span class="org-comment">if self._prn: print(self._prn, '\n')</span>
-            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self._dumprn.walk(self))</span>
-
+            <span class="org-comment-delimiter">#</span><span class="org-comment">self._prn.walk(bt)
+</span>            <span class="org-comment-delimiter">#</span><span class="org-comment">if self._prn: print(self._prn, '\n')
+</span>            <span class="org-comment-delimiter">#</span><span class="org-comment">print(self._dumprn.walk(self))
+</span>
 
 
 <span class="org-keyword">class</span> <span class="org-type">SimplePrefixPrinter</span>:
@@ -1206,8 +1244,8 @@ Let's see the implementation:
         <span class="org-keyword">return</span> <span class="org-builtin">str</span>(<span class="org-keyword">self</span>)
 
 
-<span class="org-comment-delimiter">########################################</span>
-<span class="org-keyword">def</span> <span class="org-function-name">partiallyrandomdata</span>(num, ratio<span class="org-operator">=</span>0.5):
+<span class="org-comment-delimiter">########################################</span><span class="org-comment">
+</span><span class="org-keyword">def</span> <span class="org-function-name">partiallyrandomdata</span>(num, ratio<span class="org-operator">=</span>0.5):
     <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(<span class="org-builtin">range</span>(num))
     <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0
     <span class="org-variable-name">cnt</span> <span class="org-operator">=</span> <span class="org-builtin">min</span>(num, num<span class="org-operator">*</span>ratio)
@@ -1225,9 +1263,9 @@ Let's see the implementation:
 
 <span class="org-variable-name">NUM</span> <span class="org-operator">=</span> 100
 <span class="org-variable-name">bt</span> <span class="org-operator">=</span> BinTree()
-<span class="org-comment-delimiter">#</span><span class="org-comment">arr, x = partiallyrandomdata(NUM, 0.01)</span>
-<span class="org-variable-name">arr</span> <span class="org-operator">=</span> [] <span class="org-comment-delimiter">#</span><span class="org-comment">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]</span>
-<span class="org-keyword">for</span> el <span class="org-keyword">in</span> arr:
+<span class="org-comment-delimiter">#</span><span class="org-comment">arr, x = partiallyrandomdata(NUM, 0.01)
+</span><span class="org-variable-name">arr</span> <span class="org-operator">=</span> [] <span class="org-comment-delimiter">#</span><span class="org-comment">0, 5, 12, 5, 6, 90, 4, 1, 2, 44, 55]
+</span><span class="org-keyword">for</span> el <span class="org-keyword">in</span> arr:
     bt.add(el, el)
 <span class="org-keyword">while</span> <span class="org-constant">True</span>:
     <span class="org-variable-name">prn</span> <span class="org-operator">=</span> SimplePrefixPrinter()

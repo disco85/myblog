@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Multithreading console</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Multithreading console</h1>
-<div id="outline-container-orgccdab2c" class="outline-2">
-<h2 id="orgccdab2c">Multithreading console</h2>
-<div class="outline-text-2" id="text-orgccdab2c">
+<div id="outline-container-org3927aaf" class="outline-2">
+<h2 id="org3927aaf">Multithreading console</h2>
+<div class="outline-text-2" id="text-org3927aaf">
 <p>
 There are several Unix programs with this feature: user can edit input line since program raise messages to console:
 </p>
@@ -290,19 +328,19 @@ It's implementation for Windows is simple:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">Multi-thread console input() via class MTInput</span>
-<span class="org-keyword">import</span> sys
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">Multi-thread console input() via class MTInput
+</span><span class="org-keyword">import</span> sys
 <span class="org-keyword">import</span> msvcrt
 <span class="org-keyword">import</span> string
 <span class="org-keyword">from</span> threading <span class="org-keyword">import</span> Lock
 
-<span class="org-comment-delimiter"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> Needs Win32 module msvcrt! Under Linux is possible to use</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">tty (but not on FAT FS system like in Linpac controllers!)</span>
-<span class="org-variable-name">PROMPT</span> <span class="org-operator">=</span> <span class="org-string">"&gt;&gt;&gt;"</span>
+<span class="org-comment-delimiter"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> Needs Win32 module msvcrt! Under Linux is possible to use
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">tty (but not on FAT FS system like in Linpac controllers!)
+</span><span class="org-variable-name">PROMPT</span> <span class="org-operator">=</span> <span class="org-string">"&gt;&gt;&gt;"</span>
 <span class="org-keyword">def</span> <span class="org-function-name">normstr</span>(s):
-    <span class="org-doc">"""Interpret backspaces in string s,</span>
-<span class="org-doc">    returns normal string</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Interpret backspaces in string s,
+    returns normal string
+    """</span>
     <span class="org-variable-name">rs</span> <span class="org-operator">=</span> <span class="org-builtin">reversed</span>(s)
     <span class="org-variable-name">res</span> <span class="org-operator">=</span> []
     <span class="org-variable-name">skip</span> <span class="org-operator">=</span> 0
@@ -318,26 +356,26 @@ It's implementation for Windows is simple:
     <span class="org-keyword">return</span> u<span class="org-string">""</span>.join(<span class="org-builtin">reversed</span>(res))
 
 <span class="org-keyword">class</span> <span class="org-type">MTInput</span>:
-    <span class="org-doc">"""Multi-thread input line. Can be used like:</span>
+    <span class="org-doc">"""Multi-thread input line. Can be used like:
 
-<span class="org-doc">    import time</span>
-<span class="org-doc">    import thread</span>
+    import time
+    import thread
 
-<span class="org-doc">    inputer = MTInput()</span>
-<span class="org-doc">    def f():</span>
-<span class="org-doc">    while 1:</span>
-<span class="org-doc">        print '</span><span class="org-constant">\n</span><span class="org-doc">test.......'</span>
-<span class="org-doc">        inputer.update()</span>
-<span class="org-doc">        time.sleep(2)</span>
-<span class="org-doc">    thread.start_new_thread(f, ())</span>
-<span class="org-doc">    while 1:</span>
-<span class="org-doc">        inp = inputer.input()</span>
-<span class="org-doc">        print 'ENTERED:', inp</span>
-<span class="org-doc">        if inp == ".":</span>
-<span class="org-doc">            break</span>
-<span class="org-doc">        else:</span>
-<span class="org-doc">            # ... process ...</span>
-<span class="org-doc">    """</span>
+    inputer = MTInput()
+    def f():
+    while 1:
+        print '</span><span class="org-constant">\n</span><span class="org-doc">test.......'
+        inputer.update()
+        time.sleep(2)
+    thread.start_new_thread(f, ())
+    while 1:
+        inp = inputer.input()
+        print 'ENTERED:', inp
+        if inp == ".":
+            break
+        else:
+            # ... process ...
+    """</span>
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, stdout<span class="org-operator">=</span><span class="org-constant">None</span>, prompt<span class="org-operator">=</span>PROMPT):
         <span class="org-keyword">self</span>.<span class="org-variable-name">_stdout</span> <span class="org-operator">=</span> stdout <span class="org-keyword">or</span> sys.stdout
         <span class="org-keyword">self</span>.<span class="org-variable-name">_enc</span> <span class="org-operator">=</span> <span class="org-builtin">getattr</span>(<span class="org-keyword">self</span>._stdout, <span class="org-string">"encoding"</span>, <span class="org-string">"ascii"</span>)

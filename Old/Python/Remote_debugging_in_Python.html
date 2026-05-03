@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Remote debugging in Python</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Remote debugging in Python</h1>
-<div id="outline-container-orge8277d1" class="outline-2">
-<h2 id="orge8277d1">Remote debugging in Python</h2>
-<div class="outline-text-2" id="text-orge8277d1">
+<div id="outline-container-orgc468df7" class="outline-2">
+<h2 id="orgc468df7">Remote debugging in Python</h2>
+<div class="outline-text-2" id="text-orgc468df7">
 <p>
 Allows debugging of child subprocesses, author of script is Bertrand Janin.
 (Yes, I know that some IDE has own way: PyCharm for example, but this is
@@ -332,19 +370,19 @@ And run telnet to 127.0.0.1:4444 and get (pdb) console in telnet window.
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, addr<span class="org-operator">=</span>DEFAULT_ADDR, port<span class="org-operator">=</span>DEFAULT_PORT):
         <span class="org-doc">"""Initialize the socket and initialize pdb."""</span>
 
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Backup stdin and stdout before replacing them by the socket handle</span>
-        <span class="org-keyword">self</span>.<span class="org-variable-name">old_stdout</span> <span class="org-operator">=</span> sys.stdout
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Backup stdin and stdout before replacing them by the socket handle
+</span>        <span class="org-keyword">self</span>.<span class="org-variable-name">old_stdout</span> <span class="org-operator">=</span> sys.stdout
         <span class="org-keyword">self</span>.<span class="org-variable-name">old_stdin</span> <span class="org-operator">=</span> sys.stdin
         <span class="org-keyword">self</span>.<span class="org-variable-name">port</span> <span class="org-operator">=</span> port
 
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Open a 'reusable' socket to let the webapp reload on the same port</span>
-        <span class="org-keyword">self</span>.<span class="org-variable-name">skt</span> <span class="org-operator">=</span> socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Open a 'reusable' socket to let the webapp reload on the same port
+</span>        <span class="org-keyword">self</span>.<span class="org-variable-name">skt</span> <span class="org-operator">=</span> socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         <span class="org-keyword">self</span>.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="org-constant">True</span>)
         <span class="org-keyword">self</span>.skt.bind((addr, port))
         <span class="org-keyword">self</span>.skt.listen(1)
 
-        <span class="org-comment-delimiter"># </span><span class="org-comment">Writes to stdout are forbidden in mod_wsgi environments</span>
-        <span class="org-keyword">try</span>:
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Writes to stdout are forbidden in mod_wsgi environments
+</span>        <span class="org-keyword">try</span>:
             sys.stderr.write(<span class="org-string">"pdb is running on %s:%d</span><span class="org-constant">\n</span><span class="org-string">"</span>
                              <span class="org-operator">%</span> <span class="org-keyword">self</span>.skt.getsockname())
         <span class="org-keyword">except</span> <span class="org-type">IOError</span>:
@@ -392,21 +430,21 @@ And run telnet to 127.0.0.1:4444 and get (pdb) console in telnet window.
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">set_trace</span>(addr<span class="org-operator">=</span>DEFAULT_ADDR, port<span class="org-operator">=</span>DEFAULT_PORT, frame<span class="org-operator">=</span><span class="org-constant">None</span>):
-    <span class="org-doc">"""Wrapper function to keep the same import x; x.set_trace() interface.</span>
+    <span class="org-doc">"""Wrapper function to keep the same import x; x.set_trace() interface.
 
-<span class="org-doc">    We catch all the possible exceptions from pdb and cleanup.</span>
+    We catch all the possible exceptions from pdb and cleanup.
 
-<span class="org-doc">    """</span>
+    """</span>
     <span class="org-keyword">try</span>:
         <span class="org-variable-name">debugger</span> <span class="org-operator">=</span> Rpdb(addr<span class="org-operator">=</span>addr, port<span class="org-operator">=</span>port)
     <span class="org-keyword">except</span> socket.error:
         <span class="org-keyword">if</span> OCCUPIED.is_claimed(port, sys.stdout):
-            <span class="org-comment-delimiter"># </span><span class="org-comment">rpdb is already on this port - good enough, let it go on:</span>
-            sys.stdout.write(<span class="org-string">"(Recurrent rpdb invocation ignored)</span><span class="org-constant">\n</span><span class="org-string">"</span>)
+            <span class="org-comment-delimiter"># </span><span class="org-comment">rpdb is already on this port - good enough, let it go on:
+</span>            sys.stdout.write(<span class="org-string">"(Recurrent rpdb invocation ignored)</span><span class="org-constant">\n</span><span class="org-string">"</span>)
             <span class="org-keyword">return</span>
         <span class="org-keyword">else</span>:
-            <span class="org-comment-delimiter"># </span><span class="org-comment">Port occupied by something else.</span>
-            <span class="org-keyword">raise</span>
+            <span class="org-comment-delimiter"># </span><span class="org-comment">Port occupied by something else.
+</span>            <span class="org-keyword">raise</span>
     <span class="org-keyword">try</span>:
         debugger.set_trace(frame <span class="org-keyword">or</span> sys._getframe().f_back)
     <span class="org-keyword">except</span> <span class="org-type">Exception</span>:
@@ -431,14 +469,14 @@ And run telnet to 127.0.0.1:4444 and get (pdb) console in telnet window.
 
 
 <span class="org-keyword">class</span> <span class="org-type">OccupiedPorts</span>(<span class="org-builtin">object</span>):
-    <span class="org-doc">"""Maintain rpdb port versus stdin/out file handles.</span>
+    <span class="org-doc">"""Maintain rpdb port versus stdin/out file handles.
 
-<span class="org-doc">    Provides the means to determine whether or not a collision binding to a</span>
-<span class="org-doc">    particular port is with an already operating rpdb session.</span>
+    Provides the means to determine whether or not a collision binding to a
+    particular port is with an already operating rpdb session.
 
-<span class="org-doc">    Determination is according to whether a file handle is equal to what is</span>
-<span class="org-doc">    registered against the specified port.</span>
-<span class="org-doc">    """</span>
+    Determination is according to whether a file handle is equal to what is
+    registered against the specified port.
+    """</span>
 
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>):
         <span class="org-keyword">self</span>.<span class="org-variable-name">lock</span> <span class="org-operator">=</span> threading.RLock()
@@ -460,10 +498,10 @@ And run telnet to 127.0.0.1:4444 and get (pdb) console in telnet window.
         <span class="org-keyword">del</span> <span class="org-keyword">self</span>.claims[port]
         <span class="org-keyword">self</span>.lock.release()
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">{port: sys.stdout} pairs to track recursive rpdb invocation on same port.</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">This scheme doesn't interfere with recursive invocations on separate ports -</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">useful, eg, for concurrently debugging separate threads.</span>
-<span class="org-variable-name">OCCUPIED</span> <span class="org-operator">=</span> OccupiedPorts()
+<span class="org-comment-delimiter"># </span><span class="org-comment">{port: sys.stdout} pairs to track recursive rpdb invocation on same port.
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">This scheme doesn't interfere with recursive invocations on separate ports -
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">useful, eg, for concurrently debugging separate threads.
+</span><span class="org-variable-name">OCCUPIED</span> <span class="org-operator">=</span> OccupiedPorts()
 
 </pre>
 </div>

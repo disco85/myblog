@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Factorial geometry</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -306,22 +344,22 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org70b29a4">How to introduce the concept of factorial</a></li>
-<li><a href="#org8288421">Geometric metaphor</a></li>
-<li><a href="#org66f0b13">Colored permutations</a></li>
-<li><a href="#orgf033e77">Symmetric group</a>
+<li><a href="#org7516764">How to introduce the concept of factorial</a></li>
+<li><a href="#org90ec903">Geometric metaphor</a></li>
+<li><a href="#org55b44fb">Colored permutations</a></li>
+<li><a href="#org434cf0c">Symmetric group</a>
 <ul>
-<li><a href="#org59465eb">Color symmetry</a></li>
-<li><a href="#orga1fda96">Shape symmetry</a></li>
+<li><a href="#org126b928">Color symmetry</a></li>
+<li><a href="#org7ce1b4e">Shape symmetry</a></li>
 </ul>
 </li>
-<li><a href="#org757cee6">Intuition of factorial</a></li>
+<li><a href="#orgcb3a172">Intuition of factorial</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org70b29a4" class="outline-2">
-<h2 id="org70b29a4">How to introduce the concept of factorial</h2>
-<div class="outline-text-2" id="text-org70b29a4">
+<div id="outline-container-org7516764" class="outline-2">
+<h2 id="org7516764">How to introduce the concept of factorial</h2>
+<div class="outline-text-2" id="text-org7516764">
 <p>
 How many different <code>n</code>-digit numbers can be written from <code>n</code> <b>different</b> digits?
 For example, using 1 digit - "1", we can write only one 1-digit number: "1".
@@ -334,9 +372,9 @@ and factorial of <code>4</code>, for example, is defined as: <code>4! = 4*3*2*1 
 </p>
 </div>
 </div>
-<div id="outline-container-org8288421" class="outline-2">
-<h2 id="org8288421">Geometric metaphor</h2>
-<div class="outline-text-2" id="text-org8288421">
+<div id="outline-container-org90ec903" class="outline-2">
+<h2 id="org90ec903">Geometric metaphor</h2>
+<div class="outline-text-2" id="text-org90ec903">
 <p>
 But we can see this formulae in geometry. Look at the picture:
 </p>
@@ -521,9 +559,9 @@ It is like the number of routes, but we start from 0 (not 1) and we add (not mul
 </p>
 </div>
 </div>
-<div id="outline-container-org66f0b13" class="outline-2">
-<h2 id="org66f0b13">Colored permutations</h2>
-<div class="outline-text-2" id="text-org66f0b13">
+<div id="outline-container-org55b44fb" class="outline-2">
+<h2 id="org55b44fb">Colored permutations</h2>
+<div class="outline-text-2" id="text-org55b44fb">
 <p>
 If to write all permutations of 1, 2, 3 (123, 132, 312, 321, ...) and to choose first 2
 numbers as 2D-coordinates and the 3rd number as a color (we can do it in GNU Octave) and
@@ -534,10 +572,10 @@ line <code>(3,1), (1,3)</code> too).
 
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 1: </span>Colored 2D representation of permutations of [1 2 3], GNU Octave</label><pre class="src src-octave">file <span class="org-builtin">=</span> fullfile(dir<span class="org-builtin">,</span> <span class="org-string">"Factorial_perm1.svg"</span>)<span class="org-builtin">;</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Generate permutations</span>
-P <span class="org-builtin">=</span> perms([1 2 3])<span class="org-builtin">;</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Colors</span>
-colors <span class="org-builtin">=</span> [
+<span class="org-comment-delimiter">% </span><span class="org-comment">Generate permutations
+</span>P <span class="org-builtin">=</span> perms([1 2 3])<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Colors
+</span>colors <span class="org-builtin">=</span> [
   1 1 0<span class="org-builtin">;</span>
   1 0 1<span class="org-builtin">;</span>
   1 0 0
@@ -545,24 +583,24 @@ colors <span class="org-builtin">=</span> [
 xy <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>1<span class="org-builtin">:</span>2)<span class="org-builtin">;</span>
 cidx <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>3)<span class="org-builtin">;</span>
 c <span class="org-builtin">=</span> colors(cidx<span class="org-builtin">,</span> <span class="org-builtin">:</span>)<span class="org-builtin">;</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Create smaller figure</span>
-fig <span class="org-builtin">=</span> figure(<span class="org-string">'position'</span><span class="org-builtin">,</span> [0<span class="org-builtin">,</span> 0<span class="org-builtin">,</span> 350<span class="org-builtin">,</span> 350])<span class="org-builtin">;</span> <span class="org-comment">% width, height in pixels</span>
-ax <span class="org-builtin">=</span> axes(fig)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Create smaller figure
+</span>fig <span class="org-builtin">=</span> figure(<span class="org-string">'position'</span><span class="org-builtin">,</span> [0<span class="org-builtin">,</span> 0<span class="org-builtin">,</span> 350<span class="org-builtin">,</span> 350])<span class="org-builtin">;</span> <span class="org-comment">% width, height in pixels
+</span>ax <span class="org-builtin">=</span> axes(fig)<span class="org-builtin">;</span>
 scatter(ax<span class="org-builtin">,</span> xy(<span class="org-builtin">:,</span>1)<span class="org-builtin">,</span> xy(<span class="org-builtin">:,</span>2)<span class="org-builtin">,</span> 120<span class="org-builtin">,</span> c<span class="org-builtin">,</span> <span class="org-string">'filled'</span>)<span class="org-builtin">;</span>
-hold(ax<span class="org-builtin">,</span> <span class="org-string">'on'</span>)<span class="org-builtin">;</span> <span class="org-comment">% don't removed already drawn</span>
-plot(ax<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> <span class="org-string">'k--'</span><span class="org-builtin">,</span> <span class="org-string">'LineWidth'</span><span class="org-builtin">,</span> 1.5)<span class="org-builtin">;</span>
+hold(ax<span class="org-builtin">,</span> <span class="org-string">'on'</span>)<span class="org-builtin">;</span> <span class="org-comment">% don't removed already drawn
+</span>plot(ax<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> xlim(ax)<span class="org-builtin">,</span> <span class="org-string">'k--'</span><span class="org-builtin">,</span> <span class="org-string">'LineWidth'</span><span class="org-builtin">,</span> 1.5)<span class="org-builtin">;</span>
 axis(ax<span class="org-builtin">,</span> <span class="org-string">'equal'</span>)<span class="org-builtin">;</span>
 grid(ax<span class="org-builtin">,</span> <span class="org-string">'on'</span>)<span class="org-builtin">;</span>
 xlabel(ax<span class="org-builtin">,</span> <span class="org-string">'X'</span>)<span class="org-builtin">;</span>
 ylabel(ax<span class="org-builtin">,</span> <span class="org-string">'Y'</span>)<span class="org-builtin">;</span>
 title(ax<span class="org-builtin">,</span> <span class="org-string">'Permutations'</span>)<span class="org-builtin">;</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Styling for cleaner SVG ---</span>
-set(ax<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>        <span class="org-comment">% transparent axes background</span>
-set(fig<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>       <span class="org-comment">% transparent figure background</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Try to improve SVG output consistency</span>
-set(ax<span class="org-builtin">,</span> <span class="org-string">'box'</span><span class="org-builtin">,</span> <span class="org-string">'off'</span>)<span class="org-builtin">;</span>
-<span class="org-comment-delimiter">% </span><span class="org-comment">Export as SVG</span>
-print(fig<span class="org-builtin">,</span> file<span class="org-builtin">,</span> <span class="org-string">'-dsvg'</span><span class="org-builtin">,</span> <span class="org-string">'-painters'</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Styling for cleaner SVG ---
+</span>set(ax<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>        <span class="org-comment">% transparent axes background
+</span>set(fig<span class="org-builtin">,</span> <span class="org-string">'color'</span><span class="org-builtin">,</span> <span class="org-string">'none'</span>)<span class="org-builtin">;</span>       <span class="org-comment">% transparent figure background
+</span><span class="org-comment-delimiter">% </span><span class="org-comment">Try to improve SVG output consistency
+</span>set(ax<span class="org-builtin">,</span> <span class="org-string">'box'</span><span class="org-builtin">,</span> <span class="org-string">'off'</span>)<span class="org-builtin">;</span>
+<span class="org-comment-delimiter">% </span><span class="org-comment">Export as SVG
+</span>print(fig<span class="org-builtin">,</span> file<span class="org-builtin">,</span> <span class="org-string">'-dsvg'</span><span class="org-builtin">,</span> <span class="org-string">'-painters'</span>)<span class="org-builtin">;</span>
 </pre>
 </div>
 
@@ -668,9 +706,9 @@ cidx <span class="org-builtin">=</span> P(<span class="org-builtin">:,</span>3)<
 </div>
 </div>
 </div>
-<div id="outline-container-orgf033e77" class="outline-2">
-<h2 id="orgf033e77">Symmetric group</h2>
-<div class="outline-text-2" id="text-orgf033e77">
+<div id="outline-container-org434cf0c" class="outline-2">
+<h2 id="org434cf0c">Symmetric group</h2>
+<div class="outline-text-2" id="text-org434cf0c">
 <p>
 But if to select for 2D coordinates 2nd and 3rd numbers and for the color - the 1st
 number - the resulting figure will be the same. Because all digits/positions get
@@ -755,9 +793,9 @@ OK, so we have:
 <li>a symmetry in colors (color reflection)</li>
 </ul>
 </div>
-<div id="outline-container-org59465eb" class="outline-3">
-<h3 id="org59465eb">Color symmetry</h3>
-<div class="outline-text-3" id="text-org59465eb">
+<div id="outline-container-org126b928" class="outline-3">
+<h3 id="org126b928">Color symmetry</h3>
+<div class="outline-text-3" id="text-org126b928">
 <p>
 It is explained easy, 2 coordinates determine the third digit (represented as a color), so
 obviously swapping of those 2 coordinates lead to the same color (third digit), now we see
@@ -796,9 +834,9 @@ If to ignore colors then we see a lot of symmetries.
 </p>
 </div>
 </div>
-<div id="outline-container-orga1fda96" class="outline-3">
-<h3 id="orga1fda96">Shape symmetry</h3>
-<div class="outline-text-3" id="text-orga1fda96">
+<div id="outline-container-org7ce1b4e" class="outline-3">
+<h3 id="org7ce1b4e">Shape symmetry</h3>
+<div class="outline-text-3" id="text-org7ce1b4e">
 <p>
 It is explained in a similar way: we take into accounts only 2 digits and they form only
 one unique set of permutations: <code>[2 1; 3 1; 3 2]</code> others repeat them swapping coordinates,
@@ -807,9 +845,9 @@ the third is not drawn as a point (it's a color).
 </div>
 </div>
 </div>
-<div id="outline-container-org757cee6" class="outline-2">
-<h2 id="org757cee6">Intuition of factorial</h2>
-<div class="outline-text-2" id="text-org757cee6">
+<div id="outline-container-orgcb3a172" class="outline-2">
+<h2 id="orgcb3a172">Intuition of factorial</h2>
+<div class="outline-text-2" id="text-orgcb3a172">
 <p>
 The metaphor with village/combinations between <b>DISTINCT</b> members/items/inhabitants is
 not bad.

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Intervals merge</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Intervals merge</h1>
-<div id="outline-container-org3f32079" class="outline-2">
-<h2 id="org3f32079">Intervals merge</h2>
-<div class="outline-text-2" id="text-org3f32079">
+<div id="outline-container-orgb6bdfa7" class="outline-2">
+<h2 id="orgb6bdfa7">Intervals merge</h2>
+<div class="outline-text-2" id="text-orgb6bdfa7">
 <p>
 Two simple algorithms of interval merge, which I designed yesterday while was
 sick :)
@@ -289,7 +327,7 @@ result (we must merge them), elsewhere - keep original intervals, see picture:
 </p>
 
 
-<div id="orge74f0dd" class="figure">
+<div id="org9be487c" class="figure">
 <p><img src="../../assets/IntervalMerges1.svg" alt="IntervalMerges1.svg" class="org-svg" />
 </p>
 </div>
@@ -299,11 +337,11 @@ Python implementation:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">predicat: `x` is contained in (x0, x1)</span>
-<span class="org-variable-name">c</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> x, x0, x1: x0 <span class="org-operator">&lt;=</span> x <span class="org-operator">&lt;=</span> x1
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">predicat: `x` is contained in (x0, x1)
+</span><span class="org-variable-name">c</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> x, x0, x1: x0 <span class="org-operator">&lt;=</span> x <span class="org-operator">&lt;=</span> x1
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">merge-I</span>
-<span class="org-keyword">def</span> <span class="org-function-name">m1</span>(i1, i2):
+<span class="org-comment-delimiter"># </span><span class="org-comment">merge-I
+</span><span class="org-keyword">def</span> <span class="org-function-name">m1</span>(i1, i2):
     <span class="org-variable-name">i1</span>, <span class="org-variable-name">i2</span> <span class="org-operator">=</span> <span class="org-builtin">map</span>(isort, (i1,i2))
     <span class="org-variable-name">sx</span> <span class="org-operator">=</span> isort(i1 <span class="org-operator">+</span> i2)
     <span class="org-variable-name">x1</span>, <span class="org-variable-name">x2</span> <span class="org-operator">=</span> i1; <span class="org-variable-name">x3</span>, <span class="org-variable-name">x4</span> <span class="org-operator">=</span> i2
@@ -319,8 +357,8 @@ where <code>isort()</code> is sort function, which returns tuple instead of list
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">sort interval `i`</span>
-<span class="org-variable-name">isort</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> i: <span class="org-builtin">tuple</span>(<span class="org-builtin">sorted</span>(i))
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">sort interval `i`
+</span><span class="org-variable-name">isort</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> i: <span class="org-builtin">tuple</span>(<span class="org-builtin">sorted</span>(i))
 </pre>
 </div>
 
@@ -340,7 +378,7 @@ otherwise - merge them into one by get (first, last) of sorted points.
 </p>
 
 
-<div id="org865a36a" class="figure">
+<div id="org735a08b" class="figure">
 <p><img src="../../assets/IntervalMerges2.svg" alt="IntervalMerges2.svg" class="org-svg" />
 </p>
 </div>
@@ -370,11 +408,11 @@ where <code>I</code> is interval (pair of 2 <code>X</code> points).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">Tuple 0st item selector</span>
-<span class="org-variable-name">p1</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> p: p[0]
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">Tuple 0st item selector
+</span><span class="org-variable-name">p1</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> p: p[0]
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">merge-II</span>
-<span class="org-keyword">def</span> <span class="org-function-name">m2</span>(i1, i2):
+<span class="org-comment-delimiter"># </span><span class="org-comment">merge-II
+</span><span class="org-keyword">def</span> <span class="org-function-name">m2</span>(i1, i2):
     <span class="org-variable-name">i1</span>, <span class="org-variable-name">i2</span> <span class="org-operator">=</span> <span class="org-builtin">map</span>(isort, (i1,i2))
     <span class="org-variable-name">sx</span> <span class="org-operator">=</span> isort(i1 <span class="org-operator">+</span> i2)
     <span class="org-variable-name">si</span> <span class="org-operator">=</span> <span class="org-builtin">sorted</span>((i1, i2), key<span class="org-operator">=</span>p1)
@@ -390,12 +428,12 @@ Test it:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">assert</span>
-<span class="org-keyword">def</span> <span class="org-function-name">ass</span>(a, b):
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">assert
+</span><span class="org-keyword">def</span> <span class="org-function-name">ass</span>(a, b):
     <span class="org-keyword">if</span> a <span class="org-operator">!=</span> b: <span class="org-keyword">raise</span> <span class="org-type">AssertionError</span>(<span class="org-string">'%r != %r'</span> <span class="org-operator">%</span> (a,b))
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">asserts algo. m1</span>
-ass(((1,2), (10,20)), m1((1,2), (10,20)))
+<span class="org-comment-delimiter"># </span><span class="org-comment">asserts algo. m1
+</span>ass(((1,2), (10,20)), m1((1,2), (10,20)))
 ass(((1,2), (10,20)), m1((2,1), (20,10)))
 ass((1,20), m1((2,1), (2,20)))
 ass((1,20), m1((10,1), (2,20)))

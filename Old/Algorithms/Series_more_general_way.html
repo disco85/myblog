@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Series: more general way</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Series: more general way</h1>
-<div id="outline-container-org5d8ac5a" class="outline-2">
-<h2 id="org5d8ac5a">Series: more general way</h2>
-<div class="outline-text-2" id="text-org5d8ac5a">
+<div id="outline-container-orgefbddeb" class="outline-2">
+<h2 id="orgefbddeb">Series: more general way</h2>
+<div class="outline-text-2" id="text-orgefbddeb">
 <p>
 Here is the generic algorithm of determining of the series from sequence by
 some feature <code>SeriesFeature</code>. Examples show usage of splitting series in
@@ -283,21 +321,21 @@ camelCase strings (in the same case).
 <pre class="src src-python"><span class="org-keyword">from</span> abc <span class="org-keyword">import</span> ABCMeta, abstractmethod
 <span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> groupby, imap
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">a,b,c -&gt; ((None, a), (a, b), (b, c)) (ie (prev, cur) pairs)</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">preiter = lambda it: izip(chain([None], it), it)</span>
-
+<span class="org-comment-delimiter"># </span><span class="org-comment">a,b,c -&gt; ((None, a), (a, b), (b, c)) (ie (prev, cur) pairs)
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">preiter = lambda it: izip(chain([None], it), it)
+</span>
 <span class="org-keyword">class</span> <span class="org-type">SeriesFeature</span>(<span class="org-builtin">object</span>):
     <span class="org-variable-name">__metaclass__</span> <span class="org-operator">=</span> ABCMeta
-    <span class="org-builtin">id</span> <span class="org-operator">=</span> <span class="org-constant">None</span> <span class="org-comment-delimiter"># </span><span class="org-comment">series id</span>
-    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0 <span class="org-comment-delimiter"># </span><span class="org-comment">element index</span>
-    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, serid):
+    <span class="org-builtin">id</span> <span class="org-operator">=</span> <span class="org-constant">None</span> <span class="org-comment-delimiter"># </span><span class="org-comment">series id
+</span>    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0 <span class="org-comment-delimiter"># </span><span class="org-comment">element index
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, serid):
         <span class="org-keyword">self</span>.<span class="org-variable-name">i</span> <span class="org-operator">=</span> <span class="org-operator">-</span>1
         <span class="org-keyword">self</span>.<span class="org-builtin">id</span> <span class="org-operator">=</span> serid
     <span class="org-type">@abstractmethod</span>
     <span class="org-keyword">def</span> <span class="org-function-name">__series__</span>(<span class="org-keyword">self</span>, el, serid):
-        <span class="org-doc">"""Check element `el` and return new/old series id. `serid`</span>
-<span class="org-doc">        is current series id`</span>
-<span class="org-doc">        """</span>
+        <span class="org-doc">"""Check element `el` and return new/old series id. `serid`
+        is current series id`
+        """</span>
     <span class="org-keyword">def</span> <span class="org-function-name">__call__</span>(<span class="org-keyword">self</span>, el):
         <span class="org-keyword">self</span>.<span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
         <span class="org-keyword">self</span>.<span class="org-builtin">id</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.__series__(el, <span class="org-keyword">self</span>.<span class="org-builtin">id</span>)
@@ -327,8 +365,8 @@ camelCase strings (in the same case).
     <span class="org-doc">"""Transform each CamelCase-string part with `func(ser)`"""</span>
     <span class="org-keyword">return</span> imap(func, iseries(CamelCaseSeries, s))
 
-<span class="org-comment-delimiter">########################## </span><span class="org-comment">test ##############################################</span>
-<span class="org-builtin">print</span> <span class="org-builtin">list</span>(iseries(CapitalizedSeries, <span class="org-string">'AaaaBbbCcAaa'</span>))
+<span class="org-comment-delimiter">########################## </span><span class="org-comment">test ##############################################
+</span><span class="org-builtin">print</span> <span class="org-builtin">list</span>(iseries(CapitalizedSeries, <span class="org-string">'AaaaBbbCcAaa'</span>))
 <span class="org-builtin">print</span> <span class="org-builtin">list</span>(iseries(CapitalizedSeries, <span class="org-string">'abcDefGhi'</span>))
 
 <span class="org-builtin">print</span> <span class="org-string">' '</span>.join(camelcaseto(<span class="org-string">"noSuchUserError"</span>, <span class="org-builtin">str</span>.lower)).capitalize()

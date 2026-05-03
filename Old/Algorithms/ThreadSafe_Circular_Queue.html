@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Thread-Safe Circular Queue</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,55 +308,55 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Thread-Safe Circular Queue</h1>
-<div id="outline-container-org3f11577" class="outline-2">
-<h2 id="org3f11577">Thread-Safe Circular Queue</h2>
-<div class="outline-text-2" id="text-org3f11577">
+<div id="outline-container-org6b68b87" class="outline-2">
+<h2 id="org6b68b87">Thread-Safe Circular Queue</h2>
+<div class="outline-text-2" id="text-org6b68b87">
 <p>
 Often in data processing applications are needed circular queue implemented in thread-safe way. This is the such implementation without any mutex, locks and so on:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span class="org-doc">/**</span>
-<span class="org-doc"> * </span><span class="org-doc"><span class="org-doc-markup">@file</span></span><span class="org-doc"> cqueue.h</span>
-<span class="org-doc"> * </span><span class="org-doc"><span class="org-doc-markup">@defgroup</span></span><span class="org-doc"> cqueue Circular queue support</span>
-<span class="org-doc"> * @{</span>
-<span class="org-doc"> * </span><span class="org-doc"><span class="org-doc-markup">@brief</span></span><span class="org-doc"> Fast circular queue support</span>
-<span class="org-doc"> */</span>
+<pre class="src src-cpp"><span class="org-doc">/**
+ * </span><span class="org-doc"><span class="org-doc-markup">@file</span></span><span class="org-doc"> cqueue.h
+ * </span><span class="org-doc"><span class="org-doc-markup">@defgroup</span></span><span class="org-doc"> cqueue Circular queue support
+ * @{
+ * </span><span class="org-doc"><span class="org-doc-markup">@brief</span></span><span class="org-doc"> Fast circular queue support
+ */</span>
 <span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _CQUEUE_H
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">_CQUEUE_H</span>
 
-<span class="org-doc">/** It's possible to use another (wrapper) structure or structure with another</span>
-<span class="org-doc">name for cqueue implementation. CQUEUE_STRUCT_IMPL should be defined as name</span>
-<span class="org-doc">of such structure in this case before to include cqueue.h. This structure</span>
-<span class="org-doc">must have members:</span>
-<span class="org-doc"> - unsigned integer "size"</span>
-<span class="org-doc"> - integer "rpos"</span>
-<span class="org-doc"> - integer "wpos"</span>
-<span class="org-doc"> - integer "rwrap"</span>
-<span class="org-doc"> - integer "wwrap"</span>
-<span class="org-doc"> - any other custom fields</span>
-<span class="org-doc">*/</span>
+<span class="org-doc">/** It's possible to use another (wrapper) structure or structure with another
+name for cqueue implementation. CQUEUE_STRUCT_IMPL should be defined as name
+of such structure in this case before to include cqueue.h. This structure
+must have members:
+ - unsigned integer "size"
+ - integer "rpos"
+ - integer "wpos"
+ - integer "rwrap"
+ - integer "wwrap"
+ - any other custom fields
+*/</span>
 <span class="org-preprocessor">#ifdef</span> CQUEUE_STRUCT_IMPL
 <span class="org-keyword">typedef</span> <span class="org-type">CQUEUE_STRUCT_IMPL</span> <span class="org-type">cqueue_t</span>;
 <span class="org-preprocessor">#else</span>
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Circular queue</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">cqueue_t</span> {
-    <span class="org-comment-delimiter">/// </span><span class="org-comment">Capacity of queue</span>
-    <span class="org-type">unsigned</span> <span class="org-type">int</span> <span class="org-variable-name">size</span>;
-    <span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position</span>
-    <span class="org-type">int</span> <span class="org-variable-name">rpos</span>;
-    <span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position</span>
-    <span class="org-type">int</span> <span class="org-variable-name">wpos</span>;
-    <span class="org-comment-delimiter">/// </span><span class="org-comment">Reader wrapping flag</span>
-    <span class="org-type">unsigned</span> <span class="org-type">char</span> <span class="org-variable-name">rwrap</span>;
-    <span class="org-comment-delimiter">/// </span><span class="org-comment">Writer wrapping flag</span>
-    <span class="org-type">unsigned</span> <span class="org-type">char</span> <span class="org-variable-name">wwrap</span>;
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Circular queue
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">cqueue_t</span> {
+    <span class="org-comment-delimiter">/// </span><span class="org-comment">Capacity of queue
+</span>    <span class="org-type">unsigned</span> <span class="org-type">int</span> <span class="org-variable-name">size</span>;
+    <span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position
+</span>    <span class="org-type">int</span> <span class="org-variable-name">rpos</span>;
+    <span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position
+</span>    <span class="org-type">int</span> <span class="org-variable-name">wpos</span>;
+    <span class="org-comment-delimiter">/// </span><span class="org-comment">Reader wrapping flag
+</span>    <span class="org-type">unsigned</span> <span class="org-type">char</span> <span class="org-variable-name">rwrap</span>;
+    <span class="org-comment-delimiter">/// </span><span class="org-comment">Writer wrapping flag
+</span>    <span class="org-type">unsigned</span> <span class="org-type">char</span> <span class="org-variable-name">wwrap</span>;
 } <span class="org-type">cqueue_t</span>;
 
 <span class="org-preprocessor">#endif</span>
 
-<span class="org-doc">/** Initializer for circular queue structure instance. Additional args are</span>
-<span class="org-doc">needs if separate implementation struct is used */</span>
+<span class="org-doc">/** Initializer for circular queue structure instance. Additional args are
+needs if separate implementation struct is used */</span>
 <span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INITIALIZER</span>(<span class="org-variable-name">SIZE</span>, ...) { \
     .size = (SIZE), \
     .rpos = 0, \
@@ -327,18 +365,18 @@ Often in data processing applications are needed circular queue implemented in t
     .rwrap = 0, \
     __VA_ARGS__ }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Init. function for queue structure instance</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INIT</span>(<span class="org-variable-name">Q</span>, <span class="org-variable-name">SIZE</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Init. function for queue structure instance
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INIT</span>(<span class="org-variable-name">Q</span>, <span class="org-variable-name">SIZE</span>) <span class="org-keyword">do</span> { \
     (Q)-&gt;size = (SIZE); \
     (Q)-&gt;rpos = (Q)-&gt;wpos = 0; \
     (Q)-&gt;wwrap = (Q)-&gt;rwrap = 0; \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Reset circular queue into initial state</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_RESET</span>(<span class="org-variable-name">Q</span>) CQUEUE_INIT(Q, (Q)-&gt;size)
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Reset circular queue into initial state
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_RESET</span>(<span class="org-variable-name">Q</span>) CQUEUE_INIT(Q, (Q)-&gt;size)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">General position incrementing</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR</span>(<span class="org-variable-name">Q</span>, <span class="org-variable-name">PPOS</span>, <span class="org-variable-name">PWRAP</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">General position incrementing
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR</span>(<span class="org-variable-name">Q</span>, <span class="org-variable-name">PPOS</span>, <span class="org-variable-name">PWRAP</span>) <span class="org-keyword">do</span> { \
     *(PPOS) = *(PPOS) +1; \
     <span class="org-keyword">if</span> (*(PPOS) == (Q)-&gt;size) { \
         *(PWRAP) ^= 1; \
@@ -346,38 +384,38 @@ Often in data processing applications are needed circular queue implemented in t
     } \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position (for user-side)</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_RPOS</span>(<span class="org-variable-name">Q</span>) ((Q)-&gt;rpos)
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position (for user-side)
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_RPOS</span>(<span class="org-variable-name">Q</span>) ((Q)-&gt;rpos)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position (for user-side)</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_WPOS</span>(<span class="org-variable-name">Q</span>) ((Q)-&gt;wpos)
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position (for user-side)
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_WPOS</span>(<span class="org-variable-name">Q</span>) ((Q)-&gt;wpos)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position incrementing</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR_R</span>(<span class="org-variable-name">Q</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Reader position incrementing
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR_R</span>(<span class="org-variable-name">Q</span>) <span class="org-keyword">do</span> { \
     CQUEUE_INCR(Q, &amp;((Q)-&gt;rpos), &amp;((Q)-&gt;rwrap)); \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position incrementing</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR_W</span>(<span class="org-variable-name">Q</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Writer position incrementing
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_INCR_W</span>(<span class="org-variable-name">Q</span>) <span class="org-keyword">do</span> { \
     CQUEUE_INCR(Q, &amp;((Q)-&gt;wpos), &amp;((Q)-&gt;wwrap)); \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Test of circular queue fullness</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_IS_FULL</span>(<span class="org-variable-name">Q</span>) \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Test of circular queue fullness
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_IS_FULL</span>(<span class="org-variable-name">Q</span>) \
     ((Q)-&gt;wpos == (Q)-&gt;rpos &amp;&amp; (Q)-&gt;rwrap != (Q)-&gt;wwrap)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Test of circular queue emptiness</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_IS_EMPTY</span>(<span class="org-variable-name">Q</span>) \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Test of circular queue emptiness
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_IS_EMPTY</span>(<span class="org-variable-name">Q</span>) \
     ((Q)-&gt;wpos == (Q)-&gt;rpos &amp;&amp; (Q)-&gt;rwrap == (Q)-&gt;wwrap)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Number of free slots in circular queue</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_NFREE</span>(<span class="org-variable-name">Q</span>) \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Number of free slots in circular queue
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_NFREE</span>(<span class="org-variable-name">Q</span>) \
     ((Q)-&gt;rwrap == (Q)-&gt;wwrap ? \
      ((Q)-&gt;size - (Q)-&gt;wpos + (Q)-&gt;rpos) : \
      ((Q)-&gt;rpos - (Q)-&gt;wpos))
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Number of used slots in circular queue</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_LEN</span>(<span class="org-variable-name">Q</span>) \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Number of used slots in circular queue
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CQUEUE_LEN</span>(<span class="org-variable-name">Q</span>) \
     ((Q)-&gt;rwrap != (Q)-&gt;wwrap ? \
      ((Q)-&gt;size - (Q)-&gt;rpos + (Q)-&gt;wpos) : \
      ((Q)-&gt;wpos - (Q)-&gt;rpos))

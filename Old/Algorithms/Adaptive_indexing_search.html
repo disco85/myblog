@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>"Adaptive indexing" search</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">"Adaptive indexing" search</h1>
-<div id="outline-container-org3991f6e" class="outline-2">
-<h2 id="org3991f6e">"Adaptive indexing" search</h2>
-<div class="outline-text-2" id="text-org3991f6e">
+<div id="outline-container-orgb7d7b27" class="outline-2">
+<h2 id="orgb7d7b27">"Adaptive indexing" search</h2>
+<div class="outline-text-2" id="text-orgb7d7b27">
 <p>
 Some kind of interpolation search. We take the first item and test it. If hit - return it, otherwise - shift to the next item by a step. The step is calculated from the current item value and the previous one's value: the idea is that we try to find the delta/difference between neighbor items and to calculate the offset to the searched item. It's something like adaptive indexing, I called it in such a way.
 </p>
@@ -295,8 +333,8 @@ This implementation is not perfect and can be optimized. I am not 100% sure in i
 <span class="org-keyword">from</span> math <span class="org-keyword">import</span> <span class="org-operator">*</span>
 
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">lst - ordered/sorted list</span>
-<span class="org-keyword">def</span> <span class="org-function-name">intersearch</span>(lst, target):
+<span class="org-comment-delimiter"># </span><span class="org-comment">lst - ordered/sorted list
+</span><span class="org-keyword">def</span> <span class="org-function-name">intersearch</span>(lst, target):
     <span class="org-variable-name">upbound</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(lst) <span class="org-operator">-</span> 1
     <span class="org-variable-name">prev</span> <span class="org-operator">=</span> <span class="org-operator">-</span>1
     <span class="org-variable-name">pos</span> <span class="org-operator">=</span> 0
@@ -316,12 +354,12 @@ This implementation is not perfect and can be optimized. I am not 100% sure in i
                 <span class="org-keyword">if</span> step <span class="org-operator">==</span> 0:
                     <span class="org-variable-name">step</span> <span class="org-operator">=</span> 1
                 <span class="org-keyword">elif</span> step <span class="org-operator">&lt;</span> 0:
-                <span class="org-comment-delimiter">#</span><span class="org-comment">elif (pos + step) &lt; 0:</span>
-                    <span class="org-variable-name">step</span> <span class="org-operator">=</span> 1
+                <span class="org-comment-delimiter">#</span><span class="org-comment">elif (pos + step) &lt; 0:
+</span>                    <span class="org-variable-name">step</span> <span class="org-operator">=</span> 1
         <span class="org-keyword">else</span>:
             <span class="org-variable-name">step</span> <span class="org-operator">=</span> 1
-        <span class="org-comment-delimiter">###</span>
-        <span class="org-keyword">if</span> (pos <span class="org-operator">+</span> step <span class="org-operator">&gt;</span> upbound) <span class="org-keyword">or</span> (lst[pos <span class="org-operator">+</span> step] <span class="org-operator">&gt;</span> target):
+        <span class="org-comment-delimiter">###</span><span class="org-comment">
+</span>        <span class="org-keyword">if</span> (pos <span class="org-operator">+</span> step <span class="org-operator">&gt;</span> upbound) <span class="org-keyword">or</span> (lst[pos <span class="org-operator">+</span> step] <span class="org-operator">&gt;</span> target):
             <span class="org-keyword">if</span> prev <span class="org-operator">+</span> 1 <span class="org-operator">&gt;</span> upbound:
                 <span class="org-variable-name">_prev</span> <span class="org-operator">=</span> prev
                 <span class="org-variable-name">prev</span> <span class="org-operator">=</span> pos
@@ -335,8 +373,8 @@ This implementation is not perfect and can be optimized. I am not 100% sure in i
             <span class="org-variable-name">pos</span> <span class="org-operator">+=</span> step
 
 
-<span class="org-comment-delimiter">#########################</span>
-<span class="org-keyword">class</span> <span class="org-type">ACCESS</span>(<span class="org-builtin">list</span>):
+<span class="org-comment-delimiter">#########################</span><span class="org-comment">
+</span><span class="org-keyword">class</span> <span class="org-type">ACCESS</span>(<span class="org-builtin">list</span>):
     <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, <span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
         <span class="org-builtin">super</span>().__init__(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw)
         <span class="org-keyword">self</span>.<span class="org-variable-name">_access</span> <span class="org-operator">=</span> 0
@@ -377,8 +415,8 @@ This implementation is not perfect and can be optimized. I am not 100% sure in i
 <span class="org-builtin">print</span>(f<span class="org-string">"Look for </span>{x}<span class="org-string"> in </span>{arr}<span class="org-string">"</span>)
 <span class="org-keyword">try</span>:
     <span class="org-variable-name">fnd</span> <span class="org-operator">=</span> intersearch(ACCESS(arr), x)
-    <span class="org-comment-delimiter">#</span><span class="org-comment">fnd = intersearch(arr, x)</span>
-    <span class="org-builtin">print</span>(f<span class="org-string">"Found </span>{arr[fnd]}<span class="org-string"> at </span>{fnd}<span class="org-string">"</span>)
+    <span class="org-comment-delimiter">#</span><span class="org-comment">fnd = intersearch(arr, x)
+</span>    <span class="org-builtin">print</span>(f<span class="org-string">"Found </span>{arr[fnd]}<span class="org-string"> at </span>{fnd}<span class="org-string">"</span>)
 <span class="org-keyword">except</span> <span class="org-type">KeyboardInterrupt</span>:
     <span class="org-builtin">print</span>(f<span class="org-string">"Looked for </span>{x}<span class="org-string"> in </span>{arr}<span class="org-string">"</span>)
 </pre>

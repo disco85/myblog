@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>AVR timers: calculate prescalers</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">AVR timers: calculate prescalers</h1>
-<div id="outline-container-org68dd41e" class="outline-2">
-<h2 id="org68dd41e">AVR timers: calculate prescalers</h2>
-<div class="outline-text-2" id="text-org68dd41e">
+<div id="outline-container-org47e0b63" class="outline-2">
+<h2 id="org47e0b63">AVR timers: calculate prescalers</h2>
+<div class="outline-text-2" id="text-org47e0b63">
 <p>
 Functions below are only for Atmega128, see "bitness" of timers, prescalers values&#x2026;
 </p>
@@ -347,42 +385,42 @@ This Python prototype example is only to show idea of algorithm. But next is the
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span class="org-comment-delimiter">/* </span><span class="org-comment">Calculates prescale (divisor of timer: 1,8,...) and start</span>
-<span class="org-comment"> * counter value and total cycles number. Returns 0 on success, -1 on faulire.</span>
-<span class="org-comment"> * D is the delay in microseconds.  timer is number of timer.</span>
-<span class="org-comment"> * Out values are saved in corresponding timerc_t.</span>
-<span class="org-comment"> * Atmega128 implementation!!!</span>
-<span class="org-comment-delimiter"> */</span>
+<pre class="src src-cpp"><span class="org-comment-delimiter">/* </span><span class="org-comment">Calculates prescale (divisor of timer: 1,8,...) and start
+ * counter value and total cycles number. Returns 0 on success, -1 on faulire.
+ * D is the delay in microseconds.  timer is number of timer.
+ * Out values are saved in corresponding timerc_t.
+ * Atmega128 implementation!!!
+</span><span class="org-comment-delimiter"> */</span>
 <span class="org-type">int</span>
 <span class="org-function-name">_alarm_setup</span>(<span class="org-type">int</span> <span class="org-variable-name">timer</span>,
              <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">D</span>)
 {
         <span class="org-type">int</span> <span class="org-variable-name">i</span>;
-        <span class="org-type">int</span> <span class="org-variable-name">max_psc</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">max. value of prescaler of timer</span>
-        <span class="org-type">int</span> *<span class="org-variable-name">psc</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescalers of timer</span>
-        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">T</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of tick</span>
-        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">Tclk</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of clock</span>
-        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">Tall</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of timer cycle (from 0 to bits)</span>
-
+        <span class="org-type">int</span> <span class="org-variable-name">max_psc</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">max. value of prescaler of timer
+</span>        <span class="org-type">int</span> *<span class="org-variable-name">psc</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescalers of timer
+</span>        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">T</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of tick
+</span>        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">Tclk</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of clock
+</span>        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">Tall</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">period of timer cycle (from 0 to bits)
+</span>
         psc = _timers[timer].prescalers;
         max_psc = psc[_timers[timer].nprescalers-1];
 
-        <span class="org-comment-delimiter">/* </span><span class="org-comment">Base frequency is F_CPU. Real frequency is F_CPU/prescaler.</span>
-<span class="org-comment">           One tick occupes 1/freq seconds (freq in MHz). N ticks occupes</span>
-<span class="org-comment">           N/freq. N is max ticks number in counter = bits of this counter =</span>
-<span class="org-comment">           _timers[timer].bits. So, total time to count all ticks of counter is</span>
-<span class="org-comment">           N/freq = N/(F_CPU/prescaler) = N*prescaler/F_CPU. Freq is in MHz, to</span>
-<span class="org-comment">           use microseconds instead of seconds, * 1000000.</span>
+        <span class="org-comment-delimiter">/* </span><span class="org-comment">Base frequency is F_CPU. Real frequency is F_CPU/prescaler.
+           One tick occupes 1/freq seconds (freq in MHz). N ticks occupes
+           N/freq. N is max ticks number in counter = bits of this counter =
+           _timers[timer].bits. So, total time to count all ticks of counter is
+           N/freq = N/(F_CPU/prescaler) = N*prescaler/F_CPU. Freq is in MHz, to
+           use microseconds instead of seconds, * 1000000.
 
-<span class="org-comment">           T is the total time of count all the counter with slowest freq (with</span>
-<span class="org-comment">           last prescaler - max_psc). cycles is how many counter cycles are in</span>
-<span class="org-comment">           D with slowest prescaler on this timer-counter.</span>
+           T is the total time of count all the counter with slowest freq (with
+           last prescaler - max_psc). cycles is how many counter cycles are in
+           D with slowest prescaler on this timer-counter.
 
-<span class="org-comment">           Then D set to D without cycles time.</span>
-<span class="org-comment-delimiter">           */</span>
+           Then D set to D without cycles time.
+</span><span class="org-comment-delimiter">           */</span>
 
-        <span class="org-comment-delimiter">// </span><span class="org-comment">1000000 * max_psc &gt; F_CPU, so T/F_CPU != 0</span>
-        T = (1000000 * max_psc / F_CPU) * _timers[timer].bits;
+        <span class="org-comment-delimiter">// </span><span class="org-comment">1000000 * max_psc &gt; F_CPU, so T/F_CPU != 0
+</span>        T = (1000000 * max_psc / F_CPU) * _timers[timer].bits;
         _timers[timer].cycles = D/T;
 
         <span class="org-keyword">if</span> (_timers[timer].cycles &gt; 0) {
@@ -390,24 +428,24 @@ This Python prototype example is only to show idea of algorithm. But next is the
                 _timers[timer].cycles_prescaler = max_psc;
         }
         <span class="org-keyword">else</span> {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">If does not need cycles, cycles_prescaler will be 0</span>
-                <span class="org-comment-delimiter">// </span><span class="org-comment">(may be used as flag of this)</span>
-                _timers[timer].cycles_prescaler = 0;
+                <span class="org-comment-delimiter">// </span><span class="org-comment">If does not need cycles, cycles_prescaler will be 0
+</span>                <span class="org-comment-delimiter">// </span><span class="org-comment">(may be used as flag of this)
+</span>                _timers[timer].cycles_prescaler = 0;
         }
 
-        D *= 1000; <span class="org-comment-delimiter">// </span><span class="org-comment">in nanoseconds</span>
-        Tclk = 1000000000 / F_CPU; <span class="org-comment-delimiter">// </span><span class="org-comment">in nanoseconds</span>
-        <span class="org-keyword">for</span> (i=0; i&lt;_timers[timer].nprescalers; i++) {
-                T = Tclk * psc[i]; <span class="org-comment-delimiter">// </span><span class="org-comment">time of one tick</span>
-                Tall = T * _timers[timer].bits; <span class="org-comment-delimiter">// </span><span class="org-comment">time to count all ticks of counter</span>
-                <span class="org-keyword">if</span> (D &gt; Tall) {
-                        <span class="org-comment-delimiter">// </span><span class="org-comment">delay D is too long for this Tall</span>
-                        <span class="org-keyword">continue</span>;
+        D *= 1000; <span class="org-comment-delimiter">// </span><span class="org-comment">in nanoseconds
+</span>        Tclk = 1000000000 / F_CPU; <span class="org-comment-delimiter">// </span><span class="org-comment">in nanoseconds
+</span>        <span class="org-keyword">for</span> (i=0; i&lt;_timers[timer].nprescalers; i++) {
+                T = Tclk * psc[i]; <span class="org-comment-delimiter">// </span><span class="org-comment">time of one tick
+</span>                Tall = T * _timers[timer].bits; <span class="org-comment-delimiter">// </span><span class="org-comment">time to count all ticks of counter
+</span>                <span class="org-keyword">if</span> (D &gt; Tall) {
+                        <span class="org-comment-delimiter">// </span><span class="org-comment">delay D is too long for this Tall
+</span>                        <span class="org-keyword">continue</span>;
                 }
                 <span class="org-keyword">else</span> {
                         _timers[timer].prescaler = psc[i];
-                        <span class="org-comment-delimiter">// </span><span class="org-comment">D/T how many ticks in D, cn is ticks from 0</span>
-                        _timers[timer].cn = _timers[timer].bits - D/T;
+                        <span class="org-comment-delimiter">// </span><span class="org-comment">D/T how many ticks in D, cn is ticks from 0
+</span>                        _timers[timer].cn = _timers[timer].bits - D/T;
                         <span class="org-keyword">return</span> (0);
                 }
         }
@@ -423,15 +461,15 @@ This function uses global array of timers: _timers. This is the array of the tim
 <div class="org-src-container">
 <pre class="src src-cpp"><span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">timerc_t</span> {
         <span class="org-keyword">volatile</span> <span class="org-type">timer_handler_t</span> <span class="org-variable-name">alarm_handler</span>;
-        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">nover</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">number of overflow</span>
-        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">bits</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">number of bits</span>
-        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">cn</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">start from this count value</span>
-        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">cycles</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">cycles number</span>
-        <span class="org-keyword">volatile</span> <span class="org-type">int</span> <span class="org-variable-name">prescaler</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescaler (1, 8, 32... - depends on arch. and timer)</span>
-        <span class="org-keyword">volatile</span> <span class="org-type">int</span> <span class="org-variable-name">cycles_prescaler</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescaler (usually 1024) for total counter cycles</span>
-        <span class="org-type">int</span> *<span class="org-variable-name">prescalers</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">array of timer-counter prescalers</span>
-        <span class="org-type">int</span> <span class="org-variable-name">nprescalers</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">length of prescalers' array</span>
-} <span class="org-type">timerc_t</span>; 
+        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">nover</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">number of overflow
+</span>        <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">bits</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">number of bits
+</span>        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">cn</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">start from this count value
+</span>        <span class="org-keyword">volatile</span> <span class="org-type">unsigned</span> <span class="org-type">long</span> <span class="org-variable-name">cycles</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">cycles number
+</span>        <span class="org-keyword">volatile</span> <span class="org-type">int</span> <span class="org-variable-name">prescaler</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescaler (1, 8, 32... - depends on arch. and timer)
+</span>        <span class="org-keyword">volatile</span> <span class="org-type">int</span> <span class="org-variable-name">cycles_prescaler</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">prescaler (usually 1024) for total counter cycles
+</span>        <span class="org-type">int</span> *<span class="org-variable-name">prescalers</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">array of timer-counter prescalers
+</span>        <span class="org-type">int</span> <span class="org-variable-name">nprescalers</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">length of prescalers' array
+</span>} <span class="org-type">timerc_t</span>; 
 </pre>
 </div>
 

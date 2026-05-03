@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: Qtouch sensors input</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -274,30 +312,30 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org8e2bce6">ASF: Qtouch sensors input</a></li>
-<li><a href="#orgb3ff667">fix random (false) signals (splashes or BOUNCE)</a></li>
-<li><a href="#orgc237f43">detecting PRESS state</a></li>
-<li><a href="#org706989c">detecting long "pressing" (touching) - sticking of key.</a></li>
+<li><a href="#orgd2405b8">ASF: Qtouch sensors input</a></li>
+<li><a href="#org36c4f13">fix random (false) signals (splashes or BOUNCE)</a></li>
+<li><a href="#orgc9fd82d">detecting PRESS state</a></li>
+<li><a href="#org55ceacd">detecting long "pressing" (touching) - sticking of key.</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org8e2bce6" class="outline-2">
-<h2 id="org8e2bce6">ASF: Qtouch sensors input</h2>
-<div class="outline-text-2" id="text-org8e2bce6">
+<div id="outline-container-orgd2405b8" class="outline-2">
+<h2 id="orgd2405b8">ASF: Qtouch sensors input</h2>
+<div class="outline-text-2" id="text-orgd2405b8">
 <p>
 There are several tasks when we try to process Qtouch input (Qtouch 60168):
 </p>
 </div>
 </div>
-<div id="outline-container-orgb3ff667" class="outline-2">
-<h2 id="orgb3ff667">fix random (false) signals (splashes or BOUNCE)</h2>
+<div id="outline-container-org36c4f13" class="outline-2">
+<h2 id="org36c4f13">fix random (false) signals (splashes or BOUNCE)</h2>
 </div>
-<div id="outline-container-orgc237f43" class="outline-2">
-<h2 id="orgc237f43">detecting PRESS state</h2>
+<div id="outline-container-orgc9fd82d" class="outline-2">
+<h2 id="orgc9fd82d">detecting PRESS state</h2>
 </div>
-<div id="outline-container-org706989c" class="outline-2">
-<h2 id="org706989c">detecting long "pressing" (touching) - sticking of key.</h2>
-<div class="outline-text-2" id="text-org706989c">
+<div id="outline-container-org55ceacd" class="outline-2">
+<h2 id="org55ceacd">detecting long "pressing" (touching) - sticking of key.</h2>
+<div class="outline-text-2" id="text-org55ceacd">
 <ol class="org-ol">
 <li>means: really signal from Qt is not 000..0 or 111..1 but something like 000001000000&#x2026; - with error '1' in sequence of '0' (and vise verse) because of signal bouncing, so it should be 'filtered' 2) means: we should detect when touch sensor is "pressed" 3) means: when user touches screen for long time we should detect this state as 'hold key' (like you can see in old mobile phones or key sticking in Windows) and call some special routine (callback) for processing such event.</li>
 </ol>
@@ -307,13 +345,13 @@ Next code processes all of this:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span class="org-comment-delimiter">/* </span><span class="org-comment">Input from qTouch (qt60168) with 4 buttons and one wheel</span>
-<span class="org-comment"> * - There is some feature: sticking of key (long pressing detection) will occurs</span>
-<span class="org-comment"> *   after usual key event: first key is pressed - and application open some</span>
-<span class="org-comment"> *   window, only after this may occurs long-time-detection.</span>
-<span class="org-comment"> * - test_event() test of PRESSED state, not released.</span>
-<span class="org-comment"> * - simulation of repeatition simulate seq: pressed, released, no IDLE!</span>
-<span class="org-comment-delimiter"> */</span> 
+<pre class="src src-cpp"><span class="org-comment-delimiter">/* </span><span class="org-comment">Input from qTouch (qt60168) with 4 buttons and one wheel
+ * - There is some feature: sticking of key (long pressing detection) will occurs
+ *   after usual key event: first key is pressed - and application open some
+ *   window, only after this may occurs long-time-detection.
+ * - test_event() test of PRESSED state, not released.
+ * - simulation of repeatition simulate seq: pressed, released, no IDLE!
+</span><span class="org-comment-delimiter"> */</span> 
 
 <span class="org-preprocessor">#include</span> <span class="org-string">"input.h"</span>
 <span class="org-preprocessor">#include</span> <span class="org-string">"myutl.h"</span>
@@ -338,16 +376,16 @@ Next code processes all of this:
 
 <span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_GET_SENSOR</span>(<span class="org-variable-name">INP</span>, <span class="org-variable-name">I</span>) (INP)-&gt;sensors[I]
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">set wheel to left</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_WHEEL_LEFT</span>(<span class="org-variable-name">INP</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">set wheel to left
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_WHEEL_LEFT</span>(<span class="org-variable-name">INP</span>) <span class="org-keyword">do</span> { \
   <span class="org-keyword">if</span> (INPUT_RIGHT == (INP)-&gt;keys[INPUT_WHEEL]) { \
     (INP)-&gt;wheel = 0; \
   } \
   (INP)-&gt;keys[INPUT_WHEEL] = INPUT_LEFT; \
   (INP)-&gt;wheel++; \
 } <span class="org-keyword">while</span> (0)
-<span class="org-comment-delimiter">/// </span><span class="org-comment">set wheel to right</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_WHEEL_RIGHT</span>(<span class="org-variable-name">INP</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">set wheel to right
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_WHEEL_RIGHT</span>(<span class="org-variable-name">INP</span>) <span class="org-keyword">do</span> { \
   <span class="org-keyword">if</span> (INPUT_LEFT == (INP)-&gt;keys[INPUT_WHEEL]) { \
     (INP)-&gt;wheel = 0; \
   } \
@@ -358,100 +396,100 @@ Next code processes all of this:
 <span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_SENSOR</span>(<span class="org-variable-name">INP</span>, <span class="org-variable-name">I</span>, <span class="org-variable-name">ST</span>) (INP)-&gt;sensors[I] = (ST)
 <span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_SET_KEY</span>(<span class="org-variable-name">INP</span>, <span class="org-variable-name">I</span>, <span class="org-variable-name">ST</span>) (INP)-&gt;keys[I] = (ST)
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">apply state of bounce filter FSM</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_FLTBOUNCE_APPLY_STATE</span>(<span class="org-variable-name">F</span>, <span class="org-variable-name">NEW_STATE</span>, <span class="org-variable-name">MSDELAY</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">// </span><span class="org-comment">apply state of bounce filter FSM
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_FLTBOUNCE_APPLY_STATE</span>(<span class="org-variable-name">F</span>, <span class="org-variable-name">NEW_STATE</span>, <span class="org-variable-name">MSDELAY</span>) <span class="org-keyword">do</span> { \
   (F)-&gt;state = NEW_STATE; \
   cpu_set_timeout(cpu_ms_2_cy(MSDELAY, FCPU), &amp;(F)-&gt;to); \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">is timeout in bounce filter?</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_FLTBOUNCE_IS_TO</span>(<span class="org-variable-name">F</span>) cpu_is_timeout(&amp;(F)-&gt;to)
+<span class="org-comment-delimiter">// </span><span class="org-comment">is timeout in bounce filter?
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">_INPUT_FLTBOUNCE_IS_TO</span>(<span class="org-variable-name">F</span>) cpu_is_timeout(&amp;(F)-&gt;to)
 
 <span class="org-keyword">static</span> <span class="org-type">void</span>
 <span class="org-function-name">_qt60168_io_init</span>(<span class="org-type">void</span>) {
   <span class="org-keyword">static</span> <span class="org-keyword">const</span> <span class="org-type">gpio_map_t</span> <span class="org-variable-name">QT60168_SPI_GPIO_MAP</span> =
   {
-    {QT60168_SPI_SCK_PIN, QT60168_SPI_SCK_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">SPI Clock.</span>
-    {QT60168_SPI_MISO_PIN, QT60168_SPI_MISO_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">MISO.</span>
-    {QT60168_SPI_MOSI_PIN, QT60168_SPI_MOSI_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">MOSI.</span>
-    {QT60168_SPI_NPCS0_PIN, QT60168_SPI_NPCS0_FUNCTION}<span class="org-comment-delimiter">// </span><span class="org-comment">Chip Select NPCS.</span>
-  };
+    {QT60168_SPI_SCK_PIN, QT60168_SPI_SCK_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">SPI Clock.
+</span>    {QT60168_SPI_MISO_PIN, QT60168_SPI_MISO_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">MISO.
+</span>    {QT60168_SPI_MOSI_PIN, QT60168_SPI_MOSI_FUNCTION},<span class="org-comment-delimiter">// </span><span class="org-comment">MOSI.
+</span>    {QT60168_SPI_NPCS0_PIN, QT60168_SPI_NPCS0_FUNCTION}<span class="org-comment-delimiter">// </span><span class="org-comment">Chip Select NPCS.
+</span>  };
 
-  <span class="org-comment-delimiter">// </span><span class="org-comment">SPI options.</span>
-  <span class="org-type">spi_options_t</span> <span class="org-variable-name">spiOptions</span> =
+  <span class="org-comment-delimiter">// </span><span class="org-comment">SPI options.
+</span>  <span class="org-type">spi_options_t</span> <span class="org-variable-name">spiOptions</span> =
   {
     .reg    = QT60168_SPI_NCPS,
-    .baudrate   = QT60168_SPI_MASTER_SPEED, <span class="org-comment-delimiter">// </span><span class="org-comment">Defined in conf_qt60168.h.</span>
-    .bits   = QT60168_SPI_BITS,   <span class="org-comment-delimiter">// </span><span class="org-comment">Defined in conf_qt60168.h.</span>
-    .spck_delay   = 0,
+    .baudrate   = QT60168_SPI_MASTER_SPEED, <span class="org-comment-delimiter">// </span><span class="org-comment">Defined in conf_qt60168.h.
+</span>    .bits   = QT60168_SPI_BITS,   <span class="org-comment-delimiter">// </span><span class="org-comment">Defined in conf_qt60168.h.
+</span>    .spck_delay   = 0,
     .trans_delay  = 0,
     .stay_act   = 0,
     .spi_mode   = 3,
     .modfdis  = 1
   };
 
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Assign I/Os to SPI.</span>
-  gpio_enable_module(QT60168_SPI_GPIO_MAP,
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Assign I/Os to SPI.
+</span>  gpio_enable_module(QT60168_SPI_GPIO_MAP,
       <span class="org-keyword">sizeof</span>(QT60168_SPI_GPIO_MAP) / <span class="org-keyword">sizeof</span>(QT60168_SPI_GPIO_MAP[0]));
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize as master.</span>
-  spi_initMaster(QT60168_SPI, &amp;spiOptions);
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Set selection mode: variable_ps, pcs_decode, delay.</span>
-  spi_selectionMode(QT60168_SPI, 0, 0, 0);
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Enable SPI.</span>
-  spi_enable(QT60168_SPI);
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 with SPI clock Osc0 (=FCPU).</span>
-  spi_setupChipReg(QT60168_SPI, &amp;spiOptions, FCPU);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize as master.
+</span>  spi_initMaster(QT60168_SPI, &amp;spiOptions);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Set selection mode: variable_ps, pcs_decode, delay.
+</span>  spi_selectionMode(QT60168_SPI, 0, 0, 0);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Enable SPI.
+</span>  spi_enable(QT60168_SPI);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 with SPI clock Osc0 (=FCPU).
+</span>  spi_setupChipReg(QT60168_SPI, &amp;spiOptions, FCPU);
 }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">call after INPUT(...) initializer calling</span>
-<span class="org-type">void</span>
+<span class="org-comment-delimiter">/// </span><span class="org-comment">call after INPUT(...) initializer calling
+</span><span class="org-type">void</span>
 <span class="org-function-name">input_init</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>) {
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 resources: GPIO, SPI and QT60168.</span>
-  _qt60168_io_init();
-  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 component.</span>
-  qt60168_init(FCPU);
-  <span class="org-comment-delimiter">// </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> : need?</span>
-  <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">i</span>=0; i&lt;INPUT_NUMBER_OF_KEYS; i++) {
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 resources: GPIO, SPI and QT60168.
+</span>  _qt60168_io_init();
+  <span class="org-comment-delimiter">// </span><span class="org-comment">Initialize QT60168 component.
+</span>  qt60168_init(FCPU);
+  <span class="org-comment-delimiter">// </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> : need?
+</span>  <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">i</span>=0; i&lt;INPUT_NUMBER_OF_KEYS; i++) {
     _INPUT_STICK_STOP(&amp;self-&gt;stick_keys[i]);
   }
 }
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">for input task!</span>
-<span class="org-keyword">static</span> <span class="org-keyword">inline</span> <span class="org-type">void</span>
+<span class="org-comment-delimiter">// </span><span class="org-comment">for input task!
+</span><span class="org-keyword">static</span> <span class="org-keyword">inline</span> <span class="org-type">void</span>
 <span class="org-function-name">_input_scan_keys</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>) {
 
   <span class="org-type">int</span> <span class="org-variable-name">all_keys</span> = qt60168_report_all_key();
   <span class="org-type">int</span> <span class="org-variable-name">mask</span> = 1;
   <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">i</span>=0; i&lt;QT60168_TOUCH_NUMBER_OF_SENSORS; i++ ) {
     <span class="org-keyword">if</span> (all_keys &amp; (mask&lt;&lt;i)) {
-      <span class="org-comment-delimiter">// </span><span class="org-comment">if pressed - set pressed</span>
-      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_PRESSED, INPUT_SENS_TIME)) {
+      <span class="org-comment-delimiter">// </span><span class="org-comment">if pressed - set pressed
+</span>      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_PRESSED, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_PRESSED);
       }
     }
     <span class="org-keyword">else</span> <span class="org-keyword">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, i)) {
-      <span class="org-comment-delimiter">// </span><span class="org-comment">if WAS pressed but now is not - set released</span>
-      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_RELEASED, INPUT_SENS_TIME)) {
+      <span class="org-comment-delimiter">// </span><span class="org-comment">if WAS pressed but now is not - set released
+</span>      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_RELEASED, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_RELEASED);
       }
-      <span class="org-comment-delimiter">//</span><span class="org-comment">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 RELEASED"); }</span>
-    }
+      <span class="org-comment-delimiter">//</span><span class="org-comment">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 RELEASED"); }
+</span>    }
     <span class="org-keyword">else</span> {
-      <span class="org-comment-delimiter">// </span><span class="org-comment">else (not pressed now and WASN'T pressed early) - set idle</span>
-      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_IDLE, INPUT_SENS_TIME)) {
+      <span class="org-comment-delimiter">// </span><span class="org-comment">else (not pressed now and WASN'T pressed early) - set idle
+</span>      <span class="org-keyword">if</span> (input_fltbounce_filter(self-&gt;fltsensors+i, INPUT_IDLE, INPUT_SENS_TIME)) {
         _INPUT_SET_SENSOR(self, i, INPUT_IDLE);
       }
-      <span class="org-comment-delimiter">//</span><span class="org-comment">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 IDLE"); }</span>
-    }
+      <span class="org-comment-delimiter">//</span><span class="org-comment">if (i==QT60168_TOUCH_SENSOR_BUTTON_3) { gui_screen_prn(SCREEN, RED, WHITE, "BTN3 IDLE"); }
+</span>    }
   }
 }
 
 <span class="org-keyword">static</span> <span class="org-keyword">inline</span> <span class="org-type">void</span>
 <span class="org-function-name">_input_update_keys_state</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>) {
 
-  <span class="org-comment-delimiter">// </span><span class="org-comment">reset 'ready' flag. If some will be pressed, set to true. If</span>
-  <span class="org-comment-delimiter">// </span><span class="org-comment">released - not</span>
-  self-&gt;ready = <span class="org-constant">false</span>;
+  <span class="org-comment-delimiter">// </span><span class="org-comment">reset 'ready' flag. If some will be pressed, set to true. If
+</span>  <span class="org-comment-delimiter">// </span><span class="org-comment">released - not
+</span>  self-&gt;ready = <span class="org-constant">false</span>;
 
 <span class="org-preprocessor">#define</span> <span class="org-function-name">_UPDATE_BTKKEY</span>(<span class="org-variable-name">BTN</span>, <span class="org-variable-name">KEY</span>) <span class="org-keyword">do</span> { \
   <span class="org-keyword">if</span> (INPUT_PRESSED == _INPUT_GET_SENSOR(self, BTN)) { \
@@ -478,8 +516,8 @@ Next code processes all of this:
   } \
 } <span class="org-keyword">while</span> (0)
 
-  <span class="org-comment-delimiter">// </span><span class="org-comment">scroll to right</span>
-  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
+  <span class="org-comment-delimiter">// </span><span class="org-comment">scroll to right
+</span>  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
       QT60168_TOUCH_SENSOR_WHEEL_1, _INPUT_SET_WHEEL_RIGHT);
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_1,
       QT60168_TOUCH_SENSOR_WHEEL_2, _INPUT_SET_WHEEL_RIGHT);
@@ -504,8 +542,8 @@ Next code processes all of this:
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
       QT60168_TOUCH_SENSOR_WHEEL_0, _INPUT_SET_WHEEL_RIGHT);
 
-  <span class="org-comment-delimiter">// </span><span class="org-comment">scroll to left</span>
-  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
+  <span class="org-comment-delimiter">// </span><span class="org-comment">scroll to left
+</span>  _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_0,
       QT60168_TOUCH_SENSOR_WHEEL_11, _INPUT_SET_WHEEL_LEFT);
   _UPDATE_WHKEY(QT60168_TOUCH_SENSOR_WHEEL_11,
       QT60168_TOUCH_SENSOR_WHEEL_10, _INPUT_SET_WHEEL_LEFT);
@@ -554,26 +592,26 @@ Next code processes all of this:
   (self-&gt;stick_keys[KEY].fsm.state==INPUT_STICK_FSM_NO_EMUL_ST? \
    self-&gt;keys[KEY] : self-&gt;stick_keys[KEY].fsm.state)
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">FIXED: moved all FSM switching to input_task() to prevent problem with 2</span>
-<span class="org-comment-delimiter">// </span><span class="org-comment">and more test_event() calling in ONE input cycle and getting different results!</span>
-  <span class="org-type">bool</span> <span class="org-variable-name">ret</span>;
+<span class="org-comment-delimiter">// </span><span class="org-comment">FIXED: moved all FSM switching to input_task() to prevent problem with 2
+</span><span class="org-comment-delimiter">// </span><span class="org-comment">and more test_event() calling in ONE input cycle and getting different results!
+</span>  <span class="org-type">bool</span> <span class="org-variable-name">ret</span>;
   <span class="org-keyword">switch</span> (event) {
     <span class="org-keyword">case</span> GUI_ESCAPE_EVENT:
       ret = (_KEY_STATE(INPUT_F1) == INPUT_PRESSED);
-      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);</span>
-      <span class="org-keyword">break</span>;
+      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F1, self, INPUT_STICK_FSM_RESET_EV, INPUT_F1);
+</span>      <span class="org-keyword">break</span>;
     <span class="org-keyword">case</span> GUI_UP_EVENT:
       ret = (_KEY_STATE(INPUT_F2) == INPUT_PRESSED);
-      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);</span>
-      <span class="org-keyword">break</span>;
+      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F2, self, INPUT_STICK_FSM_RESET_EV, INPUT_F2);
+</span>      <span class="org-keyword">break</span>;
     <span class="org-keyword">case</span> GUI_DOWN_EVENT:
       ret = (_KEY_STATE(INPUT_F3) == INPUT_PRESSED);
-      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);</span>
-      <span class="org-keyword">break</span>;
+      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F3, self, INPUT_STICK_FSM_RESET_EV, INPUT_F3);
+</span>      <span class="org-keyword">break</span>;
     <span class="org-keyword">case</span> GUI_ENTER_EVENT:
       ret = (_KEY_STATE(INPUT_F4) == INPUT_PRESSED);
-      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);</span>
-      <span class="org-keyword">break</span>;
+      <span class="org-comment-delimiter">//</span><span class="org-comment">input_stick_fsm(self-&gt;stick_keys+INPUT_F4, self, INPUT_STICK_FSM_RESET_EV, INPUT_F4);
+</span>      <span class="org-keyword">break</span>;
     <span class="org-keyword">default</span>:
       ret = 0;
       <span class="org-keyword">break</span>;
@@ -605,8 +643,8 @@ Next code processes all of this:
 <span class="org-keyword">inline</span> <span class="org-keyword">static</span> <span class="org-type">void</span>
 <span class="org-function-name">input_process_sticking</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-type">input_keys_t</span> <span class="org-variable-name">key</span>, <span class="org-type">input_state_t</span> <span class="org-variable-name">new_state</span>) {
   <span class="org-type">input_stick_fsm_event_t</span> <span class="org-variable-name">fsm_ev</span>;
-  <span class="org-comment-delimiter">// </span><span class="org-comment">generate events for sticking fsm</span>
-  <span class="org-keyword">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].long_to)) {
+  <span class="org-comment-delimiter">// </span><span class="org-comment">generate events for sticking fsm
+</span>  <span class="org-keyword">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].long_to)) {
     fsm_ev = INPUT_STICK_FSM_RAISED_LTO_EV;
   } <span class="org-keyword">else</span> <span class="org-keyword">if</span> (cpu_is_timeout(&amp;self-&gt;stick_keys[key].short_to)) {
     fsm_ev = INPUT_STICK_FSM_RAISED_STO_EV;
@@ -620,8 +658,8 @@ Next code processes all of this:
   input_stick_fsm(&amp;self-&gt;stick_keys[key], self, fsm_ev, key);
 }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">filter new state: returns true - allowed, false - bounce (rejected)</span>
-<span class="org-keyword">inline</span> <span class="org-keyword">static</span> <span class="org-type">bool</span>
+<span class="org-comment-delimiter">/// </span><span class="org-comment">filter new state: returns true - allowed, false - bounce (rejected)
+</span><span class="org-keyword">inline</span> <span class="org-keyword">static</span> <span class="org-type">bool</span>
 <span class="org-function-name">input_fltbounce_filter</span>(<span class="org-type">input_fltbounce_t</span>* <span class="org-variable-name">self</span>, <span class="org-type">input_state_t</span> <span class="org-variable-name">new_state</span>, <span class="org-type">int</span> <span class="org-variable-name">msdelay</span>) {
   <span class="org-keyword">if</span> (new_state == self-&gt;state) {
     <span class="org-keyword">if</span> (_INPUT_FLTBOUNCE_IS_TO(self)) {
@@ -712,8 +750,8 @@ Next code processes all of this:
 <span class="org-preprocessor"># error</span> <span class="org-string">Define FCPU to support sticking of keys!</span>
 <span class="org-preprocessor">#endif</span>
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">config {{{</span>
-<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> INPUT_KEY_STICK_TIME
+<span class="org-comment-delimiter">// </span><span class="org-comment">config {{{
+</span><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> INPUT_KEY_STICK_TIME
 <span class="org-preprocessor"># define</span> <span class="org-variable-name">INPUT_KEY_STICK_TIME</span> 2500
 <span class="org-preprocessor"># warning</span> <span class="org-string">Default INPUT_KEY_STICK_TIME is used: 2500 ms</span>
 <span class="org-preprocessor">#endif</span>
@@ -725,12 +763,12 @@ Next code processes all of this:
 <span class="org-preprocessor"># define</span> <span class="org-variable-name">INPUT_REPEAT_TIME</span> 300
 <span class="org-preprocessor"># warning</span> <span class="org-string">Default INPUT_REPEAT_TIME is used: 300 ms</span>
 <span class="org-preprocessor">#endif</span>
-<span class="org-comment-delimiter">// </span><span class="org-comment">}}}</span>
-
+<span class="org-comment-delimiter">// </span><span class="org-comment">}}}
+</span>
 <span class="org-keyword">struct</span> <span class="org-type">input_t</span>;
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">state of key/sensor</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_state_t</span> {
+<span class="org-comment-delimiter">/// </span><span class="org-comment">state of key/sensor
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_state_t</span> {
   <span class="org-variable-name">INPUT_IDLE</span>,
   <span class="org-variable-name">INPUT_PRESSED</span>,
   <span class="org-variable-name">INPUT_RELEASED</span>,
@@ -738,18 +776,18 @@ Next code processes all of this:
   <span class="org-variable-name">INPUT_RIGHT</span>
 } <span class="org-type">input_state_t</span>;
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">keys</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_keys_t</span> {
+<span class="org-comment-delimiter">/// </span><span class="org-comment">keys
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_keys_t</span> {
   <span class="org-variable-name">INPUT_F1</span>, <span class="org-comment-delimiter">/* </span><span class="org-comment">0</span><span class="org-comment-delimiter"> */</span>
   <span class="org-variable-name">INPUT_F2</span>,
   <span class="org-variable-name">INPUT_F3</span>,
   <span class="org-variable-name">INPUT_F4</span>,
   <span class="org-variable-name">INPUT_WHEEL</span>,
-  <span class="org-variable-name">INPUT_NUMBER_OF_KEYS</span> <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; total number, should be last</span>
-} <span class="org-type">input_keys_t</span>;
+  <span class="org-variable-name">INPUT_NUMBER_OF_KEYS</span> <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; total number, should be last
+</span>} <span class="org-type">input_keys_t</span>;
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">for filter key bounce (there is, yes!)</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">input_fltbounce_t</span> {
+<span class="org-comment-delimiter">/// </span><span class="org-comment">for filter key bounce (there is, yes!)
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">input_fltbounce_t</span> {
   <span class="org-type">t_cpu_time</span> <span class="org-variable-name">to</span>;
   <span class="org-type">input_state_t</span> <span class="org-variable-name">state</span>;
 } <span class="org-type">input_fltbounce_t</span>;
@@ -758,27 +796,27 @@ Next code processes all of this:
   .state = INPUT_IDLE, \
   __VA_ARGS__ }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">for key sticking, repeat (long pressing)</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_stick_fsm_state_t</span> {
+<span class="org-comment-delimiter">/// </span><span class="org-comment">for key sticking, repeat (long pressing)
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_stick_fsm_state_t</span> {
   <span class="org-variable-name">INPUT_STICK_FSM_NO_EMUL_ST</span> = INPUT_IDLE,
   <span class="org-variable-name">INPUT_STICK_FSM_EMUL_PRESSED_ST</span> = INPUT_PRESSED,
   <span class="org-variable-name">INPUT_STICK_FSM_EMUL_RELEASED_ST</span> = INPUT_RELEASED
 } <span class="org-type">input_stick_fsm_state_t</span>;
 
 <span class="org-keyword">typedef</span> <span class="org-keyword">enum</span> <span class="org-type">input_stick_fsm_event_t</span> {
-  <span class="org-variable-name">INPUT_STICK_FSM_RAISED_LTO_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">0</span>
-  <span class="org-variable-name">INPUT_STICK_FSM_RAISED_STO_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">1</span>
-  <span class="org-variable-name">INPUT_STICK_FSM_CHG_KEYST_EV</span>,  <span class="org-comment-delimiter">// </span><span class="org-comment">2</span>
-  <span class="org-variable-name">INPUT_STICK_FSM_SAME_KEYST_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">3</span>
-  <span class="org-variable-name">INPUT_STICK_FSM_RESET_EV</span>   <span class="org-comment-delimiter">// </span><span class="org-comment">4</span>
-} <span class="org-type">input_stick_fsm_event_t</span>;
+  <span class="org-variable-name">INPUT_STICK_FSM_RAISED_LTO_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">0
+</span>  <span class="org-variable-name">INPUT_STICK_FSM_RAISED_STO_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">1
+</span>  <span class="org-variable-name">INPUT_STICK_FSM_CHG_KEYST_EV</span>,  <span class="org-comment-delimiter">// </span><span class="org-comment">2
+</span>  <span class="org-variable-name">INPUT_STICK_FSM_SAME_KEYST_EV</span>,   <span class="org-comment-delimiter">// </span><span class="org-comment">3
+</span>  <span class="org-variable-name">INPUT_STICK_FSM_RESET_EV</span>   <span class="org-comment-delimiter">// </span><span class="org-comment">4
+</span>} <span class="org-type">input_stick_fsm_event_t</span>;
 
 <span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">input_stick_t</span> {
-  <span class="org-type">t_cpu_time</span> <span class="org-variable-name">long_to</span>, <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; long timeout</span>
-       <span class="org-variable-name">short_to</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; short (for emulating)</span>
-  <span class="org-keyword">struct</span> {
-    <span class="org-type">input_stick_fsm_state_t</span> <span class="org-variable-name">state</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; the same values as input_state_t!</span>
-  } <span class="org-variable-name">fsm</span>;
+  <span class="org-type">t_cpu_time</span> <span class="org-variable-name">long_to</span>, <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; long timeout
+</span>       <span class="org-variable-name">short_to</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; short (for emulating)
+</span>  <span class="org-keyword">struct</span> {
+    <span class="org-type">input_stick_fsm_state_t</span> <span class="org-variable-name">state</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; the same values as input_state_t!
+</span>  } <span class="org-variable-name">fsm</span>;
 } <span class="org-type">input_stick_t</span>;
 
 <span class="org-preprocessor">#define</span> <span class="org-function-name">INPUT_STICK_INITIALIZER</span>(...) { \
@@ -787,17 +825,17 @@ Next code processes all of this:
   .fsm = { .state=INPUT_STICK_FSM_NO_EMUL_ST }, \
   __VA_ARGS__ }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">input class {{{</span>
-<span class="org-keyword">typedef</span> <span class="org-type">void</span> (*<span class="org-type">input_onstickkey_t</span>)(<span class="org-keyword">struct</span> <span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">input_keys_t</span> <span class="org-variable-name">key</span>);
+<span class="org-comment-delimiter">/// </span><span class="org-comment">input class {{{
+</span><span class="org-keyword">typedef</span> <span class="org-type">void</span> (*<span class="org-type">input_onstickkey_t</span>)(<span class="org-keyword">struct</span> <span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">input_keys_t</span> <span class="org-variable-name">key</span>);
 <span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">input_t</span> {
   <span class="org-type">gui_input_if_t</span> <span class="org-variable-name">gui_input</span>;
-  <span class="org-type">input_state_t</span> <span class="org-variable-name">sensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; states of sensors</span>
-  <span class="org-type">input_fltbounce_t</span> <span class="org-variable-name">fltsensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; filtered states</span>
-  <span class="org-type">input_state_t</span> <span class="org-variable-name">keys</span>[INPUT_NUMBER_OF_KEYS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; states of keys</span>
-  <span class="org-type">input_stick_t</span> <span class="org-variable-name">stick_keys</span>[INPUT_NUMBER_OF_KEYS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; sticking of keys</span>
-  <span class="org-type">int</span> <span class="org-variable-name">wheel</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; wheel amount (counter)</span>
-  <span class="org-type">bool</span> <span class="org-variable-name">ready</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; there is some input</span>
-  <span class="org-type">input_onstickkey_t</span> <span class="org-variable-name">onstickkey</span>;
+  <span class="org-type">input_state_t</span> <span class="org-variable-name">sensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; states of sensors
+</span>  <span class="org-type">input_fltbounce_t</span> <span class="org-variable-name">fltsensors</span>[QT60168_TOUCH_NUMBER_OF_SENSORS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; filtered states
+</span>  <span class="org-type">input_state_t</span> <span class="org-variable-name">keys</span>[INPUT_NUMBER_OF_KEYS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; states of keys
+</span>  <span class="org-type">input_stick_t</span> <span class="org-variable-name">stick_keys</span>[INPUT_NUMBER_OF_KEYS]; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; sticking of keys
+</span>  <span class="org-type">int</span> <span class="org-variable-name">wheel</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; wheel amount (counter)
+</span>  <span class="org-type">bool</span> <span class="org-variable-name">ready</span>; <span class="org-comment-delimiter">///</span><span class="org-comment">&lt; there is some input
+</span>  <span class="org-type">input_onstickkey_t</span> <span class="org-variable-name">onstickkey</span>;
 } <span class="org-type">input_t</span>;
 
 <span class="org-preprocessor">#define</span> <span class="org-function-name">INPUT_INITIALIZER</span>(...) { \
@@ -814,18 +852,18 @@ Next code processes all of this:
   .onstickkey = <span class="org-constant">NULL</span>, \
   __VA_ARGS__ }
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">}}}</span>
-
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Global instance (use *INPUT* pointer)</span>
-<span class="org-keyword">extern</span> <span class="org-keyword">struct</span> <span class="org-type">input_t</span> <span class="org-variable-name">_input</span>;
+<span class="org-comment-delimiter">// </span><span class="org-comment">}}}
+</span>
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Global instance (use *INPUT* pointer)
+</span><span class="org-keyword">extern</span> <span class="org-keyword">struct</span> <span class="org-type">input_t</span> <span class="org-variable-name">_input</span>;
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">INPUT</span> (&amp;_input)
 
 <span class="org-type">void</span> <span class="org-function-name">input_init</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>);
 <span class="org-type">void</span> <span class="org-function-name">input_task</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>);
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Check if event occurs (key pressing)</span>
-<span class="org-type">int</span> <span class="org-function-name">input_test_event</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">gui_events_t</span> <span class="org-variable-name">event</span>);
-<span class="org-comment-delimiter">//</span><span class="org-comment">int input_get_event(input_t* self, gui_event_t *event);</span>
-<span class="org-type">void</span> <span class="org-function-name">input_reset_event</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">gui_events_t</span> <span class="org-variable-name">event</span>);
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Check if event occurs (key pressing)
+</span><span class="org-type">int</span> <span class="org-function-name">input_test_event</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">gui_events_t</span> <span class="org-variable-name">event</span>);
+<span class="org-comment-delimiter">//</span><span class="org-comment">int input_get_event(input_t* self, gui_event_t *event);
+</span><span class="org-type">void</span> <span class="org-function-name">input_reset_event</span>(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, <span class="org-keyword">enum</span> <span class="org-type">gui_events_t</span> <span class="org-variable-name">event</span>);
 
 <span class="org-preprocessor">#endif</span> <span class="org-comment-delimiter">/* </span><span class="org-comment">INPUT_H_</span><span class="org-comment-delimiter"> */</span>
 </pre>
@@ -838,16 +876,16 @@ Example of the usage:
 <div class="org-src-container">
 <pre class="src src-cpp">...
 <span class="org-type">void</span> onstickkey(<span class="org-type">input_t</span>* <span class="org-variable-name">self</span>, input_keys_t key) {
- <span class="org-comment-delimiter">// </span><span class="org-comment">do something...</span>
-}
+ <span class="org-comment-delimiter">// </span><span class="org-comment">do something...
+</span>}
 
 <span class="org-type">void</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>) {
   ...
   input_init(INPUT);
   INPUT-&gt;onstickkey = onstickkey;
   ...
-  <span class="org-keyword">while</span> (1) { <span class="org-comment-delimiter">// </span><span class="org-comment">main loop with "tasks"</span>
-    ...
+  <span class="org-keyword">while</span> (1) { <span class="org-comment-delimiter">// </span><span class="org-comment">main loop with "tasks"
+</span>    ...
     input_task(INPUT);
     ...
   }
@@ -862,9 +900,9 @@ Somewhere in the program you can test pressed key:
 
 <div class="org-src-container">
 <pre class="src src-cpp"><span class="org-keyword">if</span> (input-&gt;test_event(input, GUI_UP_EVENT)) {
-  <span class="org-comment-delimiter">// </span><span class="org-comment">event UP</span>
-  <span class="org-comment-delimiter">// </span><span class="org-comment">do something...</span>
-  input-&gt;reset_event(input, GUI_UP_EVENT);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">event UP
+</span>  <span class="org-comment-delimiter">// </span><span class="org-comment">do something...
+</span>  input-&gt;reset_event(input, GUI_UP_EVENT);
 }
 </pre>
 </div>

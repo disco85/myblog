@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Run jobs suite remotely via screen</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Run jobs suite remotely via screen</h1>
-<div id="outline-container-orgad9472b" class="outline-2">
-<h2 id="orgad9472b">Run jobs suite remotely via screen</h2>
-<div class="outline-text-2" id="text-orgad9472b">
+<div id="outline-container-org8ec9309" class="outline-2">
+<h2 id="org8ec9309">Run jobs suite remotely via screen</h2>
+<div class="outline-text-2" id="text-org8ec9309">
 <p>
 Often in needed to run some jobs remotely, for example, tests on remote test
 environment. I used different custom "daemon"-like scripts for this, monitoring
@@ -325,8 +363,8 @@ That's it.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span>
-<span class="org-variable-name">SCR</span>=<span class="org-sh-quoted-exec">`basename "$0"`</span>
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/bin/</span><span class="org-keyword">sh</span><span class="org-comment">
+</span><span class="org-variable-name">SCR</span>=<span class="org-sh-quoted-exec">`basename "$0"`</span>
 <span class="org-variable-name">SESSION</span>=${<span class="org-variable-name">USER</span>}_screen
 <span class="org-variable-name">LOG</span>=rmjobs.log
 
@@ -340,8 +378,8 @@ That's it.
 
 <span class="org-function-name">_runjob</span>() {
     [ $<span class="org-variable-name">1</span> = <span class="org-string">"0"</span> ] &amp;&amp; {
-        <span class="org-comment-delimiter"># </span><span class="org-comment">add -L to both if screelog.* logs are needed</span>
-        screen -dmS $<span class="org-variable-name">SESSION</span> -t <span class="org-string">"job$1"</span> sh -c <span class="org-string">"~/$SCR -run $1 \"$2\";sh"</span>
+        <span class="org-comment-delimiter"># </span><span class="org-comment">add -L to both if screelog.* logs are needed
+</span>        screen -dmS $<span class="org-variable-name">SESSION</span> -t <span class="org-string">"job$1"</span> sh -c <span class="org-string">"~/$SCR -run $1 \"$2\";sh"</span>
     } || {
         screen -S $<span class="org-variable-name">SESSION</span> -p 0 -X screen -t <span class="org-string">"job$1"</span> sh -c <span class="org-string">"~/$SCR -run $1 \"$2\";sh"</span>
     }

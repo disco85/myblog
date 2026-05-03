@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Internationalization in the Bottle</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -274,15 +312,15 @@ function toggleTheme() {
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org65ae97b">Internationalization in the Bottle</a></li>
-<li><a href="#orgd5f8ff5">i18n for messages (strings)</a></li>
-<li><a href="#org958ae7a">i18n for static text big pies (in the templates)</a></li>
+<li><a href="#org4ecd02b">Internationalization in the Bottle</a></li>
+<li><a href="#org812f11a">i18n for messages (strings)</a></li>
+<li><a href="#org3620082">i18n for static text big pies (in the templates)</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org65ae97b" class="outline-2">
-<h2 id="org65ae97b">Internationalization in the Bottle</h2>
-<div class="outline-text-2" id="text-org65ae97b">
+<div id="outline-container-org4ecd02b" class="outline-2">
+<h2 id="org4ecd02b">Internationalization in the Bottle</h2>
+<div class="outline-text-2" id="text-org4ecd02b">
 <p>
 This approach is very limited! In serious sites you have to support Web-robots, links with language code&#x2026; I use it for small (embedded Web console) projects only.
 </p>
@@ -292,12 +330,12 @@ I18N in the Bottle Python framework is easy. I prefer to do i18n for 2 different
 </p>
 </div>
 </div>
-<div id="outline-container-orgd5f8ff5" class="outline-2">
-<h2 id="orgd5f8ff5">i18n for messages (strings)</h2>
+<div id="outline-container-org812f11a" class="outline-2">
+<h2 id="org812f11a">i18n for messages (strings)</h2>
 </div>
-<div id="outline-container-org958ae7a" class="outline-2">
-<h2 id="org958ae7a">i18n for static text big pies (in the templates)</h2>
-<div class="outline-text-2" id="text-org958ae7a">
+<div id="outline-container-org3620082" class="outline-2">
+<h2 id="org3620082">i18n for static text big pies (in the templates)</h2>
+<div class="outline-text-2" id="text-org3620082">
 <p>
 I use gettext mechanism. In my application folder I have folders:
 </p>
@@ -349,27 +387,27 @@ So, my Bottle application have to know current language (preferred by user) and 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">to test, change language in the browser (see priority of them!). Then</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">refresh page - you should see text in different language</span>
-<span class="org-variable-name">_LANGS</span> <span class="org-operator">=</span> {}
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">to test, change language in the browser (see priority of them!). Then
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">refresh page - you should see text in different language
+</span><span class="org-variable-name">_LANGS</span> <span class="org-operator">=</span> {}
 <span class="org-keyword">def</span> <span class="org-function-name">initi18n</span>():
-    <span class="org-doc">"""Init internationalization of UI</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Init internationalization of UI
+    """</span>
     <span class="org-keyword">import</span> __builtin__
     <span class="org-keyword">global</span> _LANGS
-    <span class="org-keyword">for</span> l <span class="org-keyword">in</span> (<span class="org-string">"bg"</span>,<span class="org-string">"ru"</span>): <span class="org-comment-delimiter"># </span><span class="org-comment">list of supported language</span>
-        <span class="org-variable-name">trans</span> <span class="org-operator">=</span> gettext.translation(I18N_DOMAIN, LOCALEDIR, languages<span class="org-operator">=</span>[l])
+    <span class="org-keyword">for</span> l <span class="org-keyword">in</span> (<span class="org-string">"bg"</span>,<span class="org-string">"ru"</span>): <span class="org-comment-delimiter"># </span><span class="org-comment">list of supported language
+</span>        <span class="org-variable-name">trans</span> <span class="org-operator">=</span> gettext.translation(I18N_DOMAIN, LOCALEDIR, languages<span class="org-operator">=</span>[l])
         <span class="org-variable-name">_LANGS</span>[l] <span class="org-operator">=</span> trans
-    <span class="org-comment-delimiter"># </span><span class="org-comment">default translator (i.e. _())</span>
-    __builtin__.<span class="org-builtin">__dict__</span>[<span class="org-string">"_"</span>] <span class="org-operator">=</span> <span class="org-builtin">unicode</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">default translator (i.e. _())
+</span>    __builtin__.<span class="org-builtin">__dict__</span>[<span class="org-string">"_"</span>] <span class="org-operator">=</span> <span class="org-builtin">unicode</span>
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">request_lang</span>(req):
-    <span class="org-doc">"""Determine preferred language of the user from WSGI environment</span>
-<span class="org-doc">    variable HTTP_ACCEPT_LANGUAGE. Default is 'en'</span>
-<span class="org-doc">    """</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">if cfg module overrides user language</span>
-    <span class="org-keyword">if</span> cfg.LANG <span class="org-operator">!=</span> <span class="org-string">"default"</span>:
+    <span class="org-doc">"""Determine preferred language of the user from WSGI environment
+    variable HTTP_ACCEPT_LANGUAGE. Default is 'en'
+    """</span>
+    <span class="org-comment-delimiter"># </span><span class="org-comment">if cfg module overrides user language
+</span>    <span class="org-keyword">if</span> cfg.LANG <span class="org-operator">!=</span> <span class="org-string">"default"</span>:
         <span class="org-keyword">return</span> cfg.LANG
 
     <span class="org-keyword">try</span>:
@@ -379,8 +417,8 @@ So, my Bottle application have to know current language (preferred by user) and 
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">switch_lang</span>(lang):
-    <span class="org-doc">"""Select language for output VIA GETTEXT</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Select language for output VIA GETTEXT
+    """</span>
     <span class="org-keyword">import</span> __builtin__
     <span class="org-variable-name">trans</span> <span class="org-operator">=</span> _LANGS.get(lang, <span class="org-constant">None</span>)
     <span class="org-keyword">if</span> trans:
@@ -390,11 +428,11 @@ So, my Bottle application have to know current language (preferred by user) and 
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">templatei18n</span>(name, lang<span class="org-operator">=</span><span class="org-constant">None</span>, <span class="org-operator">**</span>kw):
-    <span class="org-doc">"""Like bottle template() but render for current language</span>
-<span class="org-doc">    from os.environ["LANGUAGE"]. And not like bottle's template,</span>
-<span class="org-doc">    doesn't support source, only name (not path!) as 1st arg!</span>
-<span class="org-doc">    If no lang, it will be selected from request</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Like bottle template() but render for current language
+    from os.environ["LANGUAGE"]. And not like bottle's template,
+    doesn't support source, only name (not path!) as 1st arg!
+    If no lang, it will be selected from request
+    """</span>
     <span class="org-keyword">if</span> <span class="org-keyword">not</span> lang:
         <span class="org-variable-name">lang</span> <span class="org-operator">=</span> request_lang(request)
     <span class="org-variable-name">tplpath</span> <span class="org-operator">=</span> <span class="org-string">"%s/%s/TEMPLATES/%s"</span> <span class="org-operator">%</span> (LOCALEDIR, lang, name)
@@ -405,9 +443,9 @@ So, my Bottle application have to know current language (preferred by user) and 
 
 
 <span class="org-keyword">def</span> <span class="org-function-name">i18n</span>(templ):
-    <span class="org-doc">"""Decorator for template rendering using current</span>
-<span class="org-doc">    language (i18n support)</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Decorator for template rendering using current
+    language (i18n support)
+    """</span>
     <span class="org-keyword">def</span> <span class="org-function-name">decor</span>(view):
         <span class="org-type">@functools.wraps</span>(view)
         <span class="org-keyword">def</span> <span class="org-function-name">w</span>(<span class="org-operator">*</span>a, <span class="org-operator">**</span>kw):
@@ -427,9 +465,9 @@ I use <code>initi18n()</code> before application starting and use <code>@i18n</c
 <div class="org-src-container">
 <pre class="src src-cpp">@i18n(<span class="org-string">"tasks"</span>) # name of the <span class="org-keyword">template</span>
 def tasks_list(self):
-    <span class="org-string">""</span><span class="org-warning">"</span><span class="org-string">Show table of tasks</span>
-    <span class="org-string">""</span><span class="org-warning">"</span>
-    ps = tasks_info()
+    <span class="org-string">""</span><span class="org-warning">"</span><span class="org-string">Show table of tasks</span><span class="org-warning">
+</span>    <span class="org-string">""</span><span class="org-warning">"
+</span>    ps = tasks_info()
     <span class="org-keyword">for</span> taskname in ps:
         msg = self.runres.get(taskname, <span class="org-string">""</span>) <span class="org-keyword">or</span> ps[taskname][<span class="org-string">"msg"</span>]
         ps[taskname][<span class="org-string">"msg"</span>] = msg

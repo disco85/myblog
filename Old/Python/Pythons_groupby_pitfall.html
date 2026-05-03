@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python's groupby pitfall</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Python's groupby pitfall</h1>
-<div id="outline-container-orgfac3ee8" class="outline-2">
-<h2 id="orgfac3ee8">Python's groupby pitfall</h2>
-<div class="outline-text-2" id="text-orgfac3ee8">
+<div id="outline-container-orge8febf7" class="outline-2">
+<h2 id="orge8febf7">Python's groupby pitfall</h2>
+<div class="outline-text-2" id="text-orge8febf7">
 <p>
 Python function <code>groupby</code> has one feature which can be cause of unexpected
 pitfall:
@@ -297,8 +335,8 @@ Example:
 )
 
 <span class="org-variable-name">grp</span> <span class="org-operator">=</span> groupby(<span class="org-builtin">input</span>, <span class="org-keyword">lambda</span> p: p[0])
-<span class="org-comment-delimiter"># </span><span class="org-comment">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)</span>
-<span class="org-variable-name">maxg</span>, <span class="org-variable-name">maxi</span> <span class="org-operator">=</span> <span class="org-builtin">max</span>(grp, key<span class="org-operator">=</span><span class="org-keyword">lambda</span> g: g[0])
+<span class="org-comment-delimiter"># </span><span class="org-comment">grp = map(lambda p: (p[0], list(p[1])), grp)   # (A)
+</span><span class="org-variable-name">maxg</span>, <span class="org-variable-name">maxi</span> <span class="org-operator">=</span> <span class="org-builtin">max</span>(grp, key<span class="org-operator">=</span><span class="org-keyword">lambda</span> g: g[0])
 <span class="org-builtin">print</span>(<span class="org-string">"maxg ="</span>, maxg, <span class="org-string">"maxi ="</span>, <span class="org-builtin">list</span>(maxi))
 </pre>
 </div>

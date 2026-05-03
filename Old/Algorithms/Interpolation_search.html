@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Interpolation search</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -302,9 +340,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Interpolation search</h1>
-<div id="outline-container-orgf85bb5b" class="outline-2">
-<h2 id="orgf85bb5b">Interpolation search</h2>
-<div class="outline-text-2" id="text-orgf85bb5b">
+<div id="outline-container-org97fe4ac" class="outline-2">
+<h2 id="org97fe4ac">Interpolation search</h2>
+<div class="outline-text-2" id="text-org97fe4ac">
 <p>
 A special case of this algorithm: in general, the assumption is made that the elements are not just ordered, but correspond to some increasing series, for example, to arithmetic progression with some errors. If it's truth then we can "calculate" approximated item position - it's better than binary search. But only if the series is close to the assumption (ideal) values: the larger the error, the more steps we need to take.
 </p>
@@ -409,8 +447,8 @@ To compare this kind of search with the binary search let's create some test cla
         <span class="org-keyword">elif</span> ax <span class="org-operator">==</span> a[<span class="org-operator">-</span>1]: <span class="org-keyword">return</span> n <span class="org-operator">-</span> 1
         <span class="org-variable-name">rat0</span> <span class="org-operator">=</span> (ax <span class="org-operator">-</span> a[0]) <span class="org-operator">*</span> (n <span class="org-operator">-</span> 1)
         <span class="org-variable-name">rat1</span> <span class="org-operator">=</span> a[<span class="org-operator">-</span>1] <span class="org-operator">-</span> a[0]
-        <span class="org-variable-name">x</span> <span class="org-operator">=</span> (1 <span class="org-operator">+</span> rat0 <span class="org-operator">//</span> rat1) <span class="org-operator">-</span> 1 <span class="org-comment-delimiter"># </span><span class="org-comment">coz indexes are zero-based</span>
-        <span class="org-keyword">if</span> a[x] <span class="org-operator">&lt;</span> ax:
+        <span class="org-variable-name">x</span> <span class="org-operator">=</span> (1 <span class="org-operator">+</span> rat0 <span class="org-operator">//</span> rat1) <span class="org-operator">-</span> 1 <span class="org-comment-delimiter"># </span><span class="org-comment">coz indexes are zero-based
+</span>        <span class="org-keyword">if</span> a[x] <span class="org-operator">&lt;</span> ax:
             <span class="org-keyword">return</span> x <span class="org-operator">+</span> 1 <span class="org-operator">+</span> <span class="org-keyword">self</span>.isearch(ax, a[x<span class="org-operator">+</span>1:])
         <span class="org-keyword">elif</span> a[x] <span class="org-operator">&gt;</span> ax:
             <span class="org-keyword">return</span> <span class="org-keyword">self</span>.isearch(ax, a[:x])

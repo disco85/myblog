@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>algutils.h macros</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">algutils.h macros</h1>
-<div id="outline-container-org6211e8d" class="outline-2">
-<h2 id="org6211e8d">algutils.h macros</h2>
-<div class="outline-text-2" id="text-org6211e8d">
+<div id="outline-container-org7710cd6" class="outline-2">
+<h2 id="org7710cd6">algutils.h macros</h2>
+<div class="outline-text-2" id="text-org7710cd6">
 <p>
 Some useful macros for algorithms C/C++ (used early in related posts):
 </p>
@@ -281,26 +319,26 @@ Some useful macros for algorithms C/C++ (used early in related posts):
 <pre class="src src-cpp"><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> _ALGUTILS_H_
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">_ALGUTILS_H_</span>
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Array numbers</span>
-<span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> sizeofarray
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Array numbers
+</span><span class="org-preprocessor">#if</span><span class="org-negation-char"><span class="org-preprocessor">n</span></span><span class="org-preprocessor">def</span> sizeofarray
 <span class="org-preprocessor">#define</span> <span class="org-function-name">sizeofarray</span>(<span class="org-variable-name">ARR</span>) (<span class="org-keyword">sizeof</span>(ARR) / <span class="org-keyword">sizeof</span>(ARR[0]))
 <span class="org-preprocessor">#endif</span>
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Division with ceil rounding</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">CEILDIV</span>(<span class="org-variable-name">X</span>,<span class="org-variable-name">Y</span>) (((X)%(Y))? (1 + ((X)/(Y))) : ((X)/(Y)))
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Division with ceil rounding
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">CEILDIV</span>(<span class="org-variable-name">X</span>,<span class="org-variable-name">Y</span>) (((X)%(Y))? (1 + ((X)/(Y))) : ((X)/(Y)))
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">min, max, abs</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">MIN</span>(<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span>) ((X)&lt;(Y)?(X):(Y))
+<span class="org-comment-delimiter">/// </span><span class="org-comment">min, max, abs
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">MIN</span>(<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span>) ((X)&lt;(Y)?(X):(Y))
 <span class="org-preprocessor">#define</span> <span class="org-function-name">MAX</span>(<span class="org-variable-name">X</span>, <span class="org-variable-name">Y</span>) ((X)&gt;(Y)?(X):(Y))
 <span class="org-preprocessor">#define</span> <span class="org-function-name">ABS</span>(<span class="org-variable-name">X</span>) ((X)&lt;0?(-(X)):(X))
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Swaps two variables via temporary var @a tmp</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">SWAP</span>(<span class="org-variable-name">x</span>, <span class="org-variable-name">y</span>, <span class="org-variable-name">tmp</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Swaps two variables via temporary var @a tmp
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">SWAP</span>(<span class="org-variable-name">x</span>, <span class="org-variable-name">y</span>, <span class="org-variable-name">tmp</span>) <span class="org-keyword">do</span> { \
     tmp = x; x = y; y = tmp; \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Print array @a ARR with length @a LEN by item format @a ELFMT</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">PRINTARRX</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">ELFMT</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Print array @a ARR with length @a LEN by item format @a ELFMT
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">PRINTARRX</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">ELFMT</span>) <span class="org-keyword">do</span> { \
     printf(<span class="org-string">"{ "</span>); \
     <span class="org-keyword">for</span> (<span class="org-type">unsigned</span> <span class="org-type">int</span> <span class="org-variable-name">i</span>=0; i&lt;(LEN); i++) { \
         printf(ELFMT <span class="org-string">" "</span>, (ARR)[i]); \
@@ -308,11 +346,11 @@ Some useful macros for algorithms C/C++ (used early in related posts):
     printf(<span class="org-string">"}\n"</span>); \
 } <span class="org-keyword">while</span> (0)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Print array @a ARR by item format @a ELFMT</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">PRINTARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">ELFMT</span>) PRINTARRX(ARR, sizeofarray(ARR), ELFMT)
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Print array @a ARR by item format @a ELFMT
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">PRINTARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">ELFMT</span>) PRINTARRX(ARR, sizeofarray(ARR), ELFMT)
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">Shift array @a ARR of length @a LEN by @a N positions to right</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">RSHIFT_ARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">N</span>) <span class="org-keyword">do</span> { \
+<span class="org-comment-delimiter">/// </span><span class="org-comment">Shift array @a ARR of length @a LEN by @a N positions to right
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">RSHIFT_ARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">N</span>) <span class="org-keyword">do</span> { \
     <span class="org-keyword">register</span> <span class="org-type">int</span> <span class="org-variable-name">_rshift_arr_i_</span>; \
     <span class="org-keyword">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
          _rshift_arr_i_&gt;(N)-1; \

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Quick sort</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Quick sort</h1>
-<div id="outline-container-orgfa58854" class="outline-2">
-<h2 id="orgfa58854">Quick sort</h2>
-<div class="outline-text-2" id="text-orgfa58854">
+<div id="outline-container-org11df374" class="outline-2">
+<h2 id="org11df374">Quick sort</h2>
+<div class="outline-text-2" id="text-org11df374">
 <p>
 This is the implementation of quick sort algorithm in C.
 </p>
@@ -288,46 +326,46 @@ This is the implementation of quick sort algorithm in C.
     <span class="org-type">long</span> <span class="org-variable-name">l</span> = 0, <span class="org-variable-name">r</span> = len, <span class="org-variable-name">mid</span> = len/2;
     <span class="org-type">T</span> <span class="org-variable-name">temp</span>, <span class="org-variable-name">p</span>;
 
-    p = a[mid]; <span class="org-comment-delimiter">// </span><span class="org-comment">central item</span>
+    p = a[mid]; <span class="org-comment-delimiter">// </span><span class="org-comment">central item
+</span>
+    <span class="org-comment-delimiter">/* </span><span class="org-comment">Swap: items less than p will go to left, above - to right,
+       l going from the left, r - from the right, before the item,
+       which denies this rule. After finding of such items we will
+       swap them
+    do {
+        // looking for item from the left which &gt; p
+        while (a[l] &lt; p) l++;
+        // looking for item from the right &lt; p
+        while (a[r] &gt; p) r--;
 
-    <span class="org-comment-delimiter">/* </span><span class="org-comment">Swap: items less than p will go to left, above - to right,</span>
-<span class="org-comment">       l going from the left, r - from the right, before the item,</span>
-<span class="org-comment">       which denies this rule. After finding of such items we will</span>
-<span class="org-comment">       swap them</span>
-<span class="org-comment">    do {</span>
-<span class="org-comment">        // looking for item from the left which &gt; p</span>
-<span class="org-comment">        while (a[l] &lt; p) l++;</span>
-<span class="org-comment">        // looking for item from the right &lt; p</span>
-<span class="org-comment">        while (a[r] &gt; p) r--;</span>
-
-<span class="org-comment">        // swap them if no wrapping</span>
-<span class="org-comment">        if (l &lt;= r) {</span>
-<span class="org-comment">            SWAP(a[l], a[r], temp);</span>
-<span class="org-comment">            l++; r--; // go to next - without it - hang up!</span>
-<span class="org-comment">        }</span>
-<span class="org-comment">    } while (l&lt;=r); // </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> may be better is l&lt;r ?</span>
+        // swap them if no wrapping
+        if (l &lt;= r) {
+            SWAP(a[l], a[r], temp);
+            l++; r--; // go to next - without it - hang up!
+        }
+    } while (l&lt;=r); // </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> may be better is l&lt;r ?
 
 
-<span class="org-comment">    /* Recursive calls if there is what to sort.</span>
-<span class="org-comment">    Both cases works, upper makes about 2 times lesser calls!</span>
-<span class="org-comment">    Split by the point where on left side are all &lt; p, on right:</span>
-<span class="org-comment">    all &gt; p. If to choice another point of splitting, result</span>
-<span class="org-comment">    of pre-sorting will be lost - ordering on one of the sides</span>
-<span class="org-comment">    will be denied</span>
-<span class="org-comment-delimiter">    */</span>
+    /* Recursive calls if there is what to sort.
+    Both cases works, upper makes about 2 times lesser calls!
+    Split by the point where on left side are all &lt; p, on right:
+    all &gt; p. If to choice another point of splitting, result
+    of pre-sorting will be lost - ordering on one of the sides
+    will be denied
+</span><span class="org-comment-delimiter">    */</span>
     <span class="org-keyword">if</span> (r &gt; 0) qsort(a, r);
     <span class="org-keyword">if</span> (len &gt; l) qsort(a+l, len-l);
 
-    <span class="org-comment-delimiter">/*</span><span class="org-comment">if (len&gt;1) {</span>
-<span class="org-comment">        qsort(a, mid);</span>
-<span class="org-comment">        qsort(a + mid, len - mid);</span>
-<span class="org-comment">    }</span><span class="org-comment-delimiter">*/</span>
+    <span class="org-comment-delimiter">/*</span><span class="org-comment">if (len&gt;1) {
+        qsort(a, mid);
+        qsort(a + mid, len - mid);
+    }</span><span class="org-comment-delimiter">*/</span>
 }
 
 
-<span class="org-comment-delimiter">/*****************************************</span>
-<span class="org-comment">                   main</span>
-<span class="org-comment"> ***************************************</span><span class="org-comment-delimiter">*/</span>
+<span class="org-comment-delimiter">/*****************************************</span><span class="org-comment">
+                   main
+ ***************************************</span><span class="org-comment-delimiter">*/</span>
 <span class="org-type">int</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>)
 {
     <span class="org-type">int</span> <span class="org-variable-name">arr</span>[] = {10, 9, 4, 5, 11, 45, 6, 7, 88, 1, 0, 1};

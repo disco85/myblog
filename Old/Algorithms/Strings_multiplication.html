@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>"Strings" multiplication</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">"Strings" multiplication</h1>
-<div id="outline-container-org0923302" class="outline-2">
-<h2 id="org0923302">"Strings" multiplication</h2>
-<div class="outline-text-2" id="text-org0923302">
+<div id="outline-container-org817e8cb" class="outline-2">
+<h2 id="org817e8cb">"Strings" multiplication</h2>
+<div class="outline-text-2" id="text-org817e8cb">
 <p>
 This is the usual task in interview: solve multiplication of integer numbers presented as strings, for ex., "25" * "25" = "625". Length of these strings may be any (not 16 bits or 32 bits only).
 Implementation will use school way of multiplication of numbers (sign is ignored), see:
@@ -319,17 +357,17 @@ So, each "saving" of result digit should make summation and there are not number
 
 <span class="org-type">char</span>* <span class="org-function-name">mul</span>(<span class="org-keyword">const</span> <span class="org-type">char</span> *<span class="org-variable-name">s1</span>, <span class="org-keyword">const</span> <span class="org-type">char</span> *<span class="org-variable-name">s2</span>, <span class="org-type">char</span> *<span class="org-variable-name">res</span>, <span class="org-type">int</span> <span class="org-variable-name">reslen</span>)
 {
-    <span class="org-type">int</span> <span class="org-variable-name">r</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in result string</span>
-        <span class="org-variable-name">i</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in s1</span>
-        <span class="org-variable-name">_i</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">offset (to left) of next middle number</span>
-        <span class="org-variable-name">j</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in s2</span>
-        <span class="org-variable-name">len1</span> = strlen(s1), <span class="org-variable-name">len2</span> = strlen(s2);
-    <span class="org-type">int</span> <span class="org-variable-name">d1</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">digit in s1</span>
-        <span class="org-variable-name">d2</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">digit in s2</span>
-        <span class="org-variable-name">ts</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">temporary summ</span>
-        <span class="org-variable-name">c</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">curry in multiplication</span>
-        <span class="org-variable-name">cs</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">curry in summation</span>
-    memset(res, 0, reslen);
+    <span class="org-type">int</span> <span class="org-variable-name">r</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in result string
+</span>        <span class="org-variable-name">i</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in s1
+</span>        <span class="org-variable-name">_i</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">offset (to left) of next middle number
+</span>        <span class="org-variable-name">j</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">index in s2
+</span>        <span class="org-variable-name">len1</span> = strlen(s1), <span class="org-variable-name">len2</span> = strlen(s2);
+    <span class="org-type">int</span> <span class="org-variable-name">d1</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">digit in s1
+</span>        <span class="org-variable-name">d2</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">digit in s2
+</span>        <span class="org-variable-name">ts</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">temporary summ
+</span>        <span class="org-variable-name">c</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">curry in multiplication
+</span>        <span class="org-variable-name">cs</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">curry in summation
+</span>    memset(res, 0, reslen);
     <span class="org-keyword">for</span> (i=len2-1, _i=0, cs=0; i&gt;=0; i--, _i++) {
         d2 = ASCII2I(s2[i]);
         r = reslen - 2 - _i;
@@ -343,8 +381,8 @@ So, each "saving" of result digit should make summation and there are not number
             r--;
         }
         <span class="org-keyword">do</span> {
-            <span class="org-comment-delimiter">// </span><span class="org-comment">do rest of sum (high digits)</span>
-            ts = ASCII2I(res[r]) + (c%10) + cs;
+            <span class="org-comment-delimiter">// </span><span class="org-comment">do rest of sum (high digits)
+</span>            ts = ASCII2I(res[r]) + (c%10) + cs;
             <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>ts) <span class="org-keyword">break</span>;
             res[r] = I2ASCII(ts%10);
             cs = ts/10;
@@ -354,10 +392,10 @@ So, each "saving" of result digit should make summation and there are not number
     <span class="org-keyword">return</span> (res + r + 1);
 }
 
-<span class="org-comment-delimiter">///////////////////////////////////////////////</span>
-<span class="org-comment-delimiter">//              </span><span class="org-comment">Main: tests</span>
-<span class="org-comment-delimiter">///////////////////////////////////////////////</span>
-
+<span class="org-comment-delimiter">///////////////////////////////////////////////</span><span class="org-comment">
+</span><span class="org-comment-delimiter">//              </span><span class="org-comment">Main: tests
+</span><span class="org-comment-delimiter">///////////////////////////////////////////////</span><span class="org-comment">
+</span>
 <span class="org-preprocessor">#define</span> <span class="org-function-name">RND</span>(<span class="org-variable-name">N</span>) (srand(time(<span class="org-constant">NULL</span>)), rand()%(N))
 
 <span class="org-type">int</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>)
@@ -367,9 +405,9 @@ So, each "saving" of result digit should make summation and there are not number
     <span class="org-type">char</span> <span class="org-variable-name">s2</span>[32] = {0};
     <span class="org-type">int</span> <span class="org-variable-name">n1</span>, <span class="org-variable-name">n2</span>, <span class="org-variable-name">rn</span>, <span class="org-variable-name">resn</span>, <span class="org-variable-name">chk</span>;
 
-    <span class="org-comment-delimiter">//</span><span class="org-comment">printf("%s\n", mul("1856", "1856", _res, sizeofarray(_res)));</span>
-    <span class="org-comment-delimiter">//</span><span class="org-comment">return 0;</span>
-
+    <span class="org-comment-delimiter">//</span><span class="org-comment">printf("%s\n", mul("1856", "1856", _res, sizeofarray(_res)));
+</span>    <span class="org-comment-delimiter">//</span><span class="org-comment">return 0;
+</span>
     <span class="org-keyword">for</span> (<span class="org-type">int</span> <span class="org-variable-name">i</span>=0; i&lt;100; i++) {
         sprintf(s1, <span class="org-string">"%d"</span>, RND(9999999));
         sprintf(s2, <span class="org-string">"%d"</span>, 1+RND(9999999));

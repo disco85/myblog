@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>In-place non-recursive Merge Sort</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">In-place non-recursive Merge Sort</h1>
-<div id="outline-container-org88ab04e" class="outline-2">
-<h2 id="org88ab04e">In-place non-recursive Merge Sort</h2>
-<div class="outline-text-2" id="text-org88ab04e">
+<div id="outline-container-orgd374add" class="outline-2">
+<h2 id="orgd374add">In-place non-recursive Merge Sort</h2>
+<div class="outline-text-2" id="text-orgd374add">
 <p>
 Merge sorting is a good known algorithm, but usually is used recursive implementation with additional array. This is an another version: without recursive and without usage of additional array.
 Merge sorting idea is to sort small parts (pairs) than longer (4 items) and etc, but each next sort phase is MERGE of previous sorted parts. Merging of 2 sorted parts should saves order of items:
@@ -325,28 +363,28 @@ So, this is the code:
 <span class="org-keyword">template</span>&lt;<span class="org-keyword">typename</span>&gt;
 <span class="org-keyword">static</span> <span class="org-keyword">inline</span> <span class="org-type">void</span> <span class="org-function-name">_merge</span>(<span class="org-type">T</span> *<span class="org-variable-name">arr</span>, <span class="org-type">int</span> <span class="org-variable-name">left</span>, <span class="org-type">int</span> <span class="org-variable-name">mid</span>, <span class="org-type">int</span> <span class="org-variable-name">right</span>)
 {
-    <span class="org-type">T</span> <span class="org-variable-name">tmp</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">tmp item needed for inserting if head position on shift</span>
-      *<span class="org-variable-name">larr</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">left subarray</span>
-      *<span class="org-variable-name">rarr</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">right subarray</span>
-    <span class="org-type">int</span> <span class="org-variable-name">llen</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">length of left subarray</span>
-        <span class="org-variable-name">rlen</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">length of right subarray</span>
-    <span class="org-type">int</span> <span class="org-variable-name">l</span>, <span class="org-variable-name">r</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">indexes of compared items in left, right subarrays</span>
-
+    <span class="org-type">T</span> <span class="org-variable-name">tmp</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">tmp item needed for inserting if head position on shift
+</span>      *<span class="org-variable-name">larr</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">left subarray
+</span>      *<span class="org-variable-name">rarr</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">right subarray
+</span>    <span class="org-type">int</span> <span class="org-variable-name">llen</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">length of left subarray
+</span>        <span class="org-variable-name">rlen</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">length of right subarray
+</span>    <span class="org-type">int</span> <span class="org-variable-name">l</span>, <span class="org-variable-name">r</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">indexes of compared items in left, right subarrays
+</span>
     l = r = 0;
     larr = &amp;arr[left];
     <span class="org-keyword">if</span> (mid==left) {
-        <span class="org-comment-delimiter">// </span><span class="org-comment">When len==2 swapping is more preferable</span>
-        rarr = &amp;arr[mid+1];
+        <span class="org-comment-delimiter">// </span><span class="org-comment">When len==2 swapping is more preferable
+</span>        rarr = &amp;arr[mid+1];
         llen = mid - left + 1;
         rlen = right - mid - 1;
     } <span class="org-keyword">else</span> {
-        <span class="org-comment-delimiter">// </span><span class="org-comment">Common case</span>
-        rarr = &amp;arr[mid];
+        <span class="org-comment-delimiter">// </span><span class="org-comment">Common case
+</span>        rarr = &amp;arr[mid];
         llen = mid - left;
         rlen = right - mid;
     }
-    <span class="org-comment-delimiter">// </span><span class="org-comment">Index in left subarray is limited by "right" index</span>
-    <span class="org-keyword">while</span> ((larr+l &lt; rarr+r) &amp;&amp; r &lt; rlen) {
+    <span class="org-comment-delimiter">// </span><span class="org-comment">Index in left subarray is limited by "right" index
+</span>    <span class="org-keyword">while</span> ((larr+l &lt; rarr+r) &amp;&amp; r &lt; rlen) {
         <span class="org-keyword">if</span> (larr[l] &gt; rarr[r]) {
             tmp = rarr[r];
             RSHIFT_ARR(larr+l, llen-(l-r), 1);
@@ -360,13 +398,13 @@ So, this is the code:
 <span class="org-keyword">template</span>&lt;<span class="org-keyword">typename</span>&gt;
 <span class="org-type">int</span> <span class="org-function-name">mergsort</span>(<span class="org-type">T</span>* <span class="org-variable-name">arr</span>, <span class="org-type">int</span> <span class="org-variable-name">len</span>)
 {
-    <span class="org-type">int</span> <span class="org-variable-name">lev</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">level of "recursion"</span>
-        <span class="org-variable-name">pie</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">number of subarray (of part)</span>
-        <span class="org-variable-name">pielen</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">subarray length: 2, 4, 8...</span>
-        <span class="org-variable-name">left</span>, <span class="org-variable-name">right</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">bounds (right is not included)</span>
-        <span class="org-variable-name">mid</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">middle point for splitting - is the same as left bound of subarray but on prev. level</span>
-        <span class="org-variable-name">lastleft</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">last left index</span>
-
+    <span class="org-type">int</span> <span class="org-variable-name">lev</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">level of "recursion"
+</span>        <span class="org-variable-name">pie</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">number of subarray (of part)
+</span>        <span class="org-variable-name">pielen</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">subarray length: 2, 4, 8...
+</span>        <span class="org-variable-name">left</span>, <span class="org-variable-name">right</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">bounds (right is not included)
+</span>        <span class="org-variable-name">mid</span>, <span class="org-comment-delimiter">// </span><span class="org-comment">middle point for splitting - is the same as left bound of subarray but on prev. level
+</span>        <span class="org-variable-name">lastleft</span>; <span class="org-comment-delimiter">// </span><span class="org-comment">last left index
+</span>
     <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>arr||<span class="org-negation-char">!</span>len) <span class="org-keyword">return</span> (0);
 
     lev = 0;
@@ -378,8 +416,8 @@ So, this is the code:
             right = left + pielen;
             <span class="org-keyword">if</span> (right &gt; len) right = len;
             mid = lev*2 + pielen*pie;
-            <span class="org-keyword">if</span> (pielen &gt; len || mid &gt; len-1) mid = lastleft; <span class="org-comment-delimiter">//</span><span class="org-comment">mid = len-2;</span>
-            _merge(arr, left, mid, right);
+            <span class="org-keyword">if</span> (pielen &gt; len || mid &gt; len-1) mid = lastleft; <span class="org-comment-delimiter">//</span><span class="org-comment">mid = len-2;
+</span>            _merge(arr, left, mid, right);
             pie++;
         } <span class="org-keyword">while</span> (right &lt; len-1);
         pielen *= 2;
@@ -390,9 +428,9 @@ So, this is the code:
 }
 
 
-<span class="org-comment-delimiter">/*****************************************</span>
-<span class="org-comment">                   main</span>
-<span class="org-comment"> ***************************************</span><span class="org-comment-delimiter">*/</span>
+<span class="org-comment-delimiter">/*****************************************</span><span class="org-comment">
+                   main
+ ***************************************</span><span class="org-comment-delimiter">*/</span>
 <span class="org-type">int</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>)
 {
     <span class="org-type">int</span> <span class="org-variable-name">arr1</span>[] = {10, 19, 1, 2, 10, 450, 6, 7, 8, 100, 120, 121};
@@ -408,8 +446,8 @@ Macros RSHIFT<sub>ARR</sub>() is trivial:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-cpp"><span class="org-comment-delimiter">/// </span><span class="org-comment">Shift array @a ARR of length @a LEN by @a N positions to right</span>
-<span class="org-preprocessor">#define</span> <span class="org-function-name">RSHIFT_ARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">N</span>) <span class="org-keyword">do</span> { \
+<pre class="src src-cpp"><span class="org-comment-delimiter">/// </span><span class="org-comment">Shift array @a ARR of length @a LEN by @a N positions to right
+</span><span class="org-preprocessor">#define</span> <span class="org-function-name">RSHIFT_ARR</span>(<span class="org-variable-name">ARR</span>, <span class="org-variable-name">LEN</span>, <span class="org-variable-name">N</span>) <span class="org-keyword">do</span> { \
     <span class="org-keyword">register</span> <span class="org-type">int</span> <span class="org-variable-name">_rshift_arr_i_</span>; \
     <span class="org-keyword">for</span> (_rshift_arr_i_=(N)+(LEN)-1; \
          _rshift_arr_i_&gt;(N)-1; \

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl: listeners</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl: listeners</h1>
-<div id="outline-container-org1083722" class="outline-2">
-<h2 id="org1083722">Tcl: listeners</h2>
-<div class="outline-text-2" id="text-org1083722">
+<div id="outline-container-orga16fdff" class="outline-2">
+<h2 id="orga16fdff">Tcl: listeners</h2>
+<div class="outline-text-2" id="text-orga16fdff">
 <p>
 This is very popular model for Dataflow (and DSP) applications and no needing to introduce it. So, only listing:
 </p>
@@ -281,9 +319,9 @@ This is very popular model for Dataflow (and DSP) applications and no needing to
 <pre class="src src-tcl"><span class="org-builtin">package</span> provide mylsn 1.0
 <span class="org-builtin">package</span> require Itcl
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">ListenEvent</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-itcl::class ListenEvent {
+<span class="org-comment-delimiter"># </span><span class="org-comment">ListenEvent
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>itcl::class ListenEvent {
     <span class="org-type">public</span> variable name
     <span class="org-type">public</span> variable src
     <span class="org-type">public</span> variable data
@@ -294,16 +332,16 @@ itcl::class ListenEvent {
     }
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">DataListener </span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-itcl::class DataListener {
-    <span class="org-comment"># list of understandable providers' datatypes. Empty - all</span>
-    <span class="org-type">public</span> variable datatypes <span class="org-string">""</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">DataListener 
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>itcl::class DataListener {
+    <span class="org-comment"># list of understandable providers' datatypes. Empty - all
+</span>    <span class="org-type">public</span> variable datatypes <span class="org-string">""</span>
 
-    <span class="org-type">protected</span> variable _event {};  <span class="org-comment"># ListenEvent</span>
-
-    <span class="org-comment"># all listeners</span>
-    <span class="org-type">public</span> common all {}
+    <span class="org-type">protected</span> variable _event {};  <span class="org-comment"># ListenEvent
+</span>
+    <span class="org-comment"># all listeners
+</span>    <span class="org-type">public</span> common all {}
 
     <span class="org-keyword">constructor</span> {} { <span class="org-builtin">lappend</span> all $<span class="org-variable-name">this</span> }
 
@@ -312,40 +350,40 @@ itcl::class DataListener {
         <span class="org-keyword">if</span> {$<span class="org-variable-name">i</span> &gt;= 0} { <span class="org-builtin">set</span> <span class="org-variable-name">all</span> [<span class="org-builtin">lreplace</span> $<span class="org-variable-name">all</span> $<span class="org-variable-name">i</span> $<span class="org-variable-name">i</span>] }
     }
 
-    <span class="org-comment"># FSM state: LISTEN|SESSION|OFF. Means:</span>
-    <span class="org-comment">#   LISTEN - ready for data from data provider</span>
-    <span class="org-comment">#   SESSION - already reading some data (first data packet was received)</span>
-    <span class="org-comment">#   OFF - reading of data is disabled</span>
-    <span class="org-type">protected</span> variable _lstate LISTEN
+    <span class="org-comment"># FSM state: LISTEN|SESSION|OFF. Means:
+</span>    <span class="org-comment">#   LISTEN - ready for data from data provider
+</span>    <span class="org-comment">#   SESSION - already reading some data (first data packet was received)
+</span>    <span class="org-comment">#   OFF - reading of data is disabled
+</span>    <span class="org-type">protected</span> variable _lstate LISTEN
 
-    <span class="org-comment"># values is list of values</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> ondata {values} {}
+    <span class="org-comment"># values is list of values
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> ondata {values} {}
 
-    <span class="org-comment"># on run polling (listening session). columns is the list of columns names,</span>
-    <span class="org-comment"># units is the list of unit names</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> onrun {columns units} {}
+    <span class="org-comment"># on run polling (listening session). columns is the list of columns names,
+</span>    <span class="org-comment"># units is the list of unit names
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> onrun {columns units} {}
 
-    <span class="org-comment"># on stop listening session</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> onstop {} {}
+    <span class="org-comment"># on stop listening session
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> onstop {} {}
 
-    <span class="org-comment"># on add to data provider</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> onadd {provider} {}
+    <span class="org-comment"># on add to data provider
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> onadd {provider} {}
 
-    <span class="org-comment"># on delete from data provider</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> ondel {provider} {}
+    <span class="org-comment"># on delete from data provider
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> ondel {provider} {}
 
     <span class="org-keyword">method</span> <span class="org-function-name">event</span> {ev src args} {
-        <span class="org-comment"># generate event (call callback) for this listener.</span>
-        <span class="org-comment"># ev is ListenEvent object, src is the source of event.</span>
-        <span class="org-comment"># ev is one of run|stop|data|on|off|add|del:</span>
-        <span class="org-comment">#   run - before first packet sent</span>
-        <span class="org-comment">#   stop - after last packet sent</span>
-        <span class="org-comment">#   data - packet is received</span>
-        <span class="org-comment">#   on - enable listening</span>
-        <span class="org-comment">#   off - disable listening</span>
-        <span class="org-comment">#   add - connect with some data provider</span>
-        <span class="org-comment">#   del - disconnect from some data provider</span>
-
+        <span class="org-comment"># generate event (call callback) for this listener.
+</span>        <span class="org-comment"># ev is ListenEvent object, src is the source of event.
+</span>        <span class="org-comment"># ev is one of run|stop|data|on|off|add|del:
+</span>        <span class="org-comment">#   run - before first packet sent
+</span>        <span class="org-comment">#   stop - after last packet sent
+</span>        <span class="org-comment">#   data - packet is received
+</span>        <span class="org-comment">#   on - enable listening
+</span>        <span class="org-comment">#   off - disable listening
+</span>        <span class="org-comment">#   add - connect with some data provider
+</span>        <span class="org-comment">#   del - disconnect from some data provider
+</span>
 
         <span class="org-builtin">set</span> <span class="org-variable-name">_event</span> [ListenEvent #auto $<span class="org-variable-name">ev</span> $<span class="org-variable-name">src</span> $<span class="org-variable-name">args</span>]
         <span class="org-keyword">switch</span> -- $<span class="org-variable-name">_lstate</span> {
@@ -377,14 +415,14 @@ itcl::class DataListener {
         }
     }
 
-    <span class="org-comment"># listen -on|-off</span>
-    <span class="org-keyword">method</span> <span class="org-function-name">listen</span> {what} {
-        <span class="org-comment"># listen -on -- turn-on listening</span>
-        <span class="org-comment"># listen -off -- turn-off listening</span>
+    <span class="org-comment"># listen -on|-off
+</span>    <span class="org-keyword">method</span> <span class="org-function-name">listen</span> {what} {
+        <span class="org-comment"># listen -on -- turn-on listening
+</span>        <span class="org-comment"># listen -off -- turn-off listening
+</span>
 
-
-        <span class="org-comment"># event without src ("" - user call is event source)</span>
-        <span class="org-keyword">switch</span> -- $<span class="org-variable-name">what</span> {
+        <span class="org-comment"># event without src ("" - user call is event source)
+</span>        <span class="org-keyword">switch</span> -- $<span class="org-variable-name">what</span> {
             -on     { $<span class="org-variable-name">this</span> event on <span class="org-string">""</span> }
             -off    { $<span class="org-variable-name">this</span> event off <span class="org-string">""</span> }
             <span class="org-keyword">default</span> { <span class="org-keyword">error</span>  <span class="org-string">"listen can be -on or -off only"</span> }
@@ -393,14 +431,14 @@ itcl::class DataListener {
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">listened</span> {} {
-        <span class="org-comment"># Is listening now?</span>
-
+        <span class="org-comment"># Is listening now?
+</span>
 
         <span class="org-keyword">return</span> [<span class="org-builtin">expr</span> {$<span class="org-variable-name">_lstate</span> ne <span class="org-string">"OFF"</span>}]
     }
 
-    <span class="org-comment"># join columns and units with delimiter into new list</span>
-    <span class="org-keyword">method</span> <span class="org-function-name">join_columns_units</span> {columns units {delim <span class="org-string">","</span>}} {
+    <span class="org-comment"># join columns and units with delimiter into new list
+</span>    <span class="org-keyword">method</span> <span class="org-function-name">join_columns_units</span> {columns units {delim <span class="org-string">","</span>}} {
         <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
         <span class="org-keyword">foreach</span> c $<span class="org-variable-name">columns</span> u $<span class="org-variable-name">units</span> {
             <span class="org-builtin">lappend</span> res <span class="org-string">"$c$delim$u"</span>
@@ -409,11 +447,11 @@ itcl::class DataListener {
     }
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">DataProvider</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-itcl::class DataProvider {
-    <span class="org-comment"># static list of all providers</span>
-    <span class="org-type">public</span> common all {}
+<span class="org-comment-delimiter"># </span><span class="org-comment">DataProvider
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>itcl::class DataProvider {
+    <span class="org-comment"># static list of all providers
+</span>    <span class="org-type">public</span> common all {}
     <span class="org-type">public</span> variable datatype <span class="org-string">""</span>
 
     <span class="org-type">protected</span> variable _listeners
@@ -425,35 +463,35 @@ itcl::class DataProvider {
         <span class="org-keyword">if</span> {$<span class="org-variable-name">i</span> &gt;= 0} { <span class="org-builtin">set</span> <span class="org-variable-name">all</span> [<span class="org-builtin">lreplace</span> $<span class="org-variable-name">all</span> $<span class="org-variable-name">i</span> $<span class="org-variable-name">i</span>] }
     }
 
-    <span class="org-comment"># returns list (pair) of columns (list) and units - if they are</span>
-    <span class="org-comment"># fixed all the time (for any session)</span>
-    <span class="org-keyword">method</span> <span class="org-function-name">fixed_columns_units</span> {} {}
+    <span class="org-comment"># returns list (pair) of columns (list) and units - if they are
+</span>    <span class="org-comment"># fixed all the time (for any session)
+</span>    <span class="org-keyword">method</span> <span class="org-function-name">fixed_columns_units</span> {} {}
 
-    <span class="org-comment"># normalize name, need bcz user can use quilified name as</span>
-    <span class="org-comment"># ::a, not a.</span>
-    <span class="org-comment"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> namespace which -variable does not work in Itcl, so</span>
-    <span class="org-comment"># i cut all :, but is possible to add/del only listeners on</span>
-    <span class="org-comment"># top-level namespace</span>
-    <span class="org-type">protected</span> <span class="org-keyword">method</span> _normname {name} {
+    <span class="org-comment"># normalize name, need bcz user can use quilified name as
+</span>    <span class="org-comment"># ::a, not a.
+</span>    <span class="org-comment"># </span><span class="org-fixme-keyword">FIXME</span><span class="org-comment"> namespace which -variable does not work in Itcl, so
+</span>    <span class="org-comment"># i cut all :, but is possible to add/del only listeners on
+</span>    <span class="org-comment"># top-level namespace
+</span>    <span class="org-type">protected</span> <span class="org-keyword">method</span> _normname {name} {
         <span class="org-keyword">return</span> [<span class="org-builtin">regsub</span> -all <span class="org-string">":"</span> $<span class="org-variable-name">name</span> <span class="org-string">""</span>]
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">get_listeners</span> {} {
-        <span class="org-comment"># Returns names of all listeners</span>
-
+        <span class="org-comment"># Returns names of all listeners
+</span>
 
         <span class="org-keyword">return</span> [<span class="org-builtin">array</span> names _listeners]
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">add_listener</span> {listener} {
-        <span class="org-comment"># Add some listener</span>
+        <span class="org-comment"># Add some listener
+</span>
 
-
-        <span class="org-builtin">set</span> <span class="org-variable-name">lsndts</span> [$<span class="org-variable-name">listener</span> cget -datatypes]; <span class="org-comment"># datatypes expected by listener</span>
-        <span class="org-keyword">if</span> {[<span class="org-builtin">llength</span> $<span class="org-variable-name">lsndts</span>] &amp;&amp; !($<span class="org-variable-name">datatype</span> <span class="org-keyword">in</span> $<span class="org-variable-name">lsndts</span>)} {
-            <span class="org-comment"># if listener datatypes not empty (expect some) and my datatype</span>
-            <span class="org-comment"># is not in it's datatypes, so I can't add this listener</span>
-            <span class="org-keyword">error</span> <span class="org-string">"Listener $listener does not understand $this provider"</span>
+        <span class="org-builtin">set</span> <span class="org-variable-name">lsndts</span> [$<span class="org-variable-name">listener</span> cget -datatypes]; <span class="org-comment"># datatypes expected by listener
+</span>        <span class="org-keyword">if</span> {[<span class="org-builtin">llength</span> $<span class="org-variable-name">lsndts</span>] &amp;&amp; !($<span class="org-variable-name">datatype</span> <span class="org-keyword">in</span> $<span class="org-variable-name">lsndts</span>)} {
+            <span class="org-comment"># if listener datatypes not empty (expect some) and my datatype
+</span>            <span class="org-comment"># is not in it's datatypes, so I can't add this listener
+</span>            <span class="org-keyword">error</span> <span class="org-string">"Listener $listener does not understand $this provider"</span>
         }
 
         <span class="org-builtin">set</span> <span class="org-variable-name">name</span> [_normname $<span class="org-variable-name">listener</span>]
@@ -469,8 +507,8 @@ itcl::class DataProvider {
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">del_listener</span> {listener {stop 1}} {
-        <span class="org-comment"># Deletes listener, sends before stop event if needed</span>
-
+        <span class="org-comment"># Deletes listener, sends before stop event if needed
+</span>
 
         <span class="org-builtin">set</span> <span class="org-variable-name">name</span> [_normname $<span class="org-variable-name">listener</span>]
         <span class="org-builtin">set</span> <span class="org-variable-name">listener</span> [<span class="org-builtin">lindex</span> [<span class="org-builtin">array</span> get _listeners $<span class="org-variable-name">name</span>] 1]
@@ -482,10 +520,10 @@ itcl::class DataProvider {
         <span class="org-keyword">return</span> $<span class="org-variable-name">listener</span>
     }
 
-    <span class="org-comment"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not effective</span>
-    <span class="org-keyword">method</span> <span class="org-function-name">del_all_listeners</span> {{stop 1}} {
-        <span class="org-comment"># Deletes all listeners, send stop event before, if needed</span>
-
+    <span class="org-comment"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not effective
+</span>    <span class="org-keyword">method</span> <span class="org-function-name">del_all_listeners</span> {{stop 1}} {
+        <span class="org-comment"># Deletes all listeners, send stop event before, if needed
+</span>
 
         <span class="org-keyword">foreach</span> name [<span class="org-builtin">array</span> names _listeners] {
             del_listener $<span class="org-variable-name">name</span> $<span class="org-variable-name">stop</span>
@@ -493,8 +531,8 @@ itcl::class DataProvider {
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">notify_all</span> {ev args} {
-        <span class="org-comment"># Notify all listeners with event ev and some args</span>
-
+        <span class="org-comment"># Notify all listeners with event ev and some args
+</span>
 
         <span class="org-keyword">foreach</span> {name listener} [<span class="org-builtin">array</span> get _listeners] {
             $<span class="org-variable-name">listener</span> event $<span class="org-variable-name">ev</span> $<span class="org-variable-name">this</span> {*}$<span class="org-variable-name">args</span>
@@ -502,18 +540,18 @@ itcl::class DataProvider {
     }
 
     <span class="org-keyword">method</span> <span class="org-function-name">number</span> {} {
-        <span class="org-comment"># Returns number of listeners</span>
-
+        <span class="org-comment"># Returns number of listeners
+</span>
 
         <span class="org-keyword">return</span> [<span class="org-builtin">array</span> size _listeners]
     }
 
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">ProxyListener - general object for process events without creating</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">a special class</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-itcl::class ProxyListener {
+<span class="org-comment-delimiter"># </span><span class="org-comment">ProxyListener - general object for process events without creating
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">a special class
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>itcl::class ProxyListener {
     <span class="org-type">inherit</span> DataListener DataProvider
 
     <span class="org-type">public</span> variable onrunproc <span class="org-string">""</span>
@@ -563,9 +601,9 @@ itcl::class ProxyListener {
     }
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">DebugListener - repeater</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-itcl::class DebugListener {
+<span class="org-comment-delimiter"># </span><span class="org-comment">DebugListener - repeater
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>itcl::class DebugListener {
     <span class="org-type">inherit</span> ProxyListener
 
     <span class="org-type">public</span> variable fixed_cu <span class="org-string">""</span>
@@ -597,34 +635,34 @@ itcl::class DebugListener {
     }
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">procedures</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================</span>
-
+<span class="org-comment-delimiter"># </span><span class="org-comment">procedures
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">=====================================================================
+</span>
 <span class="org-keyword">proc</span> <span class="org-function-name">debug_listen</span> {d between0 between1} {
-    <span class="org-comment">#DebugListener $this.#auto</span>
-    $<span class="org-variable-name">d</span> configure -fixed_cu [$<span class="org-variable-name">between0</span> fixed_columns_units]
+    <span class="org-comment">#DebugListener $this.#auto
+</span>    $<span class="org-variable-name">d</span> configure -fixed_cu [$<span class="org-variable-name">between0</span> fixed_columns_units]
     listen $<span class="org-variable-name">between0</span>:$<span class="org-variable-name">d</span>
     listen $<span class="org-variable-name">d</span>:$<span class="org-variable-name">between1</span>
 }
 
 <span class="org-keyword">proc</span> <span class="org-function-name">listen</span> args {
-    <span class="org-comment"># Set who listen who:</span>
-    <span class="org-comment">#   listen provider...: listener...</span>
-    <span class="org-comment"># or</span>
-    <span class="org-comment">#   listen prov...: all</span>
-    <span class="org-comment"># or</span>
-    <span class="org-comment">#   listen -- return list of lists {provider {listeners}}</span>
-    <span class="org-comment"># or</span>
-    <span class="org-comment">#   listen -txt -- return formatted string (for user)</span>
-    <span class="org-comment"># or</span>
-    <span class="org-comment">#   listen -p -- returns formatted string with providers and it's datatypes</span>
-    <span class="org-comment"># or</span>
-    <span class="org-comment">#   listen -l -- returns formatted string with listeners and it's datatypes</span>
-
+    <span class="org-comment"># Set who listen who:
+</span>    <span class="org-comment">#   listen provider...: listener...
+</span>    <span class="org-comment"># or
+</span>    <span class="org-comment">#   listen prov...: all
+</span>    <span class="org-comment"># or
+</span>    <span class="org-comment">#   listen -- return list of lists {provider {listeners}}
+</span>    <span class="org-comment"># or
+</span>    <span class="org-comment">#   listen -txt -- return formatted string (for user)
+</span>    <span class="org-comment"># or
+</span>    <span class="org-comment">#   listen -p -- returns formatted string with providers and it's datatypes
+</span>    <span class="org-comment"># or
+</span>    <span class="org-comment">#   listen -l -- returns formatted string with listeners and it's datatypes
+</span>
 
     <span class="org-keyword">if</span> {[lsearch -exact $<span class="org-variable-name">args</span> <span class="org-string">"-txt"</span>] != -1} {
-        <span class="org-comment"># if there is "-txt" option, return formatted string</span>
-        <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
+        <span class="org-comment"># if there is "-txt" option, return formatted string
+</span>        <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
         <span class="org-keyword">foreach</span> prov $<span class="org-variable-name">DataProvider::all</span> {
             <span class="org-builtin">set</span> <span class="org-variable-name">nprov</span> [<span class="org-builtin">regsub</span> -all <span class="org-string">":"</span> $<span class="org-variable-name">prov</span> <span class="org-string">""</span>]
             <span class="org-builtin">lappend</span> res <span class="org-string">"$nprov: [join [$prov get_listeners] ,\ ]"</span>
@@ -650,25 +688,25 @@ itcl::class DebugListener {
         <span class="org-keyword">return</span> [<span class="org-builtin">join</span> $<span class="org-variable-name">res</span> <span class="org-string">"\n"</span>]
 
     } <span class="org-keyword">elseif</span> {$<span class="org-variable-name">args</span> eq <span class="org-string">""</span>} {
-        <span class="org-comment"># if no args, returns listening table (all links)</span>
-        <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
+        <span class="org-comment"># if no args, returns listening table (all links)
+</span>        <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
         <span class="org-keyword">foreach</span> prov $<span class="org-variable-name">DataProvider::all</span> {
             <span class="org-builtin">lappend</span> res [<span class="org-builtin">list</span> $<span class="org-variable-name">prov</span> [$<span class="org-variable-name">prov</span> get_listeners]]
         }
         <span class="org-keyword">return</span> $<span class="org-variable-name">res</span>
 
     } <span class="org-keyword">else</span> {
-        <span class="org-comment"># normalize args (make ':' like arg, not part of another arg)</span>
-        lassign [<span class="org-builtin">split</span> [<span class="org-builtin">join</span> $<span class="org-variable-name">args</span> <span class="org-string">" "</span>] :] providers listeners
+        <span class="org-comment"># normalize args (make ':' like arg, not part of another arg)
+</span>        lassign [<span class="org-builtin">split</span> [<span class="org-builtin">join</span> $<span class="org-variable-name">args</span> <span class="org-string">" "</span>] :] providers listeners
 
-        <span class="org-comment"># if there is 'all' in listeners then it'll be all of them :)</span>
-        <span class="org-keyword">if</span> {[lsearch -exact $<span class="org-variable-name">listeners</span> all] != -1} {
+        <span class="org-comment"># if there is 'all' in listeners then it'll be all of them :)
+</span>        <span class="org-keyword">if</span> {[lsearch -exact $<span class="org-variable-name">listeners</span> all] != -1} {
             <span class="org-builtin">set</span> <span class="org-variable-name">listeners</span> $<span class="org-variable-name">DataListener::all</span>
         }
 
-        <span class="org-comment"># delete each listener from ALL known providers then attach</span>
-        <span class="org-comment"># to selected</span>
-        <span class="org-keyword">foreach</span> lsn $<span class="org-variable-name">listeners</span> {
+        <span class="org-comment"># delete each listener from ALL known providers then attach
+</span>        <span class="org-comment"># to selected
+</span>        <span class="org-keyword">foreach</span> lsn $<span class="org-variable-name">listeners</span> {
             <span class="org-keyword">foreach</span> prov $<span class="org-variable-name">DataProvider::all</span> { $<span class="org-variable-name">prov</span> del_listener $<span class="org-variable-name">lsn</span> 1 }
             <span class="org-keyword">foreach</span> prov $<span class="org-variable-name">providers</span> { $<span class="org-variable-name">prov</span> add_listener $<span class="org-variable-name">lsn</span> }
         }

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ASF: simple utility for font editing</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,28 +308,28 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">ASF: simple utility for font editing</h1>
-<div id="outline-container-orge79170a" class="outline-2">
-<h2 id="orge79170a">ASF: simple utility for font editing</h2>
-<div class="outline-text-2" id="text-orge79170a">
+<div id="outline-container-org5db3420" class="outline-2">
+<h2 id="org5db3420">ASF: simple utility for font editing</h2>
+<div class="outline-text-2" id="text-org5db3420">
 <p>
 Used fonts in Atmel Software Framework are simple: each glyph is described with array of bytes - each set bit is pixel, no bit - no pixel :)
 Next is the very-very simple Tcl utility to convert glyph bytes into console image of symbol and vice-verse.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">parsing and loading font</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">------------------------------------------------------------------------------</span>
-<span class="org-keyword">proc</span> <span class="org-function-name">parsesymb</span> str {
-    <span class="org-comment"># Parse one symbol in notation like:</span>
-    <span class="org-comment"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"</span>
-
+<pre class="src src-tcl"><span class="org-comment-delimiter"># </span><span class="org-comment">parsing and loading font
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">------------------------------------------------------------------------------
+</span><span class="org-keyword">proc</span> <span class="org-function-name">parsesymb</span> str {
+    <span class="org-comment"># Parse one symbol in notation like:
+</span>    <span class="org-comment"># "0x06,0x08,0x08,0x00,0x00,0x00,0x00,0x00"
+</span>
     <span class="org-builtin">set</span> <span class="org-variable-name">bytes</span> [<span class="org-builtin">regexp</span> -all -inline {0[xX][0-9a-fA-F]{2}} $<span class="org-variable-name">str</span>]
     <span class="org-keyword">return</span> $<span class="org-variable-name">bytes</span>
 }
 
 <span class="org-keyword">proc</span> <span class="org-function-name">putsymbline</span> byte {
-    <span class="org-comment"># put on screen one line of a symbol</span>
-
+    <span class="org-comment"># put on screen one line of a symbol
+</span>
     <span class="org-builtin">set</span> <span class="org-variable-name">mask</span> 0b10000000
     <span class="org-keyword">for</span> {<span class="org-builtin">set</span> i 0} {$<span class="org-variable-name">i</span>&lt;8 data-blogger-escaped-bit="bit" data-blogger-escaped-byte="byte" data-blogger-escaped-expr="<span class="org-builtin">expr</span>" data-blogger-escaped-i="i" data-blogger-escaped-incr="<span class="org-builtin">incr</span>" data-blogger-escaped-mask="mask" data-blogger-escaped-set="<span class="org-builtin">set</span>"&gt;&gt;1}]
         <span class="org-keyword">if</span> $<span class="org-variable-name">bit</span> {
@@ -303,8 +341,8 @@ Next is the very-very simple Tcl utility to convert glyph bytes into console ima
 }
 
 <span class="org-keyword">proc</span> <span class="org-function-name">putsymb</span> symb_bytes {
-    <span class="org-comment"># put on screen all symbol (all it's lines)</span>
-
+    <span class="org-comment"># put on screen all symbol (all it's lines)
+</span>
     <span class="org-builtin">puts</span> <span class="org-string">"+--------+"</span>
     <span class="org-keyword">foreach</span> sb $<span class="org-variable-name">symb_bytes</span> {
         <span class="org-builtin">puts</span> -nonewline <span class="org-string">"|"</span>
@@ -314,18 +352,18 @@ Next is the very-very simple Tcl utility to convert glyph bytes into console ima
     <span class="org-builtin">puts</span> <span class="org-string">"+--------+"</span>
 }
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Compile glyphs to font in C format</span>
-<span class="org-comment-delimiter">#</span><span class="org-comment">-------------------------------------------------------------------------------</span>
-<span class="org-keyword">proc</span> <span class="org-function-name">compsymbline</span> line {
-    <span class="org-comment"># Compile line like "# # # # " to 0xAA</span>
-
+<span class="org-comment-delimiter"># </span><span class="org-comment">Compile glyphs to font in C format
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">-------------------------------------------------------------------------------
+</span><span class="org-keyword">proc</span> <span class="org-function-name">compsymbline</span> line {
+    <span class="org-comment"># Compile line like "# # # # " to 0xAA
+</span>
     <span class="org-builtin">set</span> <span class="org-variable-name">bits</span> [<span class="org-builtin">string</span> map { <span class="org-string">" "</span> 0 # 1} $<span class="org-variable-name">line</span>]
     <span class="org-keyword">return</span> [<span class="org-builtin">format</span> 0x%02X <span class="org-string">"0b$bits"</span>]
 }
 
 <span class="org-keyword">proc</span> <span class="org-function-name">compsymb</span> symb_lines {
-    <span class="org-comment"># Compile lines of symbol (what out 'putsymb')</span>
-
+    <span class="org-comment"># Compile lines of symbol (what out 'putsymb')
+</span>
     <span class="org-builtin">set</span> <span class="org-builtin">read</span> 0
     <span class="org-builtin">set</span> <span class="org-variable-name">res</span> {}
     <span class="org-keyword">foreach</span> line $<span class="org-variable-name">symb_lines</span> {
@@ -394,14 +432,14 @@ Example of usage:
 <div class="org-src-container">
 <pre class="src src-bash">$<span class="org-variable-name">echo</span> 0x20,0x78,0xA0,0x70,0x28,0xF0,0x20,0x00|tclkitsh font.tcl put
 +--------+
-|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|</span>
-| <span class="org-comment-delimiter">####   </span><span class="org-comment">|</span>
-|<span class="org-comment-delimiter"># </span><span class="org-comment">#     |</span>
-| <span class="org-comment-delimiter">###    </span><span class="org-comment">|</span>
-|  <span class="org-comment-delimiter"># </span><span class="org-comment">#   |</span>
-|<span class="org-comment-delimiter">####    </span><span class="org-comment">|</span>
-|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|</span>
-|        |
+|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|
+</span>| <span class="org-comment-delimiter">####   </span><span class="org-comment">|
+</span>|<span class="org-comment-delimiter"># </span><span class="org-comment">#     |
+</span>| <span class="org-comment-delimiter">###    </span><span class="org-comment">|
+</span>|  <span class="org-comment-delimiter"># </span><span class="org-comment">#   |
+</span>|<span class="org-comment-delimiter">####    </span><span class="org-comment">|
+</span>|  <span class="org-comment-delimiter">#     </span><span class="org-comment">|
+</span>|        |
 +--------+
 </pre>
 </div>

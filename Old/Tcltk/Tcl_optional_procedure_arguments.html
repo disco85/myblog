@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tcl: optional procedure arguments</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Tcl: optional procedure arguments</h1>
-<div id="outline-container-orgb9c873d" class="outline-2">
-<h2 id="orgb9c873d">Tcl: optional procedure arguments</h2>
-<div class="outline-text-2" id="text-orgb9c873d">
+<div id="outline-container-org1bb3868" class="outline-2">
+<h2 id="org1bb3868">Tcl: optional procedure arguments</h2>
+<div class="outline-text-2" id="text-org1bb3868">
 <p>
 They are very usable in many language. For example in Python:
 </p>
@@ -295,10 +333,10 @@ For Tcl it's easy to write procedure for processing keyword arguments (like geto
 
 <div class="org-src-container">
 <pre class="src src-tcl"><span class="org-keyword">proc</span> <span class="org-function-name">getargs</span> {argsName kwArgsName arguments} {
-<span class="org-comment-delimiter"># </span><span class="org-comment">like getopt for proc/method, ex:</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">1) argsName may be ""|{} - to avoid positional args saving</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">2) if no value of keyword argument, then it's value will be "Y"</span>
-
+<span class="org-comment-delimiter"># </span><span class="org-comment">like getopt for proc/method, ex:
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">1) argsName may be ""|{} - to avoid positional args saving
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">2) if no value of keyword argument, then it's value will be "Y"
+</span>
     <span class="org-type">upvar</span> 1 $<span class="org-variable-name">kwArgsName</span> kwargs
     <span class="org-builtin">set</span> <span class="org-variable-name">posargs</span> {}
 
@@ -310,8 +348,8 @@ For Tcl it's easy to write procedure for processing keyword arguments (like geto
         <span class="org-builtin">lappend</span> posargs $<span class="org-variable-name">opt</span>
     }
     <span class="org-keyword">proc</span> <span class="org-function-name">setKwArg</span> {name val} {
-        <span class="org-builtin">set</span> <span class="org-variable-name">ret</span> <span class="org-string">"@NOMORE"</span>; <span class="org-comment"># used or not $val, it's possible positional opt</span>
-        <span class="org-keyword">if</span> {$<span class="org-variable-name">name</span> ne <span class="org-string">""</span>} {
+        <span class="org-builtin">set</span> <span class="org-variable-name">ret</span> <span class="org-string">"@NOMORE"</span>; <span class="org-comment"># used or not $val, it's possible positional opt
+</span>        <span class="org-keyword">if</span> {$<span class="org-variable-name">name</span> ne <span class="org-string">""</span>} {
             <span class="org-type">upvar</span> 1 kwargs kwargs
             <span class="org-builtin">set</span> <span class="org-variable-name">defaultValue</span> [<span class="org-builtin">lindex</span> [<span class="org-builtin">array</span> get kwargs $<span class="org-variable-name">name</span>] end]
             <span class="org-keyword">if</span> {$<span class="org-variable-name">defaultValue</span> <span class="org-keyword">in</span> {<span class="org-string">"Y"</span> <span class="org-string">"N"</span>}} {
@@ -328,8 +366,8 @@ For Tcl it's easy to write procedure for processing keyword arguments (like geto
     }
 
     <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> <span class="org-string">""</span>
-    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> OPT; <span class="org-comment"># OPT|VAL|END</span>
-    <span class="org-builtin">lappend</span> arguments <span class="org-string">"@EOO"</span>
+    <span class="org-builtin">set</span> <span class="org-variable-name">state</span> OPT; <span class="org-comment"># OPT|VAL|END
+</span>    <span class="org-builtin">lappend</span> arguments <span class="org-string">"@EOO"</span>
     <span class="org-keyword">foreach</span> opt $<span class="org-variable-name">arguments</span> {
         <span class="org-keyword">switch</span> -- $<span class="org-variable-name">state</span> {
             OPT {
@@ -374,9 +412,9 @@ Here is the example how to use:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-tcl"><span class="org-builtin">set</span> <span class="org-variable-name">args</span> {}; <span class="org-comment"># positional args</span>
-<span class="org-builtin">array</span> <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> {-a 1 -b 2}; <span class="org-comment"># default kw-args</span>
-<span class="org-builtin">set</span> <span class="org-variable-name">inputArgs</span> {-a 20 -c 30 zzz -q -v xxx yyy}
+<pre class="src src-tcl"><span class="org-builtin">set</span> <span class="org-variable-name">args</span> {}; <span class="org-comment"># positional args
+</span><span class="org-builtin">array</span> <span class="org-builtin">set</span> <span class="org-variable-name">kw</span> {-a 1 -b 2}; <span class="org-comment"># default kw-args
+</span><span class="org-builtin">set</span> <span class="org-variable-name">inputArgs</span> {-a 20 -c 30 zzz -q -v xxx yyy}
 getargs args kw $<span class="org-variable-name">inputArgs</span>
 <span class="org-builtin">puts</span> <span class="org-string">"Args:\n $args"</span>
 <span class="org-builtin">puts</span> <span class="org-string">"KW Args:"</span>

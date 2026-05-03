@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Multithread queue</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Multithread queue</h1>
-<div id="outline-container-org3e92439" class="outline-2">
-<h2 id="org3e92439">Multithread queue</h2>
-<div class="outline-text-2" id="text-org3e92439">
+<div id="outline-container-orgf354710" class="outline-2">
+<h2 id="orgf354710">Multithread queue</h2>
+<div class="outline-text-2" id="text-orgf354710">
 <p>
 This C module is similar to Python Queue - for multithreading programs. It is based on POSIX Threads and BSD queue.h.
 </p>
@@ -320,10 +358,10 @@ See the code:
 <span class="org-type">void</span>
 <span class="org-function-name">delete_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*)) {
         <span class="org-keyword">if</span> (q) {
-                clear_queue(q, delete_data); <span class="org-comment-delimiter">// </span><span class="org-comment">delete all items from queue</span>
-                pthread_mutex_destroy(&amp;q-&gt;qlock);
-                free(q); <span class="org-comment-delimiter">// </span><span class="org-comment">free queue</span>
-        }
+                clear_queue(q, delete_data); <span class="org-comment-delimiter">// </span><span class="org-comment">delete all items from queue
+</span>                pthread_mutex_destroy(&amp;q-&gt;qlock);
+                free(q); <span class="org-comment-delimiter">// </span><span class="org-comment">free queue
+</span>        }
 }
 <span class="org-type">void</span>
 <span class="org-function-name">clear_queue</span>(<span class="org-type">queue_t</span> *<span class="org-variable-name">q</span>, <span class="org-type">void</span> (*<span class="org-function-name">delete_data</span>)(<span class="org-type">void</span>*)) {
@@ -404,8 +442,8 @@ See the code:
         }
         <span class="org-keyword">for</span> (i=0; i&lt;q-&gt;len; i++) {
                 item = SIMPLEQ_FIRST(&amp;q-&gt;head);
-                <span class="org-comment-delimiter">//</span><span class="org-comment">assert(item);</span>
-                <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>item) <span class="org-keyword">break</span>;
+                <span class="org-comment-delimiter">//</span><span class="org-comment">assert(item);
+</span>                <span class="org-keyword">if</span> (<span class="org-negation-char">!</span>item) <span class="org-keyword">break</span>;
                 all[i] = item-&gt;data;
                 SIMPLEQ_REMOVE_HEAD(&amp;q-&gt;head, items);
                 free(item);
@@ -474,8 +512,8 @@ And an example of the usage:
         printf(<span class="org-string">"PANIC: %s\n"</span>, msg);
         exit(1);
 }
-<span class="org-comment-delimiter">/* </span><span class="org-comment">Thread of putting an elements to queue.</span>
-<span class="org-comment-delimiter"> */</span>
+<span class="org-comment-delimiter">/* </span><span class="org-comment">Thread of putting an elements to queue.
+</span><span class="org-comment-delimiter"> */</span>
 <span class="org-type">void</span>* <span class="org-function-name">thrput</span>(<span class="org-type">void</span> *<span class="org-variable-name">arg</span>) {
         <span class="org-type">int</span> <span class="org-variable-name">n</span>;
         <span class="org-type">int</span> *<span class="org-variable-name">data</span>;
@@ -491,8 +529,8 @@ And an example of the usage:
                         *data = i*NCICLES + n;
                         <span class="org-keyword">while</span> (put_to_queue(q, (<span class="org-type">void</span>*)data)) {
                             printf(<span class="org-string">"*** ERROR: queue is full!\n"</span>);
-                            <span class="org-comment-delimiter">// </span><span class="org-comment">wait 1 sec and try again</span>
-                            pthread_delay(1000);
+                            <span class="org-comment-delimiter">// </span><span class="org-comment">wait 1 sec and try again
+</span>                            pthread_delay(1000);
                         }
                 }
         }
@@ -544,18 +582,18 @@ And an example of the usage:
         }
 }
 <span class="org-type">void</span> *<span class="org-function-name">thrget</span>(<span class="org-type">void</span> *<span class="org-variable-name">arg</span>) {
-        thrget2(); <span class="org-comment-delimiter">// </span><span class="org-comment">first, get all until NULL</span>
-        thrget1(); <span class="org-comment-delimiter">// </span><span class="org-comment">then get one by one until NULL</span>
-}
+        thrget2(); <span class="org-comment-delimiter">// </span><span class="org-comment">first, get all until NULL
+</span>        thrget1(); <span class="org-comment-delimiter">// </span><span class="org-comment">then get one by one until NULL
+</span>}
 <span class="org-type">void</span>
 <span class="org-function-name">main</span>() {
         <span class="org-type">int</span> <span class="org-variable-name">n</span> = 2;
         <span class="org-type">pthread_t</span> <span class="org-variable-name">thrput_id</span>, <span class="org-variable-name">thrget_id</span>;
-        q = create_queue(200); <span class="org-comment-delimiter">// </span><span class="org-comment">size of queue</span>
-        pthread_create(&amp;thrput_id, <span class="org-constant">NULL</span>, thrput, (<span class="org-type">void</span>*)&amp;n);
+        q = create_queue(200); <span class="org-comment-delimiter">// </span><span class="org-comment">size of queue
+</span>        pthread_create(&amp;thrput_id, <span class="org-constant">NULL</span>, thrput, (<span class="org-type">void</span>*)&amp;n);
         pthread_create(&amp;thrget_id, <span class="org-constant">NULL</span>, thrget, <span class="org-constant">NULL</span>);
-        <span class="org-comment-delimiter">// </span><span class="org-comment">wait finishing of the threads</span>
-        pthread_join(thrget_id, <span class="org-constant">NULL</span>);
+        <span class="org-comment-delimiter">// </span><span class="org-comment">wait finishing of the threads
+</span>        pthread_join(thrget_id, <span class="org-constant">NULL</span>);
         pthread_join(thrput_id, <span class="org-constant">NULL</span>);
         delete_queue(q, FREE_QDATA);
 <span class="org-preprocessor">#ifdef</span> HAVE_LEAKDEBUG

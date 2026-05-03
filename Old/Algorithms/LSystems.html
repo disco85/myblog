@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>L-Systems</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">L-Systems</h1>
-<div id="outline-container-org87a8db5" class="outline-2">
-<h2 id="org87a8db5">L-Systems</h2>
-<div class="outline-text-2" id="text-org87a8db5">
+<div id="outline-container-org239918c" class="outline-2">
+<h2 id="org239918c">L-Systems</h2>
+<div class="outline-text-2" id="text-org239918c">
 <p>
 More about L-System: <a href="https://en.wikipedia.org/wiki/L-system">https://en.wikipedia.org/wiki/L-system</a>
 </p>
@@ -297,7 +335,7 @@ Example of generated picture:
 </p>
 
 
-<div id="orgb6e5819" class="figure">
+<div id="orgf56c9fa" class="figure">
 <p><img src="../../assets/Lsys1.svg" alt="Lsys1.svg" class="org-svg" />
 </p>
 </div>
@@ -311,48 +349,48 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">The idea is to iteratively match variables and to replace them with another one,</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">step by step. Like A -&gt; AB (where A,B are variables)... Finally it's unfolded</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">into some long sequence of variables that can be treated in some way (to draw</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">picture, to play music, etc).</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">More: https://en.wikipedia.org/wiki/L-system</span>
-<span class="org-comment-delimiter">#</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Parameters of variables are supported including dynamic ones (based on original,</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">matched variables, as references in regexp). But for color, width set they are</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">not used - context manager `draw_attrs()` is used instead of, because draw of</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">PythTree is as to-leaf/back-to-root, to-leaf/back-to-root... and in this case</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">colors would be black/white, black/white... not black/lighter/more-ligher/white.</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">So, the context manager calculates relative Y-coord (how far it's from the root)</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">and sets color/width.</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> draw from the bottom of the screen</span>
-<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> support big number of iterations</span>
-<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> set thickness and color using `pars`</span>
-
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">The idea is to iteratively match variables and to replace them with another one,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">step by step. Like A -&gt; AB (where A,B are variables)... Finally it's unfolded
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">into some long sequence of variables that can be treated in some way (to draw
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">picture, to play music, etc).
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">More: https://en.wikipedia.org/wiki/L-system
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Parameters of variables are supported including dynamic ones (based on original,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">matched variables, as references in regexp). But for color, width set they are
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">not used - context manager `draw_attrs()` is used instead of, because draw of
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">PythTree is as to-leaf/back-to-root, to-leaf/back-to-root... and in this case
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">colors would be black/white, black/white... not black/lighter/more-ligher/white.
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">So, the context manager calculates relative Y-coord (how far it's from the root)
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">and sets color/width.
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> draw from the bottom of the screen
+</span><span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> support big number of iterations
+</span><span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment"> set thickness and color using `pars`
+</span>
 <span class="org-keyword">import</span> random
 <span class="org-keyword">import</span> svg_turtle
 <span class="org-keyword">from</span> contextlib <span class="org-keyword">import</span> contextmanager
 
 
-<span class="org-comment-delimiter">################################## </span><span class="org-comment">L-System ####################################</span>
-
+<span class="org-comment-delimiter">################################## </span><span class="org-comment">L-System ####################################
+</span>
 <span class="org-keyword">class</span> <span class="org-type">DynPars</span>:
-  <span class="org-doc">"""Dynamic parameters: they can get parameters of matched variables and to</span>
-<span class="org-doc">  transform them into parameters of new coming (tail) variables</span>
-<span class="org-doc">  """</span>
+  <span class="org-doc">"""Dynamic parameters: they can get parameters of matched variables and to
+  transform them into parameters of new coming (tail) variables
+  """</span>
   <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, new_pars<span class="org-operator">=</span><span class="org-constant">None</span>):
     <span class="org-keyword">self</span>.<span class="org-variable-name">new_pars</span> <span class="org-operator">=</span> new_pars <span class="org-keyword">or</span> (<span class="org-keyword">lambda</span> a: a)
 
   <span class="org-keyword">def</span> <span class="org-function-name">tail_pars</span>(<span class="org-keyword">self</span>, tail_vars, matched_vars_pars):
     <span class="org-variable-name">tail_vars_pars</span> <span class="org-operator">=</span> <span class="org-builtin">list</span>(<span class="org-keyword">self</span>.new_pars(matched_vars_pars))
-    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(tail_vars_pars) <span class="org-operator">==</span> 1:                       <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure </span>
-      <span class="org-variable-name">tail_vars_pars</span> <span class="org-operator">=</span> tail_vars_pars <span class="org-operator">*</span> <span class="org-builtin">len</span>(tail_vars) <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure</span>
-    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-builtin">len</span>(tail_vars)):
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(tail_vars_pars) <span class="org-operator">==</span> 1:                       <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure 
+</span>      <span class="org-variable-name">tail_vars_pars</span> <span class="org-operator">=</span> tail_vars_pars <span class="org-operator">*</span> <span class="org-builtin">len</span>(tail_vars) <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> not sure
+</span>    <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-builtin">len</span>(tail_vars)):
       <span class="org-keyword">if</span> i <span class="org-operator">&gt;=</span> <span class="org-builtin">len</span>(tail_vars_pars):
         <span class="org-keyword">break</span>
       tail_vars[i].<span class="org-variable-name">pars</span> <span class="org-operator">=</span> tail_vars_pars[i]
-    <span class="org-comment-delimiter"># </span><span class="org-comment">print(matched_vars_pars, '=&gt;', tail_vars)</span>
-    <span class="org-keyword">return</span> tail_vars
+    <span class="org-comment-delimiter"># </span><span class="org-comment">print(matched_vars_pars, '=&gt;', tail_vars)
+</span>    <span class="org-keyword">return</span> tail_vars
 
 
 <span class="org-keyword">class</span> <span class="org-type">Var</span>:
@@ -444,8 +482,8 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
 
     <span class="org-keyword">if</span> matched <span class="org-keyword">is</span> <span class="org-constant">None</span>:
       <span class="org-variable-name">matched_pars</span> <span class="org-operator">=</span> [v.pars <span class="org-keyword">for</span> v <span class="org-keyword">in</span> <span class="org-builtin">vars</span>[:1]]
-      <span class="org-comment-delimiter">#</span><span class="org-comment">print('1', matched_pars, len(vars[:1]))</span>
-      <span class="org-variable-name">ret</span> <span class="org-operator">=</span> {<span class="org-string">'applied'</span>: <span class="org-builtin">vars</span>[0:1], <span class="org-string">'rest'</span>: <span class="org-builtin">vars</span>[1:]}
+      <span class="org-comment-delimiter">#</span><span class="org-comment">print('1', matched_pars, len(vars[:1]))
+</span>      <span class="org-variable-name">ret</span> <span class="org-operator">=</span> {<span class="org-string">'applied'</span>: <span class="org-builtin">vars</span>[0:1], <span class="org-string">'rest'</span>: <span class="org-builtin">vars</span>[1:]}
     <span class="org-keyword">else</span>:
       <span class="org-variable-name">matched_rule</span>, <span class="org-variable-name">match_res</span> <span class="org-operator">=</span> matched
       <span class="org-variable-name">new_vars</span> <span class="org-operator">=</span> matched_rule.tail[:]
@@ -456,9 +494,9 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
     <span class="org-keyword">return</span> ret
 
   <span class="org-keyword">def</span> <span class="org-function-name">apply_rules</span>(<span class="org-keyword">self</span>, <span class="org-builtin">vars</span>, prefer<span class="org-operator">=</span>Prefer.LAST):
-    <span class="org-doc">"""Performs 1 step of L-System: applies all rules on `vars` (input string)</span>
-<span class="org-doc">    until the end of input string</span>
-<span class="org-doc">    """</span>
+    <span class="org-doc">"""Performs 1 step of L-System: applies all rules on `vars` (input string)
+    until the end of input string
+    """</span>
     <span class="org-variable-name">result</span> <span class="org-operator">=</span> []
     <span class="org-variable-name">rest</span> <span class="org-operator">=</span> <span class="org-builtin">vars</span>[:]
     <span class="org-keyword">while</span> rest:
@@ -487,8 +525,8 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
     <span class="org-keyword">return</span> r
 
 
-<span class="org-comment-delimiter">#################################### </span><span class="org-comment">Render ####################################</span>
-<span class="org-keyword">class</span> <span class="org-type">IRender</span>:
+<span class="org-comment-delimiter">#################################### </span><span class="org-comment">Render ####################################
+</span><span class="org-keyword">class</span> <span class="org-type">IRender</span>:
   <span class="org-doc">"""Render interface"""</span>
   <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, lsys):
     <span class="org-keyword">self</span>.<span class="org-variable-name">lsys</span> <span class="org-operator">=</span> lsys
@@ -517,8 +555,8 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
     <span class="org-keyword">self</span>.<span class="org-variable-name">stack</span> <span class="org-operator">=</span> []
     <span class="org-keyword">self</span>.<span class="org-variable-name">only_last_step</span> <span class="org-operator">=</span> only_last_step
     <span class="org-keyword">self</span>.<span class="org-variable-name">styles</span> <span class="org-operator">=</span> styles <span class="org-keyword">or</span> {}
-    <span class="org-keyword">self</span>.<span class="org-variable-name">y0</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">start of drawing, 1st point</span>
-
+    <span class="org-keyword">self</span>.<span class="org-variable-name">y0</span> <span class="org-operator">=</span> <span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">start of drawing, 1st point
+</span>
   <span class="org-keyword">def</span> <span class="org-function-name">do_syntax_check</span>(<span class="org-keyword">self</span>, new_vars):
     <span class="org-keyword">for</span> var <span class="org-keyword">in</span> new_vars:
       <span class="org-keyword">if</span> var.name <span class="org-keyword">not</span> <span class="org-keyword">in</span> <span class="org-keyword">self</span>.ALPHABET:
@@ -544,9 +582,9 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
     <span class="org-variable-name">c0</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.pencolor()
     <span class="org-variable-name">w0</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.turtle.width()
     <span class="org-variable-name">color_step</span> <span class="org-operator">=</span> <span class="org-builtin">abs</span>(y <span class="org-operator">-</span> <span class="org-keyword">self</span>.y0)
-    <span class="org-variable-name">c1</span> <span class="org-operator">=</span> [40, 5 <span class="org-operator">+</span> color_step, 5 <span class="org-operator">+</span> color_step<span class="org-operator">/</span>4]  <span class="org-comment-delimiter"># </span><span class="org-comment">current color</span>
-    <span class="org-variable-name">w1</span> <span class="org-operator">=</span> 20 <span class="org-operator">-</span> <span class="org-builtin">abs</span>(y <span class="org-operator">-</span> <span class="org-keyword">self</span>.y0)<span class="org-operator">/</span>15                <span class="org-comment-delimiter"># </span><span class="org-comment">current width</span>
-    <span class="org-keyword">self</span>.turtle.pencolor(c1)
+    <span class="org-variable-name">c1</span> <span class="org-operator">=</span> [40, 5 <span class="org-operator">+</span> color_step, 5 <span class="org-operator">+</span> color_step<span class="org-operator">/</span>4]  <span class="org-comment-delimiter"># </span><span class="org-comment">current color
+</span>    <span class="org-variable-name">w1</span> <span class="org-operator">=</span> 20 <span class="org-operator">-</span> <span class="org-builtin">abs</span>(y <span class="org-operator">-</span> <span class="org-keyword">self</span>.y0)<span class="org-operator">/</span>15                <span class="org-comment-delimiter"># </span><span class="org-comment">current width
+</span>    <span class="org-keyword">self</span>.turtle.pencolor(c1)
     <span class="org-keyword">self</span>.turtle.width(w1)
     <span class="org-keyword">yield</span> <span class="org-constant">None</span>
     <span class="org-keyword">self</span>.turtle.pencolor(c0)
@@ -576,33 +614,33 @@ The implementation depends on <code>svg_turtle</code> (must be installed with pi
       <span class="org-keyword">self</span>.turtle.pendown()
 
 
-<span class="org-comment-delimiter">#############################</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">Test 1</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('A','AB'), Rule.make('B','A')]</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('A'))</span>
-<span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('ABAAB'))</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(7)  # WORKS</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">print(r)</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">Test 2</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('1','11'), Rule.make('0','1[0]0')]</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('0'))</span>
-<span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('1[0]0'))</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(3)  # WORKS</span>
-<span class="org-comment-delimiter">##</span><span class="org-comment">print(r)</span>
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">Just example how to change parameters dynamically</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">def new_pars(old_pars):</span>
-<span class="org-comment-delimiter">#   </span><span class="org-comment">for pars in old_pars:</span>
-<span class="org-comment-delimiter">#     </span><span class="org-comment">if len(pars) == 4:</span>
-<span class="org-comment-delimiter">#       </span><span class="org-comment">r, g, b, thickness = pars</span>
-<span class="org-comment-delimiter">#       </span><span class="org-comment">res = [min(255, r+1), min(255, g+1), min(255, b+1), thickness+0.1]</span>
-<span class="org-comment-delimiter">#       </span><span class="org-comment">yield res</span>
-
+<span class="org-comment-delimiter">#############################</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Test 1
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('A','AB'), Rule.make('B','A')]
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('A'))
+</span><span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('ABAAB'))
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(7)  # WORKS
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">print(r)
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Test 2
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">rules = [Rule.make('1','11'), Rule.make('0','1[0]0')]
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">ls = Lsys(rules, Var.make('0'))
+</span><span class="org-comment-delimiter">###</span><span class="org-comment">r = ls.apply_rules(Var.make('1[0]0'))
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">r = ls.apply(3)  # WORKS
+</span><span class="org-comment-delimiter">##</span><span class="org-comment">print(r)
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Just example how to change parameters dynamically
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">def new_pars(old_pars):
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">for pars in old_pars:
+</span><span class="org-comment-delimiter">#     </span><span class="org-comment">if len(pars) == 4:
+</span><span class="org-comment-delimiter">#       </span><span class="org-comment">r, g, b, thickness = pars
+</span><span class="org-comment-delimiter">#       </span><span class="org-comment">res = [min(255, r+1), min(255, g+1), min(255, b+1), thickness+0.1]
+</span><span class="org-comment-delimiter">#       </span><span class="org-comment">yield res
+</span>
 <span class="org-variable-name">rules</span> <span class="org-operator">=</span> [Rule.make(<span class="org-string">'1'</span>,<span class="org-string">'11'</span>), Rule.make(<span class="org-string">'0'</span>,<span class="org-string">'1[0]0'</span>)]
-<span class="org-comment-delimiter"># </span><span class="org-comment">Example of usage of dynamic parameters</span>
-<span class="org-comment-delimiter"># </span><span class="org-comment">ls = Lsys(rules, Var.make('0', [2,2,2,0.5])), DynPars(new_pars))</span>
-<span class="org-variable-name">ls</span> <span class="org-operator">=</span> Lsys(rules, Var.make(<span class="org-string">'0'</span>))
+<span class="org-comment-delimiter"># </span><span class="org-comment">Example of usage of dynamic parameters
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">ls = Lsys(rules, Var.make('0', [2,2,2,0.5])), DynPars(new_pars))
+</span><span class="org-variable-name">ls</span> <span class="org-operator">=</span> Lsys(rules, Var.make(<span class="org-string">'0'</span>))
 <span class="org-variable-name">t</span> <span class="org-operator">=</span> svg_turtle.SvgTurtle(1000, 1000)
 <span class="org-keyword">def</span> <span class="org-function-name">go</span>(t, heading<span class="org-operator">=</span>90, pos<span class="org-operator">=</span>(0,0), styles<span class="org-operator">=</span><span class="org-constant">None</span>):
   t.penup()

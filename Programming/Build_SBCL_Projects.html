@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Build of SBCL projects</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -275,8 +313,8 @@ I switched from <a href="https://roswell.github.io/">Roswell</a> to <a href="htt
 </p>
 
 <div class="org-src-container">
-<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/</span><span class="org-keyword">env</span><span class="org-comment"> bash</span>
-<span class="org-builtin">set</span> -euo pipefail
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/</span><span class="org-keyword">env</span><span class="org-comment"> bash
+</span><span class="org-builtin">set</span> -euo pipefail
 
 <span class="org-variable-name">SCRIPT_DIR</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">cd -- "$(dirname -- "$0"</span><span class="org-string">)" &amp;&amp; pwd)"</span>
 <span class="org-variable-name">PROJECT</span>=<span class="org-string">"$(</span><span class="org-sh-quoted-exec">basename "$SCRIPT_DIR"</span><span class="org-string">)"</span>
@@ -287,50 +325,50 @@ I switched from <a href="https://roswell.github.io/">Roswell</a> to <a href="htt
 <span class="org-variable-name">LOGFILE</span>=build.log
 : &gt; <span class="org-string">"$LOGFILE"</span>
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Increase heap if your image is large (adjust MB)</span>
-<span class="org-variable-name">DYNAMIC_SPACE</span>=${<span class="org-variable-name">DYNAMIC_SPACE</span>:-4096}
-<span class="org-comment-delimiter"># </span><span class="org-comment">runtime vs lisp options</span>
-<span class="org-variable-name">SBCL_RUNTIME_OPTS</span>=(--dynamic-space-size <span class="org-string">"$DYNAMIC_SPACE"</span>)
+<span class="org-comment-delimiter"># </span><span class="org-comment">Increase heap if your image is large (adjust MB)
+</span><span class="org-variable-name">DYNAMIC_SPACE</span>=${<span class="org-variable-name">DYNAMIC_SPACE</span>:-4096}
+<span class="org-comment-delimiter"># </span><span class="org-comment">runtime vs lisp options
+</span><span class="org-variable-name">SBCL_RUNTIME_OPTS</span>=(--dynamic-space-size <span class="org-string">"$DYNAMIC_SPACE"</span>)
 <span class="org-variable-name">SBCL_LISP_OPTS</span>=(--noinform --no-sysinit --noprint)
 
 <span class="org-keyword">if</span> [[ <span class="org-string">"${RELEASE+x}"</span> = x ]]; <span class="org-keyword">then</span>
   <span class="org-variable-name">SBCL_LISP_OPTS</span>+=(--disable-debugger)
   <span class="org-variable-name">SAVE_EXTRA</span>=<span class="org-string">":purify t :compression t"</span>
 <span class="org-keyword">else</span>
-  <span class="org-variable-name">SBCL_LISP_OPTS</span>+=() <span class="org-comment-delimiter">#</span><span class="org-comment">--debug 3)</span>
-  <span class="org-variable-name">SAVE_EXTRA</span>=<span class="org-string">""</span>
+  <span class="org-variable-name">SBCL_LISP_OPTS</span>+=() <span class="org-comment-delimiter">#</span><span class="org-comment">--debug 3)
+</span>  <span class="org-variable-name">SAVE_EXTRA</span>=<span class="org-string">""</span>
 <span class="org-keyword">fi</span>
 
-<span class="org-builtin">read</span> -r -d <span class="org-string">''</span> LISP_CODE &lt;&lt;EOF || true
-<span class="org-sh-heredoc">(progn</span>
-<span class="org-sh-heredoc">  (require :asdf)</span>
-<span class="org-sh-heredoc">  (defun write-log (s)</span>
-<span class="org-sh-heredoc">    (with-open-file (out "${LOGFILE}"</span>
-<span class="org-sh-heredoc">                         :direction :output</span>
-<span class="org-sh-heredoc">                         :if-exists :append</span>
-<span class="org-sh-heredoc">                         :if-does-not-exist :create)</span>
-<span class="org-sh-heredoc">      (format out "~A~%" s) (finish-output)))</span>
-<span class="org-sh-heredoc">  (write-log "=== build started ===")</span>
-<span class="org-sh-heredoc">  (write-log (format nil "cwd: ~A" (uiop:getcwd)))</span>
+<span class="org-builtin">read</span> -r -d <span class="org-string">''</span> LISP_CODE &lt;&lt;EOF || true<span class="org-sh-heredoc">
+(progn
+  (require :asdf)
+  (defun write-log (s)
+    (with-open-file (out "${LOGFILE}"
+                         :direction :output
+                         :if-exists :append
+                         :if-does-not-exist :create)
+      (format out "~A~%" s) (finish-output)))
+  (write-log "=== build started ===")
+  (write-log (format nil "cwd: ~A" (uiop:getcwd)))
 
-<span class="org-sh-heredoc">  (write-log "about to asdf:load-system :${PROJECT_L}")</span>
-<span class="org-sh-heredoc">;  (load "${PROJECT_L}.asd")</span>
-<span class="org-sh-heredoc">  (asdf:load-system :${PROJECT_L})</span>
-<span class="org-sh-heredoc">;  (write-log "asdf:load-system returned")</span>
-<span class="org-sh-heredoc">  (write-log (format nil "asdf search path: ~A" (asdf:system-source-directory :asdf)))</span>
-<span class="org-sh-heredoc">  (write-log (format nil "find-system: ~S" (asdf:find-system :${PROJECT_L})))</span>
-<span class="org-sh-heredoc">  (let ((toplevel-sym (or (find-symbol "MAIN" "${PROJECT_U}")</span>
-<span class="org-sh-heredoc">                          (intern "MAIN" "${PROJECT_U}"))))</span>
-<span class="org-sh-heredoc">    (write-log (format nil "toplevel symbol: ~S" toplevel-sym))</span>
-<span class="org-sh-heredoc">    (write-log "about to save-lisp-and-die")</span>
-<span class="org-sh-heredoc">    (write-log "=== build ended ===")</span>
-<span class="org-sh-heredoc">    (sb-ext:save-lisp-and-die "${PROJECT_L}"</span>
-<span class="org-sh-heredoc">      :executable t</span>
-<span class="org-sh-heredoc">      :save-runtime-options t</span>
-<span class="org-sh-heredoc">      :toplevel toplevel-sym</span>
-<span class="org-sh-heredoc">      SAVE-EXTRA)))</span>
-<span class="org-sh-heredoc">EOF</span>
-
+  (write-log "about to asdf:load-system :${PROJECT_L}")
+;  (load "${PROJECT_L}.asd")
+  (asdf:load-system :${PROJECT_L})
+;  (write-log "asdf:load-system returned")
+  (write-log (format nil "asdf search path: ~A" (asdf:system-source-directory :asdf)))
+  (write-log (format nil "find-system: ~S" (asdf:find-system :${PROJECT_L})))
+  (let ((toplevel-sym (or (find-symbol "MAIN" "${PROJECT_U}")
+                          (intern "MAIN" "${PROJECT_U}"))))
+    (write-log (format nil "toplevel symbol: ~S" toplevel-sym))
+    (write-log "about to save-lisp-and-die")
+    (write-log "=== build ended ===")
+    (sb-ext:save-lisp-and-die "${PROJECT_L}"
+      :executable t
+      :save-runtime-options t
+      :toplevel toplevel-sym
+      SAVE-EXTRA)))
+EOF
+</span>
 <span class="org-variable-name">LISP_CODE</span>=<span class="org-string">"${LISP_CODE//SAVE-EXTRA/$SAVE_EXTRA}"</span>
 
 <span class="org-builtin">echo</span> <span class="org-string">"---- Lisp code to be evaluated ----"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
@@ -339,8 +377,8 @@ I switched from <a href="https://roswell.github.io/">Roswell</a> to <a href="htt
 
 <span class="org-builtin">echo</span> <span class="org-string">"$LISP_CODE"</span> &gt; <span class="org-string">"/tmp/${PROJECT_L}-build.lisp"</span>
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">Run under qlot exec if you rely on qlot local projects</span>
-<span class="org-builtin">echo</span> <span class="org-string">"About to run $LISP_CMD ${SBCL_RUNTIME_OPTS[@]} ${SBCL_LISP_OPTS[@]} --load /tmp/${PROJECT_L}-build.lisp"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">Run under qlot exec if you rely on qlot local projects
+</span><span class="org-builtin">echo</span> <span class="org-string">"About to run $LISP_CMD ${SBCL_RUNTIME_OPTS[@]} ${SBCL_LISP_OPTS[@]} --load /tmp/${PROJECT_L}-build.lisp"</span> | tee -a <span class="org-string">"$LOGFILE"</span>
 $<span class="org-variable-name">LISP_CMD</span> <span class="org-string">"${SBCL_RUNTIME_OPTS[@]}"</span> <span class="org-string">"${SBCL_LISP_OPTS[@]}"</span> --load <span class="org-string">"/tmp/${PROJECT_L}-build.lisp"</span> |tee -a <span class="org-string">"$LOGFILE"</span> 2&gt;&amp;1
 </pre>
 </div>

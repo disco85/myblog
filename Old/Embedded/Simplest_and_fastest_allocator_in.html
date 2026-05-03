@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-05-01 Fri 08:42 -->
+<!-- 2026-05-03 Sun 10:58 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Simplest (and fastest) allocator in C</title>
@@ -161,6 +161,25 @@ th, td {
 .org-constant {
   color: var(--syn-constant-color);
 }
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
 /* STYLES FOR PRINTING */
 @media print {
   :root {
@@ -242,6 +261,25 @@ th, td {
     font-style: italic;
     font-size: 0.85em;
   }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
 }
 </style>
 <!-- Theme support... -->
@@ -270,9 +308,9 @@ function toggleTheme() {
 </div>
 <div id="content" class="content">
 <h1 class="title">Simplest (and fastest) allocator in C</h1>
-<div id="outline-container-orgeffd64e" class="outline-2">
-<h2 id="orgeffd64e">Simplest (and fastest) allocator in C</h2>
-<div class="outline-text-2" id="text-orgeffd64e">
+<div id="outline-container-orgad745f8" class="outline-2">
+<h2 id="orgad745f8">Simplest (and fastest) allocator in C</h2>
+<div class="outline-text-2" id="text-orgad745f8">
 <p>
 I need to allocate strings (in UI) with the same length in my MCU program, so I can use: 1) static local buffer in functions or use 2) common buffer. 1) cons: implicit memory "eating" 2) cons: funcs are not reenterable. I use next simple (simplest!) and fast allocator - it allocate strings with the same length. It has only to necessary functions in it's API: allocate and free. Here is the code:
 </p>
@@ -284,8 +322,8 @@ I need to allocate strings (in UI) with the same length in my MCU program, so I 
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">GUI_TMPSTR_N</span> 3
 <span class="org-doc">/** max string length */</span>
 <span class="org-preprocessor">#define</span> <span class="org-variable-name">GUI_TMPSTR_MAXLEN</span> 64
-<span class="org-comment-delimiter">/// </span><span class="org-comment">block of temporary strings with the same length</span>
-<span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">gui_tmpstr_buf_t</span> {
+<span class="org-comment-delimiter">/// </span><span class="org-comment">block of temporary strings with the same length
+</span><span class="org-keyword">typedef</span> <span class="org-keyword">struct</span> <span class="org-type">gui_tmpstr_buf_t</span> {
         <span class="org-type">bset_t</span> <span class="org-variable-name">pool</span>;
         <span class="org-type">char</span> <span class="org-variable-name">buf</span>[GUI_TMPSTR_N][GUI_TMPSTR_MAXLEN];
 } <span class="org-type">gui_tmpstr_buf_t</span>;
@@ -295,11 +333,11 @@ I need to allocate strings (in UI) with the same length in my MCU program, so I 
         .buf = {0} \
 }
 
-<span class="org-comment-delimiter">// </span><span class="org-comment">global blocks for allocation</span>
-<span class="org-type">gui_tmpstr_buf_t</span> <span class="org-variable-name">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
+<span class="org-comment-delimiter">// </span><span class="org-comment">global blocks for allocation
+</span><span class="org-type">gui_tmpstr_buf_t</span> <span class="org-variable-name">_tmpstrbuf</span> = GUI_TMPSTR_BUF_INITIALIZER();
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">allocate temporary string</span>
-<span class="org-type">char</span>*
+<span class="org-comment-delimiter">/// </span><span class="org-comment">allocate temporary string
+</span><span class="org-type">char</span>*
 <span class="org-function-name">gui_tmpstr_alloc</span>(<span class="org-type">void</span>) {
         <span class="org-type">int</span> <span class="org-variable-name">i</span>;
         BSET_FORCLR(i, &amp;_tmpstrbuf.pool) {
@@ -311,22 +349,22 @@ I need to allocate strings (in UI) with the same length in my MCU program, so I 
         <span class="org-keyword">return</span> (<span class="org-constant">NULL</span>);
 }
 
-<span class="org-comment-delimiter">/// </span><span class="org-comment">free allocated tmp. string</span>
-<span class="org-type">void</span>
+<span class="org-comment-delimiter">/// </span><span class="org-comment">free allocated tmp. string
+</span><span class="org-type">void</span>
 <span class="org-function-name">gui_tmpstr_free</span>(<span class="org-type">char</span>* <span class="org-variable-name">ptr</span>) {
         <span class="org-type">intptr_t</span> <span class="org-variable-name">i</span> = ((<span class="org-type">intptr_t</span>)ptr - (<span class="org-type">intptr_t</span>)_tmpstrbuf.buf);
         <span class="org-keyword">if</span> (i &lt;= 0) {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is BEFORE base addr (buf)</span>
-                <span class="org-keyword">return</span>;
+                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is BEFORE base addr (buf)
+</span>                <span class="org-keyword">return</span>;
         }
         <span class="org-keyword">if</span> (i % GUI_TMPSTR_MAXLEN) {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is not align on GUI_TMPSTR_MAXLEN</span>
-                <span class="org-keyword">return</span>;
+                <span class="org-comment-delimiter">// </span><span class="org-comment">ptr is not align on GUI_TMPSTR_MAXLEN
+</span>                <span class="org-keyword">return</span>;
         }
         i /= GUI_TMPSTR_MAXLEN;
         <span class="org-keyword">if</span> (BSET_ISSET(i, &amp;_tmpstrbuf.pool)) {
-                <span class="org-comment-delimiter">// </span><span class="org-comment">free in pool</span>
-                BSET_CLR(i, &amp;_tmpstrbuf.pool);
+                <span class="org-comment-delimiter">// </span><span class="org-comment">free in pool
+</span>                BSET_CLR(i, &amp;_tmpstrbuf.pool);
         }
 }
 </pre>
@@ -351,10 +389,10 @@ Little example:
 <div class="org-src-container">
 <pre class="src src-cpp"><span class="org-type">char</span>* <span class="org-variable-name">ptr</span> = gui_tmpstr_alloc();
 <span class="org-keyword">if</span> (ptr) {
-  <span class="org-comment-delimiter">// </span><span class="org-comment">USAGE of ptr</span>
-  ...
-  <span class="org-comment-delimiter">// </span><span class="org-comment">free:</span>
-  gui_tmpstr_free(ptr);
+  <span class="org-comment-delimiter">// </span><span class="org-comment">USAGE of ptr
+</span>  ...
+  <span class="org-comment-delimiter">// </span><span class="org-comment">free:
+</span>  gui_tmpstr_free(ptr);
 }
 </pre>
 </div>
