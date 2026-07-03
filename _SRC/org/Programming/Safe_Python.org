@@ -1,5 +1,9 @@
 #+title: Safer Python
 #+description: How to make Python code safer
+#+keywords: Python, types, Pydantic, CrossHair
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t
+#+tags: Python types Pydantic CrossHair
+#+date: <2026-07-03 Fri>
 
 * Intro
 
@@ -461,7 +465,9 @@ class Rectangle(pydantic.BaseModel):
     type: typing.Literal['rectangle'] = 'rectangle'
     width: float
     height: float
+
 Shape = Circle | Rectangle
+
 # With `type` field:
 s1 = pydantic.TypeAdapter(Shape).validate_python({'type': 'circle', 'radius': 5})
 print(s1)
@@ -519,7 +525,9 @@ print(json.dumps(sch, indent=2))
 }
 #+end_example
 
-* Basic idea of types
+* Static types
+
+** Basic idea of types
 
 - Programming: "static" contract
 - Logic: Curry-Howard correspondence:
@@ -531,16 +539,16 @@ print(json.dumps(sch, indent=2))
 
 # !!!!!!!!!!!!!!! TODO modus ponens examples with types and the same in Python
 
-#+begin_verse
+#+begin_src python :eval never-export :exports code
 oranges:list[Orange] = apples  # BUG !
-#+end_verse
+#+end_src
 
-* How types are checked
+** How types are checked
 
 - Compile time (C/C++, Java, Haskell, etc)
 - Type-checking mode/time (Python, Ruby, etc):
 
-#+begin_src python :eval yes-export :exports both :results output verbatim
+#+begin_src python :eval never-export :exports code
 import typing
 if typing.TYPE_CHECKING:
     # This block runs ONLY during static type checking (by pyright, mypy, etc)
@@ -548,15 +556,46 @@ if typing.TYPE_CHECKING:
     from mymodule import HeavyDependency
 #+end_src
 
-#+begin_verse
-pyright source_dir
-#+end_verse
+which is useful to avoid errors like ~Failed importing ...: partially initialized module '...'~
+related to circular import issues.
 
-* Comparison of type checkers
-* Examples of types based safety
+Type-check time assertions (proofs or "unit test for types"):
+
+#+begin_src python :eval never-export :exports code
+if typing.TYPE_CHECKING:
+    r0:PackageToFilesRelationNode = RelationNode()                                # 1
+    typing_extensions.assert_type(r0, RelationNode[L['PACKAGE'],list[L['FILE']]]) # 2
+    r1:Node[L['RELATIONSHIP']] = r0                                               # 3
+#+end_src
+
+1. Assume ~r0~ is a ~RelationNode[L['PACKAGE'], list[L['FILE']]]~
+   check that calling ~RelationNode()~ produces something compatible with that alias.
+2. It forces the type checker to verify that ~r0~ really is the expected specialized
+   generic type.
+3. ~RelationNode[...]~ is a subtype of ~Node[L['RELATIONSHIP']]~
+
+How to run it from a shell:
+
+#+begin_src shell :eval never-export :exports code
+pyright source_dir
+#+end_src
+
+** Where types help
+
+1. cleaner design and architecture
+2. fewer errors when writing code
+3. REFACTORING!
+4. better documentation, the code is easier to understand
+5. VERY USEFUL FOR AI!
+
+** Comparison of type checkers
+** Examples of types based safety
 * Runtime types
 * Combining compile and runtime types
 * AI and types
+
+!!!!!!!!!!! TODO - Pydantic AI
+
 * Complex types tricks (dependent types?)
 * CrossHair, SMT
 * Dufny, coq, ... generating of Python code
