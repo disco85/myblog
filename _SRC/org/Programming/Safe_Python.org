@@ -377,6 +377,7 @@ identity element, code equivalency, duality (roundtrip), etc.
 - As FromJSON/ToJSON in Haskell and many-many more
 - Speed (core in written in Rust)
 - JSON schema emitting
+- ORM support (SQLAlchemy, Django ORM, Tortoise ORM)
 - Serialization/deserialization: JSON, Python (XML via extension)
 - 8,000 packages in PyPI use it, 20/25 NASDAQ companies use it
 
@@ -420,6 +421,58 @@ print(flts.model_dump_json())
 
 #+RESULTS:
 : {"file_url":"https://a.com/MIT.txt","location":123}
+
+*** Nested models
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import pydantic
+class Address(pydantic.BaseModel):
+    city: str
+    zip: int
+class User(pydantic.BaseModel):
+    name: str
+    age: int
+    address: Address
+data = {
+    'name': 'Alice',
+    'age': 30,
+    'address': {
+        'city': 'Sofia',
+        'zip': 1000
+    }
+}
+user = User(**data)
+print(user)
+#+end_src
+
+#+RESULTS:
+: name='Alice' age=30 address=Address(city='Sofia', zip=1000)
+
+*** Discriminating unions
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import pydantic, typing
+
+class Circle(pydantic.BaseModel):
+    type: typing.Literal['circle'] = 'circle'
+    radius: float
+
+class Rectangle(pydantic.BaseModel):
+    type: typing.Literal['rectangle'] = 'rectangle'
+    width: float
+    height: float
+Shape = Circle | Rectangle
+# With `type` field:
+s1 = pydantic.TypeAdapter(Shape).validate_python({'type': 'circle', 'radius': 5})
+print(s1)
+# !!! Without `type` field even:
+s2 = pydantic.TypeAdapter(Shape).validate_python({'height': 14.8, 'width': 10.3})
+print(s2)
+#+end_src
+
+#+RESULTS:
+: type='circle' radius=5.0
+: type='rectangle' width=10.3 height=14.8
 
 *** JSON schema
 
