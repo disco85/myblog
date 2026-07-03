@@ -520,6 +520,38 @@ print(json.dumps(sch, indent=2))
 #+end_example
 
 * Basic idea of types
+
+- Programming: "static" contract
+- Logic: Curry-Howard correspondence:
+  - type is a proposition
+  - value is a proof of that proposition
+  - programs are proofs-as-constructions
+- Math: set together with the ways its elements can be constructed and used.
+- Category theory: types are objects, functions are morphisms
+
+# !!!!!!!!!!!!!!! TODO modus ponens examples with types and the same in Python
+
+#+begin_verse
+oranges:list[Orange] = apples  # BUG !
+#+end_verse
+
+* How types are checked
+
+- Compile time (C/C++, Java, Haskell, etc)
+- Type-checking mode/time (Python, Ruby, etc):
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import typing
+if typing.TYPE_CHECKING:
+    # This block runs ONLY during static type checking (by pyright, mypy, etc)
+    # and it does not run during Python execution (run time):
+    from mymodule import HeavyDependency
+#+end_src
+
+#+begin_verse
+pyright source_dir
+#+end_verse
+
 * Comparison of type checkers
 * Examples of types based safety
 * Runtime types
