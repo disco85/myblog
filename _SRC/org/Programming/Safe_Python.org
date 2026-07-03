@@ -1,0 +1,478 @@
+#+title: Safer Python
+#+description: How to make Python code safer
+
+* Intro
+
+- The reason for most bugs is ignorance of how your language, your libraries, your
+  OS, and your compiler work.
+
+- This happens because everything becomes too complicated.
+
+- To avoid it - use simple solutions and tools. Like... Python!
+
+- But how to make it... safer?
+
+* Doctests
+
+** Simple doctest
+
+- Regression tests
+- Tutorial and more illustrative documentation
+- AI friendly
+
+It leads to unexpected exception:
+#+begin_src python :eval yes-export :exports both :results output verbatim
+def longest_word(s):
+    '''Finds the longest word:
+
+    >>> longest_word('w wow word word123')
+    'word123'
+
+    And for empty input string:
+    
+    >>> longest_word('')
+    None
+    '''
+    words = s.split()
+    return max(words, key=len)
+
+import doctest; doctest.testmod(verbose=True)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Trying:
+    longest_word('w wow word word123')
+Expecting:
+    'word123'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    None
+,**********************************************************************
+File "<stdin>", line 9, in __main__.longest_word
+Failed example:
+    longest_word('')
+Exception raised:
+    Traceback (most recent call last):
+      File "/usr/lib/python3.13/doctest.py", line 1395, in __run
+        exec(compile(example.source, filename, "single",
+        ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     compileflags, True), test.globs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "<doctest __main__.longest_word[1]>", line 1, in <module>
+        longest_word('')
+        ~~~~~~~~~~~~^^^^
+      File "<stdin>", line 13, in longest_word
+    ValueError: max() iterable argument is empty
+1 item had no tests:
+    __main__
+,**********************************************************************
+1 item had failures:
+   1 of   2 in __main__.longest_word
+2 tests in 2 items.
+1 passed and 1 failed.
+,***Test Failed*** 1 failure.
+#+end_example
+
+** More tricky doctests
+
+Expected exception, ellipsis:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+def longest_word(s):
+    '''Finds the longest word:
+
+    >>> longest_word('w wow word word123')  # doctest: +ELLIPSIS
+    'word...'
+
+    And for empty input string:
+    
+    >>> longest_word('')
+    Traceback (most recent call last):
+    ...
+    ValueError: max() iterable argument is empty
+    '''
+    words = s.split()
+    return max(words, key=len)
+
+import doctest; doctest.testmod(verbose=True)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Trying:
+    longest_word('w wow word word123')  # doctest: +ELLIPSIS
+Expecting:
+    'word...'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    Traceback (most recent call last):
+    ...
+    ValueError: max() iterable argument is empty
+ok
+1 item had no tests:
+    __main__
+1 item passed all tests:
+   2 tests in __main__.longest_word
+2 tests in 2 items.
+2 passed.
+Test passed.
+#+end_example
+
+You can write very complex tests even, integration tests if they use
+"fat" functions, so it looks compact enough
+
+* Property tests
+
+** Hypothesis comparing to QuickCheck
+
+The best one [[https://hypothesis.readthedocs.io][Hypothesis]] - based on Haskell's QuickCheck but evolved
+substantially beyond it:
+
+- Tracks examples that trigger new behavior
+- Remembers previously interesting examples
+- Biases generation toward boundary cases
+- Replays known failures automatically
+- Can partially generate property tests for existing code
+
+Shrinking:
+
+- Consistent behavior (search based)
+- Works automatically for composed structures
+- Usually finds dramatically smaller counterexamples
+
+A Hypothesis test run is closer to:
+
+- generate (search vs QuickCheck's random)
+- observe behavior
+- adapt future generation
+- store interesting examples (in local "db" - to re-check them)
+- reuse them later
+
+This is fundamentally different from classic QuickCheck.
+
+** Ideas behind Hypothesis
+
+Imagine a parser bug only appears when:
+
+#+begin_verse
+length > 100
+contains unicode
+contains null byte
+#+end_verse 
+
+Pure random generation may take a long time to discover it. Hypothesis actively
+steers toward unusual and high-information examples.
+
+** Conjecture engine of Hypothesis
+
+Hypothesis is built around an internal engine called ~Conjecture~.
+
+Instead of saying:
+
+#+begin_verse
+Generate an integer
+Generate a string
+Generate a list
+#+end_verse
+
+Hypothesis effectively manipulates a stream of bytes and interprets it as structured data.
+
+Conceptually:
+
+#+begin_verse
+bytes
+  ↓
+strategy
+  ↓
+object
+#+end_verse
+
+This allows:
+
+- Uniform shrinking
+- Better exploration
+- More systematic search
+
+QuickCheck generators generally operate directly at the value level.
+
+** Hypothesis examples
+
+*** Simple example
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from hypothesis import given, strategies as st
+
+def my_sort(xs):
+    return sorted(xs)
+
+@given(st.lists(st.integers()))
+def test_sort(xs):
+    # `xs` will have values like:
+    #   []
+    #   [3]
+    #   [1, 2, 3]
+    #   [7, 7, 1]  etc.
+    result = my_sort(xs)
+    assert sorted(xs) == result
+    assert all(result[i] <= result[i+1] for i in range(len(result)-1))
+
+test_sort()
+#+end_src
+
+#+RESULTS:
+
+*** Bug-finding example with minimal counter-example
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from hypothesis import given, strategies as st
+import sys, traceback
+
+def buggy_sort(xs):
+    return list(set(xs))  # BUG: removes duplicates
+
+@given(st.lists(st.integers()))
+def test_sort(xs):
+    assert sorted(xs) == buggy_sort(xs)
+
+try:
+    test_sort()
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))
+#+end_src
+#+RESULTS:
+: AssertionError
+:  Falsifying example: test_sort(
+:      xs=[0, 0],
+:  )
+: 
+
+*** Input size control
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from hypothesis import given, strategies as st
+
+@given(st.lists(st.integers(), max_size=10))
+def test_small_lists(xs):
+    assert len(xs) <= 10
+
+test_small_lists()    
+#+end_src
+
+#+RESULTS:
+
+*** Composed structures
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from hypothesis import given, strategies as st
+
+@given(st.lists(st.tuples(st.text(), st.integers())))
+def test_pairs(data):
+    assert isinstance(data, list) and all(isinstance(d, tuple) for d in data)
+
+test_pairs()
+#+end_src
+
+#+RESULTS:
+
+*** Writes tests for you
+
+Keywords: ghostwriter, fuzz (fuzzer).
+  
+Generates a test for functions that are inverses of each other (e.g.,
+serializer/deserializer or encoder/decoder):
+
+#+begin_src shell :eval yes-export :exports both :results raw
+echo '#+begin_src python'
+hypothesis write --roundtrip json.dumps json.loads
+echo '#+end_src'
+#+end_src
+
+#+RESULTS:
+#+begin_src python
+# This test code was written by the `hypothesis.extra.ghostwriter` module
+# and is provided under the Creative Commons Zero public domain dedication.
+
+import json
+import unittest
+from hypothesis import given, strategies as st
+
+# TODO: replace st.nothing() with an appropriate strategy
+
+
+class TestRoundtripDumpsLoads(unittest.TestCase):
+
+    @given(
+        allow_nan=st.booleans(),
+        check_circular=st.booleans(),
+        cls=st.none(),
+        default=st.none(),
+        ensure_ascii=st.booleans(),
+        indent=st.none(),
+        obj=st.nothing(),
+        object_hook=st.none(),
+        object_pairs_hook=st.none(),
+        parse_constant=st.none(),
+        parse_float=st.none(),
+        parse_int=st.none(),
+        separators=st.none(),
+        skipkeys=st.booleans(),
+        sort_keys=st.booleans(),
+    )
+    def test_roundtrip_dumps_loads(
+        self,
+        allow_nan,
+        check_circular,
+        cls,
+        default,
+        ensure_ascii,
+        indent,
+        obj,
+        object_hook,
+        object_pairs_hook,
+        parse_constant,
+        parse_float,
+        parse_int,
+        separators,
+        skipkeys,
+        sort_keys,
+    ):
+        value0 = json.dumps(
+            obj=obj,
+            skipkeys=skipkeys,
+            ensure_ascii=ensure_ascii,
+            check_circular=check_circular,
+            allow_nan=allow_nan,
+            cls=cls,
+            indent=indent,
+            separators=separators,
+            default=default,
+            sort_keys=sort_keys,
+        )
+        value1 = json.loads(
+            s=value0,
+            cls=cls,
+            object_hook=object_hook,
+            parse_float=parse_float,
+            parse_int=parse_int,
+            parse_constant=parse_constant,
+            object_pairs_hook=object_pairs_hook,
+        )
+        self.assertEqual(obj, value1)
+
+#+end_src
+
+Uses predefined/template logic: checks idempotent, associativity, commutativity,
+identity element, code equivalency, duality (roundtrip), etc.
+
+* Pydantic
+
+** Features
+
+- Data validation library for Python
+- As FromJSON/ToJSON in Haskell and many-many more
+- Speed (core in written in Rust)
+- JSON schema emitting
+- Serialization/deserialization: JSON, Python (XML via extension)
+- 8,000 packages in PyPI use it, 20/25 NASDAQ companies use it
+
+** Simple examples
+
+*** From JSON
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import pydantic
+class FileLicenseTextSource(pydantic.BaseModel):
+    'Locally obtained license text'
+    file_url:str                # some URL
+    location:None|int|str=None  # either line number of something other
+try:
+    flts = FileLicenseTextSource.model_validate_json(
+        '{"file_url": "https://a.com/MIT.txt", "location": 123.12}')
+except Exception as x:
+    print(x)
+#+end_src
+
+#+RESULTS:
+: 2 validation errors for FileLicenseTextSource
+: location.int
+:   Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=123.12, input_type=float]
+:     For further information visit https://errors.pydantic.dev/2.13/v/int_from_float
+: location.str
+:   Input should be a valid string [type=string_type, input_value=123.12, input_type=float]
+:     For further information visit https://errors.pydantic.dev/2.13/v/string_type
+
+*** To JSON
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import pydantic
+class FileLicenseTextSource(pydantic.BaseModel):
+    'Locally obtained license text'
+    file_url:str                # some URL
+    location:None|int|str=None  # either line number of something other
+flts = FileLicenseTextSource(file_url='https://a.com/MIT.txt', location=123)
+print(flts.model_dump_json())
+#+end_src
+
+#+RESULTS:
+: {"file_url":"https://a.com/MIT.txt","location":123}
+
+*** JSON schema
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import pydantic, json
+class FileLicenseTextSource(pydantic.BaseModel):
+    'Locally obtained license text'
+    file_url:str                # some URL
+    location:None|int|str=None  # either line number of something other
+sch = FileLicenseTextSource.model_json_schema()
+print(json.dumps(sch, indent=2))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{
+  "description": "Locally obtained license text",
+  "properties": {
+    "file_url": {
+      "title": "File Url",
+      "type": "string"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    }
+  },
+  "required": [
+    "file_url"
+  ],
+  "title": "FileLicenseTextSource",
+  "type": "object"
+}
+#+end_example
+
+* Basic idea of types
+* Comparison of type checkers
+* Examples of types based safety
+* Runtime types
+* Combining compile and runtime types
+* AI and types
+* Complex types tricks (dependent types?)
+* CrossHair, SMT
+* Dufny, coq, ... generating of Python code
+
