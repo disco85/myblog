@@ -1062,6 +1062,39 @@ pyright /tmp/tmp9.py || :
 3 errors, 0 warnings, 0 informations
 #+end_example
 
+Another example, a return type depending on a passed argument - is very common
+situation, eg (we see it already in the previous example, now - little bit more
+focused especially on it):
+
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp10.py
+import typing
+
+@typing.overload
+def fetch_from_net(url:str, encoding:None=None) -> bytes: ...
+
+@typing.overload
+def fetch_from_net(url:str, encoding:str) -> str: ...
+
+def fetch_from_net(url:str, encoding:str|None=None) -> str|bytes:
+    if encoding is None: return b'Imagine we fetched this'
+    else: return 'Imagine we fetched this'
+
+s1:str = '\n'.join(['Result:', fetch_from_net('https://no.such', encoding='utf-8')])
+s2:str = '\n'.join(['Result:', fetch_from_net('https://no.such')])  # BUG: join of str and bytes
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp10.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp10.py
+:   /tmp/tmp10.py:14:10 - error: No overloads for "join" match the provided arguments (reportCallIssue)
+:   /tmp/tmp10.py:14:32 - error: Argument of type "list[str | bytes]" cannot be assigned to parameter "iterable" of type "Iterable[str]" in function "join"
+:     "bytes" is not assignable to "str" (reportArgumentType)
+: 2 errors, 0 warnings, 0 informations
+
+
 * Runtime types
 * Combining compile and runtime types
 * AI and types

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-04 Sat 20:22 -->
+<!-- 2026-07-04 Sat 21:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -424,7 +424,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org2044e6d">
+<pre class="example" id="org549efea">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -489,7 +489,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org00c4756">
+<pre class="example" id="orgfec7c52">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1013,7 +1013,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org9d4bfaf">
+<pre class="example" id="org1b58b00">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1913,7 +1913,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org0a7da8c">
+<pre class="example" id="orgdc5fdd9">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2002,7 +2002,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orgf2645ae">
+<pre class="example" id="orgd3722dd">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2017,6 +2017,43 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
       Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
         "Textured" is not assignable to type "Illuminated" (reportArgumentType)
 3 errors, 0 warnings, 0 informations
+</pre>
+
+<p>
+Another example, a return type depending on a passed argument - is very common
+situation, eg (we see it already in the previous example, now - little bit more
+focused especially on it):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-type">@typing.overload</span>
+<span class="linenr"> 4: </span><span class="org-keyword">def</span> <span class="org-function-name">fetch_from_net</span>(url:<span class="org-builtin">str</span>, encoding:<span class="org-constant">None</span><span class="org-operator">=</span><span class="org-constant">None</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bytes</span>: ...
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span class="org-type">@typing.overload</span>
+<span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">fetch_from_net</span>(url:<span class="org-builtin">str</span>, encoding:<span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>: ...
+<span class="linenr"> 8: </span>
+<span class="linenr"> 9: </span><span class="org-keyword">def</span> <span class="org-function-name">fetch_from_net</span>(url:<span class="org-builtin">str</span>, encoding:<span class="org-builtin">str</span><span class="org-operator">|</span><span class="org-constant">None</span><span class="org-operator">=</span><span class="org-constant">None</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span><span class="org-operator">|</span><span class="org-builtin">bytes</span>:
+<span class="linenr">10: </span>    <span class="org-keyword">if</span> encoding <span class="org-keyword">is</span> <span class="org-constant">None</span>: <span class="org-keyword">return</span> b<span class="org-string">'Imagine we fetched this'</span>
+<span class="linenr">11: </span>    <span class="org-keyword">else</span>: <span class="org-keyword">return</span> <span class="org-string">'Imagine we fetched this'</span>
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span class="org-variable-name">s1</span>:<span class="org-builtin">str</span> <span class="org-operator">=</span> <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>.join([<span class="org-string">'Result:'</span>, fetch_from_net(<span class="org-string">'https://no.such'</span>, encoding<span class="org-operator">=</span><span class="org-string">'utf-8'</span>)])
+<span class="linenr">14: </span><span class="org-variable-name">s2</span>:<span class="org-builtin">str</span> <span class="org-operator">=</span> <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">'</span>.join([<span class="org-string">'Result:'</span>, fetch_from_net(<span class="org-string">'https://no.such'</span>)])  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: join of str and bytes</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp10.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp10.py
+  /tmp/tmp10.py:14:10 - error: No overloads for "join" match the provided arguments (reportCallIssue)
+  /tmp/tmp10.py:14:32 - error: Argument of type "list[str | bytes]" cannot be assigned to parameter "iterable" of type "Iterable[str]" in function "join"
+    "bytes" is not assignable to "str" (reportArgumentType)
+2 errors, 0 warnings, 0 informations
 </pre>
 </div>
 </div>
