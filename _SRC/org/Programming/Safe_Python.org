@@ -923,6 +923,8 @@ n = make_non_empty([1,2])                           # ONCE: on the edge
 if n: print(safe_max(n))                            # USE: only trusted, refined value
 #+end_src
 
+But **here we will use PyRight, because MyPy does not fully support it and it has a regression**:
+
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 pyright /tmp/tmp8.py || :
 #+end_src
@@ -939,16 +941,130 @@ Units of measurement:
 def area(w: Meter, h: Meter) -> SquareMeter: ...
 #+end_src
 
-Still mostly experimental, perfect implementation in F#.
+Still mostly experimental, the mature production level implementation is in F#.
 
 See libraries about refined and phantom types:
 
 - [[https://github.com/espetro/refined][refined]]
-- [[https://pypi.org/project/phantom-types/][phantom-types]]  
-  
+- [[https://github.com/antonagestam/phantom-types/][phantom-types]]
+- [[https://github.com/quantumlib/TypedUnits][TypedUnits]]
+
+States control in compile time:
+
+let's imagine the next domain - we have an empty scene that can be cluttered with
+objects, objects can be "dressed" (by a texture), if they are dressed then they can
+be illuminated by a light, and only after illuminating the scene can be rendered.
+
+Transitions are:
+
+#+begin_example
+Empty-Scene    Cluttered-Scene         Textured    Illuminated    Rendered
+     ║                ║                    ║            ║             ║
+     ║----object----->║----object----.     ║            ║             ║
+                      ║<-------------'     ║            ║             ║
+                      ║                    ║            ║             ║
+                      ║<------object-------║            ║             ║
+                      ║                    ║            ║             ║
+                      ║-------dress------->║---light--->║---render--->║
+#+end_example
+
+#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp9.py
+import typing, dataclasses
+
+Empty = typing.Literal['Empty']
+Cluttered = typing.Literal['Cluttered']
+Textured = typing.Literal['Textured']
+Illuminated = typing.Literal['Illuminated']
+Rendered = typing.Literal['Rendered']
+
+SceneState = Empty | Cluttered | Textured | Illuminated | Rendered
+
+@dataclasses.dataclass
+class Scene[T:SceneState=Empty]:
+    objects:list[str]
+
+@typing.overload
+def put_object[T:SceneState](s:Scene[Empty|Cluttered]) -> Scene[Cluttered]: ...
+@typing.overload
+def put_object[T:SceneState](s:Scene[Textured]) -> Scene[Cluttered]: ...
+def put_object[T:SceneState](s:Scene[T]) -> Scene[Cluttered]:
+    return Scene(objects=s.objects + [f'obj{len(s.objects)}'])
+
+def texture_objects(s:Scene[Cluttered], texture:str) -> Scene[Textured]:
+    return Scene(objects=[f'{o.split("-")[0]}-{texture}' for o in s.objects])
+
+def light(s:Scene[Textured]) -> Scene[Illuminated]:
+    return Scene(objects=[o.upper() for o in s.objects])  # "lighting" make them upper case!
+    
+def render(s:Scene[Illuminated]) -> Scene[Rendered]:
+    print(s.objects)
+    return Scene(objects=s.objects)  # imitate change of the state
+
+# This is fully fine rendered scene with 2 textured objects, we
+# expect to see:
+#   ['OBJ0-BRICK', 'OBJ1-BRICK']:
+s0:Scene[Rendered] = \
+    render(light(texture_objects(
+        put_object(put_object(
+            Scene(objects=[]))), 'brick')))
+
+# BUG: not fine - we cannot light after put of non-textured object in
+# textured scene - it returns us back to Cluttered (non-textured) scene,
+# without type-check it produces OBJ2 illuminated but without a texture:
+#   ['OBJ0-BRICK', 'OBJ1-BRICK', 'OBJ2']
+render(light(
+    put_object(texture_objects(
+        put_object(put_object(
+            Scene(objects=[]))), 'brick'))))
+
+# BUG: no way to light scene before to texture it,
+# without type-check it produces illuminated objects but without textures:
+#   ['OBJ0', 'OBJ1']
+render(light(
+    put_object(put_object(
+        Scene(objects=[])))))
+
+# BUG: no way to render scene before to illuminate it,
+# without type-check it produces textured objects but in full darkness:
+#   ['obj0-brick', 'obj1-brick']
+render(texture_objects(
+    put_object(put_object(
+        Scene(objects=[]))), 'brick'))
+#+end_src
+
+#+RESULTS:
+: ['OBJ0-BRICK', 'OBJ1-BRICK']
+: ['OBJ0-BRICK', 'OBJ1-BRICK', 'OBJ2']
+: ['OBJ0', 'OBJ1']
+: ['obj0-brick', 'obj1-brick']
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp9.py || :
+#+end_src
+
+#+RESULTS:
+#+begin_example
+/tmp/tmp9.py
+  /tmp/tmp9.py:33:9 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
+      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
+        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
+  /tmp/tmp9.py:36:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
+    "Scene[Textured]" is not assignable to "Scene[Illuminated]"
+      Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
+        "Textured" is not assignable to type "Illuminated" (reportArgumentType)
+  /tmp/tmp9.py:41:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
+      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
+        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
+3 errors, 0 warnings, 0 informations
+#+end_example
+
 # TODO
 
-TODO or use existing libraries supporting measurement units: .......
+*** Typing KungFu
+
+# TODO
 
 * Runtime types
 * Combining compile and runtime types
