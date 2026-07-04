@@ -36,6 +36,7 @@
 - AI friendly
 
 It leads to unexpected exception:
+
 #+begin_src python :eval yes-export :exports both :results output verbatim
 def longest_word(s):
     '''Finds the longest word:
@@ -807,7 +808,9 @@ mypy /tmp/tmp4.py || :
 : /tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
 : Found 2 errors in 1 file (checked 1 source file)
 
-*** More advanced types usage
+*** Advanced types usage
+
+Wrapper-types for correct algorithms chaining:
 
 #+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp5.py
 import typing
@@ -840,7 +843,112 @@ mypy /tmp/tmp5.py || :
 : /tmp/tmp5.py:15: error: Argument 1 to "unique" has incompatible type "list[int]"; expected "SortedList"  [arg-type]
 : Found 1 error in 1 file (checked 1 source file)
 
+Distinct, refined types avoiding multiple checks (or "ensure"-functions) - refinement
+happens only once on the edge of the domain where external raw data is transformed to
+internal **typed** form:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp6.py
+import typing
+ReadableName = typing.NewType('ReadableName', str)  # DISTINCT TYPE: or a class
+def readable_name(raw_str:str) -> ReadableName:     # IDEAS: capitalized, stripped, ...
+    res = ' '.join(s.strip().capitalize() for s in raw_str.split() if s)
+    return ReadableName(res)
+def greating(n:ReadableName):
+    # n = readable_name(n)                          # REDUNDANT: we don't need it more
+    print(f'Hello {n}, how are you?')
+def closing(n:ReadableName):
+    # n = readable_name(n)                          # REDUNDANT: we don't need it more
+    print(f'-- Best regards,\n--  {n}')
+r = '   michael   dudikoff  '
+n = readable_name(r)                                # ONCE: on the edge, raw -> internal/trusted
+greating(n)                                         # OK
+closing(n)                                          # OK
+greating(r)                                         # BUG: expected ReadableName
+#+end_src
+
+#+RESULTS:
+: Hello Michael Dudikoff, how are you?
+: -- Best regards,
+: --  Michael Dudikoff
+: Hello    michael   dudikoff  , how are you?
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp6.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp6.py:16: error: Argument 1 to "greating" has incompatible type "str"; expected "ReadableName"  [arg-type]
+: Found 1 error in 1 file (checked 1 source file)
+
+Refined, strongly typed math:
+
+#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp7.py
+import typing, math
+Positive = typing.NewType('Positive', float)
+def make_positive(x:int|float) -> Positive | None:  # SMART CONSTRUCTOR
+    return Positive(x) if x >= 0 else None
+def safe_sqrt(n:Positive) -> Positive:
+    return Positive(math.sqrt(n))
+safe_sqrt(4)                                        # BUG: expected strongly typed Positive
+p = make_positive(4)                                # ONCE: on the edge
+if p: safe_sqrt(p)                                  # USE: only trusted, refined value
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp7.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp7.py:7: error: Argument 1 to "safe_sqrt" has incompatible type "int"; expected "Positive"  [arg-type]
+: Found 1 error in 1 file (checked 1 source file)
+
+Another classic example with non-empty containers:
+
+#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp8.py
+import typing
+
+class Comparable(typing.Protocol):
+    def __lt__(self, other: typing.Any, /) -> bool: ...
+
+class NonEmptyList[A](list[A]): pass
+
+def make_non_empty[A](x:list[A]) -> NonEmptyList[A] | None:
+    return NonEmptyList(x) if x else None
+
+def safe_max[A:Comparable](n:NonEmptyList[A]) -> A:
+    return max(n)
+
+print(safe_max([1,2]))                              # BUG: expected strongly typed NonEmptyList
+n = make_non_empty([1,2])                           # ONCE: on the edge
+if n: print(safe_max(n))                            # USE: only trusted, refined value
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp8.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp8.py
+:   /tmp/tmp8.py:14:16 - error: Argument of type "list[int]" cannot be assigned to parameter "n" of type "NonEmptyList[A@safe_max]" in function "safe_max"
+:     "list[int]" is not assignable to "NonEmptyList[A@safe_max]" (reportArgumentType)
+: 1 error, 0 warnings, 0 informations
+
+Units of measurement:
+
+#+begin_src python :eval no :exports code
+def area(w: Meter, h: Meter) -> SquareMeter: ...
+#+end_src
+
+Still mostly experimental, perfect implementation in F#.
+
+See libraries about refined and phantom types:
+
+- [[https://github.com/espetro/refined][refined]]
+- [[https://pypi.org/project/phantom-types/][phantom-types]]  
+  
 # TODO
+
+TODO or use existing libraries supporting measurement units: .......
 
 * Runtime types
 * Combining compile and runtime types
