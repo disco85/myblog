@@ -429,6 +429,10 @@ class TestBinaryOperationadd(unittest.TestCase):
 Uses predefined/template logic: checks idempotent, associativity, commutativity,
 identity element, code equivalency, duality (roundtrip), etc.
 
+* Dataclasses
+
+# TODO
+
 * Pydantic
 
 ** Features
@@ -729,7 +733,7 @@ Stability:
 - **pyanalyze** combines type checking with broader static analysis and can detect some
   classes of bugs that traditional type checkers do not.
 
-** Examples of types based safety
+** Examples of type based safety
 
 *** Primitive examples
 
@@ -1155,8 +1159,78 @@ pyright /tmp/tmp11.py || :
 :       "socket" is not present (reportArgumentType)
 : 2 errors, 0 warnings, 0 informations
 
+Typed dictionaries are another way to typify something traditionally raw and error
+prone - dictionaries. It is useful within business applications full of large JSON
+files, huge XML data... ~TypedDict~ allows to define typed and flexible dictionaries
+with required and optional keys:
+
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp12.py
+import typing
+class Person(typing.TypedDict, total=False):
+    name: typing.Required[str]
+    email: typing.Required[str]
+    age: int
+def print_person(p:Person):
+    try:
+        age = f', {p["age"]}' if 'age' in p else ''
+        print(f'NAME: {p["name"]}{age}')
+        print(f'EMAIL: {p["email"]}')
+        other_data = {k:p[k] for k in (p.keys() - {'name', 'email', 'age'})}
+        if other_data: print(f'OTHER DATA: {other_data}')
+        print('----------')
+    except:
+        print(f'Cannot print to the end {p}')
+p0:Person = {'name': 'Axel', 'email': 'axel@fake.com'}
+print_person(p0)
+p1:Person = {'name': 'John', 'email': 'john@fake.com', 'age': 40, 'address': '12 Willow Street', 'gender': 'male'}
+print_person(p1)
+p2:Person = {'name': 'John', 'age': 40}
+print_person(p2)
+#+end_src
+
+#+RESULTS:
+: NAME: Axel
+: EMAIL: axel@fake.com
+: ----------
+: NAME: John, 40
+: EMAIL: john@fake.com
+: OTHER DATA: {'gender': 'male', 'address': '12 Willow Street'}
+: ----------
+: NAME: John, 40
+: Cannot print to the end {'name': 'John', 'age': 40}
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp12.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp12.py
+:   /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+:     "address" is an undefined item in type "Person"
+:     "gender" is an undefined item in type "Person" (reportAssignmentType)
+:   /tmp/tmp12.py:20:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+:     "email" is required in "Person" (reportAssignmentType)
+: 2 errors, 0 warnings, 0 informations
+
+# TODO
+
+Final cases (reminds Common Lisp's ~ecase~ and ~etypecase~ but for type-check time,
+more relevant is **exhaustive switch** of Java):
+
+# TODO
+
+* Typing libraries
+
+# TODO
 
 * Runtime types
+
+Wait, but Python is graduate typing language! It means that if you did not include
+type-check into your CI, then some member of the team can inject buggy code that
+could be caught on the type-check phase!
+
+To be 100% sure, you can/have use runtime types too.
+
 * Combining compile and runtime types
 * AI and types
 

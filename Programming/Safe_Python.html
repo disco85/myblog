@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-04 Sat 22:13 -->
+<!-- 2026-07-05 Sun 01:01 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -335,6 +335,7 @@ function toggleTheme() {
 </li>
 </ul>
 </li>
+<li><a href="#org8ad2f7b">Dataclasses</a></li>
 <li><a href="#orgc2bfdde">Pydantic</a>
 <ul>
 <li><a href="#orgdca3c0b">Features</a></li>
@@ -355,7 +356,7 @@ function toggleTheme() {
 <li><a href="#orgbc24feb">How types are checked</a></li>
 <li><a href="#org7a092bf">Where types help</a></li>
 <li><a href="#orgd443d91">Comparison of type checkers</a></li>
-<li><a href="#org6016e8a">Examples of types based safety</a>
+<li><a href="#orgbb86c78">Examples of type based safety</a>
 <ul>
 <li><a href="#org60ec252">Primitive examples</a></li>
 <li><a href="#org8da15a4">Advanced types usage</a></li>
@@ -364,6 +365,7 @@ function toggleTheme() {
 </li>
 </ul>
 </li>
+<li><a href="#org60c583a">Typing libraries</a></li>
 <li><a href="#org94646a3">Runtime types</a></li>
 <li><a href="#org65ae433">Combining compile and runtime types</a></li>
 <li><a href="#orgf823b02">AI and types</a></li>
@@ -424,7 +426,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org9562999">
+<pre class="example" id="orgf2e61f4">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -489,7 +491,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgaf80463">
+<pre class="example" id="orgf6406d2">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -868,6 +870,11 @@ identity element, code equivalency, duality (roundtrip), etc.
 </div>
 </div>
 </div>
+<div id="outline-container-org8ad2f7b" class="outline-2">
+<h2 id="org8ad2f7b">Dataclasses</h2>
+<div class="outline-text-2" id="text-org8ad2f7b">
+</div>
+</div>
 <div id="outline-container-orgc2bfdde" class="outline-2">
 <h2 id="orgc2bfdde">Pydantic</h2>
 <div class="outline-text-2" id="text-orgc2bfdde">
@@ -1013,7 +1020,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgcc6e006">
+<pre class="example" id="org151385a">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1608,9 +1615,9 @@ classes of bugs that traditional type checkers do not.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org6016e8a" class="outline-3">
-<h3 id="org6016e8a">Examples of types based safety</h3>
-<div class="outline-text-3" id="text-org6016e8a">
+<div id="outline-container-orgbb86c78" class="outline-3">
+<h3 id="orgbb86c78">Examples of type based safety</h3>
+<div class="outline-text-3" id="text-orgbb86c78">
 </div>
 <div id="outline-container-org60ec252" class="outline-4">
 <h4 id="org60ec252">Primitive examples</h4>
@@ -1913,7 +1920,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org9c728fd">
+<pre class="example" id="org8f91a62">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2002,7 +2009,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orgbd065d7">
+<pre class="example" id="org0d92f08">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2126,12 +2133,95 @@ Read from TcpSource 127.0.0.1:8080
       "socket" is not present (reportArgumentType)
 2 errors, 0 warnings, 0 informations
 </pre>
+
+
+<p>
+Typed dictionaries are another way to typify something traditionally raw and error
+prone - dictionaries. It is useful within business applications full of large JSON
+files, huge XML data&#x2026; <code>TypedDict</code> allows to define typed and flexible dictionaries
+with required and optional keys:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span><span class="org-keyword">class</span> <span class="org-type">Person</span>(typing.TypedDict, total<span class="org-operator">=</span><span class="org-constant">False</span>):
+<span class="linenr"> 3: </span>    name: typing.Required[<span class="org-builtin">str</span>]
+<span class="linenr"> 4: </span>    email: typing.Required[<span class="org-builtin">str</span>]
+<span class="linenr"> 5: </span>    age: <span class="org-builtin">int</span>
+<span class="linenr"> 6: </span><span class="org-keyword">def</span> <span class="org-function-name">print_person</span>(p:Person):
+<span class="linenr"> 7: </span>    <span class="org-keyword">try</span>:
+<span class="linenr"> 8: </span>        <span class="org-variable-name">age</span> <span class="org-operator">=</span> f<span class="org-string">', </span>{p["age"]}<span class="org-string">'</span> <span class="org-keyword">if</span> <span class="org-string">'age'</span> <span class="org-keyword">in</span> p <span class="org-keyword">else</span> <span class="org-string">''</span>
+<span class="linenr"> 9: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'NAME: </span>{p["name"]}{age}<span class="org-string">'</span>)
+<span class="linenr">10: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'EMAIL: </span>{p["email"]}<span class="org-string">'</span>)
+<span class="linenr">11: </span>        <span class="org-variable-name">other_data</span> <span class="org-operator">=</span> {k:p[k] <span class="org-keyword">for</span> k <span class="org-keyword">in</span> (p.keys() <span class="org-operator">-</span> {<span class="org-string">'name'</span>, <span class="org-string">'email'</span>, <span class="org-string">'age'</span>})}
+<span class="linenr">12: </span>        <span class="org-keyword">if</span> other_data: <span class="org-builtin">print</span>(f<span class="org-string">'OTHER DATA: </span>{other_data}<span class="org-string">'</span>)
+<span class="linenr">13: </span>        <span class="org-builtin">print</span>(<span class="org-string">'----------'</span>)
+<span class="linenr">14: </span>    <span class="org-keyword">except</span>:
+<span class="linenr">15: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'Cannot print to the end </span>{p}<span class="org-string">'</span>)
+<span class="linenr">16: </span><span class="org-variable-name">p0</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'Axel'</span>, <span class="org-string">'email'</span>: <span class="org-string">'axel@fake.com'</span>}
+<span class="linenr">17: </span>print_person(p0)
+<span class="linenr">18: </span><span class="org-variable-name">p1</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'email'</span>: <span class="org-string">'john@fake.com'</span>, <span class="org-string">'age'</span>: 40, <span class="org-string">'address'</span>: <span class="org-string">'12 Willow Street'</span>, <span class="org-string">'gender'</span>: <span class="org-string">'male'</span>}
+<span class="linenr">19: </span>print_person(p1)
+<span class="linenr">20: </span><span class="org-variable-name">p2</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'age'</span>: 40}
+<span class="linenr">21: </span>print_person(p2)
+</pre>
+</div>
+
+<pre class="example">
+NAME: Axel
+EMAIL: axel@fake.com
+----------
+NAME: John, 40
+EMAIL: john@fake.com
+OTHER DATA: {'gender': 'male', 'address': '12 Willow Street'}
+----------
+NAME: John, 40
+Cannot print to the end {'name': 'John', 'age': 40}
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp12.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp12.py
+  /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+    "address" is an undefined item in type "Person"
+    "gender" is an undefined item in type "Person" (reportAssignmentType)
+  /tmp/tmp12.py:20:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+    "email" is required in "Person" (reportAssignmentType)
+2 errors, 0 warnings, 0 informations
+</pre>
+
+
+<p>
+Final cases (reminds Common Lisp's <code>ecase</code> and <code>etypecase</code> but for type-check time,
+more relevant is <b><b>exhaustive switch</b></b> of Java):
+</p>
 </div>
 </div>
+</div>
+</div>
+<div id="outline-container-org60c583a" class="outline-2">
+<h2 id="org60c583a">Typing libraries</h2>
+<div class="outline-text-2" id="text-org60c583a">
 </div>
 </div>
 <div id="outline-container-org94646a3" class="outline-2">
 <h2 id="org94646a3">Runtime types</h2>
+<div class="outline-text-2" id="text-org94646a3">
+<p>
+Wait, but Python is graduate typing language! It means that if you did not include
+type-check into your CI, then some member of the team can inject buggy code that
+could be caught on the type-check phase!
+</p>
+
+<p>
+To be 100% sure, you can/have use runtime types too.
+</p>
+</div>
 </div>
 <div id="outline-container-org65ae433" class="outline-2">
 <h2 id="org65ae433">Combining compile and runtime types</h2>
