@@ -963,11 +963,11 @@ Transitions between scene's states are:
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object----->║----object----.     ║            ║             ║
-                      ║<-------------'     ║            ║             ║
-                      ║                    ║            ║             ║
-                      ║<------object-------║            ║             ║
-                      ║                    ║            ║             ║
-                      ║-------texture----->║---light--->║---render--->║
+     ║                ║<-------------'     ║            ║             ║
+     ║                ║                    ║            ║             ║
+     ║                ║<------object-------║            ║             ║
+     ║                ║                    ║            ║             ║
+     ║                ║-------texture----->║---light--->║---render--->║
 #+end_example
 
 #+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp9.py
@@ -1092,6 +1092,67 @@ pyright /tmp/tmp10.py || :
 :   /tmp/tmp10.py:14:10 - error: No overloads for "join" match the provided arguments (reportCallIssue)
 :   /tmp/tmp10.py:14:32 - error: Argument of type "list[str | bytes]" cannot be assigned to parameter "iterable" of type "Iterable[str]" in function "join"
 :     "bytes" is not assignable to "str" (reportArgumentType)
+: 2 errors, 0 warnings, 0 informations
+
+**Structural equivalence** is very useful when you use objects from some libraries that
+you cannot modify, for example - every object having these attributes (or properties)
+will be treated as a class (successor) of these (~WebSource~, ~FileSource~) classes.
+
+You qualify (by a type) existing (library) classes for type-check time:
+
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp11.py
+import typing, socket
+
+@typing.runtime_checkable
+class TcpSource(typing.Protocol):
+    @property
+    def port(self) -> int: ...
+    @property
+    def ip(self) -> str: ...
+
+@typing.runtime_checkable
+class SocketSource(typing.Protocol):
+    @property
+    def socket(self) -> socket.socket: ...
+
+@typing.overload
+def read_from_net(src:TcpSource) -> str: ...
+@typing.overload
+def read_from_net(src:SocketSource) -> str: ...
+def read_from_net(src:TcpSource|SocketSource) -> str:
+    if isinstance(src, TcpSource):
+        return f'Read from TcpSource {src.ip}:{src.port}'
+    elif isinstance(src, SocketSource):
+        return f'Read from SocketSource'
+    else:
+        return '<nothing>'
+
+class LibTcpSrc:
+    port = 8080
+    ip = '127.0.0.1'
+
+class UnsuitableTcpSrc:
+    port_number = 8080
+    def get_ip(self): return '127.0.0.1'
+    
+print(read_from_net(LibTcpSrc()))         # OK: can be treated as TcpSource
+print(read_from_net(UnsuitableTcpSrc()))  # BUG: neither SocketSource nor TcpSource
+#+end_src
+
+#+RESULTS:
+: Read from TcpSource 127.0.0.1:8080
+: <nothing>
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp11.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp11.py
+:   /tmp/tmp11.py:36:7 - error: No overloads for "read_from_net" match the provided arguments (reportCallIssue)
+:   /tmp/tmp11.py:36:21 - error: Argument of type "UnsuitableTcpSrc" cannot be assigned to parameter "src" of type "SocketSource" in function "read_from_net"
+:     "UnsuitableTcpSrc" is incompatible with protocol "SocketSource"
+:       "socket" is not present (reportArgumentType)
 : 2 errors, 0 warnings, 0 informations
 
 

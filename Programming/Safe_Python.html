@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-04 Sat 21:37 -->
+<!-- 2026-07-04 Sat 22:09 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -424,7 +424,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org549efea">
+<pre class="example" id="org31b4f62">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -489,7 +489,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgfec7c52">
+<pre class="example" id="org12c2e99">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1013,7 +1013,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org1b58b00">
+<pre class="example" id="org548a661">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1913,15 +1913,15 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgdc5fdd9">
+<pre class="example" id="org7757179">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
-                      ║&lt;-------------'     ║            ║             ║
-                      ║                    ║            ║             ║
-                      ║&lt;------object-------║            ║             ║
-                      ║                    ║            ║             ║
-                      ║-------texture-----&gt;║---light---&gt;║---render---&gt;║
+     ║                ║&lt;-------------'     ║            ║             ║
+     ║                ║                    ║            ║             ║
+     ║                ║&lt;------object-------║            ║             ║
+     ║                ║                    ║            ║             ║
+     ║                ║-------texture-----&gt;║---light---&gt;║---render---&gt;║
 </pre>
 
 <div class="org-src-container">
@@ -2002,7 +2002,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orgd3722dd">
+<pre class="example" id="org9562999">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2053,6 +2053,77 @@ focused especially on it):
   /tmp/tmp10.py:14:10 - error: No overloads for "join" match the provided arguments (reportCallIssue)
   /tmp/tmp10.py:14:32 - error: Argument of type "list[str | bytes]" cannot be assigned to parameter "iterable" of type "Iterable[str]" in function "join"
     "bytes" is not assignable to "str" (reportArgumentType)
+2 errors, 0 warnings, 0 informations
+</pre>
+
+
+<p>
+<b><b>Structural equivalence</b></b> is very useful when you use objects from some libraries that
+you cannot modify, for example - every object having these attributes (or properties)
+will be treated as a class (successor) of these (<code>WebSource</code>, <code>FileSource</code>) classes.
+</p>
+
+<p>
+You qualify (by a type) existing (library) classes for type-check time:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing, socket
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-type">@typing.runtime_checkable</span>
+<span class="linenr"> 4: </span><span class="org-keyword">class</span> <span class="org-type">TcpSource</span>(typing.Protocol):
+<span class="linenr"> 5: </span>    @<span class="org-builtin">property</span>
+<span class="linenr"> 6: </span>    <span class="org-keyword">def</span> <span class="org-function-name">port</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>: ...
+<span class="linenr"> 7: </span>    @<span class="org-builtin">property</span>
+<span class="linenr"> 8: </span>    <span class="org-keyword">def</span> <span class="org-function-name">ip</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>: ...
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span class="org-type">@typing.runtime_checkable</span>
+<span class="linenr">11: </span><span class="org-keyword">class</span> <span class="org-type">SocketSource</span>(typing.Protocol):
+<span class="linenr">12: </span>    @<span class="org-builtin">property</span>
+<span class="linenr">13: </span>    <span class="org-keyword">def</span> <span class="org-function-name">socket</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> socket.socket: ...
+<span class="linenr">14: </span>
+<span class="linenr">15: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">16: </span><span class="org-keyword">def</span> <span class="org-function-name">read_from_net</span>(src:TcpSource) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>: ...
+<span class="linenr">17: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">18: </span><span class="org-keyword">def</span> <span class="org-function-name">read_from_net</span>(src:SocketSource) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>: ...
+<span class="linenr">19: </span><span class="org-keyword">def</span> <span class="org-function-name">read_from_net</span>(src:TcpSource<span class="org-operator">|</span>SocketSource) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>:
+<span class="linenr">20: </span>    <span class="org-keyword">if</span> <span class="org-builtin">isinstance</span>(src, TcpSource):
+<span class="linenr">21: </span>        <span class="org-keyword">return</span> f<span class="org-string">'Read from TcpSource </span>{src.ip}<span class="org-string">:</span>{src.port}<span class="org-string">'</span>
+<span class="linenr">22: </span>    <span class="org-keyword">elif</span> <span class="org-builtin">isinstance</span>(src, SocketSource):
+<span class="linenr">23: </span>        <span class="org-keyword">return</span> f<span class="org-string">'Read from SocketSource'</span>
+<span class="linenr">24: </span>    <span class="org-keyword">else</span>:
+<span class="linenr">25: </span>        <span class="org-keyword">return</span> <span class="org-string">'&lt;nothing&gt;'</span>
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span class="org-keyword">class</span> <span class="org-type">LibTcpSrc</span>:
+<span class="linenr">28: </span>    <span class="org-variable-name">port</span> <span class="org-operator">=</span> 8080
+<span class="linenr">29: </span>    <span class="org-variable-name">ip</span> <span class="org-operator">=</span> <span class="org-string">'127.0.0.1'</span>
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span class="org-keyword">class</span> <span class="org-type">UnsuitableTcpSrc</span>:
+<span class="linenr">32: </span>    <span class="org-variable-name">port_number</span> <span class="org-operator">=</span> 8080
+<span class="linenr">33: </span>    <span class="org-keyword">def</span> <span class="org-function-name">get_ip</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-string">'127.0.0.1'</span>
+<span class="linenr">34: </span>    
+<span class="linenr">35: </span><span class="org-builtin">print</span>(read_from_net(LibTcpSrc()))         <span class="org-comment-delimiter"># </span><span class="org-comment">OK: can be treated as TcpSource
+<span class="linenr">36: </span></span><span class="org-builtin">print</span>(read_from_net(UnsuitableTcpSrc()))  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: neither SocketSource nor TcpSource</span>
+</pre>
+</div>
+
+<pre class="example">
+Read from TcpSource 127.0.0.1:8080
+&lt;nothing&gt;
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp11.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp11.py
+  /tmp/tmp11.py:36:7 - error: No overloads for "read_from_net" match the provided arguments (reportCallIssue)
+  /tmp/tmp11.py:36:21 - error: Argument of type "UnsuitableTcpSrc" cannot be assigned to parameter "src" of type "SocketSource" in function "read_from_net"
+    "UnsuitableTcpSrc" is incompatible with protocol "SocketSource"
+      "socket" is not present (reportArgumentType)
 2 errors, 0 warnings, 0 informations
 </pre>
 </div>
