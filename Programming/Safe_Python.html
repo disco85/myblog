@@ -1,0 +1,2054 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-07-04 Sat 20:01 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Safer Python</title>
+<meta name="description" content="How to make Python code safer" />
+<meta name="keywords" content="Python, types, Pydantic, CrossHair" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Safer Python</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org3d6cd1d">Intro</a></li>
+<li><a href="#orgc63322b">Doctests</a>
+<ul>
+<li><a href="#org29ab881">Simple doctest</a></li>
+<li><a href="#org74707b1">More tricky doctests</a></li>
+</ul>
+</li>
+<li><a href="#org69e3f4b">Property tests</a>
+<ul>
+<li><a href="#orgf321de2">Hypothesis comparing to QuickCheck</a></li>
+<li><a href="#org3854f67">Ideas behind Hypothesis</a></li>
+<li><a href="#org7b8c918">Conjecture engine of Hypothesis</a></li>
+<li><a href="#orgfd1e4d8">Hypothesis examples</a>
+<ul>
+<li><a href="#orgcdede71">Simple example</a></li>
+<li><a href="#org9428e95">Bug-finding example with minimal counter-example</a></li>
+<li><a href="#org20b2ad6">Input size control</a></li>
+<li><a href="#org34a611c">Composed structures</a></li>
+<li><a href="#org0aac9e7">Writes tests for you</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgc2bfdde">Pydantic</a>
+<ul>
+<li><a href="#orgdca3c0b">Features</a></li>
+<li><a href="#org53147e8">Simple examples</a>
+<ul>
+<li><a href="#orgaefeb90">From JSON</a></li>
+<li><a href="#orgc04a854">To JSON</a></li>
+<li><a href="#orgda14653">Nested models</a></li>
+<li><a href="#orga36f09c">Discriminating unions</a></li>
+<li><a href="#org515abfa">JSON schema</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org869aa7a">Static types</a>
+<ul>
+<li><a href="#orgbff0318">Basic idea of types</a></li>
+<li><a href="#orgbc24feb">How types are checked</a></li>
+<li><a href="#org7a092bf">Where types help</a></li>
+<li><a href="#orgd443d91">Comparison of type checkers</a></li>
+<li><a href="#org6016e8a">Examples of types based safety</a>
+<ul>
+<li><a href="#org60ec252">Primitive examples</a></li>
+<li><a href="#org8da15a4">Advanced types usage</a></li>
+<li><a href="#org11391b2">Typing KungFu</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org94646a3">Runtime types</a></li>
+<li><a href="#org65ae433">Combining compile and runtime types</a></li>
+<li><a href="#orgf823b02">AI and types</a></li>
+<li><a href="#orge0e007b">Complex types tricks (dependent types?)</a></li>
+<li><a href="#org33ce2d3">CrossHair, SMT</a></li>
+<li><a href="#orgbd799ab">Dufny, coq, &#x2026; generating of Python code</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3d6cd1d" class="outline-2">
+<h2 id="org3d6cd1d">Intro</h2>
+<div class="outline-text-2" id="text-org3d6cd1d">
+<ul class="org-ul">
+<li>The reason for most bugs is ignorance of how your language, your libraries, your
+OS, and your compiler work.</li>
+
+<li>This happens because everything becomes too complicated.</li>
+
+<li>To avoid it - use simple solutions and tools. Like&#x2026; Python!</li>
+
+<li>But how to make it&#x2026; safer?</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc63322b" class="outline-2">
+<h2 id="orgc63322b">Doctests</h2>
+<div class="outline-text-2" id="text-orgc63322b">
+</div>
+<div id="outline-container-org29ab881" class="outline-3">
+<h3 id="org29ab881">Simple doctest</h3>
+<div class="outline-text-3" id="text-org29ab881">
+<ul class="org-ul">
+<li>Regression tests</li>
+<li>Tutorial and more illustrative documentation</li>
+<li>AI friendly</li>
+</ul>
+
+<p>
+It leads to unexpected exception:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">longest_word</span>(s):
+    <span class="org-doc">'''Finds the longest word:
+
+    &gt;&gt;&gt; longest_word('w wow word word123')
+    'word123'
+
+    And for empty input string:
+    
+    &gt;&gt;&gt; longest_word('')
+    None
+    '''</span>
+    <span class="org-variable-name">words</span> <span class="org-operator">=</span> s.split()
+    <span class="org-keyword">return</span> <span class="org-builtin">max</span>(words, key<span class="org-operator">=</span><span class="org-builtin">len</span>)
+
+<span class="org-keyword">import</span> doctest; doctest.testmod(verbose<span class="org-operator">=</span><span class="org-constant">True</span>)
+</pre>
+</div>
+
+<pre class="example" id="org9424406">
+Trying:
+    longest_word('w wow word word123')
+Expecting:
+    'word123'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    None
+**********************************************************************
+File "&lt;stdin&gt;", line 9, in __main__.longest_word
+Failed example:
+    longest_word('')
+Exception raised:
+    Traceback (most recent call last):
+      File "/usr/lib/python3.13/doctest.py", line 1395, in __run
+        exec(compile(example.source, filename, "single",
+        ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     compileflags, True), test.globs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "&lt;doctest __main__.longest_word[1]&gt;", line 1, in &lt;module&gt;
+        longest_word('')
+        ~~~~~~~~~~~~^^^^
+      File "&lt;stdin&gt;", line 13, in longest_word
+    ValueError: max() iterable argument is empty
+1 item had no tests:
+    __main__
+**********************************************************************
+1 item had failures:
+   1 of   2 in __main__.longest_word
+2 tests in 2 items.
+1 passed and 1 failed.
+***Test Failed*** 1 failure.
+</pre>
+</div>
+</div>
+<div id="outline-container-org74707b1" class="outline-3">
+<h3 id="org74707b1">More tricky doctests</h3>
+<div class="outline-text-3" id="text-org74707b1">
+<p>
+Expected exception, ellipsis:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">longest_word</span>(s):
+    <span class="org-doc">'''Finds the longest word:
+
+    &gt;&gt;&gt; longest_word('w wow word word123')  # doctest: +ELLIPSIS
+    'word...'
+
+    And for empty input string:
+    
+    &gt;&gt;&gt; longest_word('')
+    Traceback (most recent call last):
+    ...
+    ValueError: max() iterable argument is empty
+    '''</span>
+    <span class="org-variable-name">words</span> <span class="org-operator">=</span> s.split()
+    <span class="org-keyword">return</span> <span class="org-builtin">max</span>(words, key<span class="org-operator">=</span><span class="org-builtin">len</span>)
+
+<span class="org-keyword">import</span> doctest; doctest.testmod(verbose<span class="org-operator">=</span><span class="org-constant">True</span>)
+</pre>
+</div>
+
+<pre class="example" id="orgf15467a">
+Trying:
+    longest_word('w wow word word123')  # doctest: +ELLIPSIS
+Expecting:
+    'word...'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    Traceback (most recent call last):
+    ...
+    ValueError: max() iterable argument is empty
+ok
+1 item had no tests:
+    __main__
+1 item passed all tests:
+   2 tests in __main__.longest_word
+2 tests in 2 items.
+2 passed.
+Test passed.
+</pre>
+
+<p>
+You can write very complex tests even, integration tests if they use
+"fat" functions, so it looks compact enough
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org69e3f4b" class="outline-2">
+<h2 id="org69e3f4b">Property tests</h2>
+<div class="outline-text-2" id="text-org69e3f4b">
+</div>
+<div id="outline-container-orgf321de2" class="outline-3">
+<h3 id="orgf321de2">Hypothesis comparing to QuickCheck</h3>
+<div class="outline-text-3" id="text-orgf321de2">
+<p>
+The best one <a href="https://hypothesis.readthedocs.io">Hypothesis</a> - based on Haskell's QuickCheck but evolved
+substantially beyond it:
+</p>
+
+<ul class="org-ul">
+<li>Tracks examples that trigger new behavior</li>
+<li>Remembers previously interesting examples</li>
+<li>Biases generation toward boundary cases</li>
+<li>Replays known failures automatically</li>
+<li>Can partially generate property tests for existing code</li>
+</ul>
+
+<p>
+Shrinking:
+</p>
+
+<ul class="org-ul">
+<li>Consistent behavior (search based)</li>
+<li>Works automatically for composed structures</li>
+<li>Usually finds dramatically smaller counterexamples</li>
+</ul>
+
+<p>
+A Hypothesis test run is closer to:
+</p>
+
+<ul class="org-ul">
+<li>generate (search vs QuickCheck's random)</li>
+<li>observe behavior</li>
+<li>adapt future generation</li>
+<li>store interesting examples (in local "db" - to re-check them)</li>
+<li>reuse them later</li>
+</ul>
+
+<p>
+This is fundamentally different from classic QuickCheck.
+</p>
+</div>
+</div>
+<div id="outline-container-org3854f67" class="outline-3">
+<h3 id="org3854f67">Ideas behind Hypothesis</h3>
+<div class="outline-text-3" id="text-org3854f67">
+<p>
+Imagine a parser bug only appears when:
+</p>
+
+<p class="verse">
+length &gt; 100<br />
+contains unicode<br />
+contains null byte<br />
+</p>
+
+<p>
+Pure random generation may take a long time to discover it. Hypothesis actively
+steers toward unusual and high-information examples.
+</p>
+</div>
+</div>
+<div id="outline-container-org7b8c918" class="outline-3">
+<h3 id="org7b8c918">Conjecture engine of Hypothesis</h3>
+<div class="outline-text-3" id="text-org7b8c918">
+<p>
+Hypothesis is built around an internal engine called <code>Conjecture</code>.
+</p>
+
+<p>
+Instead of saying:
+</p>
+
+<p class="verse">
+Generate an integer<br />
+Generate a string<br />
+Generate a list<br />
+</p>
+
+<p>
+Hypothesis effectively manipulates a stream of bytes and interprets it as structured data.
+</p>
+
+<p>
+Conceptually:
+</p>
+
+<p class="verse">
+bytes<br />
+&#xa0;&#xa0;↓<br />
+strategy<br />
+&#xa0;&#xa0;↓<br />
+object<br />
+</p>
+
+<p>
+This allows:
+</p>
+
+<ul class="org-ul">
+<li>Uniform shrinking</li>
+<li>Better exploration</li>
+<li>More systematic search</li>
+</ul>
+
+<p>
+QuickCheck generators generally operate directly at the value level.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd1e4d8" class="outline-3">
+<h3 id="orgfd1e4d8">Hypothesis examples</h3>
+<div class="outline-text-3" id="text-orgfd1e4d8">
+</div>
+<div id="outline-container-orgcdede71" class="outline-4">
+<h4 id="orgcdede71">Simple example</h4>
+<div class="outline-text-4" id="text-orgcdede71">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+
+<span class="org-keyword">def</span> <span class="org-function-name">my_sort</span>(xs):
+    <span class="org-keyword">return</span> <span class="org-builtin">sorted</span>(xs)
+
+<span class="org-type">@given</span>(st.lists(st.integers()))
+<span class="org-keyword">def</span> <span class="org-function-name">test_sort</span>(xs):
+    <span class="org-comment-delimiter"># </span><span class="org-comment">`xs` will have values like:
+</span>    <span class="org-comment-delimiter">#   </span><span class="org-comment">[]
+</span>    <span class="org-comment-delimiter">#   </span><span class="org-comment">[3]
+</span>    <span class="org-comment-delimiter">#   </span><span class="org-comment">[1, 2, 3]
+</span>    <span class="org-comment-delimiter">#   </span><span class="org-comment">[7, 7, 1]  etc.
+</span>    <span class="org-variable-name">result</span> <span class="org-operator">=</span> my_sort(xs)
+    <span class="org-keyword">assert</span> <span class="org-builtin">sorted</span>(xs) <span class="org-operator">==</span> result
+    <span class="org-keyword">assert</span> <span class="org-builtin">all</span>(result[i] <span class="org-operator">&lt;=</span> result[i<span class="org-operator">+</span>1] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(<span class="org-builtin">len</span>(result)<span class="org-operator">-</span>1))
+
+test_sort()
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9428e95" class="outline-4">
+<h4 id="org9428e95">Bug-finding example with minimal counter-example</h4>
+<div class="outline-text-4" id="text-org9428e95">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+<span class="org-keyword">import</span> sys, traceback
+
+<span class="org-keyword">def</span> <span class="org-function-name">buggy_sort</span>(xs):
+    <span class="org-keyword">return</span> <span class="org-builtin">list</span>(<span class="org-builtin">set</span>(xs))  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: removes duplicates
+</span>
+<span class="org-type">@given</span>(st.lists(st.integers()))
+<span class="org-keyword">def</span> <span class="org-function-name">test_sort</span>(xs):
+    <span class="org-keyword">assert</span> <span class="org-builtin">sorted</span>(xs) <span class="org-operator">==</span> buggy_sort(xs)
+
+<span class="org-keyword">try</span>:
+    test_sort()
+<span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))
+</pre>
+</div>
+
+<pre class="example">
+AssertionError
+ Falsifying example: test_sort(
+     xs=[0, 0],
+ )
+
+</pre>
+</div>
+</div>
+<div id="outline-container-org20b2ad6" class="outline-4">
+<h4 id="org20b2ad6">Input size control</h4>
+<div class="outline-text-4" id="text-org20b2ad6">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+
+<span class="org-type">@given</span>(st.lists(st.integers(), max_size<span class="org-operator">=</span>10))
+<span class="org-keyword">def</span> <span class="org-function-name">test_small_lists</span>(xs):
+    <span class="org-keyword">assert</span> <span class="org-builtin">len</span>(xs) <span class="org-operator">&lt;=</span> 10
+
+test_small_lists()    
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org34a611c" class="outline-4">
+<h4 id="org34a611c">Composed structures</h4>
+<div class="outline-text-4" id="text-org34a611c">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+
+<span class="org-type">@given</span>(st.lists(st.tuples(st.text(), st.integers())))
+<span class="org-keyword">def</span> <span class="org-function-name">test_pairs</span>(data):
+    <span class="org-keyword">assert</span> <span class="org-builtin">isinstance</span>(data, <span class="org-builtin">list</span>) <span class="org-keyword">and</span> <span class="org-builtin">all</span>(<span class="org-builtin">isinstance</span>(d, <span class="org-builtin">tuple</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> data)
+
+test_pairs()
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org0aac9e7" class="outline-4">
+<h4 id="org0aac9e7">Writes tests for you</h4>
+<div class="outline-text-4" id="text-org0aac9e7">
+<p>
+Keywords: ghostwriter, fuzz (fuzzer).
+</p>
+
+<p>
+Generates a test for functions that are inverses of each other (e.g.,
+serializer/deserializer or encoder/decoder):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> <span class="org-string">'#+begin_src python :results none'</span>
+hypothesis write --roundtrip json.dumps json.loads
+<span class="org-builtin">echo</span> <span class="org-string">'#+end_src'</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">This test code was written by the `hypothesis.extra.ghostwriter` module
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">and is provided under the Creative Commons Zero public domain dedication.
+</span>
+<span class="org-keyword">import</span> json
+<span class="org-keyword">import</span> unittest
+<span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: replace st.nothing() with an appropriate strategy
+</span>
+
+<span class="org-keyword">class</span> <span class="org-type">TestRoundtripDumpsLoads</span>(unittest.TestCase):
+
+    <span class="org-type">@given</span>(
+        allow_nan<span class="org-operator">=</span>st.booleans(),
+        check_circular<span class="org-operator">=</span>st.booleans(),
+        cls<span class="org-operator">=</span>st.none(),
+        default<span class="org-operator">=</span>st.none(),
+        ensure_ascii<span class="org-operator">=</span>st.booleans(),
+        indent<span class="org-operator">=</span>st.none(),
+        obj<span class="org-operator">=</span>st.nothing(),
+        object_hook<span class="org-operator">=</span>st.none(),
+        object_pairs_hook<span class="org-operator">=</span>st.none(),
+        parse_constant<span class="org-operator">=</span>st.none(),
+        parse_float<span class="org-operator">=</span>st.none(),
+        parse_int<span class="org-operator">=</span>st.none(),
+        separators<span class="org-operator">=</span>st.none(),
+        skipkeys<span class="org-operator">=</span>st.booleans(),
+        sort_keys<span class="org-operator">=</span>st.booleans(),
+    )
+    <span class="org-keyword">def</span> <span class="org-function-name">test_roundtrip_dumps_loads</span>(
+        <span class="org-keyword">self</span>,
+        allow_nan,
+        check_circular,
+        cls,
+        default,
+        ensure_ascii,
+        indent,
+        obj,
+        object_hook,
+        object_pairs_hook,
+        parse_constant,
+        parse_float,
+        parse_int,
+        separators,
+        skipkeys,
+        sort_keys,
+    ):
+        <span class="org-variable-name">value0</span> <span class="org-operator">=</span> json.dumps(
+            obj<span class="org-operator">=</span>obj,
+            skipkeys<span class="org-operator">=</span>skipkeys,
+            ensure_ascii<span class="org-operator">=</span>ensure_ascii,
+            check_circular<span class="org-operator">=</span>check_circular,
+            allow_nan<span class="org-operator">=</span>allow_nan,
+            cls<span class="org-operator">=</span>cls,
+            indent<span class="org-operator">=</span>indent,
+            separators<span class="org-operator">=</span>separators,
+            default<span class="org-operator">=</span>default,
+            sort_keys<span class="org-operator">=</span>sort_keys,
+        )
+        <span class="org-variable-name">value1</span> <span class="org-operator">=</span> json.loads(
+            s<span class="org-operator">=</span>value0,
+            cls<span class="org-operator">=</span>cls,
+            object_hook<span class="org-operator">=</span>object_hook,
+            parse_float<span class="org-operator">=</span>parse_float,
+            parse_int<span class="org-operator">=</span>parse_int,
+            parse_constant<span class="org-operator">=</span>parse_constant,
+            object_pairs_hook<span class="org-operator">=</span>object_pairs_hook,
+        )
+        <span class="org-keyword">self</span>.assertEqual(obj, value1)
+
+</pre>
+</div>
+
+<p>
+Property test for associative, commutative, identity properties:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell"><span class="org-builtin">echo</span> <span class="org-string">'#+begin_src python :results none'</span>
+hypothesis write --binary-op operator.add
+<span class="org-builtin">echo</span> <span class="org-string">'#+end_src'</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-comment-delimiter"># </span><span class="org-comment">This test code was written by the `hypothesis.extra.ghostwriter` module
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">and is provided under the Creative Commons Zero public domain dedication.
+</span>
+<span class="org-keyword">import</span> operator
+<span class="org-keyword">import</span> unittest
+<span class="org-keyword">from</span> hypothesis <span class="org-keyword">import</span> given, strategies <span class="org-keyword">as</span> st
+
+<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">: replace st.nothing() with an appropriate strategy
+</span>
+
+<span class="org-keyword">class</span> <span class="org-type">TestBinaryOperationadd</span>(unittest.TestCase):
+    <span class="org-variable-name">add_operands</span> <span class="org-operator">=</span> st.nothing()
+
+    <span class="org-type">@given</span>(a<span class="org-operator">=</span>add_operands, b<span class="org-operator">=</span>add_operands, c<span class="org-operator">=</span>add_operands)
+    <span class="org-keyword">def</span> <span class="org-function-name">test_associative_binary_operation_add</span>(<span class="org-keyword">self</span>, a, b, c):
+        <span class="org-variable-name">left</span> <span class="org-operator">=</span> operator.add(a, operator.add(b, c))
+        <span class="org-variable-name">right</span> <span class="org-operator">=</span> operator.add(operator.add(a, b), c)
+        <span class="org-keyword">self</span>.assertEqual(left, right)
+
+    <span class="org-type">@given</span>(a<span class="org-operator">=</span>add_operands, b<span class="org-operator">=</span>add_operands)
+    <span class="org-keyword">def</span> <span class="org-function-name">test_commutative_binary_operation_add</span>(<span class="org-keyword">self</span>, a, b):
+        <span class="org-variable-name">left</span> <span class="org-operator">=</span> operator.add(a, b)
+        <span class="org-variable-name">right</span> <span class="org-operator">=</span> operator.add(b, a)
+        <span class="org-keyword">self</span>.assertEqual(left, right)
+
+    <span class="org-type">@given</span>(a<span class="org-operator">=</span>add_operands)
+    <span class="org-keyword">def</span> <span class="org-function-name">test_identity_binary_operation_add</span>(<span class="org-keyword">self</span>, a):
+        <span class="org-variable-name">identity</span> <span class="org-operator">=</span> <span class="org-string">"identity element here"</span>
+        <span class="org-keyword">self</span>.assertEqual(a, operator.add(a, identity))
+        <span class="org-keyword">self</span>.assertEqual(a, operator.add(identity, a))
+
+</pre>
+</div>
+
+<p>
+Uses predefined/template logic: checks idempotent, associativity, commutativity,
+identity element, code equivalency, duality (roundtrip), etc.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc2bfdde" class="outline-2">
+<h2 id="orgc2bfdde">Pydantic</h2>
+<div class="outline-text-2" id="text-orgc2bfdde">
+</div>
+<div id="outline-container-orgdca3c0b" class="outline-3">
+<h3 id="orgdca3c0b">Features</h3>
+<div class="outline-text-3" id="text-orgdca3c0b">
+<ul class="org-ul">
+<li>Data validation library for Python</li>
+<li>As FromJSON/ToJSON in Haskell and many-many more</li>
+<li>Speed (core in written in Rust)</li>
+<li>JSON schema emitting</li>
+<li>ORM support (SQLAlchemy, Django ORM, Tortoise ORM)</li>
+<li>Serialization/deserialization: JSON, Python (XML via extension)</li>
+<li>8,000 packages in PyPI use it, 20/25 NASDAQ companies use it</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org53147e8" class="outline-3">
+<h3 id="org53147e8">Simple examples</h3>
+<div class="outline-text-3" id="text-org53147e8">
+</div>
+<div id="outline-container-orgaefeb90" class="outline-4">
+<h4 id="orgaefeb90">From JSON</h4>
+<div class="outline-text-4" id="text-orgaefeb90">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pydantic
+<span class="org-keyword">class</span> <span class="org-type">FileLicenseTextSource</span>(pydantic.BaseModel):
+    <span class="org-doc">'Locally obtained license text'</span>
+    file_url:<span class="org-builtin">str</span>                <span class="org-comment-delimiter"># </span><span class="org-comment">some URL
+</span>    location:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">str</span><span class="org-operator">=</span><span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">either line number of something other
+</span><span class="org-keyword">try</span>:
+    <span class="org-variable-name">flts</span> <span class="org-operator">=</span> FileLicenseTextSource.model_validate_json(
+        <span class="org-string">'{"file_url": "https://a.com/MIT.txt", "location": 123.12}'</span>)
+<span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(x)
+</pre>
+</div>
+
+<pre class="example">
+2 validation errors for FileLicenseTextSource
+location.int
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=123.12, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.13/v/int_from_float
+location.str
+  Input should be a valid string [type=string_type, input_value=123.12, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_type
+</pre>
+</div>
+</div>
+<div id="outline-container-orgc04a854" class="outline-4">
+<h4 id="orgc04a854">To JSON</h4>
+<div class="outline-text-4" id="text-orgc04a854">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pydantic
+<span class="org-keyword">class</span> <span class="org-type">FileLicenseTextSource</span>(pydantic.BaseModel):
+    <span class="org-doc">'Locally obtained license text'</span>
+    file_url:<span class="org-builtin">str</span>                <span class="org-comment-delimiter"># </span><span class="org-comment">some URL
+</span>    location:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">str</span><span class="org-operator">=</span><span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">either line number of something other
+</span><span class="org-variable-name">flts</span> <span class="org-operator">=</span> FileLicenseTextSource(file_url<span class="org-operator">=</span><span class="org-string">'https://a.com/MIT.txt'</span>, location<span class="org-operator">=</span>123)
+<span class="org-builtin">print</span>(flts.model_dump_json())
+</pre>
+</div>
+
+<pre class="example">
+{"file_url":"https://a.com/MIT.txt","location":123}
+</pre>
+</div>
+</div>
+<div id="outline-container-orgda14653" class="outline-4">
+<h4 id="orgda14653">Nested models</h4>
+<div class="outline-text-4" id="text-orgda14653">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pydantic
+<span class="org-keyword">class</span> <span class="org-type">Address</span>(pydantic.BaseModel):
+    city: <span class="org-builtin">str</span>
+    <span class="org-builtin">zip</span>: <span class="org-builtin">int</span>
+<span class="org-keyword">class</span> <span class="org-type">User</span>(pydantic.BaseModel):
+    name: <span class="org-builtin">str</span>
+    age: <span class="org-builtin">int</span>
+    address: Address
+<span class="org-variable-name">data</span> <span class="org-operator">=</span> {
+    <span class="org-string">'name'</span>: <span class="org-string">'Alice'</span>,
+    <span class="org-string">'age'</span>: 30,
+    <span class="org-string">'address'</span>: {
+        <span class="org-string">'city'</span>: <span class="org-string">'Sofia'</span>,
+        <span class="org-string">'zip'</span>: 1000
+    }
+}
+<span class="org-variable-name">user</span> <span class="org-operator">=</span> User(<span class="org-operator">**</span>data)
+<span class="org-builtin">print</span>(user)
+</pre>
+</div>
+
+<pre class="example">
+name='Alice' age=30 address=Address(city='Sofia', zip=1000)
+</pre>
+</div>
+</div>
+<div id="outline-container-orga36f09c" class="outline-4">
+<h4 id="orga36f09c">Discriminating unions</h4>
+<div class="outline-text-4" id="text-orga36f09c">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pydantic, typing
+
+<span class="org-keyword">class</span> <span class="org-type">Circle</span>(pydantic.BaseModel):
+    <span class="org-builtin">type</span>: <span class="org-type">typing</span>.<span class="org-type">Literal</span>[<span class="org-string">'circle'</span>] <span class="org-operator">=</span> <span class="org-string">'circle'</span>
+    radius: <span class="org-builtin">float</span>
+
+<span class="org-keyword">class</span> <span class="org-type">Rectangle</span>(pydantic.BaseModel):
+    <span class="org-builtin">type</span>: <span class="org-type">typing</span>.<span class="org-type">Literal</span>[<span class="org-string">'rectangle'</span>] <span class="org-operator">=</span> <span class="org-string">'rectangle'</span>
+    width: <span class="org-builtin">float</span>
+    height: <span class="org-builtin">float</span>
+
+<span class="org-variable-name">Shape</span> <span class="org-operator">=</span> Circle <span class="org-operator">|</span> Rectangle
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">With `type` field:
+</span><span class="org-variable-name">s1</span> <span class="org-operator">=</span> pydantic.TypeAdapter(Shape).validate_python({<span class="org-string">'type'</span>: <span class="org-string">'circle'</span>, <span class="org-string">'radius'</span>: 5})
+<span class="org-builtin">print</span>(s1)
+<span class="org-comment-delimiter"># </span><span class="org-comment">!!! Without `type` field even:
+</span><span class="org-variable-name">s2</span> <span class="org-operator">=</span> pydantic.TypeAdapter(Shape).validate_python({<span class="org-string">'height'</span>: 14.8, <span class="org-string">'width'</span>: 10.3})
+<span class="org-builtin">print</span>(s2)
+</pre>
+</div>
+
+<pre class="example">
+type='circle' radius=5.0
+type='rectangle' width=10.3 height=14.8
+</pre>
+</div>
+</div>
+<div id="outline-container-org515abfa" class="outline-4">
+<h4 id="org515abfa">JSON schema</h4>
+<div class="outline-text-4" id="text-org515abfa">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pydantic, json
+<span class="org-keyword">class</span> <span class="org-type">FileLicenseTextSource</span>(pydantic.BaseModel):
+    <span class="org-doc">'Locally obtained license text'</span>
+    file_url:<span class="org-builtin">str</span>                <span class="org-comment-delimiter"># </span><span class="org-comment">some URL
+</span>    location:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">str</span><span class="org-operator">=</span><span class="org-constant">None</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">either line number of something other
+</span><span class="org-variable-name">sch</span> <span class="org-operator">=</span> FileLicenseTextSource.model_json_schema()
+<span class="org-builtin">print</span>(json.dumps(sch, indent<span class="org-operator">=</span>2))
+</pre>
+</div>
+
+<pre class="example" id="orgb5379bd">
+{
+  "description": "Locally obtained license text",
+  "properties": {
+    "file_url": {
+      "title": "File Url",
+      "type": "string"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    }
+  },
+  "required": [
+    "file_url"
+  ],
+  "title": "FileLicenseTextSource",
+  "type": "object"
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org869aa7a" class="outline-2">
+<h2 id="org869aa7a">Static types</h2>
+<div class="outline-text-2" id="text-org869aa7a">
+</div>
+<div id="outline-container-orgbff0318" class="outline-3">
+<h3 id="orgbff0318">Basic idea of types</h3>
+<div class="outline-text-3" id="text-orgbff0318">
+<ul class="org-ul">
+<li>Programming: "static" contract</li>
+<li>Logic: Curry-Howard correspondence:
+<ul class="org-ul">
+<li>type is a proposition</li>
+<li>value is a proof of that proposition</li>
+<li>programs are proofs-as-constructions</li>
+</ul></li>
+<li>Math: set together with the ways its elements can be constructed and used.</li>
+<li>Category theory: types are objects, functions are morphisms</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">oranges</span>:<span class="org-builtin">list</span>[<span class="org-type">Orange</span>] <span class="org-operator">=</span> apples  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG !</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbc24feb" class="outline-3">
+<h3 id="orgbc24feb">How types are checked</h3>
+<div class="outline-text-3" id="text-orgbc24feb">
+<ul class="org-ul">
+<li>Compile time (C/C++, Java, Haskell, etc)</li>
+<li>Type-checking mode/time (Python, Ruby, etc):</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing
+<span class="org-keyword">if</span> typing.TYPE_CHECKING:
+    <span class="org-comment-delimiter"># </span><span class="org-comment">This block runs ONLY during static type checking (by pyright, mypy, etc)
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">and it does not run during Python execution (run time):
+</span>    <span class="org-keyword">from</span> mymodule <span class="org-keyword">import</span> HeavyDependency
+</pre>
+</div>
+
+<p>
+which is useful to avoid errors like <code>Failed importing ...: partially initialized module '...'</code>
+related to circular import issues.
+</p>
+
+<p>
+Type-check time assertions (proofs or "unit test for types"):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">if</span> typing.TYPE_CHECKING:
+    <span class="org-variable-name">r0</span>:<span class="org-type">PackageToFilesRelationNode</span> <span class="org-operator">=</span> RelationNode()                                <span class="org-comment-delimiter"># </span><span class="org-comment">1
+</span>    typing_extensions.assert_type(r0, RelationNode[L[<span class="org-string">'PACKAGE'</span>],<span class="org-builtin">list</span>[L[<span class="org-string">'FILE'</span>]]]) <span class="org-comment-delimiter"># </span><span class="org-comment">2
+</span>    <span class="org-variable-name">r1</span>:<span class="org-type">Node</span>[<span class="org-type">L</span>[<span class="org-string">'RELATIONSHIP'</span>]] <span class="org-operator">=</span> r0                                               <span class="org-comment-delimiter"># </span><span class="org-comment">3</span>
+</pre>
+</div>
+
+<ol class="org-ol">
+<li>Assume <code>r0</code> is a <code>RelationNode[L['PACKAGE'], list[L['FILE']]]</code>
+check that calling <code>RelationNode()</code> produces something compatible with that alias.</li>
+<li>It forces the type checker to verify that <code>r0</code> really is the expected specialized
+generic type.</li>
+<li><code>RelationNode[...]</code> is a subtype of <code>Node[L['RELATIONSHIP']]</code></li>
+</ol>
+
+<p>
+How to run it from a shell:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright source_dir
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org7a092bf" class="outline-3">
+<h3 id="org7a092bf">Where types help</h3>
+<div class="outline-text-3" id="text-org7a092bf">
+<ol class="org-ol">
+<li>cleaner design and architecture</li>
+<li>fewer errors when writing code</li>
+<li>REFACTORING!</li>
+<li>better documentation, the code is easier to understand</li>
+<li>VERY USEFUL FOR AI!</li>
+<li>Include type-checking to your CI, together with doctests, unittests, property-tests&#x2026;</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgd443d91" class="outline-3">
+<h3 id="orgd443d91">Comparison of type checkers</h3>
+<div class="outline-text-3" id="text-orgd443d91">
+<p>
+Main features:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Type checker</th>
+<th scope="col" class="org-left">Implementation</th>
+<th scope="col" class="org-left">Speed</th>
+<th scope="col" class="org-left">Type inference</th>
+<th scope="col" class="org-left">Typing features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">mypy</td>
+<td class="org-left">Python</td>
+<td class="org-left">Medium</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent (PEP 484)</td>
+</tr>
+
+<tr>
+<td class="org-left">basedpyright</td>
+<td class="org-left">TypeScript</td>
+<td class="org-left">Very fast</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent + stricter defaults</td>
+</tr>
+
+<tr>
+<td class="org-left">pyright</td>
+<td class="org-left">TypeScript</td>
+<td class="org-left">Very fast</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+</tr>
+
+<tr>
+<td class="org-left">ty</td>
+<td class="org-left">Rust</td>
+<td class="org-left">Extremely fast</td>
+<td class="org-left">Good (rapidly improving)</td>
+<td class="org-left">Good (still incomplete)</td>
+</tr>
+
+<tr>
+<td class="org-left">pytype</td>
+<td class="org-left">C++ + Python</td>
+<td class="org-left">Fast</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Good</td>
+</tr>
+
+<tr>
+<td class="org-left">pyre</td>
+<td class="org-left">OCaml</td>
+<td class="org-left">Very fast</td>
+<td class="org-left">Very good</td>
+<td class="org-left">Very good</td>
+</tr>
+
+<tr>
+<td class="org-left">pyanalyze</td>
+<td class="org-left">Python</td>
+<td class="org-left">Medium</td>
+<td class="org-left">Very good</td>
+<td class="org-left">Good</td>
+</tr>
+
+<tr>
+<td class="org-left">pytype2 (experimental)</td>
+<td class="org-left">Various</td>
+<td class="org-left">Experimental</td>
+<td class="org-left">Experimental</td>
+<td class="org-left">Experimental</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Integration features:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Type checker</th>
+<th scope="col" class="org-left">Plugins</th>
+<th scope="col" class="org-left">Python support</th>
+<th scope="col" class="org-left">IDE integration</th>
+<th scope="col" class="org-left">Typical use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">mypy</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">General-purpose, library authors</td>
+</tr>
+
+<tr>
+<td class="org-left">basedpyright</td>
+<td class="org-left">No</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent (VS Code, LSP)</td>
+<td class="org-left">Strict application development</td>
+</tr>
+
+<tr>
+<td class="org-left">pyright</td>
+<td class="org-left">No</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent (VS Code, LSP)</td>
+<td class="org-left">Fast feedback during development</td>
+</tr>
+
+<tr>
+<td class="org-left">ty</td>
+<td class="org-left">No</td>
+<td class="org-left">Latest Python</td>
+<td class="org-left">LSP in progress</td>
+<td class="org-left">Future Ruff ecosystem</td>
+</tr>
+
+<tr>
+<td class="org-left">pytype</td>
+<td class="org-left">No</td>
+<td class="org-left">Good</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Google codebases</td>
+</tr>
+
+<tr>
+<td class="org-left">pyre</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Good</td>
+<td class="org-left">Good</td>
+<td class="org-left">Large Meta codebases</td>
+</tr>
+
+<tr>
+<td class="org-left">pyanalyze</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Good</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Bug finding, advanced analysis</td>
+</tr>
+
+<tr>
+<td class="org-left">pytype2 (experimental)</td>
+<td class="org-left">No</td>
+<td class="org-left">Experimental</td>
+<td class="org-left">Experimental</td>
+<td class="org-left">Research</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Typing details:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Feature</th>
+<th scope="col" class="org-left">mypy</th>
+<th scope="col" class="org-left">pyright</th>
+<th scope="col" class="org-left">basedpyright</th>
+<th scope="col" class="org-left">ty</th>
+<th scope="col" class="org-left">pytype</th>
+<th scope="col" class="org-left">pyre</th>
+<th scope="col" class="org-left">pyanalyze</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Incremental checking</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Planned</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Yes</td>
+<td class="org-left">No</td>
+</tr>
+
+<tr>
+<td class="org-left">Daemon mode</td>
+<td class="org-left">Yes (dmypy)</td>
+<td class="org-left">LSP</td>
+<td class="org-left">LSP</td>
+<td class="org-left">Planned</td>
+<td class="org-left">No</td>
+<td class="org-left">Yes</td>
+<td class="org-left">No</td>
+</tr>
+
+<tr>
+<td class="org-left">Generic inference</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Good</td>
+<td class="org-left">Very good</td>
+<td class="org-left">Very good</td>
+<td class="org-left">Good</td>
+</tr>
+
+<tr>
+<td class="org-left">Literal types</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Type narrowing</td>
+<td class="org-left">Good</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Excellent</td>
+<td class="org-left">Good</td>
+<td class="org-left">Good</td>
+<td class="org-left">Very good</td>
+<td class="org-left">Excellent</td>
+</tr>
+
+<tr>
+<td class="org-left">TypedDict</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">Protocols</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Partial</td>
+</tr>
+
+<tr>
+<td class="org-left">Variadic generics</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Partial</td>
+<td class="org-left">Partial</td>
+</tr>
+
+<tr>
+<td class="org-left">Plugins</td>
+<td class="org-left">Yes</td>
+<td class="org-left">No</td>
+<td class="org-left">No</td>
+<td class="org-left">No</td>
+<td class="org-left">No</td>
+<td class="org-left">Limited</td>
+<td class="org-left">Limited</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Recommendations:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">If you&#x2026;</th>
+<th scope="col" class="org-left">Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Want the reference implementation</td>
+<td class="org-left">mypy</td>
+</tr>
+
+<tr>
+<td class="org-left">Want the fastest mature checker</td>
+<td class="org-left">basedpyright</td>
+</tr>
+
+<tr>
+<td class="org-left">Use VS Code</td>
+<td class="org-left">pyright or basedpyright</td>
+</tr>
+
+<tr>
+<td class="org-left">Write libraries for others</td>
+<td class="org-left">mypy</td>
+</tr>
+
+<tr>
+<td class="org-left">Want the strictest diagnostics</td>
+<td class="org-left">basedpyright</td>
+</tr>
+
+<tr>
+<td class="org-left">Work at Google</td>
+<td class="org-left">pytype</td>
+</tr>
+
+<tr>
+<td class="org-left">Work at Meta</td>
+<td class="org-left">pyre</td>
+</tr>
+
+<tr>
+<td class="org-left">Like Ruff and Rust tools</td>
+<td class="org-left">ty</td>
+</tr>
+
+<tr>
+<td class="org-left">Want additional bug-finding beyond typing</td>
+<td class="org-left">pyanalyze</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Stability:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Checker</th>
+<th scope="col" class="org-left">Stable Python API</th>
+<th scope="col" class="org-left">Stable CLI</th>
+<th scope="col" class="org-left">LSP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">mypy</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+<td class="org-left">No</td>
+</tr>
+
+<tr>
+<td class="org-left">pyright</td>
+<td class="org-left">No</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">basedpyright</td>
+<td class="org-left">No</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Yes</td>
+</tr>
+
+<tr>
+<td class="org-left">ty</td>
+<td class="org-left">Not yet</td>
+<td class="org-left">Yes</td>
+<td class="org-left">In progress</td>
+</tr>
+</tbody>
+</table>
+
+<ul class="org-ul">
+<li><b><b>mypy</b></b> remains the de facto reference implementation for Python's typing
+ecosystem. New PEPs are often implemented there first, and it has the richest
+plugin ecosystem.</li>
+<li><b><b>Pyright</b></b> is widely regarded as the fastest mature checker and has excellent type
+inference.</li>
+<li><b><b>basedpyright</b></b> is a fork of Pyright with stricter defaults, additional diagnostics,
+and a focus on catching more potential issues without requiring as much manual
+configuration.</li>
+<li><b><b>ty</b></b> is a relatively new Rust-based checker developed as part of the Ruff
+ecosystem. It's exceptionally fast, but as of mid-2026 it is still catching up to
+mypy and Pyright in terms of feature completeness.</li>
+<li><b><b>pytype</b></b> uses abstract interpretation and can infer types in code with few or no
+annotations, but it's primarily developed for Google's internal use cases.</li>
+<li><b><b>Pyre</b></b> emphasizes performance and scalability for very large repositories.</li>
+<li><b><b>pyanalyze</b></b> combines type checking with broader static analysis and can detect some
+classes of bugs that traditional type checkers do not.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6016e8a" class="outline-3">
+<h3 id="org6016e8a">Examples of types based safety</h3>
+<div class="outline-text-3" id="text-org6016e8a">
+</div>
+<div id="outline-container-org60ec252" class="outline-4">
+<h4 id="org60ec252">Primitive examples</h4>
+<div class="outline-text-4" id="text-org60ec252">
+<p>
+Assignment:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">x</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> <span class="org-string">'hello world'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: it is not int</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp1.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp1.py:1: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Incorrect usage of a function possibly returning <code>None</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> math
+<span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:<span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">float</span>:
+    <span class="org-keyword">return</span> math.sqrt(n) <span class="org-keyword">if</span> n <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">no more exception, just None
+</span>2.5 <span class="org-operator">+</span> safe_sqrt(9)                            <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: 2.5 + None|float</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp2.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp2.py:4: error: Unsupported operand types for + ("float" and "None")  [operator]
+/tmp/tmp2.py:4: note: Right operand is of type "float | None"
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Wrong argument's type:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">size</span>(x:<span class="org-builtin">tuple</span><span class="org-operator">|</span><span class="org-builtin">list</span><span class="org-operator">|</span><span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+    <span class="org-keyword">if</span> x <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:           <span class="org-comment-delimiter"># </span><span class="org-comment">IMPROVEMENT: you don't need this check anymore
+</span>        <span class="org-keyword">return</span> <span class="org-builtin">len</span>(x)
+size(12)                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: int is not expected
+</span>size({1: <span class="org-string">'a'</span>, 2:<span class="org-string">'b'</span>}.get(100))  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: {}.get() can return None, must be checked</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp3.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp3.py:4: error: Argument 1 to "size" has incompatible type "int"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
+/tmp/tmp3.py:5: error: Argument 1 to "size" has incompatible type "str | None"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
+Found 2 errors in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+More precise standard containers:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing, enum
+<span class="org-keyword">class</span> <span class="org-type">Planet</span>(enum.StrEnum):
+    <span class="org-variable-name">Mars</span> <span class="org-operator">=</span> <span class="org-string">'Mars'</span>
+    <span class="org-variable-name">Earth</span> <span class="org-operator">=</span> <span class="org-string">'Earth'</span>
+    <span class="org-variable-name">Jupiter</span> <span class="org-operator">=</span> <span class="org-string">'Jupiter'</span>
+planet_masses:<span class="org-builtin">dict</span>[Planet,<span class="org-builtin">float</span>]
+<span class="org-variable-name">planet_masses</span>[Planet.Mars] <span class="org-operator">=</span> 6.42e23
+<span class="org-variable-name">planet_masses</span>[Planet.Earth] <span class="org-operator">=</span> 5.97e24
+<span class="org-variable-name">planet_masses</span>[Planet.Jupiter] <span class="org-operator">=</span> <span class="org-string">'1.90e24 tonnes'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected float, not str
+</span><span class="org-variable-name">planet_masses</span>[<span class="org-string">'Saturn'</span>] <span class="org-operator">=</span> 68e26                   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected enumerated Planet, not str</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp4.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp4.py:9: error: Incompatible types in assignment (expression has type "str", target has type "float")  [assignment]
+/tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
+Found 2 errors in 1 file (checked 1 source file)
+</pre>
+</div>
+</div>
+<div id="outline-container-org8da15a4" class="outline-4">
+<h4 id="org8da15a4">Advanced types usage</h4>
+<div class="outline-text-4" id="text-org8da15a4">
+<p>
+Wrapper-types for correct algorithms chaining:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing
+
+<span class="org-keyword">class</span> <span class="org-type">SortedList</span>(<span class="org-builtin">list</span>):
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, items):
+        <span class="org-builtin">super</span>().__init__(<span class="org-builtin">sorted</span>(items))
+
+<span class="org-keyword">def</span> <span class="org-function-name">unique</span>(data: SortedList) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>:
+    <span class="org-variable-name">res</span>: <span class="org-builtin">list</span> <span class="org-operator">=</span> []
+    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> data:
+        <span class="org-keyword">if</span> res <span class="org-keyword">and</span> x <span class="org-operator">==</span> res[<span class="org-operator">-</span>1]: <span class="org-keyword">continue</span>
+        <span class="org-keyword">else</span>: res.append(x)
+    <span class="org-keyword">return</span> res
+<span class="org-variable-name">items</span> <span class="org-operator">=</span> [11, 20, 11, 20, 1, 20, 11, 5, 1]
+<span class="org-variable-name">sorted_items</span> <span class="org-operator">=</span> SortedList(items)
+<span class="org-builtin">print</span>(unique(items))             <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected SortedList so unique() works correctly
+</span><span class="org-builtin">print</span>(unique(sorted_items))
+</pre>
+</div>
+
+<pre class="example">
+[11, 20, 11, 20, 1, 20, 11, 5, 1]
+[1, 5, 11, 20]
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp5.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp5.py:15: error: Argument 1 to "unique" has incompatible type "list[int]"; expected "SortedList"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Distinct, refined types avoiding multiple checks (or "ensure"-functions) - refinement
+happens only once on the edge of the domain where external raw data is transformed to
+internal <b><b>typed</b></b> form:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing
+<span class="org-variable-name">ReadableName</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'ReadableName'</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">DISTINCT TYPE: or a class
+</span><span class="org-keyword">def</span> <span class="org-function-name">readable_name</span>(raw_str:<span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> ReadableName:     <span class="org-comment-delimiter"># </span><span class="org-comment">IDEAS: capitalized, stripped, ...
+</span>    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-string">' '</span>.join(s.strip().capitalize() <span class="org-keyword">for</span> s <span class="org-keyword">in</span> raw_str.split() <span class="org-keyword">if</span> s)
+    <span class="org-keyword">return</span> ReadableName(res)
+<span class="org-keyword">def</span> <span class="org-function-name">greating</span>(n:ReadableName):
+    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
+</span>    <span class="org-builtin">print</span>(f<span class="org-string">'Hello </span>{n}<span class="org-string">, how are you?'</span>)
+<span class="org-keyword">def</span> <span class="org-function-name">closing</span>(n:ReadableName):
+    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
+</span>    <span class="org-builtin">print</span>(f<span class="org-string">'-- Best regards,</span><span class="org-constant">\n</span><span class="org-string">--  </span>{n}<span class="org-string">'</span>)
+<span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-string">'   michael   dudikoff  '</span>
+<span class="org-variable-name">n</span> <span class="org-operator">=</span> readable_name(r)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge, raw -&gt; internal/trusted
+</span>greating(n)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">OK
+</span>closing(n)                                          <span class="org-comment-delimiter"># </span><span class="org-comment">OK
+</span>greating(r)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected ReadableName</span>
+</pre>
+</div>
+
+<pre class="example">
+Hello Michael Dudikoff, how are you?
+-- Best regards,
+--  Michael Dudikoff
+Hello    michael   dudikoff  , how are you?
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp6.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp6.py:16: error: Argument 1 to "greating" has incompatible type "str"; expected "ReadableName"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Refined, strongly typed math:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing, math
+<span class="org-variable-name">Positive</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'Positive'</span>, <span class="org-builtin">float</span>)
+<span class="org-keyword">def</span> <span class="org-function-name">make_positive</span>(x:<span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">float</span>) <span class="org-operator">-&gt;</span> Positive <span class="org-operator">|</span> <span class="org-constant">None</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">SMART CONSTRUCTOR
+</span>    <span class="org-keyword">return</span> Positive(x) <span class="org-keyword">if</span> x <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>
+<span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:Positive) <span class="org-operator">-&gt;</span> Positive:
+    <span class="org-keyword">return</span> Positive(math.sqrt(n))
+safe_sqrt(4)                                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed Positive
+</span><span class="org-variable-name">p</span> <span class="org-operator">=</span> make_positive(4)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
+</span><span class="org-keyword">if</span> p: safe_sqrt(p)                                  <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp7.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp7.py:7: error: Argument 1 to "safe_sqrt" has incompatible type "int"; expected "Positive"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Another classic example with non-empty containers:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing
+
+<span class="org-keyword">class</span> <span class="org-type">Comparable</span>(typing.Protocol):
+    <span class="org-keyword">def</span> <span class="org-function-name">__lt__</span>(<span class="org-keyword">self</span>, other: typing.Any, <span class="org-operator">/</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>: ...
+
+<span class="org-keyword">class</span> <span class="org-type">NonEmptyList</span>[A](<span class="org-builtin">list</span>[A]): <span class="org-keyword">pass</span>
+
+<span class="org-keyword">def</span> <span class="org-function-name">make_non_empty</span>[A](x:<span class="org-builtin">list</span>[A]) <span class="org-operator">-&gt;</span> NonEmptyList[A] <span class="org-operator">|</span> <span class="org-constant">None</span>:
+    <span class="org-keyword">return</span> NonEmptyList(x) <span class="org-keyword">if</span> x <span class="org-keyword">else</span> <span class="org-constant">None</span>
+
+<span class="org-keyword">def</span> <span class="org-function-name">safe_max</span>[A:Comparable](n:NonEmptyList[A]) <span class="org-operator">-&gt;</span> A:
+    <span class="org-keyword">return</span> <span class="org-builtin">max</span>(n)
+
+<span class="org-builtin">print</span>(safe_max([1,2]))                              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed NonEmptyList
+</span><span class="org-variable-name">n</span> <span class="org-operator">=</span> make_non_empty([1,2])                           <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
+</span><span class="org-keyword">if</span> n: <span class="org-builtin">print</span>(safe_max(n))                            <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
+</pre>
+</div>
+
+<p>
+But <b><b>here we will use PyRight, because MyPy does not fully support it and it has a regression</b></b>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp8.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp8.py
+  /tmp/tmp8.py:14:16 - error: Argument of type "list[int]" cannot be assigned to parameter "n" of type "NonEmptyList[A@safe_max]" in function "safe_max"
+    "list[int]" is not assignable to "NonEmptyList[A@safe_max]" (reportArgumentType)
+1 error, 0 warnings, 0 informations
+</pre>
+
+
+<p>
+Units of measurement:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">area</span>(w: Meter, h: Meter) <span class="org-operator">-&gt;</span> SquareMeter: ...
+</pre>
+</div>
+
+<p>
+Still mostly experimental, the mature production level implementation is in F#.
+</p>
+
+<p>
+See libraries about refined and phantom types:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/espetro/refined">refined</a></li>
+<li><a href="https://github.com/antonagestam/phantom-types/">phantom-types</a></li>
+<li><a href="https://github.com/quantumlib/TypedUnits">TypedUnits</a></li>
+</ul>
+
+<p>
+States control in compile time:
+</p>
+
+<p>
+let's imagine the next domain - we have an empty scene that can be cluttered with
+objects, objects can be "dressed" (by a texture), if they are dressed then they can
+be illuminated by a light, and only after illuminating the scene can be rendered.
+</p>
+
+<p>
+Transitions are:
+</p>
+
+<pre class="example" id="org5ba4514">
+Empty-Scene    Cluttered-Scene         Textured    Illuminated    Rendered
+     ║                ║                    ║            ║             ║
+     ║----object-----&gt;║----object----.     ║            ║             ║
+                      ║&lt;-------------'     ║            ║             ║
+                      ║                    ║            ║             ║
+                      ║&lt;------object-------║            ║             ║
+                      ║                    ║            ║             ║
+                      ║-------dress-------&gt;║---light---&gt;║---render---&gt;║
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typing, dataclasses
+
+<span class="org-variable-name">Empty</span> <span class="org-operator">=</span> typing.Literal[<span class="org-string">'Empty'</span>]
+<span class="org-variable-name">Cluttered</span> <span class="org-operator">=</span> typing.Literal[<span class="org-string">'Cluttered'</span>]
+<span class="org-variable-name">Textured</span> <span class="org-operator">=</span> typing.Literal[<span class="org-string">'Textured'</span>]
+<span class="org-variable-name">Illuminated</span> <span class="org-operator">=</span> typing.Literal[<span class="org-string">'Illuminated'</span>]
+<span class="org-variable-name">Rendered</span> <span class="org-operator">=</span> typing.Literal[<span class="org-string">'Rendered'</span>]
+
+<span class="org-variable-name">SceneState</span> <span class="org-operator">=</span> Empty <span class="org-operator">|</span> Cluttered <span class="org-operator">|</span> Textured <span class="org-operator">|</span> Illuminated <span class="org-operator">|</span> Rendered
+
+<span class="org-type">@dataclasses.dataclass</span>
+<span class="org-keyword">class</span> <span class="org-type">Scene</span>[T:SceneState<span class="org-operator">=</span>Empty]:
+    objects:<span class="org-builtin">list</span>[<span class="org-builtin">str</span>]
+
+<span class="org-type">@typing.overload</span>
+<span class="org-keyword">def</span> <span class="org-function-name">put_object</span>[T:SceneState](s:Scene[Empty<span class="org-operator">|</span>Cluttered]) <span class="org-operator">-&gt;</span> Scene[Cluttered]: ...
+<span class="org-type">@typing.overload</span>
+<span class="org-keyword">def</span> <span class="org-function-name">put_object</span>[T:SceneState](s:Scene[Textured]) <span class="org-operator">-&gt;</span> Scene[Cluttered]: ...
+<span class="org-keyword">def</span> <span class="org-function-name">put_object</span>[T:SceneState](s:Scene[T]) <span class="org-operator">-&gt;</span> Scene[Cluttered]:
+    <span class="org-keyword">return</span> Scene(objects<span class="org-operator">=</span>s.objects <span class="org-operator">+</span> [f<span class="org-string">'obj</span>{<span class="org-builtin">len</span>(s.objects)}<span class="org-string">'</span>])
+
+<span class="org-keyword">def</span> <span class="org-function-name">texture_objects</span>(s:Scene[Cluttered], texture:<span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Scene[Textured]:
+    <span class="org-keyword">return</span> Scene(objects<span class="org-operator">=</span>[f<span class="org-string">'</span>{o.split("<span class="org-operator">-</span>")[0]}<span class="org-string">-</span>{texture}<span class="org-string">'</span> <span class="org-keyword">for</span> o <span class="org-keyword">in</span> s.objects])
+
+<span class="org-keyword">def</span> <span class="org-function-name">light</span>(s:Scene[Textured]) <span class="org-operator">-&gt;</span> Scene[Illuminated]:
+    <span class="org-keyword">return</span> Scene(objects<span class="org-operator">=</span>[o.upper() <span class="org-keyword">for</span> o <span class="org-keyword">in</span> s.objects])  <span class="org-comment-delimiter"># </span><span class="org-comment">"lighting" make them upper case!
+</span>    
+<span class="org-keyword">def</span> <span class="org-function-name">render</span>(s:Scene[Illuminated]) <span class="org-operator">-&gt;</span> Scene[Rendered]:
+    <span class="org-builtin">print</span>(s.objects)
+    <span class="org-keyword">return</span> Scene(objects<span class="org-operator">=</span>s.objects)  <span class="org-comment-delimiter"># </span><span class="org-comment">imitate change of the state
+</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">This is fully fine rendered scene with 2 textured objects, we
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">expect to see:
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">['OBJ0-BRICK', 'OBJ1-BRICK']:
+</span><span class="org-variable-name">s0</span>:<span class="org-type">Scene</span>[<span class="org-type">Rendered</span>] <span class="org-operator">=</span> \
+    render(light(texture_objects(
+        put_object(put_object(
+            Scene(objects<span class="org-operator">=</span>[]))), <span class="org-string">'brick'</span>)))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">BUG: not fine - we cannot light after put of non-textured object in
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">textured scene - it returns us back to Cluttered (non-textured) scene,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">without type-check it produces OBJ2 illuminated but without a texture:
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">['OBJ0-BRICK', 'OBJ1-BRICK', 'OBJ2']
+</span>render(light(
+    put_object(texture_objects(
+        put_object(put_object(
+            Scene(objects<span class="org-operator">=</span>[]))), <span class="org-string">'brick'</span>))))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no way to light scene before to texture it,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">without type-check it produces illuminated objects but without textures:
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">['OBJ0', 'OBJ1']
+</span>render(light(
+    put_object(put_object(
+        Scene(objects<span class="org-operator">=</span>[])))))
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no way to render scene before to illuminate it,
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">without type-check it produces textured objects but in full darkness:
+</span><span class="org-comment-delimiter">#   </span><span class="org-comment">['obj0-brick', 'obj1-brick']
+</span>render(texture_objects(
+    put_object(put_object(
+        Scene(objects<span class="org-operator">=</span>[]))), <span class="org-string">'brick'</span>))
+</pre>
+</div>
+
+<pre class="example">
+['OBJ0-BRICK', 'OBJ1-BRICK']
+['OBJ0-BRICK', 'OBJ1-BRICK', 'OBJ2']
+['OBJ0', 'OBJ1']
+['obj0-brick', 'obj1-brick']
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp9.py || :
+</pre>
+</div>
+
+<pre class="example" id="orgcac130f">
+/tmp/tmp9.py
+  /tmp/tmp9.py:33:9 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
+      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
+        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
+  /tmp/tmp9.py:36:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
+    "Scene[Textured]" is not assignable to "Scene[Illuminated]"
+      Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
+        "Textured" is not assignable to type "Illuminated" (reportArgumentType)
+  /tmp/tmp9.py:41:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
+      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
+        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
+3 errors, 0 warnings, 0 informations
+</pre>
+</div>
+</div>
+<div id="outline-container-org11391b2" class="outline-4">
+<h4 id="org11391b2">Typing KungFu</h4>
+<div class="outline-text-4" id="text-org11391b2">
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org94646a3" class="outline-2">
+<h2 id="org94646a3">Runtime types</h2>
+</div>
+<div id="outline-container-org65ae433" class="outline-2">
+<h2 id="org65ae433">Combining compile and runtime types</h2>
+</div>
+<div id="outline-container-orgf823b02" class="outline-2">
+<h2 id="orgf823b02">AI and types</h2>
+<div class="outline-text-2" id="text-orgf823b02">
+<p>
+!!!!!!!!!!! TODO - Pydantic AI
+</p>
+</div>
+</div>
+<div id="outline-container-orge0e007b" class="outline-2">
+<h2 id="orge0e007b">Complex types tricks (dependent types?)</h2>
+</div>
+<div id="outline-container-org33ce2d3" class="outline-2">
+<h2 id="org33ce2d3">CrossHair, SMT</h2>
+</div>
+<div id="outline-container-orgbd799ab" class="outline-2">
+<h2 id="orgbd799ab">Dufny, coq, &#x2026; generating of Python code</h2>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
