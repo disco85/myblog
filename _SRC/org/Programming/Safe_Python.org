@@ -5,6 +5,17 @@
 #+tags: Python types Pydantic CrossHair
 #+date: <2026-07-03 Fri>
 
+# How to setup environment
+# ------------------------
+# Install direnv: apt-get install direnv
+# Create venv: python -m venv .venv
+# Then install deps: pip install -r requirements.txt
+# This is to generate tangled (temporary) files
+#+begin_src emacs-lisp :eval yes-export :exports none :results silent
+(org-babel-tangle)
+#+end_src
+# Evaluate all blocks in buffer: C-c C-v b, also C-c C-e P p export does it too
+
 * Intro
 
 - The reason for most bugs is ignorance of how your language, your libraries, your
@@ -248,6 +259,7 @@ try:
 except Exception as x:
     print(*traceback.format_exception_only(x, file=sys.stdout))
 #+end_src
+
 #+RESULTS:
 : AssertionError
 :  Falsifying example: test_sort(
@@ -291,13 +303,13 @@ Generates a test for functions that are inverses of each other (e.g.,
 serializer/deserializer or encoder/decoder):
 
 #+begin_src shell :eval yes-export :exports both :results raw
-echo '#+begin_src python'
+echo '#+begin_src python :results none'
 hypothesis write --roundtrip json.dumps json.loads
 echo '#+end_src'
 #+end_src
 
 #+RESULTS:
-#+begin_src python
+#+begin_src python :results none
 # This test code was written by the `hypothesis.extra.ghostwriter` module
 # and is provided under the Creative Commons Zero public domain dedication.
 
@@ -373,13 +385,13 @@ class TestRoundtripDumpsLoads(unittest.TestCase):
 Property test for associative, commutative, identity properties:
 
 #+begin_src shell :eval yes-export :exports both :results raw
-echo '#+begin_src python'
+echo '#+begin_src python :results none'
 hypothesis write --binary-op operator.add
 echo '#+end_src'
 #+end_src
 
 #+RESULTS:
-#+begin_src python
+#+begin_src python :results none
 # This test code was written by the `hypothesis.extra.ghostwriter` module
 # and is provided under the Creative Commons Zero public domain dedication.
 
@@ -586,12 +598,14 @@ print(json.dumps(sch, indent=2))
 oranges:list[Orange] = apples  # BUG !
 #+end_src
 
+#+RESULTS:
+
 ** How types are checked
 
 - Compile time (C/C++, Java, Haskell, etc)
 - Type-checking mode/time (Python, Ruby, etc):
 
-#+begin_src python :eval never-export :exports code
+#+begin_src python :eval never-export :exports code :results none
 import typing
 if typing.TYPE_CHECKING:
     # This block runs ONLY during static type checking (by pyright, mypy, etc)
@@ -604,7 +618,7 @@ related to circular import issues.
 
 Type-check time assertions (proofs or "unit test for types"):
 
-#+begin_src python :eval never-export :exports code
+#+begin_src python :eval never-export :exports code :results none
 if typing.TYPE_CHECKING:
     r0:PackageToFilesRelationNode = RelationNode()                                # 1
     typing_extensions.assert_type(r0, RelationNode[L['PACKAGE'],list[L['FILE']]]) # 2
@@ -619,7 +633,7 @@ if typing.TYPE_CHECKING:
 
 How to run it from a shell:
 
-#+begin_src shell :eval never-export :exports code
+#+begin_src shell :eval no :exports code :results none
 pyright source_dir
 #+end_src
 
@@ -630,34 +644,35 @@ pyright source_dir
 3. REFACTORING!
 4. better documentation, the code is easier to understand
 5. VERY USEFUL FOR AI!
+6. Include type-checking to your CI, together with doctests, unittests, property-tests...
 
 ** Comparison of type checkers
 
 Main features:
 
-| Type checker           | Implementation | Speed          | Type inference           | Typing features                              |
-|------------------------+----------------+----------------+--------------------------+----------------------------------------------|
-| mypy                   | Python         | Medium         | Excellent                | Excellent (PEP 484 reference implementation) |
-| basedpyright           | TypeScript     | Very fast      | Excellent                | Excellent + stricter defaults                |
-| pyright                | TypeScript     | Very fast      | Excellent                | Excellent                                    |
-| ty                     | Rust           | Extremely fast | Good (rapidly improving) | Good (still incomplete)                      |
-| pytype                 | C++ + Python   | Fast           | Excellent                | Good                                         |
-| pyre                   | OCaml          | Very fast      | Very good                | Very good                                    |
-| pyanalyze              | Python         | Medium         | Very good                | Good                                         |
-| pytype2 (experimental) | Various        | Experimental   | Experimental             | Experimental                                 |
+| Type checker           | Implementation | Speed          | Type inference           | Typing features               |
+|------------------------+----------------+----------------+--------------------------+-------------------------------|
+| mypy                   | Python         | Medium         | Excellent                | Excellent (PEP 484)           |
+| basedpyright           | TypeScript     | Very fast      | Excellent                | Excellent + stricter defaults |
+| pyright                | TypeScript     | Very fast      | Excellent                | Excellent                     |
+| ty                     | Rust           | Extremely fast | Good (rapidly improving) | Good (still incomplete)       |
+| pytype                 | C++ + Python   | Fast           | Excellent                | Good                          |
+| pyre                   | OCaml          | Very fast      | Very good                | Very good                     |
+| pyanalyze              | Python         | Medium         | Very good                | Good                          |
+| pytype2 (experimental) | Various        | Experimental   | Experimental             | Experimental                  |
 
 Integration features:
 
-| Type checker           | Plugins   | Python version support | IDE integration          | Typical use                      |
-|------------------------+-----------+------------------------+--------------------------+----------------------------------|
-| mypy                   | Excellent | Excellent              | Excellent                | General-purpose, library authors |
-| basedpyright           | No        | Excellent              | Excellent (VS Code, LSP) | Strict application development   |
-| pyright                | No        | Excellent              | Excellent (VS Code, LSP) | Fast feedback during development |
-| ty                     | No        | Targets latest Python  | LSP in progress          | Future Ruff ecosystem            |
-| pytype                 | No        | Good                   | Limited                  | Google codebases                 |
-| pyre                   | Limited   | Good                   | Good                     | Large Meta codebases             |
-| pyanalyze              | Limited   | Good                   | Limited                  | Bug finding, advanced analysis   |
-| pytype2 (experimental) | No        | Experimental           | Experimental             | Research                         |
+| Type checker           | Plugins   | Python support | IDE integration          | Typical use                      |
+|------------------------+-----------+----------------+--------------------------+----------------------------------|
+| mypy                   | Excellent | Excellent      | Excellent                | General-purpose, library authors |
+| basedpyright           | No        | Excellent      | Excellent (VS Code, LSP) | Strict application development   |
+| pyright                | No        | Excellent      | Excellent (VS Code, LSP) | Fast feedback during development |
+| ty                     | No        | Latest Python  | LSP in progress          | Future Ruff ecosystem            |
+| pytype                 | No        | Good           | Limited                  | Google codebases                 |
+| pyre                   | Limited   | Good           | Good                     | Large Meta codebases             |
+| pyanalyze              | Limited   | Good           | Limited                  | Bug finding, advanced analysis   |
+| pytype2 (experimental) | No        | Experimental   | Experimental             | Research                         |
 
 Typing details:
 
@@ -687,6 +702,15 @@ Recommendations:
 | Like Ruff and Rust tools                  | ty                      |
 | Want additional bug-finding beyond typing | pyanalyze               |
 
+Stability:
+
+| Checker      | Stable Python API | Stable CLI | LSP         |
+|--------------+-------------------+------------+-------------|
+| mypy         | Yes               | Yes        | No          |
+| pyright      | No                | Yes        | Yes         |
+| basedpyright | No                | Yes        | Yes         |
+| ty           | Not yet           | Yes        | In progress |
+
 - **mypy** remains the de facto reference implementation for Python's typing
   ecosystem. New PEPs are often implemented there first, and it has the richest
   plugin ecosystem.
@@ -705,6 +729,119 @@ Recommendations:
   classes of bugs that traditional type checkers do not.
 
 ** Examples of types based safety
+
+*** Primitive examples
+
+Assignment:
+
+#+begin_src python :eval yes-export :exports code :results none :tangle /tmp/tmp1.py
+x:int = 'hello world'   # BUG: it is not int
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp1.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp1.py:1: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
+: Found 1 error in 1 file (checked 1 source file)
+
+Incorrect usage of a function possibly returning =None=:
+
+#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp2.py
+import math
+def safe_sqrt(n:int) -> None|float:
+    return math.sqrt(n) if n >= 0 else None   # no more exception, just None
+2.5 + safe_sqrt(9)                            # BUG: 2.5 + None|float
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp2.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp2.py:4: error: Unsupported operand types for + ("float" and "None")  [operator]
+: /tmp/tmp2.py:4: note: Right operand is of type "float | None"
+: Found 1 error in 1 file (checked 1 source file)
+
+Wrong argument's type:
+
+#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp3.py
+def size(x:tuple|list|str) -> int:
+    if x is not None:           # IMPROVEMENT: you don't need this check anymore
+        return len(x)
+size(12)                        # BUG: int is not expected
+size({1: 'a', 2:'b'}.get(100))  # BUG: {}.get() can return None, must be checked
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp3.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp3.py:4: error: Argument 1 to "size" has incompatible type "int"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
+: /tmp/tmp3.py:5: error: Argument 1 to "size" has incompatible type "str | None"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
+: Found 2 errors in 1 file (checked 1 source file)
+
+More precise standard containers:
+
+#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp4.py
+import typing, enum
+class Planet(enum.StrEnum):
+    Mars = 'Mars'
+    Earth = 'Earth'
+    Jupiter = 'Jupiter'
+planet_masses:dict[Planet,float]
+planet_masses[Planet.Mars] = 6.42e23
+planet_masses[Planet.Earth] = 5.97e24
+planet_masses[Planet.Jupiter] = '1.90e24 tonnes'  # BUG: expected float, not str
+planet_masses['Saturn'] = 68e26                   # BUG: expected enumerated Planet, not str
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp4.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp4.py:9: error: Incompatible types in assignment (expression has type "str", target has type "float")  [assignment]
+: /tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
+: Found 2 errors in 1 file (checked 1 source file)
+
+*** More advanced types usage
+
+#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp5.py
+import typing
+
+class SortedList(list):
+    def __init__(self, items):
+        super().__init__(sorted(items))
+
+def unique(data: SortedList) -> list:
+    res: list = []
+    for x in data:
+        if res and x == res[-1]: continue
+        else: res.append(x)
+    return res
+items = [11, 20, 11, 20, 1, 20, 11, 5, 1]
+sorted_items = SortedList(items)
+print(unique(items))             # BUG: expected SortedList so unique() works correctly
+print(unique(sorted_items))
+#+end_src
+
+#+RESULTS:
+: [11, 20, 11, 20, 1, 20, 11, 5, 1]
+: [1, 5, 11, 20]
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp5.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp5.py:15: error: Argument 1 to "unique" has incompatible type "list[int]"; expected "SortedList"  [arg-type]
+: Found 1 error in 1 file (checked 1 source file)
+
+# TODO
+
 * Runtime types
 * Combining compile and runtime types
 * AI and types
