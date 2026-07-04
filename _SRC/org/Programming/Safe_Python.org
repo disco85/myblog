@@ -370,6 +370,49 @@ class TestRoundtripDumpsLoads(unittest.TestCase):
 
 #+end_src
 
+Property test for associative, commutative, identity properties:
+
+#+begin_src shell :eval yes-export :exports both :results raw
+echo '#+begin_src python'
+hypothesis write --binary-op operator.add
+echo '#+end_src'
+#+end_src
+
+#+RESULTS:
+#+begin_src python
+# This test code was written by the `hypothesis.extra.ghostwriter` module
+# and is provided under the Creative Commons Zero public domain dedication.
+
+import operator
+import unittest
+from hypothesis import given, strategies as st
+
+# TODO: replace st.nothing() with an appropriate strategy
+
+
+class TestBinaryOperationadd(unittest.TestCase):
+    add_operands = st.nothing()
+
+    @given(a=add_operands, b=add_operands, c=add_operands)
+    def test_associative_binary_operation_add(self, a, b, c):
+        left = operator.add(a, operator.add(b, c))
+        right = operator.add(operator.add(a, b), c)
+        self.assertEqual(left, right)
+
+    @given(a=add_operands, b=add_operands)
+    def test_commutative_binary_operation_add(self, a, b):
+        left = operator.add(a, b)
+        right = operator.add(b, a)
+        self.assertEqual(left, right)
+
+    @given(a=add_operands)
+    def test_identity_binary_operation_add(self, a):
+        identity = "identity element here"
+        self.assertEqual(a, operator.add(a, identity))
+        self.assertEqual(a, operator.add(identity, a))
+
+#+end_src
+
 Uses predefined/template logic: checks idempotent, associativity, commutativity,
 identity element, code equivalency, duality (roundtrip), etc.
 
@@ -589,6 +632,78 @@ pyright source_dir
 5. VERY USEFUL FOR AI!
 
 ** Comparison of type checkers
+
+Main features:
+
+| Type checker           | Implementation | Speed          | Type inference           | Typing features                              |
+|------------------------+----------------+----------------+--------------------------+----------------------------------------------|
+| mypy                   | Python         | Medium         | Excellent                | Excellent (PEP 484 reference implementation) |
+| basedpyright           | TypeScript     | Very fast      | Excellent                | Excellent + stricter defaults                |
+| pyright                | TypeScript     | Very fast      | Excellent                | Excellent                                    |
+| ty                     | Rust           | Extremely fast | Good (rapidly improving) | Good (still incomplete)                      |
+| pytype                 | C++ + Python   | Fast           | Excellent                | Good                                         |
+| pyre                   | OCaml          | Very fast      | Very good                | Very good                                    |
+| pyanalyze              | Python         | Medium         | Very good                | Good                                         |
+| pytype2 (experimental) | Various        | Experimental   | Experimental             | Experimental                                 |
+
+Integration features:
+
+| Type checker           | Plugins   | Python version support | IDE integration          | Typical use                      |
+|------------------------+-----------+------------------------+--------------------------+----------------------------------|
+| mypy                   | Excellent | Excellent              | Excellent                | General-purpose, library authors |
+| basedpyright           | No        | Excellent              | Excellent (VS Code, LSP) | Strict application development   |
+| pyright                | No        | Excellent              | Excellent (VS Code, LSP) | Fast feedback during development |
+| ty                     | No        | Targets latest Python  | LSP in progress          | Future Ruff ecosystem            |
+| pytype                 | No        | Good                   | Limited                  | Google codebases                 |
+| pyre                   | Limited   | Good                   | Good                     | Large Meta codebases             |
+| pyanalyze              | Limited   | Good                   | Limited                  | Bug finding, advanced analysis   |
+| pytype2 (experimental) | No        | Experimental           | Experimental             | Research                         |
+
+Typing details:
+
+| Feature              | mypy        | pyright   | basedpyright | ty      | pytype    | pyre      | pyanalyze |
+|----------------------+-------------+-----------+--------------+---------+-----------+-----------+-----------|
+| Incremental checking | Yes         | Yes       | Yes          | Planned | Limited   | Yes       | No        |
+| Daemon mode          | Yes (dmypy) | LSP       | LSP          | Planned | No        | Yes       | No        |
+| Generic inference    | Excellent   | Excellent | Excellent    | Good    | Very good | Very good | Good      |
+| Literal types        | Yes         | Yes       | Yes          | Partial | Yes       | Yes       | Yes       |
+| Type narrowing       | Good        | Excellent | Excellent    | Good    | Good      | Very good | Excellent |
+| TypedDict            | Yes         | Yes       | Yes          | Partial | Yes       | Yes       | Yes       |
+| Protocols            | Yes         | Yes       | Yes          | Partial | Partial   | Yes       | Partial   |
+| Variadic generics    | Yes         | Yes       | Yes          | Partial | Partial   | Partial   | Partial   |
+| Plugins              | Yes         | No        | No           | No      | No        | Limited   | Limited   |
+
+Recommendations:
+
+| If you...                                 | Recommended             |
+|-------------------------------------------+-------------------------|
+| Want the reference implementation         | mypy                    |
+| Want the fastest mature checker           | basedpyright            |
+| Use VS Code                               | pyright or basedpyright |
+| Write libraries for others                | mypy                    |
+| Want the strictest diagnostics            | basedpyright            |
+| Work at Google                            | pytype                  |
+| Work at Meta                              | pyre                    |
+| Like Ruff and Rust tools                  | ty                      |
+| Want additional bug-finding beyond typing | pyanalyze               |
+
+- **mypy** remains the de facto reference implementation for Python's typing
+  ecosystem. New PEPs are often implemented there first, and it has the richest
+  plugin ecosystem.
+- **Pyright** is widely regarded as the fastest mature checker and has excellent type
+  inference.
+- **basedpyright** is a fork of Pyright with stricter defaults, additional diagnostics,
+  and a focus on catching more potential issues without requiring as much manual
+  configuration.
+- **ty** is a relatively new Rust-based checker developed as part of the Ruff
+  ecosystem. It's exceptionally fast, but as of mid-2026 it is still catching up to
+  mypy and Pyright in terms of feature completeness.
+- **pytype** uses abstract interpretation and can infer types in code with few or no
+  annotations, but it's primarily developed for Google's internal use cases.
+- **Pyre** emphasizes performance and scalability for very large repositories.
+- **pyanalyze** combines type checking with broader static analysis and can detect some
+  classes of bugs that traditional type checkers do not.
+
 ** Examples of types based safety
 * Runtime types
 * Combining compile and runtime types
