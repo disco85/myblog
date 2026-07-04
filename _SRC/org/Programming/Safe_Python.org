@@ -949,26 +949,28 @@ See libraries about refined and phantom types:
 - [[https://github.com/antonagestam/phantom-types/][phantom-types]]
 - [[https://github.com/quantumlib/TypedUnits][TypedUnits]]
 
+*** Typing KungFu
+  
 States control in compile time:
 
 let's imagine the next domain - we have an empty scene that can be cluttered with
-objects, objects can be "dressed" (by a texture), if they are dressed then they can
+objects, objects can be "dressed" (by a texture), if they are textured then they can
 be illuminated by a light, and only after illuminating the scene can be rendered.
 
-Transitions are:
+Transitions between scene's states are:
 
 #+begin_example
-Empty-Scene    Cluttered-Scene         Textured    Illuminated    Rendered
+Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object----->║----object----.     ║            ║             ║
                       ║<-------------'     ║            ║             ║
                       ║                    ║            ║             ║
                       ║<------object-------║            ║             ║
                       ║                    ║            ║             ║
-                      ║-------dress------->║---light--->║---render--->║
+                      ║-------texture----->║---light--->║---render--->║
 #+end_example
 
-#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp9.py
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp9.py
 import typing, dataclasses
 
 Empty = typing.Literal['Empty']
@@ -980,7 +982,7 @@ Rendered = typing.Literal['Rendered']
 SceneState = Empty | Cluttered | Textured | Illuminated | Rendered
 
 @dataclasses.dataclass
-class Scene[T:SceneState=Empty]:
+class Scene[T:SceneState=Empty]:  # default constructor produces Empty scene
     objects:list[str]
 
 @typing.overload
@@ -1045,26 +1047,20 @@ pyright /tmp/tmp9.py || :
 #+RESULTS:
 #+begin_example
 /tmp/tmp9.py
-  /tmp/tmp9.py:33:9 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+  /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
       Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
         "Cluttered" is not assignable to type "Textured" (reportArgumentType)
-  /tmp/tmp9.py:36:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
+  /tmp/tmp9.py:53:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
+      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
+        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
+  /tmp/tmp9.py:59:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
     "Scene[Textured]" is not assignable to "Scene[Illuminated]"
       Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
         "Textured" is not assignable to type "Illuminated" (reportArgumentType)
-  /tmp/tmp9.py:41:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
-    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
-      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
-        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
 3 errors, 0 warnings, 0 informations
 #+end_example
-
-# TODO
-
-*** Typing KungFu
-
-# TODO
 
 * Runtime types
 * Combining compile and runtime types
