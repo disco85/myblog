@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 18:23 -->
+<!-- 2026-07-05 Sun 19:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -366,7 +366,12 @@ function toggleTheme() {
 </li>
 </ul>
 </li>
-<li><a href="#orgb95b37d">Type-stub libraries</a></li>
+<li><a href="#orgb95b37d">Type-stub libraries</a>
+<ul>
+<li><a href="#orgce022fa">More about types</a></li>
+<li><a href="#orge474ecc">Interesting typing experiments in Python</a></li>
+</ul>
+</li>
 <li><a href="#org94646a3">Runtime types</a>
 <ul>
 <li><a href="#org4a845ff">Comparison of libraries</a></li>
@@ -374,8 +379,11 @@ function toggleTheme() {
 </ul>
 </li>
 <li><a href="#org65ae433">Combining compile and runtime types</a></li>
-<li><a href="#orgf823b02">AI and types</a></li>
-<li><a href="#orge0e007b">Complex types tricks (dependent types?)</a></li>
+<li><a href="#orgf823b02">AI and types</a>
+<ul>
+<li><a href="#org0dc4add">Personal experience</a></li>
+</ul>
+</li>
 <li><a href="#org33ce2d3">CrossHair, SMT</a></li>
 <li><a href="#orgbd799ab">Dufny, coq, &#x2026; generating of Python code</a></li>
 <li><a href="#org729b5ba">Stronger "Python" - Scala</a></li>
@@ -433,7 +441,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orga6d9d29">
+<pre class="example" id="orgb28b5b0">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -498,7 +506,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgaa4a0cc">
+<pre class="example" id="orgdb819d2">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1027,7 +1035,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org7a73f79">
+<pre class="example" id="orgb6a07ad">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1155,10 +1163,12 @@ How to run it from a shell:
 <ol class="org-ol">
 <li>cleaner design and architecture</li>
 <li>fewer errors when writing code</li>
-<li>REFACTORING!</li>
+<li>SAFE REFACTORING!</li>
 <li>better documentation, the code is easier to understand</li>
 <li>VERY USEFUL FOR AI!</li>
-<li>Include type-checking to your CI, together with doctests, unittests, property-tests&#x2026;</li>
+<li>Include type-checking to your CI, together with doctests, unittests,
+property-tests&#x2026;</li>
+<li>Amazing IDE autocompletion</li>
 </ol>
 </div>
 </div>
@@ -1632,9 +1642,17 @@ classes of bugs that traditional type checkers do not.</li>
 </ul>
 
 <p>
-Type-checkers can be extended with <b><b>custom plugins</b></b> allowing more complex type systems
-(think about dependent types, affined types&#x2026;)
+Remember:
 </p>
+
+<ul class="org-ul">
+<li>Type-checkers can be configured, theyr errors, warnings, the can be very <b><b>strict</b></b>
+or weak</li>
+<li>Type-checkers can be extended with <b><b>custom plugins</b></b> allowing more complex type
+systems (think about dependent types, affined types&#x2026;)</li>
+<li>Different type-checkers can report different errors, warnings, either use only one
+or use multiple and try to satisfy them all</li>
+</ul>
 </div>
 </div>
 <div id="outline-container-orgbb86c78" class="outline-3">
@@ -1928,7 +1946,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="orgc023b05">
+<pre class="example" id="org1b1e9ef">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -1960,7 +1978,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgfe8e60f">
+<pre class="example" id="orgf084812">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2049,7 +2067,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orgb28b5b0">
+<pre class="example" id="org235d6cb">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2507,7 +2525,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orga02a67b">
+<pre class="example" id="org7843cce">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2517,7 +2535,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orgf4a5928">
+<pre class="example" id="orgbed4d43">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -2542,6 +2560,34 @@ Types can be imported and used as usually:
 <li>They can be found, for ex., as: <a href="https://pypi.org/project/typing/">https://pypi.org/project/typing/</a></li>
 <li>Example: <a href="https://pypi.org/project/argparse-typing/">https://pypi.org/project/argparse-typing/</a> (enhanced types for <code>argparse</code>)</li>
 </ul>
+</div>
+<div id="outline-container-orgce022fa" class="outline-3">
+<h3 id="orgce022fa">More about types</h3>
+<div class="outline-text-3" id="text-orgce022fa">
+<ul class="org-ul">
+<li>Typing in Python: <a href="https://docs.python.org/3.13/library/typing.html">https://docs.python.org/3.13/library/typing.html</a></li>
+<li>Introduction to typing: <a href="https://fastapi.tiangolo.com/python-types/">https://fastapi.tiangolo.com/python-types/</a></li>
+<li>Introduction to typing:
+<a href="https://ryan.himmelwright.net/post/python-type-hinting-intro/">https://ryan.himmelwright.net/post/python-type-hinting-intro/</a></li>
+<li>Deep introduction: <a href="https://www.geeksforgeeks.org/python/introduction-to-python-typing-extensions-module/#core-features-of-typingextensions">https://www.geeksforgeeks.org/python/introduction-to-python-typing-extensions-module/#core-features-of-typingextensions</a></li>
+<li>Advanced Python typing: <a href="https://jellis18.github.io/post/2023-01-15-advanced-python-types/">https://jellis18.github.io/post/2023-01-15-advanced-python-types/</a></li>
+<li>Common theory: <a href="https://en.wikipedia.org/wiki/Type_theory">https://en.wikipedia.org/wiki/Type_theory</a></li>
+<li>Theory of categories: <a href="https://en.wikipedia.org/wiki/Theory_of_categories">https://en.wikipedia.org/wiki/Theory_of_categories</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge474ecc" class="outline-3">
+<h3 id="orge474ecc">Interesting typing experiments in Python</h3>
+<div class="outline-text-3" id="text-orge474ecc">
+<ul class="org-ul">
+<li><a href="https://www.stephendiehl.com/posts/calculus_of_constructions_python/">Dependent types in 200 lines</a></li>
+<li><a href="https://www.philipzucker.com/frozenset_dtt/">A Python frozenset interpretation of Dependent Type Theory</a></li>
+<li><a href="https://sobolevn.me/2019/01/simple-dependent-types-in-python">Simple dependent types in Python</a></li>
+<li><a href="https://stackoverflow.com/questions/43292197/can-python-implement-dependent-types">SO: can Python implement dependent types?</a></li>
+<li><a href="https://sobolevn.me/2019/08/testing-mypy-types">MyPy types and plugins</a></li>
+<li><a href="https://github.com/suned/stateless">Effects, abilities in Python</a></li>
+</ul>
+</div>
 </div>
 </div>
 <div id="outline-container-org94646a3" class="outline-2">
@@ -2946,6 +2992,11 @@ Integration:
 <h3 id="org3014bd6">Examples</h3>
 <div class="outline-text-3" id="text-org3014bd6">
 <p>
+Pay attention - all checks happen in <b><b>run-time</b></b> and run-time exceptions are not
+weird and cryptic more: they report type violation before to operate with the object!
+</p>
+
+<p>
 Simple example:
 </p>
 
@@ -3003,22 +3054,81 @@ Example with generics:
 typeguard.TypeCheckError: item 1 of item 0 of argument "x" (list) is not an instance of bool
 
 </pre>
+
+
+<p>
+Example with classes:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typeguard, traceback, sys
+
+<span class="org-type">@typeguard.typechecked</span>
+<span class="org-keyword">class</span> <span class="org-type">Counter</span>:
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, start:<span class="org-builtin">int</span><span class="org-operator">=</span>0, <span class="org-operator">*</span>, name:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">str</span><span class="org-operator">=</span><span class="org-constant">None</span>):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">name</span>:<span class="org-builtin">str</span> <span class="org-operator">=</span> name <span class="org-keyword">or</span> <span class="org-string">'&lt;unnamed&gt;'</span>
+        <span class="org-keyword">self</span>.<span class="org-variable-name">value</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> start
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_root_name</span>:<span class="org-builtin">str</span> <span class="org-operator">=</span> <span class="org-string">'&lt;unnamed&gt;'</span>
+
+    <span class="org-keyword">def</span> <span class="org-function-name">increment</span>(<span class="org-keyword">self</span>, step:<span class="org-builtin">int</span><span class="org-operator">=</span>1) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+        <span class="org-keyword">self</span>.<span class="org-variable-name">value</span> <span class="org-operator">+=</span> step
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>.value
+
+    @<span class="org-builtin">property</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">root_name</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>: <span class="org-keyword">return</span> <span class="org-keyword">self</span>._root_name
+
+    <span class="org-type">@root_name.setter</span>
+    <span class="org-type">@typeguard.typechecked</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">root_name</span>(<span class="org-keyword">self</span>, <span class="org-variable-name">n</span>:<span class="org-builtin">str</span>): <span class="org-keyword">self</span>.<span class="org-type">_root_name</span> <span class="org-operator">=</span> n
+
+<span class="org-variable-name">cnt</span> <span class="org-operator">=</span> Counter(10)
+cnt.increment(2)
+<span class="org-keyword">try</span>:
+    cnt.increment(<span class="org-string">'a'</span>)        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: must be int
+</span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))    
+<span class="org-keyword">try</span>:
+    cnt.<span class="org-variable-name">name</span> <span class="org-operator">=</span> <span class="org-constant">True</span>           <span class="org-comment-delimiter"># </span><span class="org-comment">WARN: no check here
+</span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))    
+<span class="org-keyword">try</span>:
+    cnt.<span class="org-variable-name">root_name</span> <span class="org-operator">=</span> <span class="org-constant">True</span>      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: thrown, bcs it happens via typechecked setter!
+</span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))    
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">python /tmp/tmp19.py
+</pre>
+</div>
+
+<pre class="example">
+typeguard.TypeCheckError: argument "step" (str) is not an instance of int
+
+typeguard.TypeCheckError: argument "n" (bool) is not an instance of str
+
+</pre>
 </div>
 </div>
 </div>
 <div id="outline-container-org65ae433" class="outline-2">
 <h2 id="org65ae433">Combining compile and runtime types</h2>
+<div class="outline-text-2" id="text-org65ae433">
+<p>
+Just run your type-checkers as before.
+</p>
+</div>
 </div>
 <div id="outline-container-orgf823b02" class="outline-2">
 <h2 id="orgf823b02">AI and types</h2>
 <div class="outline-text-2" id="text-orgf823b02">
-<p>
-!!!!!!!!!!! TODO - Pydantic AI
-</p>
+</div>
+<div id="outline-container-org0dc4add" class="outline-3">
+<h3 id="org0dc4add">Personal experience</h3>
+<div class="outline-text-3" id="text-org0dc4add">
 </div>
 </div>
-<div id="outline-container-orge0e007b" class="outline-2">
-<h2 id="orge0e007b">Complex types tricks (dependent types?)</h2>
 </div>
 <div id="outline-container-org33ce2d3" class="outline-2">
 <h2 id="org33ce2d3">CrossHair, SMT</h2>

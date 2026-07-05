@@ -652,10 +652,12 @@ pyright source_dir
 
 1. cleaner design and architecture
 2. fewer errors when writing code
-3. REFACTORING!
+3. SAFE REFACTORING!
 4. better documentation, the code is easier to understand
 5. VERY USEFUL FOR AI!
-6. Include type-checking to your CI, together with doctests, unittests, property-tests...
+6. Include type-checking to your CI, together with doctests, unittests,
+   property-tests...
+7. Amazing IDE autocompletion
 
 ** Comparison of type checkers
 
@@ -739,8 +741,14 @@ Stability:
 - **pyanalyze** combines type checking with broader static analysis and can detect some
   classes of bugs that traditional type checkers do not.
 
-Type-checkers can be extended with **custom plugins** allowing more complex type systems
-(think about dependent types, affined types...)
+Remember:
+
+- Type-checkers can be configured, theyr errors, warnings, the can be very **strict**
+  or weak
+- Type-checkers can be extended with **custom plugins** allowing more complex type
+  systems (think about dependent types, affined types...)
+- Different type-checkers can report different errors, warnings, either use only one
+  or use multiple and try to satisfy them all
 
 ** Examples of type based safety
 
@@ -1488,6 +1496,26 @@ from mypkg.types.geometry import Shape
 - They can be found, for ex., as: https://pypi.org/project/typing/
 - Example: https://pypi.org/project/argparse-typing/ (enhanced types for ~argparse~)
 
+** More about types
+
+- Typing in Python: https://docs.python.org/3.13/library/typing.html
+- Introduction to typing: https://fastapi.tiangolo.com/python-types/
+- Introduction to typing:
+  https://ryan.himmelwright.net/post/python-type-hinting-intro/
+- Deep introduction: https://www.geeksforgeeks.org/python/introduction-to-python-typing-extensions-module/#core-features-of-typingextensions  
+- Advanced Python typing: https://jellis18.github.io/post/2023-01-15-advanced-python-types/
+- Common theory: https://en.wikipedia.org/wiki/Type_theory
+- Theory of categories: https://en.wikipedia.org/wiki/Theory_of_categories
+
+** Interesting typing experiments in Python
+
+- [[https://www.stephendiehl.com/posts/calculus_of_constructions_python/][Dependent types in 200 lines]]
+- [[https://www.philipzucker.com/frozenset_dtt/][A Python frozenset interpretation of Dependent Type Theory]]  
+- [[https://sobolevn.me/2019/01/simple-dependent-types-in-python][Simple dependent types in Python]]
+- [[https://stackoverflow.com/questions/43292197/can-python-implement-dependent-types][SO: can Python implement dependent types?]]
+- [[https://sobolevn.me/2019/08/testing-mypy-types][MyPy types and plugins]]
+- [[https://github.com/suned/stateless][Effects, abilities in Python]]
+
 * Runtime types
 
 Wait, but Python is graduate typing language! It means that if you did not include
@@ -1562,9 +1590,10 @@ Integration:
 
 ** Examples
 
-Simple example:
+Pay attention - all checks happen in **run-time** and run-time exceptions are not
+weird and cryptic more: they report type violation before to operate with the object!
 
-# TODO error is wrong - not from the type-checker -- maybe to tangle?:
+Simple example:
 
 #+begin_src python :eval no :exports both :results none :tangle /tmp/tmp17.py
 import typeguard, traceback, sys
@@ -1612,14 +1641,66 @@ python /tmp/tmp18.py
 : typeguard.TypeCheckError: item 1 of item 0 of argument "x" (list) is not an instance of bool
 : 
 
-# TODO
+Example with classes:
+
+#+begin_src python :eval no :exports both :results none :tangle /tmp/tmp19.py
+import typeguard, traceback, sys
+
+@typeguard.typechecked
+class Counter:
+    def __init__(self, start:int=0, *, name:None|str=None):
+        self.name:str = name or '<unnamed>'
+        self.value:int = start
+        self._root_name:str = '<unnamed>'
+
+    def increment(self, step:int=1) -> int:
+        self.value += step
+        return self.value
+
+    @property
+    def root_name(self) -> str: return self._root_name
+
+    @root_name.setter
+    @typeguard.typechecked
+    def root_name(self, n:str): self._root_name = n
+
+cnt = Counter(10)
+cnt.increment(2)
+try:
+    cnt.increment('a')        # BUG: must be int
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))    
+try:
+    cnt.name = True           # WARN: no check here
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))    
+try:
+    cnt.root_name = True      # BUG: thrown, bcs it happens via typechecked setter!
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))    
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+python /tmp/tmp19.py
+#+end_src
+
+#+RESULTS:
+: typeguard.TypeCheckError: argument "step" (str) is not an instance of int
+: 
+: typeguard.TypeCheckError: argument "n" (bool) is not an instance of str
+: 
 
 * Combining compile and runtime types
+
+Just run your type-checkers as before.
+
 * AI and types
 
-!!!!!!!!!!! TODO - Pydantic AI
+** Personal experience
 
-* Complex types tricks (dependent types?)
+# TODO
+# TODO - Pydantic AI
+
 * CrossHair, SMT
 * Dufny, coq, ... generating of Python code
 * Stronger "Python" - Scala
