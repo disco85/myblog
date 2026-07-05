@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 11:04 -->
+<!-- 2026-07-05 Sun 13:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -427,7 +427,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org86d1319">
+<pre class="example" id="org3bc4ac2">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -492,7 +492,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org950eda0">
+<pre class="example" id="orgf095a31">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1021,7 +1021,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org96f0075">
+<pre class="example" id="org354e51f">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1921,7 +1921,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgd2195ab">
+<pre class="example" id="org247229e">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2010,7 +2010,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org6c032d5">
+<pre class="example" id="org9bbaf2f">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2205,7 +2205,7 @@ more relevant is <b><b>exhaustive switch</b></b> of Java) - very helpful when re
 <span class="linenr"> 4: </span></span><span class="org-keyword">class</span> <span class="org-type">Name</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
 <span class="linenr"> 5: </span><span class="org-keyword">class</span> <span class="org-type">Nick</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
 <span class="linenr"> 6: </span>
-<span class="linenr"> 7: </span><span class="org-comment-delimiter"># </span><span class="org-comment">Then, during refactoring, we added FullName:
+<span class="linenr"> 7: </span><span class="org-comment-delimiter"># </span><span class="org-comment">Then, during refactoring, I added FullName:
 <span class="linenr"> 8: </span></span><span class="org-keyword">class</span> <span class="org-type">FullName</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
 <span class="linenr"> 9: </span><span class="org-builtin">type</span> <span class="org-variable-name">Moniker</span> <span class="org-operator">=</span> Name <span class="org-operator">|</span> Nick <span class="org-operator">|</span> FullName
 <span class="linenr">10: </span>
@@ -2250,13 +2250,13 @@ Type-guards refine types for an underlying branch:
 <span class="linenr"> 7: </span>    <span class="org-keyword">return</span> (<span class="org-builtin">isinstance</span>(something, C.Iterable) <span class="org-keyword">and</span>
 <span class="linenr"> 8: </span>            <span class="org-builtin">all</span>(<span class="org-builtin">isinstance</span>(el, <span class="org-builtin">int</span>) <span class="org-keyword">for</span> el <span class="org-keyword">in</span> something))
 <span class="linenr"> 9: </span><span class="org-comment-delimiter"># </span><span class="org-comment">IMPORTANT: without object typing x1,x2 are Any, which prevents their type-check:
-<span class="linenr">10: </span></span><span class="org-variable-name">x1</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'[1,2,3,4,5]'</span>)
-<span class="linenr">11: </span><span class="org-variable-name">x2</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'["a", "b", "c"]'</span>)
-<span class="linenr">12: </span><span class="org-keyword">try</span>:
+<span class="linenr">10: </span></span><span class="org-variable-name">x1</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'[1,2,3,4,5]'</span>)       <span class="org-comment-delimiter"># </span><span class="org-comment">Simulate external source
+<span class="linenr">11: </span></span><span class="org-variable-name">x2</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'["a", "b", "c"]'</span>)   <span class="org-comment-delimiter"># </span><span class="org-comment">Simulate external source
+<span class="linenr">12: </span></span><span class="org-keyword">try</span>:
 <span class="linenr">13: </span>    <span class="org-keyword">if</span> are_indexes(x1):                     <span class="org-comment-delimiter"># </span><span class="org-comment">x1 is object
-<span class="linenr">14: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'1:'</span>, check_indexes(10, x1))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if we enter "if", x1 is Iterable[int]
+<span class="linenr">14: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'1:'</span>, check_indexes(10, x1))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if I enter "if", x1 is Iterable[int]
 <span class="linenr">15: </span></span>    <span class="org-keyword">if</span> are_indexes(x2):                     <span class="org-comment-delimiter"># </span><span class="org-comment">x2 is object
-<span class="linenr">16: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'2:'</span>, check_indexes(10, x2))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if we enter "if", x2 is Iterable[int]
+<span class="linenr">16: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'2:'</span>, check_indexes(10, x2))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if I enter "if", x2 is Iterable[int]
 <span class="linenr">17: </span></span>    <span class="org-builtin">print</span>(<span class="org-string">'3:'</span>, check_indexes(10, x1))      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: unsure Iterable[int]
 <span class="linenr">18: </span></span>    <span class="org-builtin">print</span>(<span class="org-string">'4:'</span>, check_indexes(10, x2))      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: unsure Iterable[int] + raises
 <span class="linenr">19: </span></span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
@@ -2284,8 +2284,101 @@ Found 2 errors in 1 file (checked 1 source file)
 
 
 <p>
+Another example clarifying external dictionaries:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing, json
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-keyword">class</span> <span class="org-type">Person</span>(typing.TypedDict):
+<span class="linenr"> 4: </span>    name: <span class="org-builtin">str</span>
+<span class="linenr"> 5: </span>    surname: typing.NotRequired[<span class="org-builtin">str</span>]
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">is_person</span>(d:<span class="org-builtin">object</span>) <span class="org-operator">-&gt;</span> typing.TypeGuard[Person]:
+<span class="linenr"> 8: </span>    <span class="org-keyword">return</span> <span class="org-builtin">isinstance</span>(d, <span class="org-builtin">dict</span>) <span class="org-keyword">and</span> <span class="org-builtin">isinstance</span>(d.get(<span class="org-string">'name'</span>), <span class="org-builtin">str</span>)
+<span class="linenr"> 9: </span>
+<span class="linenr">10: </span><span class="org-comment-delimiter"># </span><span class="org-comment">IMPORTANT: force type-checking with object instead of default Any:
+<span class="linenr">11: </span></span><span class="org-variable-name">xs</span>:<span class="org-builtin">list</span>[<span class="org-builtin">object</span>] <span class="org-operator">=</span> [json.loads(<span class="org-string">'{"name": "John", "surname": "Doe"}'</span>),
+<span class="linenr">12: </span>                   json.loads(<span class="org-string">'{"email": "steve@apple.com"}'</span>)]
+<span class="linenr">13: </span><span class="org-keyword">for</span> x <span class="org-keyword">in</span> xs:                            <span class="org-comment-delimiter"># </span><span class="org-comment">x is object
+<span class="linenr">14: </span></span>    <span class="org-keyword">if</span> is_person(x):                    <span class="org-comment-delimiter"># </span><span class="org-comment">skips x that are not Person
+<span class="linenr">15: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'Name:'</span>, x[<span class="org-string">'name'</span>])       <span class="org-comment-delimiter"># </span><span class="org-comment">here x is the typed dict Person
+<span class="linenr">16: </span></span>        <span class="org-keyword">if</span> surname :<span class="org-operator">=</span> x.get(<span class="org-string">'surname'</span>): <span class="org-comment-delimiter"># </span><span class="org-comment">...with optional surname key
+<span class="linenr">17: </span></span>            <span class="org-builtin">print</span>(<span class="org-string">'Surname:'</span>, surname)
+<span class="linenr">18: </span><span class="org-keyword">try</span>:
+<span class="linenr">19: </span>    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> xs:                        <span class="org-comment-delimiter"># </span><span class="org-comment">x is any object
+<span class="linenr">20: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'Name:'</span>, x[<span class="org-string">'name'</span>])       <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: x being object forces report "x is not indexable"
+<span class="linenr">21: </span></span>        <span class="org-keyword">if</span> surname :<span class="org-operator">=</span> x.get(<span class="org-string">'surname'</span>): <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: and x can miss .get()
+<span class="linenr">22: </span></span>            <span class="org-builtin">print</span>(<span class="org-string">'Surname:'</span>, surname)
+<span class="linenr">23: </span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+<span class="linenr">24: </span>    <span class="org-builtin">print</span>(f<span class="org-string">'ERROR: </span>{x}<span class="org-string">!'</span>)               <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: I hit it bcs some x is not dict like Person</span>
+</pre>
+</div>
+
+<pre class="example">
+Name: John
+Surname: Doe
+Name: John
+Surname: Doe
+ERROR: 'name'!
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp15.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp15.py:20: error: Value of type "object" is not indexable  [index]
+/tmp/tmp15.py:21: error: "object" has no attribute "get"  [attr-defined]
+Found 2 errors in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
 Terminal branches leading to unreachable code:
 </p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-type">@typing.overload</span>
+<span class="linenr"> 4: </span><span class="org-keyword">def</span> <span class="org-function-name">report_error</span>(error:<span class="org-builtin">str</span>, exception:<span class="org-builtin">type</span>[<span class="org-type">Exception</span>]) <span class="org-operator">-&gt;</span> typing.NoReturn: ...
+<span class="linenr"> 5: </span><span class="org-type">@typing.overload</span>
+<span class="linenr"> 6: </span><span class="org-keyword">def</span> <span class="org-function-name">report_error</span>(error:<span class="org-builtin">str</span>, exception:<span class="org-constant">None</span><span class="org-operator">=</span><span class="org-constant">None</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>: ...
+<span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">report_error</span>(error:<span class="org-builtin">str</span>, exception:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">type</span>[<span class="org-type">Exception</span>]<span class="org-operator">=</span><span class="org-constant">None</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>:
+<span class="linenr"> 8: </span>    <span class="org-keyword">if</span> exception <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+<span class="linenr"> 9: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'ERROR HAPPENS, GUYS: </span>{error}<span class="org-string">'</span>)
+<span class="linenr">10: </span>        <span class="org-keyword">return</span> <span class="org-constant">None</span>                       <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: to satisfy MyPy
+<span class="linenr">11: </span></span>    <span class="org-keyword">else</span>:
+<span class="linenr">12: </span>        <span class="org-keyword">raise</span> exception(error)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span>report_error(<span class="org-string">'No data'</span>)
+<span class="linenr">15: </span>report_error(<span class="org-string">'No data again'</span>, <span class="org-type">ValueError</span>) <span class="org-comment-delimiter"># </span><span class="org-comment">here an exception will be thrown, so -
+<span class="linenr">16: </span></span>report_error(<span class="org-string">'No data'</span>)                   <span class="org-comment-delimiter"># </span><span class="org-comment">WARN: statement is unreachable!</span>
+</pre>
+</div>
+
+<pre class="example">
+ERROR HAPPENS, GUYS: No data
+</pre>
+
+
+<p>
+Pay attention that I add the option <code>--warn-unreachable</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy --warn-unreachable /tmp/tmp16.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp16.py:16: error: Statement is unreachable  [unreachable]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
 
 <p>
 Types can be used for introspections and different tricks with help of annotations.
@@ -2299,11 +2392,27 @@ Use-cases:
 <li>Serialization/deserialization/validation</li>
 <li>IDE integration/documentation</li>
 <li>Hooks/callbacks/chaining</li>
-<li>Optimization/hints</li>
+<li>Optimization hints</li>
 <li>Code generation</li>
 <li>DSL</li>
 <li>&#x2026;</li>
 </ul>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Annotated
+
+<span class="org-keyword">class</span> <span class="org-type">PrimaryKey</span>: <span class="org-keyword">pass</span>
+<span class="org-keyword">class</span> <span class="org-type">Indexed</span>: <span class="org-keyword">pass</span>
+
+<span class="org-keyword">class</span> <span class="org-type">User</span>:
+    <span class="org-builtin">id</span>: Annotated[<span class="org-builtin">int</span>, PrimaryKey()]  <span class="org-comment-delimiter"># </span><span class="org-comment">int, but with extra-metadata marked it as a primary key
+</span>    email: Annotated[<span class="org-builtin">str</span>, Indexed()]  <span class="org-comment-delimiter"># </span><span class="org-comment">str, but with extra-metadata marked it as an index
+</span>
+<span class="org-type">@validate</span>
+<span class="org-keyword">def</span> <span class="org-function-name">set_age</span>(age: Annotated[<span class="org-builtin">int</span>, Between(0, 120)]): <span class="org-comment-delimiter"># </span><span class="org-comment">args also can be Annotated
+</span>    <span class="org-keyword">return</span> age
+</pre>
+</div>
 </div>
 </div>
 </div>

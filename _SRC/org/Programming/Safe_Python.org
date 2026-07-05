@@ -1218,7 +1218,7 @@ import typing
 class Name(str): pass
 class Nick(str): pass
 
-# Then, during refactoring, we added FullName:
+# Then, during refactoring, I added FullName:
 class FullName(str): pass
 type Moniker = Name | Nick | FullName
 
@@ -1255,13 +1255,13 @@ def are_indexes(something) -> typing.TypeGuard[C.Iterable[int]]:
     return (isinstance(something, C.Iterable) and
             all(isinstance(el, int) for el in something))
 # IMPORTANT: without object typing x1,x2 are Any, which prevents their type-check:
-x1:object = json.loads('[1,2,3,4,5]')
-x2:object = json.loads('["a", "b", "c"]')
+x1:object = json.loads('[1,2,3,4,5]')       # Simulate external source
+x2:object = json.loads('["a", "b", "c"]')   # Simulate external source
 try:
     if are_indexes(x1):                     # x1 is object
-        print('1:', check_indexes(10, x1))  # ...but if we enter "if", x1 is Iterable[int]
+        print('1:', check_indexes(10, x1))  # ...but if I enter "if", x1 is Iterable[int]
     if are_indexes(x2):                     # x2 is object
-        print('2:', check_indexes(10, x2))  # ...but if we enter "if", x2 is Iterable[int]
+        print('2:', check_indexes(10, x2))  # ...but if I enter "if", x2 is Iterable[int]
     print('3:', check_indexes(10, x1))      # BUG: unsure Iterable[int]
     print('4:', check_indexes(10, x2))      # BUG: unsure Iterable[int] + raises
 except Exception as x:
@@ -1278,13 +1278,88 @@ mypy /tmp/tmp14.py || :
 #+end_src
 
 #+RESULTS:
-: /tmp/tmp14.py:15: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
-: /tmp/tmp14.py:16: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+: /tmp/tmp14.py:17: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+: /tmp/tmp14.py:18: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+: Found 2 errors in 1 file (checked 1 source file)
+
+Another example clarifying external dictionaries:
+
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp15.py
+import typing, json
+
+class Person(typing.TypedDict):
+    name: str
+    surname: typing.NotRequired[str]
+
+def is_person(d:object) -> typing.TypeGuard[Person]:
+    return isinstance(d, dict) and isinstance(d.get('name'), str)
+
+# IMPORTANT: force type-checking with object instead of default Any:
+xs:list[object] = [json.loads('{"name": "John", "surname": "Doe"}'),
+                   json.loads('{"email": "steve@apple.com"}')]
+for x in xs:                            # x is object
+    if is_person(x):                    # skips x that are not Person
+        print('Name:', x['name'])       # here x is the typed dict Person
+        if surname := x.get('surname'): # ...with optional surname key
+            print('Surname:', surname)
+try:
+    for x in xs:                        # x is any object
+        print('Name:', x['name'])       # BUG: x being object forces report "x is not indexable"
+        if surname := x.get('surname'): # BUG: and x can miss .get()
+            print('Surname:', surname)
+except Exception as x:
+    print(f'ERROR: {x}!')               # BUG: I hit it bcs some x is not dict like Person
+#+end_src
+
+#+RESULTS:
+: Name: John
+: Surname: Doe
+: Name: John
+: Surname: Doe
+: ERROR: 'name'!
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp15.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp15.py:20: error: Value of type "object" is not indexable  [index]
+: /tmp/tmp15.py:21: error: "object" has no attribute "get"  [attr-defined]
 : Found 2 errors in 1 file (checked 1 source file)
 
 Terminal branches leading to unreachable code:
 
-# TODO
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp16.py
+import typing
+
+@typing.overload
+def report_error(error:str, exception:type[Exception]) -> typing.NoReturn: ...
+@typing.overload
+def report_error(error:str, exception:None=None) -> None: ...
+def report_error(error:str, exception:None|type[Exception]=None) -> None:
+    if exception is None:
+        print(f'ERROR HAPPENS, GUYS: {error}')
+        return None                       # HINT: to satisfy MyPy
+    else:
+        raise exception(error)
+
+report_error('No data')
+report_error('No data again', ValueError) # here an exception will be thrown, so -
+report_error('No data')                   # WARN: statement is unreachable!
+#+end_src
+
+#+RESULTS:
+: ERROR HAPPENS, GUYS: No data
+
+Pay attention that I add the option ~--warn-unreachable~:
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy --warn-unreachable /tmp/tmp16.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp16.py:16: error: Statement is unreachable  [unreachable]
+: Found 1 error in 1 file (checked 1 source file)
 
 Types can be used for introspections and different tricks with help of annotations.
 Use-cases:
@@ -1295,12 +1370,25 @@ Use-cases:
 - Serialization/deserialization/validation
 - IDE integration/documentation
 - Hooks/callbacks/chaining
-- Optimization/hints
+- Optimization hints
 - Code generation
 - DSL
 - ...
 
-# TODO
+#+begin_src python :eval yes-export :exports both :results none
+from typing import Annotated
+
+class PrimaryKey: pass
+class Indexed: pass
+
+class User:
+    id: Annotated[int, PrimaryKey()]  # int, but with extra-metadata marked it as a primary key
+    email: Annotated[str, Indexed()]  # str, but with extra-metadata marked it as an index
+
+@validate
+def set_age(age: Annotated[int, Between(0, 120)]): # args also can be Annotated
+    return age
+#+end_src
 
 * Typing libraries
 
