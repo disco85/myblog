@@ -1518,14 +1518,25 @@ Typing PEP following:
 
 Features:
 
-| Library      | Union | Literal | Annotated | TypedDict | Notes                            |
-|--------------+-------+---------+-----------+-----------+----------------------------------|
-| Beartype     | ✔     | ✔       | ✔         | ✔         | Best support for typing PEPs     |
-| Typeguard    | ✔     | ✔       | ✔         | ✔         | Very complete                    |
-| Pytypes      | ✔     | ✔       | ✔         | ✔         | Extremely complete               |
-| Enforce      | ✔     | ✘       | ✘         | ✘         | Basic type checking only         |
-| Typeenforcer | ✔     | ✘       | ✘         | ✘         | Declarative rules, not full PEPs |
-| attrs        | ✔     | ✔       | ✔         | ✔         | Depends on validators            |
+| Library      | Union | Literal | Annotated | TypedDict |
+|--------------+-------+---------+-----------+-----------|
+| Beartype     | ✔     | ✔       | ✔         | ✔         |
+| Typeguard    | ✔     | ✔       | ✔         | ✔         |
+| Pytypes      | ✔     | ✔       | ✔         | ✔         |
+| Enforce      | ✔     | ✘       | ✘         | ✘         |
+| Typeenforcer | ✔     | ✘       | ✘         | ✘         |
+| attrs        | ✔     | ✔       | ✔         | ✔         |
+
+Generics support:
+
+| Library      | Supports Generic Types | Parametric Checking | Nested Generics |
+|--------------+------------------------+---------------------+-----------------|
+| Beartype     | ✔                      | ✔                   | ✔               |
+| Typeguard    | ✔                      | ✔                   | ✔               |
+| Pytypes      | ✔                      | ✔                   | ✔               |
+| Enforce      | ✘                      | ✘                   | ✘               |
+| Typeenforcer | ✘                      | ✘                   | ✘               |
+| attrs        | ✔ (via validators)     | ✘ (manual)          | ✘ (manual)      |
 
 Performance:
 
@@ -1552,9 +1563,9 @@ Integration:
 ** Examples
 
 #+begin_src python :eval yes-export :exports both :results output verbatim
-from typeguard import typechecked
+import typeguard
 
-@typechecked
+@typeguard.typechecked
 def add(x: int, y: int) -> int:
     return x + y
 try:
@@ -1566,7 +1577,6 @@ except Exception as x:
 
 #+RESULTS:
 : ERROR: can only concatenate str (not "int") to str
-
 
 # TODO
 
