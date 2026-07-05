@@ -1496,10 +1496,77 @@ could be caught on the type-check phase!
 
 To be 100% sure, you can/have use runtime types too.
 
-Libraries:
+** Comparison of libraries
 
 - [[https://github.com/agronholm/typeguard][typeguard]]
 - [[https://github.com/beartype/beartype][beartype]]
+- [[https://github.com/python-attrs/attrs][attrs]]
+- [[https://github.com/Stewori/pytypes][pytypes]] (old)
+- [[https://github.com/RussBaz/enforce][enforce]] (old)
+- [[https://github.com/MalinkyZubr/TypeEnforcer][TypeEnforcer]] (old)
+
+Typing PEP following:
+  
+| Library      | Strict Runtime Checking | Coercion | Follows Typing PEPs | Notes                                |
+|--------------+-------------------------+----------+---------------------+--------------------------------------|
+| Beartype     | ✔                       | ✘        | ✔                   | Fastest strict checker               |
+| Typeguard    | ✔                       | ✘        | ✔                   | Most widely used strict checker      |
+| Pytypes      | ✔                       | ✘        | ✔                   | Very complete typing support         |
+| Enforce      | ✔                       | ✘        | ✔                   | Simple, lightweight checker          |
+| Typeenforcer | ✔                       | ✘        | ✔                   | Declarative runtime type enforcement |
+| attrs        | ✘ (optional validators) | ✔        | ✔                   | Declarative classes; flexible typing |
+
+Features:
+
+| Library      | Union | Literal | Annotated | TypedDict | Notes                            |
+|--------------+-------+---------+-----------+-----------+----------------------------------|
+| Beartype     | ✔     | ✔       | ✔         | ✔         | Best support for typing PEPs     |
+| Typeguard    | ✔     | ✔       | ✔         | ✔         | Very complete                    |
+| Pytypes      | ✔     | ✔       | ✔         | ✔         | Extremely complete               |
+| Enforce      | ✔     | ✘       | ✘         | ✘         | Basic type checking only         |
+| Typeenforcer | ✔     | ✘       | ✘         | ✘         | Declarative rules, not full PEPs |
+| attrs        | ✔     | ✔       | ✔         | ✔         | Depends on validators            |
+
+Performance:
+
+| Library      | Runtime Speed | Import Overhead | Notes                                 |
+|--------------+---------------+-----------------+---------------------------------------|
+| Beartype     | ✔ Fast        | ✔ Low           | JIT-compiled checks; fastest overall  |
+| Typeguard    | ✘ Medium      | ✔ Low           | Pure Python; slower than Beartype     |
+| Pytypes      | ✘ Slow        | ✘ High          | Very complete but heavy               |
+| Enforce      | ✔ Fast        | ✔ Low           | Lightweight; simple checks            |
+| Typeenforcer | ✔ Fast        | ✔ Low           | Declarative; efficient                |
+| attrs        | ✔ Fast        | ✔ Low           | Validation optional; minimal overhead |
+
+Integration:
+
+| Library      | Error Messages | IDE Friendliness | Config Complexity | Notes                         |
+|--------------+----------------+------------------+-------------------+-------------------------------|
+| Beartype     | ✔ Excellent    | ✔ Good           | ✘ Medium          | Very descriptive errors       |
+| Typeguard    | ✔ Good         | ✔ Good           | ✔ Low             | Simple decorator-based usage  |
+| Pytypes      | ✔ Good         | ✘ Poor           | ✘ High            | Powerful but complex          |
+| Enforce      | ✘ Basic        | ✔ Good           | ✔ Low             | Minimalistic                  |
+| Typeenforcer | ✔ Good         | ✔ Good           | ✔ Low             | Declarative and readable      |
+| attrs        | ✔ Good         | ✔ Excellent      | ✔ Low             | Great DX; optional validation |
+
+** Examples
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from typeguard import typechecked
+
+@typechecked
+def add(x: int, y: int) -> int:
+    return x + y
+try:
+    add(1, 5)
+    add('a', 5)
+except Exception as x:
+    print(f'ERROR: {x}')
+#+end_src
+
+#+RESULTS:
+: ERROR: can only concatenate str (not "int") to str
+
 
 # TODO
 

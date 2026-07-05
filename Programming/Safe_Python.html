@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 16:50 -->
+<!-- 2026-07-05 Sun 17:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -367,7 +367,12 @@ function toggleTheme() {
 </ul>
 </li>
 <li><a href="#orgb95b37d">Type-stub libraries</a></li>
-<li><a href="#org94646a3">Runtime types</a></li>
+<li><a href="#org94646a3">Runtime types</a>
+<ul>
+<li><a href="#org4a845ff">Comparison of libraries</a></li>
+<li><a href="#org3014bd6">Examples</a></li>
+</ul>
+</li>
 <li><a href="#org65ae433">Combining compile and runtime types</a></li>
 <li><a href="#orgf823b02">AI and types</a></li>
 <li><a href="#orge0e007b">Complex types tricks (dependent types?)</a></li>
@@ -428,7 +433,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orge026476">
+<pre class="example" id="org79e2ad0">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -493,7 +498,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org97ff854">
+<pre class="example" id="org7715b6e">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1022,7 +1027,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org1be3ef0">
+<pre class="example" id="orgc9ff899">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1923,7 +1928,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org506920e">
+<pre class="example" id="org210e852">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -1955,7 +1960,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org5ba2b7f">
+<pre class="example" id="org11aea3a">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2044,7 +2049,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org79e2ad0">
+<pre class="example" id="org58f66da">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2502,7 +2507,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgcffbc0e">
+<pre class="example" id="org717113d">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2512,7 +2517,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orge6a964e">
+<pre class="example" id="org6f01d4d">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -2551,15 +2556,353 @@ could be caught on the type-check phase!
 <p>
 To be 100% sure, you can/have use runtime types too.
 </p>
-
-<p>
-Libraries:
-</p>
-
+</div>
+<div id="outline-container-org4a845ff" class="outline-3">
+<h3 id="org4a845ff">Comparison of libraries</h3>
+<div class="outline-text-3" id="text-org4a845ff">
 <ul class="org-ul">
 <li><a href="https://github.com/agronholm/typeguard">typeguard</a></li>
 <li><a href="https://github.com/beartype/beartype">beartype</a></li>
+<li><a href="https://github.com/python-attrs/attrs">attrs</a></li>
+<li><a href="https://github.com/Stewori/pytypes">pytypes</a> (old)</li>
+<li><a href="https://github.com/RussBaz/enforce">enforce</a> (old)</li>
+<li><a href="https://github.com/MalinkyZubr/TypeEnforcer">TypeEnforcer</a> (old)</li>
 </ul>
+
+<p>
+Typing PEP following:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Library</th>
+<th scope="col" class="org-left">Strict Runtime Checking</th>
+<th scope="col" class="org-left">Coercion</th>
+<th scope="col" class="org-left">Follows Typing PEPs</th>
+<th scope="col" class="org-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Beartype</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✔</td>
+<td class="org-left">Fastest strict checker</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeguard</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✔</td>
+<td class="org-left">Most widely used strict checker</td>
+</tr>
+
+<tr>
+<td class="org-left">Pytypes</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✔</td>
+<td class="org-left">Very complete typing support</td>
+</tr>
+
+<tr>
+<td class="org-left">Enforce</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✔</td>
+<td class="org-left">Simple, lightweight checker</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeenforcer</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✔</td>
+<td class="org-left">Declarative runtime type enforcement</td>
+</tr>
+
+<tr>
+<td class="org-left">attrs</td>
+<td class="org-left">✘ (optional validators)</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">Declarative classes; flexible typing</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Features:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Library</th>
+<th scope="col" class="org-left">Union</th>
+<th scope="col" class="org-left">Literal</th>
+<th scope="col" class="org-left">Annotated</th>
+<th scope="col" class="org-left">TypedDict</th>
+<th scope="col" class="org-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Beartype</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">Best support for typing PEPs</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeguard</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">Very complete</td>
+</tr>
+
+<tr>
+<td class="org-left">Pytypes</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">Extremely complete</td>
+</tr>
+
+<tr>
+<td class="org-left">Enforce</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✘</td>
+<td class="org-left">✘</td>
+<td class="org-left">Basic type checking only</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeenforcer</td>
+<td class="org-left">✔</td>
+<td class="org-left">✘</td>
+<td class="org-left">✘</td>
+<td class="org-left">✘</td>
+<td class="org-left">Declarative rules, not full PEPs</td>
+</tr>
+
+<tr>
+<td class="org-left">attrs</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">✔</td>
+<td class="org-left">Depends on validators</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Performance:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Library</th>
+<th scope="col" class="org-left">Runtime Speed</th>
+<th scope="col" class="org-left">Import Overhead</th>
+<th scope="col" class="org-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Beartype</td>
+<td class="org-left">✔ Fast</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">JIT-compiled checks; fastest overall</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeguard</td>
+<td class="org-left">✘ Medium</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Pure Python; slower than Beartype</td>
+</tr>
+
+<tr>
+<td class="org-left">Pytypes</td>
+<td class="org-left">✘ Slow</td>
+<td class="org-left">✘ High</td>
+<td class="org-left">Very complete but heavy</td>
+</tr>
+
+<tr>
+<td class="org-left">Enforce</td>
+<td class="org-left">✔ Fast</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Lightweight; simple checks</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeenforcer</td>
+<td class="org-left">✔ Fast</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Declarative; efficient</td>
+</tr>
+
+<tr>
+<td class="org-left">attrs</td>
+<td class="org-left">✔ Fast</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Validation optional; minimal overhead</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Integration:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Library</th>
+<th scope="col" class="org-left">Error Messages</th>
+<th scope="col" class="org-left">IDE Friendliness</th>
+<th scope="col" class="org-left">Config Complexity</th>
+<th scope="col" class="org-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Beartype</td>
+<td class="org-left">✔ Excellent</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✘ Medium</td>
+<td class="org-left">Very descriptive errors</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeguard</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Simple decorator-based usage</td>
+</tr>
+
+<tr>
+<td class="org-left">Pytypes</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✘ Poor</td>
+<td class="org-left">✘ High</td>
+<td class="org-left">Powerful but complex</td>
+</tr>
+
+<tr>
+<td class="org-left">Enforce</td>
+<td class="org-left">✘ Basic</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Minimalistic</td>
+</tr>
+
+<tr>
+<td class="org-left">Typeenforcer</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Declarative and readable</td>
+</tr>
+
+<tr>
+<td class="org-left">attrs</td>
+<td class="org-left">✔ Good</td>
+<td class="org-left">✔ Excellent</td>
+<td class="org-left">✔ Low</td>
+<td class="org-left">Great DX; optional validation</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org3014bd6" class="outline-3">
+<h3 id="org3014bd6">Examples</h3>
+<div class="outline-text-3" id="text-org3014bd6">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> typeguard <span class="org-keyword">import</span> typechecked
+
+<span class="org-type">@typechecked</span>
+<span class="org-keyword">def</span> <span class="org-function-name">add</span>(x: <span class="org-builtin">int</span>, y: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+    <span class="org-keyword">return</span> x <span class="org-operator">+</span> y
+<span class="org-keyword">try</span>:
+    add(1, 5)
+    add(<span class="org-string">'a'</span>, 5)
+<span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(f<span class="org-string">'ERROR: </span>{x}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+ERROR: can only concatenate str (not "int") to str
+</pre>
+</div>
 </div>
 </div>
 <div id="outline-container-org65ae433" class="outline-2">
