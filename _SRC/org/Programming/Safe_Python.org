@@ -739,7 +739,7 @@ Stability:
 
 Assignment:
 
-#+begin_src python :eval yes-export :exports code :results none :tangle /tmp/tmp1.py
+#+begin_src python -n :eval yes-export :exports code :results none :tangle /tmp/tmp1.py
 x:int = 'hello world'   # BUG: it is not int
 #+end_src
 
@@ -753,7 +753,7 @@ mypy /tmp/tmp1.py || :
 
 Incorrect usage of a function possibly returning =None=:
 
-#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp2.py
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp2.py
 import math
 def safe_sqrt(n:int) -> None|float:
     return math.sqrt(n) if n >= 0 else None   # no more exception, just None
@@ -771,7 +771,7 @@ mypy /tmp/tmp2.py || :
 
 Wrong argument's type:
 
-#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp3.py
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp3.py
 def size(x:tuple|list|str) -> int:
     if x is not None:           # IMPROVEMENT: you don't need this check anymore
         return len(x)
@@ -790,7 +790,7 @@ mypy /tmp/tmp3.py || :
 
 More precise standard containers:
 
-#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp4.py
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp4.py
 import typing, enum
 class Planet(enum.StrEnum):
     Mars = 'Mars'
@@ -816,7 +816,7 @@ mypy /tmp/tmp4.py || :
 
 Wrapper-types for correct algorithms chaining:
 
-#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp5.py
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp5.py
 import typing
 
 class SortedList(list):
@@ -851,7 +851,7 @@ Distinct, refined types avoiding multiple checks (or "ensure"-functions) - refin
 happens only once on the edge of the domain where external raw data is transformed to
 internal **typed** form:
 
-#+begin_src python :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp6.py
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp6.py
 import typing
 ReadableName = typing.NewType('ReadableName', str)  # DISTINCT TYPE: or a class
 def readable_name(raw_str:str) -> ReadableName:     # IDEAS: capitalized, stripped, ...
@@ -886,7 +886,7 @@ mypy /tmp/tmp6.py || :
 
 Refined, strongly typed math:
 
-#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp7.py
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp7.py
 import typing, math
 Positive = typing.NewType('Positive', float)
 def make_positive(x:int|float) -> Positive | None:  # SMART CONSTRUCTOR
@@ -908,7 +908,7 @@ mypy /tmp/tmp7.py || :
 
 Another classic example with non-empty containers:
 
-#+begin_src python :eval yes-export :exports both :results none :tangle /tmp/tmp8.py
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp8.py
 import typing
 
 class Comparable(typing.Protocol):
@@ -1175,16 +1175,14 @@ def print_person(p:Person):
         age = f', {p["age"]}' if 'age' in p else ''
         print(f'NAME: {p["name"]}{age}')
         print(f'EMAIL: {p["email"]}')
-        other_data = {k:p[k] for k in (p.keys() - {'name', 'email', 'age'})}
-        if other_data: print(f'OTHER DATA: {other_data}')
         print('----------')
-    except:
-        print(f'Cannot print to the end {p}')
+    except Exception as x:
+        print(f'Cannot print to the end {p}: {x}')
 p0:Person = {'name': 'Axel', 'email': 'axel@fake.com'}
 print_person(p0)
-p1:Person = {'name': 'John', 'email': 'john@fake.com', 'age': 40, 'address': '12 Willow Street', 'gender': 'male'}
+p1:Person = {'name': 'John', 'email': 'john@fake.com', 'age': 40, 'gender': 'male'} # BUG: gender is superfluous
 print_person(p1)
-p2:Person = {'name': 'John', 'age': 40}
+p2:Person = {'name': 'John', 'age': 40}                                             # BUG: no email
 print_person(p2)
 #+end_src
 
@@ -1194,10 +1192,9 @@ print_person(p2)
 : ----------
 : NAME: John, 40
 : EMAIL: john@fake.com
-: OTHER DATA: {'gender': 'male', 'address': '12 Willow Street'}
 : ----------
 : NAME: John, 40
-: Cannot print to the end {'name': 'John', 'age': 40}
+: Cannot print to the end {'name': 'John', 'age': 40}: 'email'
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 pyright /tmp/tmp12.py || :
@@ -1205,17 +1202,103 @@ pyright /tmp/tmp12.py || :
 
 #+RESULTS:
 : /tmp/tmp12.py
-:   /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
-:     "address" is an undefined item in type "Person"
+:   /tmp/tmp12.py:16:67 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
 :     "gender" is an undefined item in type "Person" (reportAssignmentType)
-:   /tmp/tmp12.py:20:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+:   /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
 :     "email" is required in "Person" (reportAssignmentType)
 : 2 errors, 0 warnings, 0 informations
 
+Final cases (reminds Common Lisp's ~ecase~ and ~etypecase~ but for type-check time,
+more relevant is **exhaustive switch** of Java) - very helpful when refactoring happens:
+
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp13.py
+import typing
+
+# Initial implementation:
+class Name(str): pass
+class Nick(str): pass
+
+# Then, during refactoring, we added FullName:
+class FullName(str): pass
+type Moniker = Name | Nick | FullName
+
+# BUGGY CODE AFTER REFACTORING: in another module I had this case-analysis:
+def print_moniker(m:Moniker):
+    match m:
+        case Name(): print(f'Name is {m}')
+        case Nick(): print(f'Nick is {m}')
+        case _:      typing.assert_never(m)  # BUG: FullName cannot be Never
+print_moniker(Nick('maverick'))
+print_moniker(FullName('Alex Johnson'))      # BUG: nothing printed + assert_never raises
+#+end_src
+
+#+RESULTS:
+: Nick is maverick
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp13.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp13.py:16: error: Argument 1 to "assert_never" has incompatible type "FullName"; expected "Never"  [arg-type]
+: Found 1 error in 1 file (checked 1 source file)
+
+Type-guards refine types for an underlying branch:
+
+#+begin_src python -n :eval yes-export :exports both :results output verbatim :tangle /tmp/tmp14.py
+import typing, json, collections.abc as C
+
+def check_indexes(size:int, nums:C.Iterable[int]) -> bool:
+    return min(nums) >= 0 and max(nums) < size if nums else True
+
+def are_indexes(something) -> typing.TypeGuard[C.Iterable[int]]:
+    return (isinstance(something, C.Iterable) and
+            all(isinstance(el, int) for el in something))
+# IMPORTANT: without object typing x1,x2 are Any, which prevents their type-check:
+x1:object = json.loads('[1,2,3,4,5]')
+x2:object = json.loads('["a", "b", "c"]')
+try:
+    if are_indexes(x1):                     # x1 is object
+        print('1:', check_indexes(10, x1))  # ...but if we enter "if", x1 is Iterable[int]
+    if are_indexes(x2):                     # x2 is object
+        print('2:', check_indexes(10, x2))  # ...but if we enter "if", x2 is Iterable[int]
+    print('3:', check_indexes(10, x1))      # BUG: unsure Iterable[int]
+    print('4:', check_indexes(10, x2))      # BUG: unsure Iterable[int] + raises
+except Exception as x:
+    print(f'ERROR: {x}')
+#+end_src
+
+#+RESULTS:
+: 1: True
+: 3: True
+: ERROR: '>=' not supported between instances of 'str' and 'int'
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp14.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp14.py:15: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+: /tmp/tmp14.py:16: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+: Found 2 errors in 1 file (checked 1 source file)
+
+Terminal branches leading to unreachable code:
+
 # TODO
 
-Final cases (reminds Common Lisp's ~ecase~ and ~etypecase~ but for type-check time,
-more relevant is **exhaustive switch** of Java):
+Types can be used for introspections and different tricks with help of annotations.
+Use-cases:
+
+- ORM
+- Dependency injections
+- Routing
+- Serialization/deserialization/validation
+- IDE integration/documentation
+- Hooks/callbacks/chaining
+- Optimization/hints
+- Code generation
+- DSL
+- ...
 
 # TODO
 
@@ -1239,4 +1322,5 @@ To be 100% sure, you can/have use runtime types too.
 * Complex types tricks (dependent types?)
 * CrossHair, SMT
 * Dufny, coq, ... generating of Python code
+* Stronger "Python" - Scala
 

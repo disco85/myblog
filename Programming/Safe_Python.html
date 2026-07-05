@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 01:01 -->
+<!-- 2026-07-05 Sun 11:04 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -372,6 +372,7 @@ function toggleTheme() {
 <li><a href="#orge0e007b">Complex types tricks (dependent types?)</a></li>
 <li><a href="#org33ce2d3">CrossHair, SMT</a></li>
 <li><a href="#orgbd799ab">Dufny, coq, &#x2026; generating of Python code</a></li>
+<li><a href="#org729b5ba">Stronger "Python" - Scala</a></li>
 </ul>
 </div>
 </div>
@@ -426,7 +427,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orgf2e61f4">
+<pre class="example" id="org86d1319">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -491,7 +492,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgf6406d2">
+<pre class="example" id="org950eda0">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1020,7 +1021,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org151385a">
+<pre class="example" id="org96f0075">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1627,7 +1628,7 @@ Assignment:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-variable-name">x</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> <span class="org-string">'hello world'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: it is not int</span>
+<pre class="src src-python"><span class="linenr">1: </span><span class="org-variable-name">x</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> <span class="org-string">'hello world'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: it is not int</span>
 </pre>
 </div>
 
@@ -1647,10 +1648,10 @@ Incorrect usage of a function possibly returning <code>None</code>:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> math
-<span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:<span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">float</span>:
-    <span class="org-keyword">return</span> math.sqrt(n) <span class="org-keyword">if</span> n <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">no more exception, just None
-</span>2.5 <span class="org-operator">+</span> safe_sqrt(9)                            <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: 2.5 + None|float</span>
+<pre class="src src-python"><span class="linenr">1: </span><span class="org-keyword">import</span> math
+<span class="linenr">2: </span><span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:<span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">float</span>:
+<span class="linenr">3: </span>    <span class="org-keyword">return</span> math.sqrt(n) <span class="org-keyword">if</span> n <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">no more exception, just None
+<span class="linenr">4: </span></span>2.5 <span class="org-operator">+</span> safe_sqrt(9)                            <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: 2.5 + None|float</span>
 </pre>
 </div>
 
@@ -1671,11 +1672,11 @@ Wrong argument's type:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">size</span>(x:<span class="org-builtin">tuple</span><span class="org-operator">|</span><span class="org-builtin">list</span><span class="org-operator">|</span><span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
-    <span class="org-keyword">if</span> x <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:           <span class="org-comment-delimiter"># </span><span class="org-comment">IMPROVEMENT: you don't need this check anymore
-</span>        <span class="org-keyword">return</span> <span class="org-builtin">len</span>(x)
-size(12)                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: int is not expected
-</span>size({1: <span class="org-string">'a'</span>, 2:<span class="org-string">'b'</span>}.get(100))  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: {}.get() can return None, must be checked</span>
+<pre class="src src-python"><span class="linenr">1: </span><span class="org-keyword">def</span> <span class="org-function-name">size</span>(x:<span class="org-builtin">tuple</span><span class="org-operator">|</span><span class="org-builtin">list</span><span class="org-operator">|</span><span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr">2: </span>    <span class="org-keyword">if</span> x <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:           <span class="org-comment-delimiter"># </span><span class="org-comment">IMPROVEMENT: you don't need this check anymore
+<span class="linenr">3: </span></span>        <span class="org-keyword">return</span> <span class="org-builtin">len</span>(x)
+<span class="linenr">4: </span>size(12)                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: int is not expected
+<span class="linenr">5: </span></span>size({1: <span class="org-string">'a'</span>, 2:<span class="org-string">'b'</span>}.get(100))  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: {}.get() can return None, must be checked</span>
 </pre>
 </div>
 
@@ -1696,16 +1697,16 @@ More precise standard containers:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typing, enum
-<span class="org-keyword">class</span> <span class="org-type">Planet</span>(enum.StrEnum):
-    <span class="org-variable-name">Mars</span> <span class="org-operator">=</span> <span class="org-string">'Mars'</span>
-    <span class="org-variable-name">Earth</span> <span class="org-operator">=</span> <span class="org-string">'Earth'</span>
-    <span class="org-variable-name">Jupiter</span> <span class="org-operator">=</span> <span class="org-string">'Jupiter'</span>
-planet_masses:<span class="org-builtin">dict</span>[Planet,<span class="org-builtin">float</span>]
-<span class="org-variable-name">planet_masses</span>[Planet.Mars] <span class="org-operator">=</span> 6.42e23
-<span class="org-variable-name">planet_masses</span>[Planet.Earth] <span class="org-operator">=</span> 5.97e24
-<span class="org-variable-name">planet_masses</span>[Planet.Jupiter] <span class="org-operator">=</span> <span class="org-string">'1.90e24 tonnes'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected float, not str
-</span><span class="org-variable-name">planet_masses</span>[<span class="org-string">'Saturn'</span>] <span class="org-operator">=</span> 68e26                   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected enumerated Planet, not str</span>
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing, enum
+<span class="linenr"> 2: </span><span class="org-keyword">class</span> <span class="org-type">Planet</span>(enum.StrEnum):
+<span class="linenr"> 3: </span>    <span class="org-variable-name">Mars</span> <span class="org-operator">=</span> <span class="org-string">'Mars'</span>
+<span class="linenr"> 4: </span>    <span class="org-variable-name">Earth</span> <span class="org-operator">=</span> <span class="org-string">'Earth'</span>
+<span class="linenr"> 5: </span>    <span class="org-variable-name">Jupiter</span> <span class="org-operator">=</span> <span class="org-string">'Jupiter'</span>
+<span class="linenr"> 6: </span>planet_masses:<span class="org-builtin">dict</span>[Planet,<span class="org-builtin">float</span>]
+<span class="linenr"> 7: </span><span class="org-variable-name">planet_masses</span>[Planet.Mars] <span class="org-operator">=</span> 6.42e23
+<span class="linenr"> 8: </span><span class="org-variable-name">planet_masses</span>[Planet.Earth] <span class="org-operator">=</span> 5.97e24
+<span class="linenr"> 9: </span><span class="org-variable-name">planet_masses</span>[Planet.Jupiter] <span class="org-operator">=</span> <span class="org-string">'1.90e24 tonnes'</span>  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected float, not str
+<span class="linenr">10: </span></span><span class="org-variable-name">planet_masses</span>[<span class="org-string">'Saturn'</span>] <span class="org-operator">=</span> 68e26                   <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected enumerated Planet, not str</span>
 </pre>
 </div>
 
@@ -1729,22 +1730,22 @@ Wrapper-types for correct algorithms chaining:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typing
-
-<span class="org-keyword">class</span> <span class="org-type">SortedList</span>(<span class="org-builtin">list</span>):
-    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, items):
-        <span class="org-builtin">super</span>().__init__(<span class="org-builtin">sorted</span>(items))
-
-<span class="org-keyword">def</span> <span class="org-function-name">unique</span>(data: SortedList) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>:
-    <span class="org-variable-name">res</span>: <span class="org-builtin">list</span> <span class="org-operator">=</span> []
-    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> data:
-        <span class="org-keyword">if</span> res <span class="org-keyword">and</span> x <span class="org-operator">==</span> res[<span class="org-operator">-</span>1]: <span class="org-keyword">continue</span>
-        <span class="org-keyword">else</span>: res.append(x)
-    <span class="org-keyword">return</span> res
-<span class="org-variable-name">items</span> <span class="org-operator">=</span> [11, 20, 11, 20, 1, 20, 11, 5, 1]
-<span class="org-variable-name">sorted_items</span> <span class="org-operator">=</span> SortedList(items)
-<span class="org-builtin">print</span>(unique(items))             <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected SortedList so unique() works correctly
-</span><span class="org-builtin">print</span>(unique(sorted_items))
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-keyword">class</span> <span class="org-type">SortedList</span>(<span class="org-builtin">list</span>):
+<span class="linenr"> 4: </span>    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, items):
+<span class="linenr"> 5: </span>        <span class="org-builtin">super</span>().__init__(<span class="org-builtin">sorted</span>(items))
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">unique</span>(data: SortedList) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>:
+<span class="linenr"> 8: </span>    <span class="org-variable-name">res</span>: <span class="org-builtin">list</span> <span class="org-operator">=</span> []
+<span class="linenr"> 9: </span>    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> data:
+<span class="linenr">10: </span>        <span class="org-keyword">if</span> res <span class="org-keyword">and</span> x <span class="org-operator">==</span> res[<span class="org-operator">-</span>1]: <span class="org-keyword">continue</span>
+<span class="linenr">11: </span>        <span class="org-keyword">else</span>: res.append(x)
+<span class="linenr">12: </span>    <span class="org-keyword">return</span> res
+<span class="linenr">13: </span><span class="org-variable-name">items</span> <span class="org-operator">=</span> [11, 20, 11, 20, 1, 20, 11, 5, 1]
+<span class="linenr">14: </span><span class="org-variable-name">sorted_items</span> <span class="org-operator">=</span> SortedList(items)
+<span class="linenr">15: </span><span class="org-builtin">print</span>(unique(items))             <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected SortedList so unique() works correctly
+<span class="linenr">16: </span></span><span class="org-builtin">print</span>(unique(sorted_items))
 </pre>
 </div>
 
@@ -1772,22 +1773,22 @@ internal <b><b>typed</b></b> form:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typing
-<span class="org-variable-name">ReadableName</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'ReadableName'</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">DISTINCT TYPE: or a class
-</span><span class="org-keyword">def</span> <span class="org-function-name">readable_name</span>(raw_str:<span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> ReadableName:     <span class="org-comment-delimiter"># </span><span class="org-comment">IDEAS: capitalized, stripped, ...
-</span>    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-string">' '</span>.join(s.strip().capitalize() <span class="org-keyword">for</span> s <span class="org-keyword">in</span> raw_str.split() <span class="org-keyword">if</span> s)
-    <span class="org-keyword">return</span> ReadableName(res)
-<span class="org-keyword">def</span> <span class="org-function-name">greating</span>(n:ReadableName):
-    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
-</span>    <span class="org-builtin">print</span>(f<span class="org-string">'Hello </span>{n}<span class="org-string">, how are you?'</span>)
-<span class="org-keyword">def</span> <span class="org-function-name">closing</span>(n:ReadableName):
-    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
-</span>    <span class="org-builtin">print</span>(f<span class="org-string">'-- Best regards,</span><span class="org-constant">\n</span><span class="org-string">--  </span>{n}<span class="org-string">'</span>)
-<span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-string">'   michael   dudikoff  '</span>
-<span class="org-variable-name">n</span> <span class="org-operator">=</span> readable_name(r)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge, raw -&gt; internal/trusted
-</span>greating(n)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">OK
-</span>closing(n)                                          <span class="org-comment-delimiter"># </span><span class="org-comment">OK
-</span>greating(r)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected ReadableName</span>
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span><span class="org-variable-name">ReadableName</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'ReadableName'</span>, <span class="org-builtin">str</span>)  <span class="org-comment-delimiter"># </span><span class="org-comment">DISTINCT TYPE: or a class
+<span class="linenr"> 3: </span></span><span class="org-keyword">def</span> <span class="org-function-name">readable_name</span>(raw_str:<span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> ReadableName:     <span class="org-comment-delimiter"># </span><span class="org-comment">IDEAS: capitalized, stripped, ...
+<span class="linenr"> 4: </span></span>    <span class="org-variable-name">res</span> <span class="org-operator">=</span> <span class="org-string">' '</span>.join(s.strip().capitalize() <span class="org-keyword">for</span> s <span class="org-keyword">in</span> raw_str.split() <span class="org-keyword">if</span> s)
+<span class="linenr"> 5: </span>    <span class="org-keyword">return</span> ReadableName(res)
+<span class="linenr"> 6: </span><span class="org-keyword">def</span> <span class="org-function-name">greating</span>(n:ReadableName):
+<span class="linenr"> 7: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
+<span class="linenr"> 8: </span></span>    <span class="org-builtin">print</span>(f<span class="org-string">'Hello </span>{n}<span class="org-string">, how are you?'</span>)
+<span class="linenr"> 9: </span><span class="org-keyword">def</span> <span class="org-function-name">closing</span>(n:ReadableName):
+<span class="linenr">10: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">n = readable_name(n)                          # REDUNDANT: we don't need it more
+<span class="linenr">11: </span></span>    <span class="org-builtin">print</span>(f<span class="org-string">'-- Best regards,</span><span class="org-constant">\n</span><span class="org-string">--  </span>{n}<span class="org-string">'</span>)
+<span class="linenr">12: </span><span class="org-variable-name">r</span> <span class="org-operator">=</span> <span class="org-string">'   michael   dudikoff  '</span>
+<span class="linenr">13: </span><span class="org-variable-name">n</span> <span class="org-operator">=</span> readable_name(r)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge, raw -&gt; internal/trusted
+<span class="linenr">14: </span></span>greating(n)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">OK
+<span class="linenr">15: </span></span>closing(n)                                          <span class="org-comment-delimiter"># </span><span class="org-comment">OK
+<span class="linenr">16: </span></span>greating(r)                                         <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected ReadableName</span>
 </pre>
 </div>
 
@@ -1815,15 +1816,15 @@ Refined, strongly typed math:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typing, math
-<span class="org-variable-name">Positive</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'Positive'</span>, <span class="org-builtin">float</span>)
-<span class="org-keyword">def</span> <span class="org-function-name">make_positive</span>(x:<span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">float</span>) <span class="org-operator">-&gt;</span> Positive <span class="org-operator">|</span> <span class="org-constant">None</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">SMART CONSTRUCTOR
-</span>    <span class="org-keyword">return</span> Positive(x) <span class="org-keyword">if</span> x <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>
-<span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:Positive) <span class="org-operator">-&gt;</span> Positive:
-    <span class="org-keyword">return</span> Positive(math.sqrt(n))
-safe_sqrt(4)                                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed Positive
-</span><span class="org-variable-name">p</span> <span class="org-operator">=</span> make_positive(4)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
-</span><span class="org-keyword">if</span> p: safe_sqrt(p)                                  <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
+<pre class="src src-python"><span class="linenr">1: </span><span class="org-keyword">import</span> typing, math
+<span class="linenr">2: </span><span class="org-variable-name">Positive</span> <span class="org-operator">=</span> typing.NewType(<span class="org-string">'Positive'</span>, <span class="org-builtin">float</span>)
+<span class="linenr">3: </span><span class="org-keyword">def</span> <span class="org-function-name">make_positive</span>(x:<span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">float</span>) <span class="org-operator">-&gt;</span> Positive <span class="org-operator">|</span> <span class="org-constant">None</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">SMART CONSTRUCTOR
+<span class="linenr">4: </span></span>    <span class="org-keyword">return</span> Positive(x) <span class="org-keyword">if</span> x <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">else</span> <span class="org-constant">None</span>
+<span class="linenr">5: </span><span class="org-keyword">def</span> <span class="org-function-name">safe_sqrt</span>(n:Positive) <span class="org-operator">-&gt;</span> Positive:
+<span class="linenr">6: </span>    <span class="org-keyword">return</span> Positive(math.sqrt(n))
+<span class="linenr">7: </span>safe_sqrt(4)                                        <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed Positive
+<span class="linenr">8: </span></span><span class="org-variable-name">p</span> <span class="org-operator">=</span> make_positive(4)                                <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
+<span class="linenr">9: </span></span><span class="org-keyword">if</span> p: safe_sqrt(p)                                  <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
 </pre>
 </div>
 
@@ -1843,22 +1844,22 @@ Another classic example with non-empty containers:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typing
-
-<span class="org-keyword">class</span> <span class="org-type">Comparable</span>(typing.Protocol):
-    <span class="org-keyword">def</span> <span class="org-function-name">__lt__</span>(<span class="org-keyword">self</span>, other: typing.Any, <span class="org-operator">/</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>: ...
-
-<span class="org-keyword">class</span> <span class="org-type">NonEmptyList</span>[A](<span class="org-builtin">list</span>[A]): <span class="org-keyword">pass</span>
-
-<span class="org-keyword">def</span> <span class="org-function-name">make_non_empty</span>[A](x:<span class="org-builtin">list</span>[A]) <span class="org-operator">-&gt;</span> NonEmptyList[A] <span class="org-operator">|</span> <span class="org-constant">None</span>:
-    <span class="org-keyword">return</span> NonEmptyList(x) <span class="org-keyword">if</span> x <span class="org-keyword">else</span> <span class="org-constant">None</span>
-
-<span class="org-keyword">def</span> <span class="org-function-name">safe_max</span>[A:Comparable](n:NonEmptyList[A]) <span class="org-operator">-&gt;</span> A:
-    <span class="org-keyword">return</span> <span class="org-builtin">max</span>(n)
-
-<span class="org-builtin">print</span>(safe_max([1,2]))                              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed NonEmptyList
-</span><span class="org-variable-name">n</span> <span class="org-operator">=</span> make_non_empty([1,2])                           <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
-</span><span class="org-keyword">if</span> n: <span class="org-builtin">print</span>(safe_max(n))                            <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-keyword">class</span> <span class="org-type">Comparable</span>(typing.Protocol):
+<span class="linenr"> 4: </span>    <span class="org-keyword">def</span> <span class="org-function-name">__lt__</span>(<span class="org-keyword">self</span>, other: typing.Any, <span class="org-operator">/</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>: ...
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span class="org-keyword">class</span> <span class="org-type">NonEmptyList</span>[A](<span class="org-builtin">list</span>[A]): <span class="org-keyword">pass</span>
+<span class="linenr"> 7: </span>
+<span class="linenr"> 8: </span><span class="org-keyword">def</span> <span class="org-function-name">make_non_empty</span>[A](x:<span class="org-builtin">list</span>[A]) <span class="org-operator">-&gt;</span> NonEmptyList[A] <span class="org-operator">|</span> <span class="org-constant">None</span>:
+<span class="linenr"> 9: </span>    <span class="org-keyword">return</span> NonEmptyList(x) <span class="org-keyword">if</span> x <span class="org-keyword">else</span> <span class="org-constant">None</span>
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span class="org-keyword">def</span> <span class="org-function-name">safe_max</span>[A:Comparable](n:NonEmptyList[A]) <span class="org-operator">-&gt;</span> A:
+<span class="linenr">12: </span>    <span class="org-keyword">return</span> <span class="org-builtin">max</span>(n)
+<span class="linenr">13: </span>
+<span class="linenr">14: </span><span class="org-builtin">print</span>(safe_max([1,2]))                              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: expected strongly typed NonEmptyList
+<span class="linenr">15: </span></span><span class="org-variable-name">n</span> <span class="org-operator">=</span> make_non_empty([1,2])                           <span class="org-comment-delimiter"># </span><span class="org-comment">ONCE: on the edge
+<span class="linenr">16: </span></span><span class="org-keyword">if</span> n: <span class="org-builtin">print</span>(safe_max(n))                            <span class="org-comment-delimiter"># </span><span class="org-comment">USE: only trusted, refined value</span>
 </pre>
 </div>
 
@@ -1920,7 +1921,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org8f91a62">
+<pre class="example" id="orgd2195ab">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2009,7 +2010,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org0d92f08">
+<pre class="example" id="org6c032d5">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2153,17 +2154,15 @@ with required and optional keys:
 <span class="linenr"> 8: </span>        <span class="org-variable-name">age</span> <span class="org-operator">=</span> f<span class="org-string">', </span>{p["age"]}<span class="org-string">'</span> <span class="org-keyword">if</span> <span class="org-string">'age'</span> <span class="org-keyword">in</span> p <span class="org-keyword">else</span> <span class="org-string">''</span>
 <span class="linenr"> 9: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'NAME: </span>{p["name"]}{age}<span class="org-string">'</span>)
 <span class="linenr">10: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'EMAIL: </span>{p["email"]}<span class="org-string">'</span>)
-<span class="linenr">11: </span>        <span class="org-variable-name">other_data</span> <span class="org-operator">=</span> {k:p[k] <span class="org-keyword">for</span> k <span class="org-keyword">in</span> (p.keys() <span class="org-operator">-</span> {<span class="org-string">'name'</span>, <span class="org-string">'email'</span>, <span class="org-string">'age'</span>})}
-<span class="linenr">12: </span>        <span class="org-keyword">if</span> other_data: <span class="org-builtin">print</span>(f<span class="org-string">'OTHER DATA: </span>{other_data}<span class="org-string">'</span>)
-<span class="linenr">13: </span>        <span class="org-builtin">print</span>(<span class="org-string">'----------'</span>)
-<span class="linenr">14: </span>    <span class="org-keyword">except</span>:
-<span class="linenr">15: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'Cannot print to the end </span>{p}<span class="org-string">'</span>)
-<span class="linenr">16: </span><span class="org-variable-name">p0</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'Axel'</span>, <span class="org-string">'email'</span>: <span class="org-string">'axel@fake.com'</span>}
-<span class="linenr">17: </span>print_person(p0)
-<span class="linenr">18: </span><span class="org-variable-name">p1</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'email'</span>: <span class="org-string">'john@fake.com'</span>, <span class="org-string">'age'</span>: 40, <span class="org-string">'address'</span>: <span class="org-string">'12 Willow Street'</span>, <span class="org-string">'gender'</span>: <span class="org-string">'male'</span>}
-<span class="linenr">19: </span>print_person(p1)
-<span class="linenr">20: </span><span class="org-variable-name">p2</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'age'</span>: 40}
-<span class="linenr">21: </span>print_person(p2)
+<span class="linenr">11: </span>        <span class="org-builtin">print</span>(<span class="org-string">'----------'</span>)
+<span class="linenr">12: </span>    <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+<span class="linenr">13: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'Cannot print to the end </span>{p}<span class="org-string">: </span>{x}<span class="org-string">'</span>)
+<span class="linenr">14: </span><span class="org-variable-name">p0</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'Axel'</span>, <span class="org-string">'email'</span>: <span class="org-string">'axel@fake.com'</span>}
+<span class="linenr">15: </span>print_person(p0)
+<span class="linenr">16: </span><span class="org-variable-name">p1</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'email'</span>: <span class="org-string">'john@fake.com'</span>, <span class="org-string">'age'</span>: 40, <span class="org-string">'gender'</span>: <span class="org-string">'male'</span>} <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: gender is superfluous
+<span class="linenr">17: </span></span>print_person(p1)
+<span class="linenr">18: </span><span class="org-variable-name">p2</span>:<span class="org-type">Person</span> <span class="org-operator">=</span> {<span class="org-string">'name'</span>: <span class="org-string">'John'</span>, <span class="org-string">'age'</span>: 40}                                             <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no email
+<span class="linenr">19: </span></span>print_person(p2)
 </pre>
 </div>
 
@@ -2173,10 +2172,9 @@ EMAIL: axel@fake.com
 ----------
 NAME: John, 40
 EMAIL: john@fake.com
-OTHER DATA: {'gender': 'male', 'address': '12 Willow Street'}
 ----------
 NAME: John, 40
-Cannot print to the end {'name': 'John', 'age': 40}
+Cannot print to the end {'name': 'John', 'age': 40}: 'email'
 </pre>
 
 
@@ -2187,10 +2185,9 @@ Cannot print to the end {'name': 'John', 'age': 40}
 
 <pre class="example">
 /tmp/tmp12.py
-  /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
-    "address" is an undefined item in type "Person"
+  /tmp/tmp12.py:16:67 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
     "gender" is an undefined item in type "Person" (reportAssignmentType)
-  /tmp/tmp12.py:20:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
+  /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
     "email" is required in "Person" (reportAssignmentType)
 2 errors, 0 warnings, 0 informations
 </pre>
@@ -2198,8 +2195,115 @@ Cannot print to the end {'name': 'John', 'age': 40}
 
 <p>
 Final cases (reminds Common Lisp's <code>ecase</code> and <code>etypecase</code> but for type-check time,
-more relevant is <b><b>exhaustive switch</b></b> of Java):
+more relevant is <b><b>exhaustive switch</b></b> of Java) - very helpful when refactoring happens:
 </p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-comment-delimiter"># </span><span class="org-comment">Initial implementation:
+<span class="linenr"> 4: </span></span><span class="org-keyword">class</span> <span class="org-type">Name</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
+<span class="linenr"> 5: </span><span class="org-keyword">class</span> <span class="org-type">Nick</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
+<span class="linenr"> 6: </span>
+<span class="linenr"> 7: </span><span class="org-comment-delimiter"># </span><span class="org-comment">Then, during refactoring, we added FullName:
+<span class="linenr"> 8: </span></span><span class="org-keyword">class</span> <span class="org-type">FullName</span>(<span class="org-builtin">str</span>): <span class="org-keyword">pass</span>
+<span class="linenr"> 9: </span><span class="org-builtin">type</span> <span class="org-variable-name">Moniker</span> <span class="org-operator">=</span> Name <span class="org-operator">|</span> Nick <span class="org-operator">|</span> FullName
+<span class="linenr">10: </span>
+<span class="linenr">11: </span><span class="org-comment-delimiter"># </span><span class="org-comment">BUGGY CODE AFTER REFACTORING: in another module I had this case-analysis:
+<span class="linenr">12: </span></span><span class="org-keyword">def</span> <span class="org-function-name">print_moniker</span>(m:Moniker):
+<span class="linenr">13: </span>    <span class="org-keyword">match</span> m:
+<span class="linenr">14: </span>        <span class="org-keyword">case</span> Name(): <span class="org-builtin">print</span>(f<span class="org-string">'Name is </span>{m}<span class="org-string">'</span>)
+<span class="linenr">15: </span>        <span class="org-keyword">case</span> Nick(): <span class="org-builtin">print</span>(f<span class="org-string">'Nick is </span>{m}<span class="org-string">'</span>)
+<span class="linenr">16: </span>        <span class="org-keyword">case</span> _:      typing.assert_never(m)  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: FullName cannot be Never
+<span class="linenr">17: </span></span>print_moniker(Nick(<span class="org-string">'maverick'</span>))
+<span class="linenr">18: </span>print_moniker(FullName(<span class="org-string">'Alex Johnson'</span>))      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: nothing printed + assert_never raises</span>
+</pre>
+</div>
+
+<pre class="example">
+Nick is maverick
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp13.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp13.py:16: error: Argument 1 to "assert_never" has incompatible type "FullName"; expected "Never"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Type-guards refine types for an underlying branch:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing, json, collections.abc <span class="org-keyword">as</span> C
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-keyword">def</span> <span class="org-function-name">check_indexes</span>(size:<span class="org-builtin">int</span>, nums:C.Iterable[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>:
+<span class="linenr"> 4: </span>    <span class="org-keyword">return</span> <span class="org-builtin">min</span>(nums) <span class="org-operator">&gt;=</span> 0 <span class="org-keyword">and</span> <span class="org-builtin">max</span>(nums) <span class="org-operator">&lt;</span> size <span class="org-keyword">if</span> nums <span class="org-keyword">else</span> <span class="org-constant">True</span>
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span class="org-keyword">def</span> <span class="org-function-name">are_indexes</span>(something) <span class="org-operator">-&gt;</span> typing.TypeGuard[C.Iterable[<span class="org-builtin">int</span>]]:
+<span class="linenr"> 7: </span>    <span class="org-keyword">return</span> (<span class="org-builtin">isinstance</span>(something, C.Iterable) <span class="org-keyword">and</span>
+<span class="linenr"> 8: </span>            <span class="org-builtin">all</span>(<span class="org-builtin">isinstance</span>(el, <span class="org-builtin">int</span>) <span class="org-keyword">for</span> el <span class="org-keyword">in</span> something))
+<span class="linenr"> 9: </span><span class="org-comment-delimiter"># </span><span class="org-comment">IMPORTANT: without object typing x1,x2 are Any, which prevents their type-check:
+<span class="linenr">10: </span></span><span class="org-variable-name">x1</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'[1,2,3,4,5]'</span>)
+<span class="linenr">11: </span><span class="org-variable-name">x2</span>:<span class="org-builtin">object</span> <span class="org-operator">=</span> json.loads(<span class="org-string">'["a", "b", "c"]'</span>)
+<span class="linenr">12: </span><span class="org-keyword">try</span>:
+<span class="linenr">13: </span>    <span class="org-keyword">if</span> are_indexes(x1):                     <span class="org-comment-delimiter"># </span><span class="org-comment">x1 is object
+<span class="linenr">14: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'1:'</span>, check_indexes(10, x1))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if we enter "if", x1 is Iterable[int]
+<span class="linenr">15: </span></span>    <span class="org-keyword">if</span> are_indexes(x2):                     <span class="org-comment-delimiter"># </span><span class="org-comment">x2 is object
+<span class="linenr">16: </span></span>        <span class="org-builtin">print</span>(<span class="org-string">'2:'</span>, check_indexes(10, x2))  <span class="org-comment-delimiter"># </span><span class="org-comment">...but if we enter "if", x2 is Iterable[int]
+<span class="linenr">17: </span></span>    <span class="org-builtin">print</span>(<span class="org-string">'3:'</span>, check_indexes(10, x1))      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: unsure Iterable[int]
+<span class="linenr">18: </span></span>    <span class="org-builtin">print</span>(<span class="org-string">'4:'</span>, check_indexes(10, x2))      <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: unsure Iterable[int] + raises
+<span class="linenr">19: </span></span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+<span class="linenr">20: </span>    <span class="org-builtin">print</span>(f<span class="org-string">'ERROR: </span>{x}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+1: True
+3: True
+ERROR: '&gt;=' not supported between instances of 'str' and 'int'
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp14.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp14.py:17: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+/tmp/tmp14.py:18: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
+Found 2 errors in 1 file (checked 1 source file)
+</pre>
+
+
+<p>
+Terminal branches leading to unreachable code:
+</p>
+
+<p>
+Types can be used for introspections and different tricks with help of annotations.
+Use-cases:
+</p>
+
+<ul class="org-ul">
+<li>ORM</li>
+<li>Dependency injections</li>
+<li>Routing</li>
+<li>Serialization/deserialization/validation</li>
+<li>IDE integration/documentation</li>
+<li>Hooks/callbacks/chaining</li>
+<li>Optimization/hints</li>
+<li>Code generation</li>
+<li>DSL</li>
+<li>&#x2026;</li>
+</ul>
 </div>
 </div>
 </div>
@@ -2242,6 +2346,9 @@ To be 100% sure, you can/have use runtime types too.
 </div>
 <div id="outline-container-orgbd799ab" class="outline-2">
 <h2 id="orgbd799ab">Dufny, coq, &#x2026; generating of Python code</h2>
+</div>
+<div id="outline-container-org729b5ba" class="outline-2">
+<h2 id="org729b5ba">Stronger "Python" - Scala</h2>
 </div>
 </div>
 <div id="postamble" class="status">
