@@ -585,6 +585,12 @@ print(json.dumps(sch, indent=2))
 }
 #+end_example
 
+** Alternatives
+
+- [[https://github.com/msgspec/msgspec][msgspec]] (JSON, YAML, TOML, MessagePack)
+- [[https://github.com/marshmallow-code/marshmallow][marshmallow]]
+- [[https://github.com/lidatong/dataclasses-json][dataclasses-json]] (old)
+
 * Static types
 
 ** Basic idea of types
@@ -732,6 +738,9 @@ Stability:
 - **Pyre** emphasizes performance and scalability for very large repositories.
 - **pyanalyze** combines type checking with broader static analysis and can detect some
   classes of bugs that traditional type checkers do not.
+
+Type-checkers can be extended with **custom plugins** allowing more complex type systems
+(think about dependent types, affined types...)
 
 ** Examples of type based safety
 
@@ -1391,9 +1400,10 @@ Use-cases:
 - Optimization hints
 - Code generation
 - DSL
+- Custom type systems (dependent types, etc)
 - ...
 
-#+begin_src python :eval yes-export :exports both :results none
+#+begin_src python :eval no :exports both :results none
 from typing import Annotated
 
 class PrimaryKey: pass
@@ -1408,9 +1418,75 @@ def set_age(age: Annotated[int, Between(0, 120)]): # args also can be Annotated
     return age
 #+end_src
 
-* Typing libraries
+3rd party DSL for ~Annotated~: [[https://pypi.org/project/annotated-types/][annotated-types]] (standardized DSL for complex refined types):
 
-# TODO
+#+begin_src python :eval no :exports both :results none
+from typing import Annotated
+from annotated_types import Gt, Len, Predicate
+
+class MyClass:
+    age: Annotated[int, Gt(18)]                         # Valid: 19, 20, ...
+                                                        # Invalid: 17, 18, "19", 19.0, ...
+    factors: list[Annotated[int, Predicate(is_prime)]]  # Valid: 2, 3, 5, 7, 11, ...
+                                                        # Invalid: 4, 8, -2, 5.0, "prime", ...
+
+    my_list: Annotated[list[int], Len(0, 10)]           # Valid: [], [10, 20, 30, 40, 50]
+                                                        # Invalid: (1, 2), ["abc"], [0] * 20
+#+end_src
+
+* Type-stub libraries
+
+- Used for static analysis, runtime metaprogramming, and developer tooling.
+- ~.pyi~ modules.
+- Used by type-checkers, not by Python.
+- Usually MyPy and Pyright automatically pick up ~.pyi~ files.
+
+#+begin_src python :eval no :exports both :results none
+'''Module shapes.pyi'''
+from typing import Protocol
+
+class Shape(Protocol):
+    def area(self) -> float: ...
+    def perimeter(self) -> float: ...
+
+class Circle:
+    radius: float
+    def area(self) -> float: ...
+    def perimeter(self) -> float: ...
+
+PI: float
+#+end_src
+
+Location:
+
+#+begin_example
+project/
+    shapes.py
+    shapes.pyi <- type stub for shapes.py
+#+end_example
+
+If sub-files are located in a separate directory - one of options is:
+
+#+begin_example
+    Directories:           mypy.ini:              pyrightconfig.json:
+~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
+project/                   [mypy]                 { "stubPath": "stubs" }
+    src/                   mypy_path = stubs
+        mypkg/
+            ...
+    stubs/
+        mypkg/
+            utils.pyi
+#+end_example
+
+Types can be imported and used as usually:
+
+#+begin_src python :eval no :exports both :results none
+from mypkg.types.geometry import Shape
+#+end_src
+
+- They can be found, for ex., as: https://pypi.org/project/typing/
+- Example: https://pypi.org/project/argparse-typing/ (enhanced types for ~argparse~)
 
 * Runtime types
 
@@ -1419,6 +1495,13 @@ type-check into your CI, then some member of the team can inject buggy code that
 could be caught on the type-check phase!
 
 To be 100% sure, you can/have use runtime types too.
+
+Libraries:
+
+- [[https://github.com/agronholm/typeguard][typeguard]]
+- [[https://github.com/beartype/beartype][beartype]]
+
+# TODO
 
 * Combining compile and runtime types
 * AI and types

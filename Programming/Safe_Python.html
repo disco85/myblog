@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 13:27 -->
+<!-- 2026-07-05 Sun 16:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -348,6 +348,7 @@ function toggleTheme() {
 <li><a href="#org515abfa">JSON schema</a></li>
 </ul>
 </li>
+<li><a href="#org457d555">Alternatives</a></li>
 </ul>
 </li>
 <li><a href="#org869aa7a">Static types</a>
@@ -365,7 +366,7 @@ function toggleTheme() {
 </li>
 </ul>
 </li>
-<li><a href="#org60c583a">Typing libraries</a></li>
+<li><a href="#orgb95b37d">Type-stub libraries</a></li>
 <li><a href="#org94646a3">Runtime types</a></li>
 <li><a href="#org65ae433">Combining compile and runtime types</a></li>
 <li><a href="#orgf823b02">AI and types</a></li>
@@ -427,7 +428,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org1c4e1e2">
+<pre class="example" id="orge026476">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -492,7 +493,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgf8146ad">
+<pre class="example" id="org97ff854">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1021,7 +1022,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgb181571">
+<pre class="example" id="org1be3ef0">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1053,6 +1054,16 @@ type='rectangle' width=10.3 height=14.8
 }
 </pre>
 </div>
+</div>
+</div>
+<div id="outline-container-org457d555" class="outline-3">
+<h3 id="org457d555">Alternatives</h3>
+<div class="outline-text-3" id="text-org457d555">
+<ul class="org-ul">
+<li><a href="https://github.com/msgspec/msgspec">msgspec</a> (JSON, YAML, TOML, MessagePack)</li>
+<li><a href="https://github.com/marshmallow-code/marshmallow">marshmallow</a></li>
+<li><a href="https://github.com/lidatong/dataclasses-json">dataclasses-json</a> (old)</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1614,6 +1625,11 @@ annotations, but it's primarily developed for Google's internal use cases.</li>
 <li><b><b>pyanalyze</b></b> combines type checking with broader static analysis and can detect some
 classes of bugs that traditional type checkers do not.</li>
 </ul>
+
+<p>
+Type-checkers can be extended with <b><b>custom plugins</b></b> allowing more complex type systems
+(think about dependent types, affined types&#x2026;)
+</p>
 </div>
 </div>
 <div id="outline-container-orgbb86c78" class="outline-3">
@@ -1907,7 +1923,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org3b94681">
+<pre class="example" id="org506920e">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -1939,7 +1955,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgd8fd9d1">
+<pre class="example" id="org5ba2b7f">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2028,7 +2044,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orge026476">
+<pre class="example" id="org79e2ad0">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2413,6 +2429,7 @@ Use-cases:
 <li>Optimization hints</li>
 <li>Code generation</li>
 <li>DSL</li>
+<li>Custom type systems (dependent types, etc)</li>
 <li>&#x2026;</li>
 </ul>
 
@@ -2431,13 +2448,95 @@ Use-cases:
 </span>    <span class="org-keyword">return</span> age
 </pre>
 </div>
+
+<p>
+3rd party DSL for <code>Annotated</code>: <a href="https://pypi.org/project/annotated-types/">annotated-types</a> (standardized DSL for complex refined types):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Annotated
+<span class="org-keyword">from</span> annotated_types <span class="org-keyword">import</span> Gt, Len, Predicate
+
+<span class="org-keyword">class</span> <span class="org-type">MyClass</span>:
+    age: Annotated[<span class="org-builtin">int</span>, Gt(18)]                         <span class="org-comment-delimiter"># </span><span class="org-comment">Valid: 19, 20, ...
+</span>                                                        <span class="org-comment-delimiter"># </span><span class="org-comment">Invalid: 17, 18, "19", 19.0, ...
+</span>    factors: <span class="org-builtin">list</span>[Annotated[<span class="org-builtin">int</span>, Predicate(is_prime)]]  <span class="org-comment-delimiter"># </span><span class="org-comment">Valid: 2, 3, 5, 7, 11, ...
+</span>                                                        <span class="org-comment-delimiter"># </span><span class="org-comment">Invalid: 4, 8, -2, 5.0, "prime", ...
+</span>
+    my_list: Annotated[<span class="org-builtin">list</span>[<span class="org-builtin">int</span>], Len(0, 10)]           <span class="org-comment-delimiter"># </span><span class="org-comment">Valid: [], [10, 20, 30, 40, 50]
+</span>                                                        <span class="org-comment-delimiter"># </span><span class="org-comment">Invalid: (1, 2), ["abc"], [0] * 20</span>
+</pre>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org60c583a" class="outline-2">
-<h2 id="org60c583a">Typing libraries</h2>
-<div class="outline-text-2" id="text-org60c583a">
+</div>
+<div id="outline-container-orgb95b37d" class="outline-2">
+<h2 id="orgb95b37d">Type-stub libraries</h2>
+<div class="outline-text-2" id="text-orgb95b37d">
+<ul class="org-ul">
+<li>Used for static analysis, runtime metaprogramming, and developer tooling.</li>
+<li><code>.pyi</code> modules.</li>
+<li>Used by type-checkers, not by Python.</li>
+<li>Usually MyPy and Pyright automatically pick up <code>.pyi</code> files.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-doc">'''Module shapes.pyi'''</span>
+<span class="org-keyword">from</span> typing <span class="org-keyword">import</span> Protocol
+
+<span class="org-keyword">class</span> <span class="org-type">Shape</span>(Protocol):
+    <span class="org-keyword">def</span> <span class="org-function-name">area</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>: ...
+    <span class="org-keyword">def</span> <span class="org-function-name">perimeter</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>: ...
+
+<span class="org-keyword">class</span> <span class="org-type">Circle</span>:
+    radius: <span class="org-builtin">float</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">area</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>: ...
+    <span class="org-keyword">def</span> <span class="org-function-name">perimeter</span>(<span class="org-keyword">self</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>: ...
+
+PI: <span class="org-builtin">float</span>
+</pre>
+</div>
+
+<p>
+Location:
+</p>
+
+<pre class="example" id="orgcffbc0e">
+project/
+    shapes.py
+    shapes.pyi &lt;- type stub for shapes.py
+</pre>
+
+<p>
+If sub-files are located in a separate directory - one of options is:
+</p>
+
+<pre class="example" id="orge6a964e">
+    Directories:           mypy.ini:              pyrightconfig.json:
+~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
+project/                   [mypy]                 { "stubPath": "stubs" }
+    src/                   mypy_path = stubs
+        mypkg/
+            ...
+    stubs/
+        mypkg/
+            utils.pyi
+</pre>
+
+<p>
+Types can be imported and used as usually:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> mypkg.types.geometry <span class="org-keyword">import</span> Shape
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>They can be found, for ex., as: <a href="https://pypi.org/project/typing/">https://pypi.org/project/typing/</a></li>
+<li>Example: <a href="https://pypi.org/project/argparse-typing/">https://pypi.org/project/argparse-typing/</a> (enhanced types for <code>argparse</code>)</li>
+</ul>
 </div>
 </div>
 <div id="outline-container-org94646a3" class="outline-2">
@@ -2452,6 +2551,15 @@ could be caught on the type-check phase!
 <p>
 To be 100% sure, you can/have use runtime types too.
 </p>
+
+<p>
+Libraries:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/agronholm/typeguard">typeguard</a></li>
+<li><a href="https://github.com/beartype/beartype">beartype</a></li>
+</ul>
 </div>
 </div>
 <div id="outline-container-org65ae433" class="outline-2">
