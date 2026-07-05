@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-05 Sun 17:27 -->
+<!-- 2026-07-05 Sun 18:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -433,7 +433,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orgc4a9ab7">
+<pre class="example" id="orga6d9d29">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -498,7 +498,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgc8f3182">
+<pre class="example" id="orgaa4a0cc">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1027,7 +1027,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org6d0975d">
+<pre class="example" id="org7a73f79">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1928,7 +1928,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org816676f">
+<pre class="example" id="orgc023b05">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -1960,7 +1960,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgfaffac6">
+<pre class="example" id="orgfe8e60f">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2049,7 +2049,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orga6d9d29">
+<pre class="example" id="orgb28b5b0">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2507,7 +2507,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgd9cb937">
+<pre class="example" id="orga02a67b">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2517,7 +2517,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orgd07a229">
+<pre class="example" id="orgf4a5928">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -2945,8 +2945,12 @@ Integration:
 <div id="outline-container-org3014bd6" class="outline-3">
 <h3 id="org3014bd6">Examples</h3>
 <div class="outline-text-3" id="text-org3014bd6">
+<p>
+Simple example:
+</p>
+
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-keyword">import</span> typeguard
+<pre class="src src-python"><span class="org-keyword">import</span> typeguard, traceback, sys
 
 <span class="org-type">@typeguard.typechecked</span>
 <span class="org-keyword">def</span> <span class="org-function-name">add</span>(x: <span class="org-builtin">int</span>, y: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
@@ -2955,12 +2959,49 @@ Integration:
     add(1, 5)
     add(<span class="org-string">'a'</span>, 5)
 <span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
-    <span class="org-builtin">print</span>(f<span class="org-string">'ERROR: </span>{x}<span class="org-string">'</span>)
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))    
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">python /tmp/tmp17.py
 </pre>
 </div>
 
 <pre class="example">
-ERROR: can only concatenate str (not "int") to str
+typeguard.TypeCheckError: argument "x" (str) is not an instance of int
+
+</pre>
+
+
+<p>
+Example with generics:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> typeguard, traceback, sys
+
+<span class="org-type">@typeguard.typechecked</span>
+<span class="org-keyword">def</span> <span class="org-function-name">add</span>(x:<span class="org-builtin">list</span>[<span class="org-builtin">tuple</span>[<span class="org-builtin">int</span>,<span class="org-builtin">bool</span>]], f:<span class="org-builtin">bool</span>):
+    x.append((<span class="org-builtin">len</span>(x), f))
+<span class="org-keyword">try</span>:
+    <span class="org-variable-name">x</span> <span class="org-operator">=</span> []
+    <span class="org-variable-name">y</span>:<span class="org-builtin">list</span>[<span class="org-builtin">tuple</span>[<span class="org-builtin">bool</span>,<span class="org-builtin">str</span>]] <span class="org-operator">=</span> [(<span class="org-constant">False</span>,<span class="org-string">'hi!'</span>)] <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: empty mutable containers are not checked!
+</span>    add(x, <span class="org-constant">True</span>)
+    add(y, <span class="org-constant">True</span>)                              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: y contains unexpected item type
+</span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))    
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">python /tmp/tmp18.py
+</pre>
+</div>
+
+<pre class="example">
+typeguard.TypeCheckError: item 1 of item 0 of argument "x" (list) is not an instance of bool
+
 </pre>
 </div>
 </div>

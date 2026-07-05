@@ -1562,8 +1562,12 @@ Integration:
 
 ** Examples
 
-#+begin_src python :eval yes-export :exports both :results output verbatim
-import typeguard
+Simple example:
+
+# TODO error is wrong - not from the type-checker -- maybe to tangle?:
+
+#+begin_src python :eval no :exports both :results none :tangle /tmp/tmp17.py
+import typeguard, traceback, sys
 
 @typeguard.typechecked
 def add(x: int, y: int) -> int:
@@ -1572,11 +1576,41 @@ try:
     add(1, 5)
     add('a', 5)
 except Exception as x:
-    print(f'ERROR: {x}')
+    print(*traceback.format_exception_only(x, file=sys.stdout))    
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+python /tmp/tmp17.py
 #+end_src
 
 #+RESULTS:
-: ERROR: can only concatenate str (not "int") to str
+: typeguard.TypeCheckError: argument "x" (str) is not an instance of int
+: 
+
+Example with generics:
+
+#+begin_src python :eval no :exports both :results none :tangle /tmp/tmp18.py
+import typeguard, traceback, sys
+
+@typeguard.typechecked
+def add(x:list[tuple[int,bool]], f:bool):
+    x.append((len(x), f))
+try:
+    x = []
+    y:list[tuple[bool,str]] = [(False,'hi!')] # HINT: empty mutable containers are not checked!
+    add(x, True)
+    add(y, True)                              # BUG: y contains unexpected item type
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))    
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+python /tmp/tmp18.py
+#+end_src
+
+#+RESULTS:
+: typeguard.TypeCheckError: item 1 of item 0 of argument "x" (list) is not an instance of bool
+: 
 
 # TODO
 
