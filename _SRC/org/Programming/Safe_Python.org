@@ -24,6 +24,25 @@
 - To avoid it - use simple solutions and tools. Like... Python!
 - But how to make it... safer?
 
+* Asserts
+
+Useful like in C, C++, etc:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import sys, traceback
+def area(x, y):
+    assert x and y, 'No any area!'   # HINT: or raise ValueError (exposed/API functions)
+    return x * y
+try:
+    area(2, 0)
+except Exception as x:
+    print(*traceback.format_exception_only(x, file=sys.stdout))
+#+end_src
+
+#+RESULTS:
+: AssertionError: No any area!
+: 
+
 * Doctests
 
 ** Simple doctest
@@ -1107,15 +1126,16 @@ See libraries about refined and phantom types:
 *** Typing KungFu
 
 #+begin_example
-    S I M P L E   U S A G E   O F   T Y P E S
-   (v e r y   s h o r t   c o d e    r o u t e)
+       S I M P L E   U S A G E   O F   T Y P E S
+     [v e r y   s h o r t   c o d e    r o u t e]
 
                  pass     expect
                 value    some type
                   o--------->o
 
-    A D V A N C E D   U S A G E   O F   T Y P E S
-  (l o n g   c o m p l e x   c o d e   r o u t e s)
+     A D V A N C E D   U S A G E   O F   T Y P E S
+  ⎡ l o n g   c o m p l e x   c o d e   r o u t e s ⎤
+  ⎣ o r   b i g   c o n s i s t e n c e   f o r m s ⎦
      
   state    state1            state3      never
   zero             state2      or        state5
@@ -1235,9 +1255,98 @@ pyright /tmp/tmp9.py || :
 3 errors, 0 warnings, 0 informations
 #+end_example
 
-Another example, a return type depending on a passed argument - is very common
-situation, eg (we see it already in the previous example, now - little bit more
-focused especially on it):
+Example modeling animal breeding. We have species: a lion, a tiger, a donkey, a horse,
+and some of them can have offsprings, some - cannot:
+
+| male   | female | offspring |
+|--------+--------+-----------|
+| Lion   | Tiger  | Liger     |
+| Tiger  | Lion   | Tigon     |
+| Donkey | Horse  | Mule      |
+| Horse  | Donkey | Hinny     |
+| N      | N      | N         |
+
+and animals will have nicknames. Let's model it:
+
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp10_0.py
+import typing, dataclasses
+
+class Species: ...
+class Lion(Species): ...
+class Tiger(Species): ...
+class Liger(Species): ...
+class Tigon(Species): ...
+class Donkey(Species): ...
+class Horse(Species): ...
+class Mule(Species): ...
+class Hinny(Species): ...
+
+S = typing.TypeVar('S', bound=Species) # HINT: Species is kind of S
+
+@dataclasses.dataclass
+class Animal(typing.Generic[S]):
+    nick: str
+
+# Play role of type-level functions:
+
+@typing.overload
+def offspring(male: Animal[Lion], female: Animal[Tiger], nick: str) -> Animal[Liger]: ...
+
+@typing.overload
+def offspring(male: Animal[Tiger], female: Animal[Lion], nick: str) -> Animal[Tigon]: ...
+
+@typing.overload
+def offspring(male: Animal[Donkey], female: Animal[Horse], nick: str) -> Animal[Mule]: ...
+
+@typing.overload
+def offspring(male: Animal[Horse], female: Animal[Donkey], nick: str) -> Animal[Hinny]: ...
+
+@typing.overload
+def offspring(male: Animal[S], female: Animal[S], nick: str) -> Animal[S]: ...
+
+def offspring(male: Animal, female: Animal, nick: str) -> Animal:
+    return Animal(nick)
+
+a1 = Animal[Tiger]('Shere Khan')
+a2 = Animal[int]('Inty')                # BUG: Species cannot be int, only Lion, Tiger, ...
+o1 = offspring(Animal[Donkey]('Snag'),
+               Animal[Horse]('Jinnah'),
+               'Bud')
+typing.reveal_type(o1)                  # Mule!
+o2 = offspring(Animal[Horse]('Night'),
+               Animal[Donkey]('Lisa'),
+               'Cat')
+typing.reveal_type(o2)                  # Hinny!
+o3 = offspring(Animal[Horse]('Night'),
+               Animal[Horse]('Donna'),
+               'Cadger')
+typing.reveal_type(o3)                  # Horse!
+o4 = offspring(Animal[Horse]('Night'),  # BUG: Horse and Tiger have not offsprings
+               Animal[Tiger]('Leonna'),
+               'Cadger')
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+pyright /tmp/tmp10_0.py || :
+#+end_src
+
+#+RESULTS:
+#+begin_example
+/tmp/tmp10_0.py
+  /tmp/tmp10_0.py:40:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
+    Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
+      "int" is not assignable to "Species" (reportInvalidTypeArguments)
+  /tmp/tmp10_0.py:44:20 - information: Type of "o1" is "Animal[Mule]"
+  /tmp/tmp10_0.py:48:20 - information: Type of "o2" is "Animal[Hinny]"
+  /tmp/tmp10_0.py:52:20 - information: Type of "o3" is "Animal[Horse]"
+  /tmp/tmp10_0.py:53:6 - error: No overloads for "offspring" match the provided arguments (reportCallIssue)
+  /tmp/tmp10_0.py:54:16 - error: Argument of type "Animal[Tiger]" cannot be assigned to parameter "female" of type "Animal[S@offspring]" in function "offspring"
+    "Animal[Tiger]" is not assignable to "Animal[Horse]"
+      Type parameter "S@Animal" is invariant, but "Tiger" is not the same as "Horse" (reportArgumentType)
+3 errors, 0 warnings, 3 informations
+#+end_example
+
+Another similar example:
 
 #+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp10.py
 import typing
@@ -1856,20 +1965,20 @@ text chaos.
 
 #+begin_example
              TRADITIONAL LLM CODE:
-                                            +----------+
- Extract name      +-----+                  | parse to |
- and age from -->  | LLM | --> raw text --> | extract  | --> ('John', 21)
-  this text        +-----+                  |  data    |
-                                            +----------+
+                                           +----------+
+ Extract name     +-----+                  | parse to |
+ and age from --> | LLM | --> raw text --> | extract  | --> ('John', 21)
+  this text       +-----+                  |  data    |
+                                           +----------+
 
                  PYDANTIC AI:
 
 class Person(BaseModel):
-    name: str            ------+               
-    age: int                   |    +-----+
-                               +--> | LLM | --> Person(name='John', age=21)
-                               |    +-----+ 
-Give me Person           ------+
+    name: str            ----.
+    age: int                  \     +-----+
+                               >--> | LLM | --> Person(name='John', age=21)
+                              /     +-----+ 
+Give me Person           ----'  
 from this text
 #+end_example
 
@@ -1915,9 +2024,9 @@ integrated to LSP, to find difference between behavior of 2 version, etc:
 - automatically generates inputs for your functions
 - uses symbolic execution + SMT solving (not runs as ~pytest~ do it)
 - searches for:
-- crashes
-- assertion violations
-- unexpected edge cases
+  - crashes
+  - assertion violations
+  - unexpected edge cases
 - can sometimes prove properties always hold
 
 Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F*, etc.
@@ -1928,7 +2037,7 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 def div1(a: int, b: int) -> int:
     '''
     post: True
-    '''
+    '''                            # HINT: "post: True" - will be checked!
     return a // b                  # BUG: can lead to zero division (non-totality/partial function)!
 
 def div2(a: int, b: int) -> int:
@@ -1952,6 +2061,36 @@ crosshair check /tmp/tmp20.py 2>&1 || :
 #+RESULTS:
 : /tmp/tmp20.py:5: error: ZeroDivisionError:  when calling div1(0, 0)
 : /tmp/tmp20.py:18: error: PreconditionFailed: Precondition "b != 0" was not satisfied before calling "div2" when calling div3(0, 0)
+
+Very similar to previous:
+
+#+begin_src python -n :eval no :exports both :results none :tangle /tmp/tmp21.py
+def average(xs: list[int]) -> float:
+    '''post: True'''
+    # BUG: Crosshair finds when ZeroDivisionError will bee thrown - xs==[]:
+    return sum(xs) / len(xs)
+def index(xs: list[int], i: int) -> int:
+    '''post: True'''
+    # BUG: Crosshai finds that xs==[0], i==1 will step over assert and throw IndexError
+    assert 0 <= i <= len(xs)
+    return xs[i]
+def is_power_of_two(n: int) -> bool:
+    '''post: __return__ if n > 0 else False'''
+    # BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
+    return (n & (n - 1)) == 0
+#+end_src
+
+Crosshair finds errors **faster** then property tests - it's symbolic "execution"
+(with stubs) using Satisfiability Modulo Theories (SMT) solver (~Z3~ in the case).
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+crosshair check --analysis_kind=asserts,PEP316,icontract,deal /tmp/tmp21.py 2>&1 || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
+: /tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
+: /tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
 
 * Dafny, coq, ... generating of Python code
 

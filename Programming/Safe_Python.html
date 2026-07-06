@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 16:47 -->
+<!-- 2026-07-06 Mon 21:07 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -313,6 +313,7 @@ function toggleTheme() {
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#orgd55fcd3">Intro</a></li>
+<li><a href="#orgb005d17">Asserts</a></li>
 <li><a href="#org370f51d">Doctests</a>
 <ul>
 <li><a href="#org87cc612">Simple doctest</a></li>
@@ -404,6 +405,31 @@ OS, and your compiler work.</li>
 </ul>
 </div>
 </div>
+<div id="outline-container-orgb005d17" class="outline-2">
+<h2 id="orgb005d17">Asserts</h2>
+<div class="outline-text-2" id="text-orgb005d17">
+<p>
+Useful like in C, C++, etc:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> sys, traceback
+<span class="org-keyword">def</span> <span class="org-function-name">area</span>(x, y):
+    <span class="org-keyword">assert</span> x <span class="org-keyword">and</span> y, <span class="org-string">'No any area!'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: or raise ValueError (exposed/API functions)
+</span>    <span class="org-keyword">return</span> x <span class="org-operator">*</span> y
+<span class="org-keyword">try</span>:
+    area(2, 0)
+<span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
+    <span class="org-builtin">print</span>(<span class="org-operator">*</span>traceback.format_exception_only(x, <span class="org-builtin">file</span><span class="org-operator">=</span>sys.stdout))
+</pre>
+</div>
+
+<pre class="example">
+AssertionError: No any area!
+
+</pre>
+</div>
+</div>
 <div id="outline-container-org370f51d" class="outline-2">
 <h2 id="org370f51d">Doctests</h2>
 <div class="outline-text-2" id="text-org370f51d">
@@ -440,7 +466,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org1c40504">
+<pre class="example" id="org01617f1">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -505,7 +531,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org25a92b2">
+<pre class="example" id="orgcafa70d">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -979,7 +1005,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgc7c42b1">
+<pre class="example" id="org363e9b2">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1189,7 +1215,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org58d0d77">
+<pre class="example" id="orgd562d36">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2122,16 +2148,17 @@ See libraries about refined and phantom types:
 <div id="outline-container-orgcd24df5" class="outline-4">
 <h4 id="orgcd24df5">Typing KungFu</h4>
 <div class="outline-text-4" id="text-orgcd24df5">
-<pre class="example" id="org1e21ab4">
-    S I M P L E   U S A G E   O F   T Y P E S
-   (v e r y   s h o r t   c o d e    r o u t e)
+<pre class="example" id="orgd25bc80">
+       S I M P L E   U S A G E   O F   T Y P E S
+     [v e r y   s h o r t   c o d e    r o u t e]
 
                  pass     expect
                 value    some type
                   o---------&gt;o
 
-    A D V A N C E D   U S A G E   O F   T Y P E S
-  (l o n g   c o m p l e x   c o d e   r o u t e s)
+     A D V A N C E D   U S A G E   O F   T Y P E S
+  ⎡ l o n g   c o m p l e x   c o d e   r o u t e s ⎤
+  ⎣ o r   b i g   c o n s i s t e n c e   f o r m s ⎦
      
   state    state1            state3      never
   zero             state2      or        state5
@@ -2154,7 +2181,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgcf624ab">
+<pre class="example" id="org417e2cf">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2243,7 +2270,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org9cc93d7">
+<pre class="example" id="org1cbcdb2">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2261,9 +2288,145 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 
 <p>
-Another example, a return type depending on a passed argument - is very common
-situation, eg (we see it already in the previous example, now - little bit more
-focused especially on it):
+Example modeling animal breeding. We have species: a lion, a tiger, a donkey, a horse,
+and some of them can have offsprings, some - cannot:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">male</th>
+<th scope="col" class="org-left">female</th>
+<th scope="col" class="org-left">offspring</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Lion</td>
+<td class="org-left">Tiger</td>
+<td class="org-left">Liger</td>
+</tr>
+
+<tr>
+<td class="org-left">Tiger</td>
+<td class="org-left">Lion</td>
+<td class="org-left">Tigon</td>
+</tr>
+
+<tr>
+<td class="org-left">Donkey</td>
+<td class="org-left">Horse</td>
+<td class="org-left">Mule</td>
+</tr>
+
+<tr>
+<td class="org-left">Horse</td>
+<td class="org-left">Donkey</td>
+<td class="org-left">Hinny</td>
+</tr>
+
+<tr>
+<td class="org-left">N</td>
+<td class="org-left">N</td>
+<td class="org-left">N</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+and animals will have nicknames. Let's model it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">import</span> typing, dataclasses
+<span class="linenr"> 2: </span>
+<span class="linenr"> 3: </span><span class="org-keyword">class</span> <span class="org-type">Species</span>: ...
+<span class="linenr"> 4: </span><span class="org-keyword">class</span> <span class="org-type">Lion</span>(Species): ...
+<span class="linenr"> 5: </span><span class="org-keyword">class</span> <span class="org-type">Tiger</span>(Species): ...
+<span class="linenr"> 6: </span><span class="org-keyword">class</span> <span class="org-type">Liger</span>(Species): ...
+<span class="linenr"> 7: </span><span class="org-keyword">class</span> <span class="org-type">Tigon</span>(Species): ...
+<span class="linenr"> 8: </span><span class="org-keyword">class</span> <span class="org-type">Donkey</span>(Species): ...
+<span class="linenr"> 9: </span><span class="org-keyword">class</span> <span class="org-type">Horse</span>(Species): ...
+<span class="linenr">10: </span><span class="org-keyword">class</span> <span class="org-type">Mule</span>(Species): ...
+<span class="linenr">11: </span><span class="org-keyword">class</span> <span class="org-type">Hinny</span>(Species): ...
+<span class="linenr">12: </span>
+<span class="linenr">13: </span><span class="org-variable-name">S</span> <span class="org-operator">=</span> typing.TypeVar(<span class="org-string">'S'</span>, bound<span class="org-operator">=</span>Species) <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: Species is kind of S
+<span class="linenr">14: </span></span>
+<span class="linenr">15: </span><span class="org-type">@dataclasses.dataclass</span>
+<span class="linenr">16: </span><span class="org-keyword">class</span> <span class="org-type">Animal</span>(typing.Generic[S]):
+<span class="linenr">17: </span>    nick: <span class="org-builtin">str</span>
+<span class="linenr">18: </span>
+<span class="linenr">19: </span><span class="org-comment-delimiter"># </span><span class="org-comment">Play role of type-level functions:
+<span class="linenr">20: </span></span>
+<span class="linenr">21: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">22: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal[Lion], female: Animal[Tiger], nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal[Liger]: ...
+<span class="linenr">23: </span>
+<span class="linenr">24: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">25: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal[Tiger], female: Animal[Lion], nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal[Tigon]: ...
+<span class="linenr">26: </span>
+<span class="linenr">27: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">28: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal[Donkey], female: Animal[Horse], nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal[Mule]: ...
+<span class="linenr">29: </span>
+<span class="linenr">30: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">31: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal[Horse], female: Animal[Donkey], nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal[Hinny]: ...
+<span class="linenr">32: </span>
+<span class="linenr">33: </span><span class="org-type">@typing.overload</span>
+<span class="linenr">34: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal[S], female: Animal[S], nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal[S]: ...
+<span class="linenr">35: </span>
+<span class="linenr">36: </span><span class="org-keyword">def</span> <span class="org-function-name">offspring</span>(male: Animal, female: Animal, nick: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> Animal:
+<span class="linenr">37: </span>    <span class="org-keyword">return</span> Animal(nick)
+<span class="linenr">38: </span>
+<span class="linenr">39: </span><span class="org-variable-name">a1</span> <span class="org-operator">=</span> Animal[Tiger](<span class="org-string">'Shere Khan'</span>)
+<span class="linenr">40: </span><span class="org-variable-name">a2</span> <span class="org-operator">=</span> Animal[<span class="org-builtin">int</span>](<span class="org-string">'Inty'</span>)                <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Species cannot be int, only Lion, Tiger, ...
+<span class="linenr">41: </span></span><span class="org-variable-name">o1</span> <span class="org-operator">=</span> offspring(Animal[Donkey](<span class="org-string">'Snag'</span>),
+<span class="linenr">42: </span>               Animal[Horse](<span class="org-string">'Jinnah'</span>),
+<span class="linenr">43: </span>               <span class="org-string">'Bud'</span>)
+<span class="linenr">44: </span>typing.reveal_type(o1)                  <span class="org-comment-delimiter"># </span><span class="org-comment">Mule!
+<span class="linenr">45: </span></span><span class="org-variable-name">o2</span> <span class="org-operator">=</span> offspring(Animal[Horse](<span class="org-string">'Night'</span>),
+<span class="linenr">46: </span>               Animal[Donkey](<span class="org-string">'Lisa'</span>),
+<span class="linenr">47: </span>               <span class="org-string">'Cat'</span>)
+<span class="linenr">48: </span>typing.reveal_type(o2)                  <span class="org-comment-delimiter"># </span><span class="org-comment">Hinny!
+<span class="linenr">49: </span></span><span class="org-variable-name">o3</span> <span class="org-operator">=</span> offspring(Animal[Horse](<span class="org-string">'Night'</span>),
+<span class="linenr">50: </span>               Animal[Horse](<span class="org-string">'Donna'</span>),
+<span class="linenr">51: </span>               <span class="org-string">'Cadger'</span>)
+<span class="linenr">52: </span>typing.reveal_type(o3)                  <span class="org-comment-delimiter"># </span><span class="org-comment">Horse!
+<span class="linenr">53: </span></span><span class="org-variable-name">o4</span> <span class="org-operator">=</span> offspring(Animal[Horse](<span class="org-string">'Night'</span>),  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Horse and Tiger have not offsprings
+<span class="linenr">54: </span></span>               Animal[Tiger](<span class="org-string">'Leonna'</span>),
+<span class="linenr">55: </span>               <span class="org-string">'Cadger'</span>)
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">pyright /tmp/tmp10_0.py || :
+</pre>
+</div>
+
+<pre class="example" id="org40fdcb7">
+/tmp/tmp10_0.py
+  /tmp/tmp10_0.py:40:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
+    Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
+      "int" is not assignable to "Species" (reportInvalidTypeArguments)
+  /tmp/tmp10_0.py:44:20 - information: Type of "o1" is "Animal[Mule]"
+  /tmp/tmp10_0.py:48:20 - information: Type of "o2" is "Animal[Hinny]"
+  /tmp/tmp10_0.py:52:20 - information: Type of "o3" is "Animal[Horse]"
+  /tmp/tmp10_0.py:53:6 - error: No overloads for "offspring" match the provided arguments (reportCallIssue)
+  /tmp/tmp10_0.py:54:16 - error: Argument of type "Animal[Tiger]" cannot be assigned to parameter "female" of type "Animal[S@offspring]" in function "offspring"
+    "Animal[Tiger]" is not assignable to "Animal[Horse]"
+      Type parameter "S@Animal" is invariant, but "Tiger" is not the same as "Horse" (reportArgumentType)
+3 errors, 0 warnings, 3 informations
+</pre>
+
+<p>
+Another similar example:
 </p>
 
 <div class="org-src-container">
@@ -2701,7 +2864,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgc45df04">
+<pre class="example" id="org419b35a">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2711,7 +2874,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orga8f4ed9">
+<pre class="example" id="org41c5479">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3337,22 +3500,22 @@ text chaos.
 <li>Reliable API wrappers around LLMs</li>
 </ul>
 
-<pre class="example" id="org72aff03">
+<pre class="example" id="orgfa82940">
              TRADITIONAL LLM CODE:
-                                            +----------+
- Extract name      +-----+                  | parse to |
- and age from --&gt;  | LLM | --&gt; raw text --&gt; | extract  | --&gt; ('John', 21)
-  this text        +-----+                  |  data    |
-                                            +----------+
+                                           +----------+
+ Extract name     +-----+                  | parse to |
+ and age from --&gt; | LLM | --&gt; raw text --&gt; | extract  | --&gt; ('John', 21)
+  this text       +-----+                  |  data    |
+                                           +----------+
 
                  PYDANTIC AI:
 
 class Person(BaseModel):
-    name: str            ------+               
-    age: int                   |    +-----+
-                               +--&gt; | LLM | --&gt; Person(name='John', age=21)
-                               |    +-----+ 
-Give me Person           ------+
+    name: str            ----.
+    age: int                  \     +-----+
+                               &gt;--&gt; | LLM | --&gt; Person(name='John', age=21)
+                              /     +-----+ 
+Give me Person           ----'  
 from this text
 </pre>
 
@@ -3410,10 +3573,12 @@ integrated to LSP, to find difference between behavior of 2 version, etc:
 <ul class="org-ul">
 <li>automatically generates inputs for your functions</li>
 <li>uses symbolic execution + SMT solving (not runs as <code>pytest</code> do it)</li>
-<li>searches for:</li>
+<li>searches for:
+<ul class="org-ul">
 <li>crashes</li>
 <li>assertion violations</li>
 <li>unexpected edge cases</li>
+</ul></li>
 <li>can sometimes prove properties always hold</li>
 </ul>
 
@@ -3429,8 +3594,8 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 <pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">def</span> <span class="org-function-name">div1</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
 <span class="linenr"> 2: </span>    <span class="org-doc">'''
 <span class="linenr"> 3: </span>    post: True
-<span class="linenr"> 4: </span>    '''</span>
-<span class="linenr"> 5: </span>    <span class="org-keyword">return</span> a <span class="org-operator">//</span> b                  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: can lead to zero division (non-totality/partial function)!
+<span class="linenr"> 4: </span>    '''</span>                            <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: "post: True" - will be checked!
+<span class="linenr"> 5: </span></span>    <span class="org-keyword">return</span> a <span class="org-operator">//</span> b                  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: can lead to zero division (non-totality/partial function)!
 <span class="linenr"> 6: </span></span>
 <span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">div2</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
 <span class="linenr"> 8: </span>    <span class="org-doc">'''
@@ -3455,6 +3620,44 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 <pre class="example">
 /tmp/tmp20.py:5: error: ZeroDivisionError:  when calling div1(0, 0)
 /tmp/tmp20.py:18: error: PreconditionFailed: Precondition "b != 0" was not satisfied before calling "div2" when calling div3(0, 0)
+</pre>
+
+
+<p>
+Very similar to previous:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">def</span> <span class="org-function-name">average</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>:
+<span class="linenr"> 2: </span>    <span class="org-doc">'''post: True'''</span>
+<span class="linenr"> 3: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshair finds when ZeroDivisionError will bee thrown - xs==[]:
+<span class="linenr"> 4: </span></span>    <span class="org-keyword">return</span> <span class="org-builtin">sum</span>(xs) <span class="org-operator">/</span> <span class="org-builtin">len</span>(xs)
+<span class="linenr"> 5: </span><span class="org-keyword">def</span> <span class="org-function-name">index</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], i: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr"> 6: </span>    <span class="org-doc">'''post: True'''</span>
+<span class="linenr"> 7: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshai finds that xs==[0], i==1 will step over assert and throw IndexError
+<span class="linenr"> 8: </span></span>    <span class="org-keyword">assert</span> 0 <span class="org-operator">&lt;=</span> i <span class="org-operator">&lt;=</span> <span class="org-builtin">len</span>(xs)
+<span class="linenr"> 9: </span>    <span class="org-keyword">return</span> xs[i]
+<span class="linenr">10: </span><span class="org-keyword">def</span> <span class="org-function-name">is_power_of_two</span>(n: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>:
+<span class="linenr">11: </span>    <span class="org-doc">'''post: __return__ if n &gt; 0 else False'''</span>
+<span class="linenr">12: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
+<span class="linenr">13: </span></span>    <span class="org-keyword">return</span> (n <span class="org-operator">&amp;</span> (n <span class="org-operator">-</span> 1)) <span class="org-operator">==</span> 0
+</pre>
+</div>
+
+<p>
+Crosshair finds errors <b><b>faster</b></b> then property tests - it's symbolic "execution"
+(with stubs) using Satisfiability Modulo Theories (SMT) solver (<code>Z3</code> in the case).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">crosshair check --analysis_kind=asserts,PEP316,icontract,deal /tmp/tmp21.py 2&gt;&amp;1 || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
+/tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
+/tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
 </pre>
 </div>
 </div>
