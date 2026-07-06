@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 10:20 -->
+<!-- 2026-07-06 Mon 10:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -383,6 +383,7 @@ function toggleTheme() {
 <li><a href="#orgf823b02">AI and types</a>
 <ul>
 <li><a href="#org0dc4add">Personal experience</a></li>
+<li><a href="#org9a2b4ff">Pydantic AI</a></li>
 </ul>
 </li>
 <li><a href="#org33ce2d3">CrossHair, SMT</a></li>
@@ -439,7 +440,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org327b146">
+<pre class="example" id="org951b217">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -504,7 +505,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgd560562">
+<pre class="example" id="orgb606c08">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -978,7 +979,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgd7cfb71">
+<pre class="example" id="orgb252947">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1188,7 +1189,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org08815c1">
+<pre class="example" id="org74ce051">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2121,7 +2122,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org8d71309">
+<pre class="example" id="org4206e14">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -2153,7 +2154,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org9c4995f">
+<pre class="example" id="orgb73a49e">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2242,7 +2243,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orgfa84f93">
+<pre class="example" id="orgf09ad35">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2700,7 +2701,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="org20e7d8b">
+<pre class="example" id="org3ea5d80">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2710,7 +2711,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org9784093">
+<pre class="example" id="orge4f3867">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3313,6 +3314,87 @@ also to fix them and to run type-checkers in a shell and to fix type problems.
 check errors if there are any - AI found that the just written code contains errors -
 the type-checking helped AI - and it fixed problems!
 </p>
+</div>
+</div>
+<div id="outline-container-org9a2b4ff" class="outline-3">
+<h3 id="org9a2b4ff">Pydantic AI</h3>
+<div class="outline-text-3" id="text-org9a2b4ff">
+<p>
+It is where stronger typing meets AI!
+</p>
+
+<p>
+Pydantic AI is a framework for building “AI assistants/agents” where inputs and
+outputs are strongly typed, validated, and predictable instead of being free-form
+text chaos.
+</p>
+
+<ul class="org-ul">
+<li>AI agents (chatbots with tools + memory)</li>
+<li>LLM workflows (multi-step reasoning systems)</li>
+<li>Structured data extraction from text</li>
+<li>Tool-using AI systems (function calling)</li>
+<li>Reliable API wrappers around LLMs</li>
+</ul>
+
+<pre class="example" id="org70b5dda">
+             TRADITIONAL LLM CODE:
+                                            +----------+
+ Extract name      +-----+                  | parse to |
+ and age from --&gt;  | LLM | --&gt; raw text --&gt; | extract  | --&gt; ('John', 21)
+  this text        +-----+                  |  data    |
+                                            +----------+
+
+                 PYDANTIC AI:
+
+class Person(BaseModel):
+    name: str            ------+               
+    age: int                   |    +-----+
+                               +--&gt; | LLM | --&gt; Person(name='John', age=21)
+                               |    +-----+ 
+Give me Person           ------+
+from this text
+</pre>
+
+<ul class="org-ul">
+<li>✔ validated</li>
+<li>✔ typed (input, output, intermediate steps)</li>
+<li>✔ structured (DIE support, static hints)</li>
+<li>✔ safe</li>
+<li>✔ agents, instead of prompts</li>
+<li>✘ not mature yet</li>
+</ul>
+
+<p>
+Usage:
+</p>
+
+<ul class="org-ul">
+<li>AI chatbots with memory</li>
+<li>Data extraction pipelines</li>
+<li>Tool-using agents</li>
+<li>Backend AI services</li>
+<li>Enterprise AI workflows</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> pydantic <span class="org-keyword">import</span> BaseModel
+<span class="org-keyword">from</span> pydantic_ai <span class="org-keyword">import</span> Agent
+
+<span class="org-keyword">class</span> <span class="org-type">Weather</span>(BaseModel):
+    city: <span class="org-builtin">str</span>
+    temperature: <span class="org-builtin">int</span>
+
+<span class="org-variable-name">agent</span> <span class="org-operator">=</span> Agent(<span class="org-string">"openai:gpt-4o"</span>)
+
+<span class="org-variable-name">result</span> <span class="org-operator">=</span> agent.run(
+    <span class="org-string">"What's the weather in Paris?"</span>,
+    result_type<span class="org-operator">=</span>Weather
+)
+
+<span class="org-builtin">print</span>(result.data)   <span class="org-comment-delimiter"># </span><span class="org-comment">OUT: Weather(city='Paris', temperature=22)</span>
+</pre>
+</div>
 </div>
 </div>
 </div>

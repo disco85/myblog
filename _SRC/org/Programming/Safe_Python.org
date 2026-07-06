@@ -1840,8 +1840,71 @@ also to fix them and to run type-checkers in a shell and to fix type problems.
 check errors if there are any - AI found that the just written code contains errors -
 the type-checking helped AI - and it fixed problems!
 
+** Pydantic AI
 
-# TODO - Pydantic AI
+It is where stronger typing meets AI!
+
+Pydantic AI is a framework for building “AI assistants/agents” where inputs and
+outputs are strongly typed, validated, and predictable instead of being free-form
+text chaos.
+
+- AI agents (chatbots with tools + memory)
+- LLM workflows (multi-step reasoning systems)
+- Structured data extraction from text
+- Tool-using AI systems (function calling)
+- Reliable API wrappers around LLMs
+
+#+begin_example
+             TRADITIONAL LLM CODE:
+                                            +----------+
+ Extract name      +-----+                  | parse to |
+ and age from -->  | LLM | --> raw text --> | extract  | --> ('John', 21)
+  this text        +-----+                  |  data    |
+                                            +----------+
+
+                 PYDANTIC AI:
+
+class Person(BaseModel):
+    name: str            ------+               
+    age: int                   |    +-----+
+                               +--> | LLM | --> Person(name='John', age=21)
+                               |    +-----+ 
+Give me Person           ------+
+from this text
+#+end_example
+
+- ✔ validated
+- ✔ typed (input, output, intermediate steps)
+- ✔ structured (DIE support, static hints)
+- ✔ safe
+- ✔ agents, instead of prompts
+- ✘ not mature yet
+
+Usage:
+
+- AI chatbots with memory
+- Data extraction pipelines
+- Tool-using agents
+- Backend AI services
+- Enterprise AI workflows
+
+#+begin_src python :eval no :exports both :results none
+from pydantic import BaseModel
+from pydantic_ai import Agent
+
+class Weather(BaseModel):
+    city: str
+    temperature: int
+
+agent = Agent("openai:gpt-4o")
+
+result = agent.run(
+    "What's the weather in Paris?",
+    result_type=Weather
+)
+
+print(result.data)   # OUT: Weather(city='Paris', temperature=22)
+#+end_src
 
 * CrossHair, SMT
 
