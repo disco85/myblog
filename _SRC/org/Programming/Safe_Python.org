@@ -198,11 +198,11 @@ Hypothesis effectively manipulates a stream of bytes and interprets it as struct
 Conceptually:
 
 #+begin_verse
-bytes
-  ↓
-strategy
-  ↓
-object
+   bytes
+     ↓
+  strategy
+     ↓
+   object
 #+end_verse
 
 This allows:
@@ -946,6 +946,22 @@ mypy /tmp/tmp4.py || :
 : /tmp/tmp4.py:9: error: Incompatible types in assignment (expression has type "str", target has type "float")  [assignment]
 : /tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
 : Found 2 errors in 1 file (checked 1 source file)
+
+Final values:
+
+#+begin_src python -n :eval yes-export :exports both :results none :tangle /tmp/tmp4_0.py
+import typing
+pi:typing.Final = 3.14
+pi = 3                  # BUG: cannot re-assign final value
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+mypy /tmp/tmp4_0.py || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp4_0.py:3: error: Cannot assign to final name "pi"  [misc]
+: Found 1 error in 1 file (checked 1 source file)
 
 *** Advanced types usage
 

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 10:04 -->
+<!-- 2026-07-06 Mon 10:14 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -439,7 +439,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org49cce91">
+<pre class="example" id="orga5cd0a0">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -504,7 +504,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org12733f2">
+<pre class="example" id="orgf053ad9">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -625,11 +625,11 @@ Conceptually:
 </p>
 
 <p class="verse">
-bytes<br />
-&#xa0;&#xa0;↓<br />
+&#xa0;bytes<br />
+&#xa0;&#xa0;&#xa0;↓<br />
 strategy<br />
-&#xa0;&#xa0;↓<br />
-object<br />
+&#xa0;&#xa0;&#xa0;↓<br />
+&#xa0;object<br />
 </p>
 
 <p>
@@ -978,7 +978,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="org1d8c0a5">
+<pre class="example" id="org73d9e42">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1188,7 +1188,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgf7c822e">
+<pre class="example" id="orgd5c6afd">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1912,6 +1912,28 @@ More precise standard containers:
 /tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
 Found 2 errors in 1 file (checked 1 source file)
 </pre>
+
+
+<p>
+Final values:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr">1: </span><span class="org-keyword">import</span> typing
+<span class="linenr">2: </span><span class="org-variable-name">pi</span>:<span class="org-type">typing</span>.<span class="org-type">Final</span> <span class="org-operator">=</span> 3.14
+<span class="linenr">3: </span><span class="org-variable-name">pi</span> <span class="org-operator">=</span> 3                  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: cannot re-assign final value</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">mypy /tmp/tmp4_0.py || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp4_0.py:3: error: Cannot assign to final name "pi"  [misc]
+Found 1 error in 1 file (checked 1 source file)
+</pre>
 </div>
 </div>
 <div id="outline-container-org8da15a4" class="outline-4">
@@ -2099,7 +2121,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org9ad9e3a">
+<pre class="example" id="org759e626">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -2131,7 +2153,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgc281926">
+<pre class="example" id="org569bc38">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2220,7 +2242,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="orga5cd0a0">
+<pre class="example" id="org327b146">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2678,7 +2700,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgb382dc2">
+<pre class="example" id="org65d5f07">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2688,7 +2710,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org4e5af39">
+<pre class="example" id="orga2d58ad">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
