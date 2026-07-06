@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 09:31 -->
+<!-- 2026-07-06 Mon 10:04 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -439,7 +439,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org235d6cb">
+<pre class="example" id="org49cce91">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -504,7 +504,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org9d2487e">
+<pre class="example" id="org12733f2">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -887,16 +887,43 @@ identity element, code equivalency, duality (roundtrip), etc.
 <h2 id="org6169165">Enums</h2>
 <div class="outline-text-2" id="text-org6169165">
 <p>
-Enums restrict values to explicitly known set of predefined values. Like:
+Enums <b><b>restrict values to closed set of predefined values</b></b>.
+</p>
+
+<p>
+But a set is too wide term: we can treat them as a bit-fields/flags containers,
+strings containers, integers containers&#x2026;
+</p>
+
+<p>
+They exist: <code>IntEnum</code>, <code>StrEnum</code>, <code>IntFlag</code>, <code>FlagBoundary</code>, <code>EnumDict</code>, etc&#x2026;
+</p>
+
+<p>
+Alternative "old-school" approaches:
+</p>
+
+<ul class="org-ul">
+<li>No grouping (just loose variables)</li>
+<li>No type safety</li>
+<li>Hard to discover valid values</li>
+<li>Easy to mix unrelated constants</li>
+<li>Boilerplate code</li>
+</ul>
+
+<p>
+Example:
 </p>
 
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">import</span> enum
-<span class="org-keyword">class</span> <span class="org-type">Format</span>(enum.Enum):  <span class="org-comment-delimiter"># </span><span class="org-comment">simplest enum
-</span>    <span class="org-variable-name">XML</span> <span class="org-operator">=</span> 1               <span class="org-comment-delimiter"># </span><span class="org-comment">or use enum.auto() to avoid clashing
+
+<span class="org-keyword">class</span> <span class="org-type">Format</span>(enum.Enum):       <span class="org-comment-delimiter"># </span><span class="org-comment">simplest enum
+</span>    <span class="org-variable-name">XML</span> <span class="org-operator">=</span> 1                    <span class="org-comment-delimiter"># </span><span class="org-comment">or use enum.auto() to avoid clashing
 </span>    <span class="org-variable-name">JSON</span> <span class="org-operator">=</span> 2
     <span class="org-variable-name">TOML</span> <span class="org-operator">=</span> 3
 <span class="org-variable-name">f</span> <span class="org-operator">=</span> Format.JSON
+
 <span class="org-keyword">class</span> <span class="org-type">Distro</span>(enum.StrEnum):    <span class="org-comment-delimiter"># </span><span class="org-comment">Distro also is str
 </span>    <span class="org-variable-name">DEBIAN</span> <span class="org-operator">=</span> <span class="org-string">'debian'</span>
     <span class="org-variable-name">MX</span> <span class="org-operator">=</span> <span class="org-string">'mx'</span>
@@ -904,20 +931,25 @@ Enums restrict values to explicitly known set of predefined values. Like:
     <span class="org-variable-name">UNKNOWN</span> <span class="org-operator">=</span> enum.auto()
 <span class="org-builtin">print</span>(<span class="org-string">'Is Distro.DEBIAN a str?'</span>, <span class="org-builtin">isinstance</span>(Distro.DEBIAN, <span class="org-builtin">str</span>))
 <span class="org-builtin">print</span>(Distro.MX.capitalize() <span class="org-operator">+</span> <span class="org-string">' linux!'</span>)
-<span class="org-comment-delimiter"># </span><span class="org-todo-keyword">TODO</span><span class="org-comment">
-</span><span class="org-keyword">class</span> <span class="org-type">Country</span>(enum.Flag):
-    <span class="org-variable-name">Indonesia</span> <span class="org-operator">=</span> auto()
-    <span class="org-variable-name">Italy</span> <span class="org-operator">=</span> auto()
-    <span class="org-variable-name">Morocco</span> <span class="org-operator">=</span> auto()
-<span class="org-variable-name">arab_league</span> <span class="org-operator">=</span> Country.Morocco <span class="org-operator">|</span>
-<span class="org-variable-name">african_union</span> <span class="org-operator">=</span> Country.Morocco <span class="org-operator">|</span>
-<span class="org-variable-name">union_for_the_mediterranean</span> <span class="org-operator">=</span> Country.Morocco <span class="org-operator">|</span> Country.Italy
+
+<span class="org-keyword">class</span> <span class="org-type">Lang</span>(enum.IntFlag):      <span class="org-comment-delimiter"># </span><span class="org-comment">set of flags
+</span>    <span class="org-variable-name">PYTHON</span> <span class="org-operator">=</span> enum.auto()
+    <span class="org-variable-name">JAVA</span> <span class="org-operator">=</span> enum.auto()
+    <span class="org-variable-name">GO</span> <span class="org-operator">=</span> enum.auto()    
+
+<span class="org-variable-name">object_oriented</span> <span class="org-operator">=</span> Lang.PYTHON  <span class="org-operator">|</span> Lang.JAVA
+<span class="org-variable-name">procedural</span> <span class="org-operator">=</span> Lang.PYTHON <span class="org-operator">|</span> Lang.GO
+<span class="org-builtin">print</span>(<span class="org-string">'Is Python object oriented?'</span>, Lang.PYTHON <span class="org-keyword">in</span> object_oriented)
+<span class="org-builtin">print</span>(<span class="org-string">'Is Go object oriented?'</span>, Lang.GO <span class="org-keyword">in</span> object_oriented)
 </pre>
 </div>
 
-<p>
-There are enums: IntEnum, StrEnum, IntFlag, FlagBoundary, EnumDict, etc&#x2026;
-</p>
+<pre class="example">
+Is Distro.DEBIAN a str? True
+Mx linux!
+Is Python object oriented? True
+Is Go object oriented? False
+</pre>
 </div>
 </div>
 <div id="outline-container-org8ad2f7b" class="outline-2">
@@ -925,7 +957,7 @@ There are enums: IntEnum, StrEnum, IntFlag, FlagBoundary, EnumDict, etc&#x2026;
 <div class="outline-text-2" id="text-org8ad2f7b">
 <p>
 They are close to the concept of Java, C# records, Scala case classes, Kotlin data
-classes. This about them as about <b><b>records</b></b>.
+classes. Think about them as about <b><b>records</b></b>.
 </p>
 
 <p>
@@ -946,7 +978,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgd47147d">
+<pre class="example" id="org1d8c0a5">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1025,7 +1057,7 @@ They are used for:
 <li>JSON schema emitting</li>
 <li>ORM support (SQLAlchemy, Django ORM, Tortoise ORM)</li>
 <li>Serialization/deserialization: JSON, Python (XML via extension)</li>
-<li>8,000 packages in PyPI use it, 20/25 NASDAQ companies use it</li>
+<li>8,000 packages in PyPI use it, 20 of 25 NASDAQ companies use it</li>
 </ul>
 </div>
 </div>
@@ -1156,7 +1188,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org9d45fc9">
+<pre class="example" id="orgf7c822e">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2067,7 +2099,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org9599568">
+<pre class="example" id="org9ad9e3a">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -2099,7 +2131,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org9d21d1c">
+<pre class="example" id="orgc281926">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2188,7 +2220,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org4c4dd0b">
+<pre class="example" id="orga5cd0a0">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2646,7 +2678,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="org42d74fd">
+<pre class="example" id="orgb382dc2">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2656,7 +2688,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org6a9a786">
+<pre class="example" id="org4e5af39">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3252,6 +3284,11 @@ Just run your type-checkers as before.
 </div>
 <div id="outline-container-org33ce2d3" class="outline-2">
 <h2 id="org33ce2d3">CrossHair, SMT</h2>
+<div class="outline-text-2" id="text-org33ce2d3">
+<p>
+Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F\*, etc.
+</p>
+</div>
 </div>
 <div id="outline-container-orgbd799ab" class="outline-2">
 <h2 id="orgbd799ab">Dufny, coq, &#x2026; generating of Python code</h2>

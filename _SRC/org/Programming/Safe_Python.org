@@ -428,15 +428,32 @@ identity element, code equivalency, duality (roundtrip), etc.
 
 * Enums
 
-Enums restrict values to explicitly known set of predefined values. Like:
+Enums **restrict values to closed set of predefined values**.
+
+But a set is too wide term: we can treat them as a bit-fields/flags containers,
+strings containers, integers containers...
+
+They exist: ~IntEnum~, ~StrEnum~, ~IntFlag~, ~FlagBoundary~, ~EnumDict~, etc...
+
+Alternative "old-school" approaches:
+
+- No grouping (just loose variables)
+- No type safety
+- Hard to discover valid values
+- Easy to mix unrelated constants
+- Boilerplate code
+
+Example:
 
 #+begin_src python :eval yes-export :exports both :results output verbatim
 import enum
-class Format(enum.Enum):  # simplest enum
-    XML = 1               # or use enum.auto() to avoid clashing
+
+class Format(enum.Enum):       # simplest enum
+    XML = 1                    # or use enum.auto() to avoid clashing
     JSON = 2
     TOML = 3
 f = Format.JSON
+
 class Distro(enum.StrEnum):    # Distro also is str
     DEBIAN = 'debian'
     MX = 'mx'
@@ -444,27 +461,28 @@ class Distro(enum.StrEnum):    # Distro also is str
     UNKNOWN = enum.auto()
 print('Is Distro.DEBIAN a str?', isinstance(Distro.DEBIAN, str))
 print(Distro.MX.capitalize() + ' linux!')
-# TODO
-class Country(enum.Flag):
-    Indonesia = auto()
-    Italy = auto()
-    Morocco = auto()
-arab_league = Country.Morocco |
-african_union = Country.Morocco |
-union_for_the_mediterranean = Country.Morocco | Country.Italy
+
+class Lang(enum.IntFlag):      # set of flags
+    PYTHON = enum.auto()
+    JAVA = enum.auto()
+    GO = enum.auto()    
+
+object_oriented = Lang.PYTHON  | Lang.JAVA
+procedural = Lang.PYTHON | Lang.GO
+print('Is Python object oriented?', Lang.PYTHON in object_oriented)
+print('Is Go object oriented?', Lang.GO in object_oriented)
 #+end_src
 
 #+RESULTS:
-
-There are enums: IntEnum, StrEnum, IntFlag, FlagBoundary, EnumDict, etc...
-
-
-# TODO
+: Is Distro.DEBIAN a str? True
+: Mx linux!
+: Is Python object oriented? True
+: Is Go object oriented? False
 
 * Dataclasses
 
 They are close to the concept of Java, C# records, Scala case classes, Kotlin data
-classes. This about them as about **records**.
+classes. Think about them as about **records**.
 
 Automatically generates are ~__init__~, ~__repr__~, ~__eq__~, ordering methods
 (optional), ~__hash__~ (depending on options), Haskell records (with deriving
@@ -543,7 +561,7 @@ They are used for:
 - JSON schema emitting
 - ORM support (SQLAlchemy, Django ORM, Tortoise ORM)
 - Serialization/deserialization: JSON, Python (XML via extension)
-- 8,000 packages in PyPI use it, 20/25 NASDAQ companies use it
+- 8,000 packages in PyPI use it, 20 of 25 NASDAQ companies use it
 
 ** Simple examples
 
@@ -1801,6 +1819,9 @@ Just run your type-checkers as before.
 # TODO - Pydantic AI
 
 * CrossHair, SMT
+
+Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F\*, etc.
+
 * Dufny, coq, ... generating of Python code
 * Stronger "Python" - Scala
 
