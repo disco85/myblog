@@ -1906,10 +1906,37 @@ result = agent.run(
 print(result.data)   # OUT: Weather(city='Paris', temperature=22)
 #+end_src
 
-* CrossHair, SMT
+* CrossHair
+
+# TODO
 
 Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F*, etc.
 
 * Dafny, coq, ... generating of Python code
+
+# TODO
+
 * Stronger "Python" - Scala
 
+This is very "Pythonish" code:
+
+#+begin_src python :eval no :exports both :results none
+class Layer(i: Int):
+  val sqside = 10 + 4 * i
+  val (width, height) = SIZE
+  val cols = (1 + i * LAYERDIST) until (width / sqside - 1 - i * LAYERDIST)
+  val rows = (1 + i * LAYERDIST) until (height / sqside - 1 - i * LAYERDIST)
+
+  private val _pencolor_hsl = (50 * i, 10 + 10 * (3 - i), 4 + 6 * i)
+  private val _brushcolor_hsl = (24 + i * 10, 10 * (3 - i), 25 + 10 * i)
+
+  def pencolor: (Int, Int, Int) =
+    val (h, s, l) = _pencolor_hsl
+    (h, rnd(s, 10), rnd(l, 30))
+
+  def brushcolor: (Int, Int, Int) =
+    val (h, s, l) = _brushcolor_hsl
+    (h, rnd(s, 70), rnd(l, 10))
+#+end_src
+
+but it is... Scala! :)
