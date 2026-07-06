@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 10:14 -->
+<!-- 2026-07-06 Mon 10:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -439,7 +439,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orga5cd0a0">
+<pre class="example" id="org327b146">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -504,7 +504,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="orgf053ad9">
+<pre class="example" id="orgd560562">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -978,7 +978,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="org73d9e42">
+<pre class="example" id="orgd7cfb71">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1188,7 +1188,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgd5c6afd">
+<pre class="example" id="org08815c1">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2121,7 +2121,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="org759e626">
+<pre class="example" id="org8d71309">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -2153,7 +2153,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org569bc38">
+<pre class="example" id="org9c4995f">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2242,7 +2242,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org327b146">
+<pre class="example" id="orgfa84f93">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2700,7 +2700,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="org65d5f07">
+<pre class="example" id="org20e7d8b">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2710,7 +2710,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orga2d58ad">
+<pre class="example" id="org9784093">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3301,6 +3301,18 @@ Just run your type-checkers as before.
 <div id="outline-container-org0dc4add" class="outline-3">
 <h3 id="org0dc4add">Personal experience</h3>
 <div class="outline-text-3" id="text-org0dc4add">
+<p>
+Type annotations help a lot to AI (the same as to IDE/LSP) - AI "understands" the
+code better, refactoring done by AI is many times better, <b><b>it is able to infer
+types</b></b> by self, and it is able to check them, find an error, <b><b>to explain them</b></b>,
+also to fix them and to run type-checkers in a shell and to fix type problems.
+</p>
+
+<p>
+⚠ I have hit a case when AI wrote wrong code, I asked him to run type-checker and to
+check errors if there are any - AI found that the just written code contains errors -
+the type-checking helped AI - and it fixed problems!
+</p>
 </div>
 </div>
 </div>
