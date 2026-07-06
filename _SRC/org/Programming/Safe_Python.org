@@ -20,11 +20,8 @@
 
 - The reason for most bugs is ignorance of how your language, your libraries, your
   OS, and your compiler work.
-
 - This happens because everything becomes too complicated.
-
 - To avoid it - use simple solutions and tools. Like... Python!
-
 - But how to make it... safer?
 
 * Doctests
@@ -429,9 +426,112 @@ class TestBinaryOperationadd(unittest.TestCase):
 Uses predefined/template logic: checks idempotent, associativity, commutativity,
 identity element, code equivalency, duality (roundtrip), etc.
 
-* Dataclasses
+* Enums
+
+Enums restrict values to explicitly known set of predefined values. Like:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import enum
+class Format(enum.Enum):  # simplest enum
+    XML = 1               # or use enum.auto() to avoid clashing
+    JSON = 2
+    TOML = 3
+f = Format.JSON
+class Distro(enum.StrEnum):    # Distro also is str
+    DEBIAN = 'debian'
+    MX = 'mx'
+    GUIXOS = 'guixos'
+    UNKNOWN = enum.auto()
+print('Is Distro.DEBIAN a str?', isinstance(Distro.DEBIAN, str))
+print(Distro.MX.capitalize() + ' linux!')
+# TODO
+class Country(enum.Flag):
+    Indonesia = auto()
+    Italy = auto()
+    Morocco = auto()
+arab_league = Country.Morocco |
+african_union = Country.Morocco |
+union_for_the_mediterranean = Country.Morocco | Country.Italy
+#+end_src
+
+#+RESULTS:
+
+There are enums: IntEnum, StrEnum, IntFlag, FlagBoundary, EnumDict, etc...
+
 
 # TODO
+
+* Dataclasses
+
+They are close to the concept of Java, C# records, Scala case classes, Kotlin data
+classes. This about them as about **records**.
+
+Automatically generates are ~__init__~, ~__repr__~, ~__eq__~, ordering methods
+(optional), ~__hash__~ (depending on options), Haskell records (with deriving
+instances).
+
+- Better than any tuples:
+  1. fields have names
+  2. can be mutable (default) and immutable (~frozen=True~)
+  3. they can have methods
+  4. they can extend other classes
+- Better than named tuples: fields have types (NOTE: but since 3.5 ~NamedTuple~ supports types)
+- Better than plain classes: auto-generated magic methods
+
+#+begin_example
+                         INCREASED SAFETY:
+
+     tuples        ->       named tuples       ->      dataclasses
+     ------                 ------------               -----------
+
+('John', 31)           Person=namedtuple(              @dataclass
+                         'Person',                     class Person(Human):
+                         'name age')                     name:str
+                       p = Person('Joe', 31)             age:int
+                                                         def __str__(self):
+                                                           return f'{self.name}, {self.age}'
+
+                               BUT:
+
+t:tuple[str,int] = \   Person=NamedTuple(
+  ('John', 31)           'Person',
+                         [('name', str),
+                          ('age', int)])
+#+end_example
+
+Example:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+import dataclasses
+
+@dataclasses.dataclass(kw_only=True)
+class Person:
+    name:str
+    age:int
+    greeting:str=''
+    def __post_init__(self):
+        if self.age < 20: self.greeting = f'Hi, {self.name} !!'
+        else:             self.greeting = f'How do you do, {self.name}.'
+p1 = Person(name='John', age=15)
+p2 = Person(name='Joe', age=35)
+p3 = Person(name='John', age=15)
+print(p1.greeting)
+print(p2.greeting)
+print(p1 == p2, p1 == p3)
+#+end_src
+
+#+RESULTS:
+: Hi, John !!
+: How do you do, Joe.
+: False True
+
+They are used for:
+
+- "value" objects
+- DTO (data transfer objects)
+- configuration objects
+- domain models
+- ...
 
 * Pydantic
 
@@ -1498,14 +1598,13 @@ from mypkg.types.geometry import Shape
 
 ** More about types
 
-- Typing in Python: https://docs.python.org/3.13/library/typing.html
-- Introduction to typing: https://fastapi.tiangolo.com/python-types/
-- Introduction to typing:
-  https://ryan.himmelwright.net/post/python-type-hinting-intro/
-- Deep introduction: https://www.geeksforgeeks.org/python/introduction-to-python-typing-extensions-module/#core-features-of-typingextensions  
-- Advanced Python typing: https://jellis18.github.io/post/2023-01-15-advanced-python-types/
-- Common theory: https://en.wikipedia.org/wiki/Type_theory
-- Theory of categories: https://en.wikipedia.org/wiki/Theory_of_categories
+- [[https://docs.python.org/3.13/library/typing.html][Typing in Python]] 
+- [[https://fastapi.tiangolo.com/python-types/][Introduction to typing]] 
+- [[https://ryan.himmelwright.net/post/python-type-hinting-intro/][Introduction to typing]]
+- [[https://www.geeksforgeeks.org/python/introduction-to-python-typing-extensions-module/#core-features-of-typingextensions][Deep introduction]] 
+- [[https://jellis18.github.io/post/2023-01-15-advanced-python-types/][Advanced Python typing]] 
+- [[https://en.wikipedia.org/wiki/Type_theory][Common theory]]
+- [[https://en.wikipedia.org/wiki/Theory_of_categories][Theory of categories]] 
 
 ** Interesting typing experiments in Python
 
@@ -1603,7 +1702,7 @@ def add(x: int, y: int) -> int:
     return x + y
 try:
     add(1, 5)
-    add('a', 5)
+    add('a', 5)         # BUG: unexpected str for x
 except Exception as x:
     print(*traceback.format_exception_only(x, file=sys.stdout))    
 #+end_src
