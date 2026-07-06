@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-06 Mon 11:00 -->
+<!-- 2026-07-06 Mon 16:39 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -388,7 +388,7 @@ function toggleTheme() {
 </li>
 <li><a href="#org42f0535">CrossHair</a></li>
 <li><a href="#org1ef0310">Dafny, coq, &#x2026; generating of Python code</a></li>
-<li><a href="#org729b5ba">Stronger "Python" - Scala</a></li>
+<li><a href="#orgadf20e8">Stronger "Python" is&#x2026;</a></li>
 </ul>
 </div>
 </div>
@@ -440,7 +440,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org8e62b3c">
+<pre class="example" id="orgeb897e9">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -505,7 +505,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org2ee63e0">
+<pre class="example" id="org4b196f0">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -979,7 +979,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="org8cb6615">
+<pre class="example" id="org54f93ff">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1189,7 +1189,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgefdc62b">
+<pre class="example" id="org5a21533">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1322,7 +1322,7 @@ How to run it from a shell:
 <li>VERY USEFUL FOR AI!</li>
 <li>Include type-checking to your CI, together with doctests, unittests,
 property-tests&#x2026;</li>
-<li>Amazing IDE autocompletion</li>
+<li>Amazing IDE autocompletion and navigation (go to class/method/function/type of&#x2026;)</li>
 </ol>
 </div>
 </div>
@@ -2122,7 +2122,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-org11391b2" class="outline-4">
 <h4 id="org11391b2">Typing KungFu</h4>
 <div class="outline-text-4" id="text-org11391b2">
-<pre class="example" id="orgd7f7372">
+<pre class="example" id="org20815b9">
     S I M P L E   U S A G E   O F   T Y P E S
    (v e r y   s h o r t   c o d e    r o u t e)
 
@@ -2154,7 +2154,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org73bb429">
+<pre class="example" id="org795999a">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2243,7 +2243,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org7baa4b9">
+<pre class="example" id="org2e9e98c">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2701,7 +2701,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="org034d045">
+<pre class="example" id="orgcb2f70c">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2711,7 +2711,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org6474c03">
+<pre class="example" id="orgb12f824">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3337,7 +3337,7 @@ text chaos.
 <li>Reliable API wrappers around LLMs</li>
 </ul>
 
-<pre class="example" id="orga70ffe4">
+<pre class="example" id="org1e5ccf1">
              TRADITIONAL LLM CODE:
                                             +----------+
  Extract name      +-----+                  | parse to |
@@ -3402,8 +3402,60 @@ Usage:
 <h2 id="org42f0535">CrossHair</h2>
 <div class="outline-text-2" id="text-org42f0535">
 <p>
+Formal verification/symbolic execution tool for Python, it supports IDEs, as
+Web-broswer playground, can be included in CI, to "watch" source directory, to be
+integrated to LSP, to find difference between behavior of 2 version, etc:
+</p>
+
+<ul class="org-ul">
+<li>automatically generates inputs for your functions</li>
+<li>uses symbolic execution + SMT solving (not runs as <code>pytest</code> do it)</li>
+<li>searches for:</li>
+<li>crashes</li>
+<li>assertion violations</li>
+<li>unexpected edge cases</li>
+<li>can sometimes prove properties always hold</li>
+</ul>
+
+<p>
 Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F*, etc.
 </p>
+
+<p>
+Simple example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">def</span> <span class="org-function-name">div1</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr"> 2: </span>    <span class="org-doc">'''
+<span class="linenr"> 3: </span>    post: True
+<span class="linenr"> 4: </span>    '''</span>
+<span class="linenr"> 5: </span>    <span class="org-keyword">return</span> a <span class="org-operator">//</span> b                  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: can lead to zero division (non-totality/partial function)!
+<span class="linenr"> 6: </span></span>
+<span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">div2</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr"> 8: </span>    <span class="org-doc">'''
+<span class="linenr"> 9: </span>    pre: b != 0
+<span class="linenr">10: </span>    post: True
+<span class="linenr">11: </span>    '''</span>
+<span class="linenr">12: </span>    <span class="org-keyword">return</span> a <span class="org-operator">//</span> b                  <span class="org-comment-delimiter"># </span><span class="org-comment">OK: precondition requires safe value for b
+<span class="linenr">13: </span></span>
+<span class="linenr">14: </span><span class="org-keyword">def</span> <span class="org-function-name">div3</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr">15: </span>    <span class="org-doc">'''
+<span class="linenr">16: </span>    post: True
+<span class="linenr">17: </span>    '''</span>
+<span class="linenr">18: </span>    <span class="org-keyword">return</span> div2(a, b)              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: precondition on div2's b can be violated</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-shell">crosshair check /tmp/tmp20.py 2&gt;&amp;1 || :
+</pre>
+</div>
+
+<pre class="example">
+/tmp/tmp20.py:5: error: ZeroDivisionError:  when calling div1(0, 0)
+/tmp/tmp20.py:18: error: PreconditionFailed: Precondition "b != 0" was not satisfied before calling "div2" when calling div3(0, 0)
+</pre>
 </div>
 </div>
 <div id="outline-container-org1ef0310" class="outline-2">
@@ -3411,9 +3463,9 @@ Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F*, etc.
 <div class="outline-text-2" id="text-org1ef0310">
 </div>
 </div>
-<div id="outline-container-org729b5ba" class="outline-2">
-<h2 id="org729b5ba">Stronger "Python" - Scala</h2>
-<div class="outline-text-2" id="text-org729b5ba">
+<div id="outline-container-orgadf20e8" class="outline-2">
+<h2 id="orgadf20e8">Stronger "Python" is&#x2026;</h2>
+<div class="outline-text-2" id="text-orgadf20e8">
 <p>
 This is very "Pythonish" code:
 </p>

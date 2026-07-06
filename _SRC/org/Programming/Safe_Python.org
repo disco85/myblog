@@ -775,7 +775,7 @@ pyright source_dir
 5. VERY USEFUL FOR AI!
 6. Include type-checking to your CI, together with doctests, unittests,
    property-tests...
-7. Amazing IDE autocompletion
+7. Amazing IDE autocompletion and navigation (go to class/method/function/type of...)
 
 ** Comparison of type checkers
 
@@ -1908,15 +1908,58 @@ print(result.data)   # OUT: Weather(city='Paris', temperature=22)
 
 * CrossHair
 
-# TODO
+Formal verification/symbolic execution tool for Python, it supports IDEs, as
+Web-broswer playground, can be included in CI, to "watch" source directory, to be
+integrated to LSP, to find difference between behavior of 2 version, etc:
+
+- automatically generates inputs for your functions
+- uses symbolic execution + SMT solving (not runs as ~pytest~ do it)
+- searches for:
+- crashes
+- assertion violations
+- unexpected edge cases
+- can sometimes prove properties always hold
 
 Static contracts exist also in Ada SPARK, Dafny, LiquidHaskell, F*, etc.
+
+Simple example:
+
+# TODO
+
+#+begin_src python -n :eval no :exports both :results none :tangle /tmp/tmp20.py
+def div1(a: int, b: int) -> int:
+    '''
+    post: True
+    '''
+    return a // b                  # BUG: can lead to zero division (non-totality/partial function)!
+
+def div2(a: int, b: int) -> int:
+    '''
+    pre: b != 0
+    post: True
+    '''
+    return a // b                  # OK: precondition requires safe value for b
+
+def div3(a: int, b: int) -> int:
+    '''
+    post: True
+    '''
+    return div2(a, b)              # BUG: precondition on div2's b can be violated
+#+end_src
+
+#+begin_src shell :eval yes-export :exports both :results output verbatim
+crosshair check /tmp/tmp20.py 2>&1 || :
+#+end_src
+
+#+RESULTS:
+: /tmp/tmp20.py:5: error: ZeroDivisionError:  when calling div1(0, 0)
+: /tmp/tmp20.py:18: error: PreconditionFailed: Precondition "b != 0" was not satisfied before calling "div2" when calling div3(0, 0)
 
 * Dafny, coq, ... generating of Python code
 
 # TODO
 
-* Stronger "Python" - Scala
+* Stronger "Python" is...
 
 This is very "Pythonish" code:
 
