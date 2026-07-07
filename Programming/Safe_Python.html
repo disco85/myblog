@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-07 Tue 19:23 -->
+<!-- 2026-07-07 Tue 19:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -390,6 +390,7 @@ function toggleTheme() {
 <li><a href="#org368e073">CrossHair</a></li>
 <li><a href="#orgeb46a4c">Dafny, Coq, etc extracting of Python code</a></li>
 <li><a href="#orgc57fa91">Stronger "Python" is&#x2026;</a></li>
+<li><a href="#orgcca1bda">How to try it by self</a></li>
 </ul>
 </div>
 </div>
@@ -466,7 +467,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org47bcad7">
+<pre class="example" id="org78c7bdd">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -531,7 +532,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org7d409bf">
+<pre class="example" id="org00b8b10">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -652,7 +653,7 @@ Conceptually:
 </p>
 
 <p class="verse">
-&#xa0;&#xa0;bytes<br />
+&#xa0;bytes<br />
 &#xa0;&#xa0;&#xa0;↓<br />
 strategy<br />
 &#xa0;&#xa0;&#xa0;↓<br />
@@ -1005,7 +1006,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgcc552d4">
+<pre class="example" id="org3405a8a">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1215,7 +1216,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgf3727e1">
+<pre class="example" id="org7ca6114">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2148,7 +2149,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-orgcd24df5" class="outline-4">
 <h4 id="orgcd24df5">Typing KungFu</h4>
 <div class="outline-text-4" id="text-orgcd24df5">
-<pre class="example" id="orgdc7021e">
+<pre class="example" id="org80bcbef">
        S I M P L E   U S A G E   O F   T Y P E S
      [v e r y   s h o r t   c o d e    r o u t e]
 
@@ -2181,7 +2182,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org8bddde4">
+<pre class="example" id="org0a66ae8">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2270,7 +2271,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org8e5021a">
+<pre class="example" id="orgb5e8732">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2411,7 +2412,7 @@ and animals will have nicknames. Let's model it:
 </pre>
 </div>
 
-<pre class="example" id="org4425881">
+<pre class="example" id="orgfccda6f">
 /tmp/tmp10_0.py
   /tmp/tmp10_0.py:41:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
     Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
@@ -2865,7 +2866,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="org231e591">
+<pre class="example" id="org35aede1">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2875,7 +2876,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org1afd802">
+<pre class="example" id="org206f78e">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3501,7 +3502,7 @@ text chaos.
 <li>Reliable API wrappers around LLMs</li>
 </ul>
 
-<pre class="example" id="orgddbee88">
+<pre class="example" id="org1abf449">
              TRADITIONAL LLM CODE:
                                            +----------+
  Extract name     +-----+                  | parse to |
@@ -3631,42 +3632,54 @@ Very similar to previous:
 <div class="org-src-container">
 <pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">def</span> <span class="org-function-name">average</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>:
 <span class="linenr"> 2: </span>    <span class="org-doc">'''post: True'''</span>
-<span class="linenr"> 3: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshair finds when ZeroDivisionError will bee thrown - xs==[]:
+<span class="linenr"> 3: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshair finds when ZeroDivisionError will be thrown: xs==[]:
 <span class="linenr"> 4: </span></span>    <span class="org-keyword">return</span> <span class="org-builtin">sum</span>(xs) <span class="org-operator">/</span> <span class="org-builtin">len</span>(xs)
-<span class="linenr"> 5: </span><span class="org-keyword">def</span> <span class="org-function-name">index</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], i: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
-<span class="linenr"> 6: </span>    <span class="org-doc">'''post: True'''</span>
-<span class="linenr"> 7: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshair finds that xs==[0], i==1 will step over assert and throw IndexError
-<span class="linenr"> 8: </span></span>    <span class="org-keyword">assert</span> 0 <span class="org-operator">&lt;=</span> i <span class="org-operator">&lt;=</span> <span class="org-builtin">len</span>(xs)
-<span class="linenr"> 9: </span>    <span class="org-keyword">return</span> xs[i]
-<span class="linenr">10: </span><span class="org-keyword">def</span> <span class="org-function-name">is_power_of_two</span>(n: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>:
-<span class="linenr">11: </span>    <span class="org-doc">'''post: __return__ if n &gt; 0 else False'''</span>
-<span class="linenr">12: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
-<span class="linenr">13: </span></span>    <span class="org-keyword">return</span> (n <span class="org-operator">&amp;</span> (n <span class="org-operator">-</span> 1)) <span class="org-operator">==</span> 0
-<span class="linenr">14: </span><span class="org-keyword">def</span> <span class="org-function-name">buggy_sort</span>(xs:<span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
-<span class="linenr">15: </span>    <span class="org-doc">'''post: all(a &lt;= b for a,b in zip(__return__, __return__[1:]))
-<span class="linenr">16: </span>    '''</span>
-<span class="linenr">17: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no sorting/wrong sorting
-<span class="linenr">18: </span></span>    <span class="org-keyword">return</span> xs
-<span class="linenr">19: </span><span class="org-keyword">def</span> <span class="org-function-name">remove_negatives</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
-<span class="linenr">20: </span>    <span class="org-doc">'''post: len(__return__) == sum(x &gt;= 0 for x in __old__.xs)
-<span class="linenr">21: </span>    '''</span>
-<span class="linenr">22: </span>    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> xs:
-<span class="linenr">23: </span>        <span class="org-keyword">if</span> x <span class="org-operator">&lt;</span> 0:
-<span class="linenr">24: </span>            xs.remove(x)
-<span class="linenr">25: </span>    <span class="org-keyword">return</span> xs
-<span class="linenr">26: </span><span class="org-keyword">def</span> <span class="org-function-name">append_one</span>(a: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], b: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>:
-<span class="linenr">27: </span>    <span class="org-doc">'''post[]: True
-<span class="linenr">28: </span>    '''</span>             <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: empty [] - nothing is mutated
-<span class="linenr">29: </span></span>    a.append(1)     <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: a is mutated, counter-example:  [0] -&gt; [0, 1]
-<span class="linenr">30: </span></span><span class="org-variable-name">State0</span>, <span class="org-variable-name">State1</span> <span class="org-operator">=</span> 0, 1
-<span class="linenr">31: </span><span class="org-keyword">class</span> <span class="org-type">Parser</span>:
-<span class="linenr">32: </span>    <span class="org-doc">'''inv: self.state in (State0, State1)
-<span class="linenr">33: </span>    '''</span>
-<span class="linenr">34: </span>    <span class="org-variable-name">state</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> State0
-<span class="linenr">35: </span>    <span class="org-keyword">def</span> <span class="org-function-name">parse</span>(<span class="org-keyword">self</span>, s:<span class="org-builtin">str</span>):
-<span class="linenr">36: </span>        <span class="org-keyword">if</span> <span class="org-variable-name">s</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> State0
-<span class="linenr">37: </span>        <span class="org-keyword">elif</span> s <span class="org-operator">==</span> <span class="org-string">'a'</span>: <span class="org-keyword">self</span>.<span class="org-variable-name">state</span> <span class="org-operator">=</span> State1
-<span class="linenr">38: </span>        <span class="org-keyword">else</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> 10  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: invariant is violated with parse(Parser(), '') !</span>
+<span class="linenr"> 5: </span>
+<span class="linenr"> 6: </span><span class="org-keyword">def</span> <span class="org-function-name">index</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], i: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
+<span class="linenr"> 7: </span>    <span class="org-doc">'''post: True'''</span>
+<span class="linenr"> 8: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: Crosshair finds that xs==[0], i==1 will step over the assert and throw IndexError
+<span class="linenr"> 9: </span></span>    <span class="org-keyword">assert</span> 0 <span class="org-operator">&lt;=</span> i <span class="org-operator">&lt;=</span> <span class="org-builtin">len</span>(xs)
+<span class="linenr">10: </span>    <span class="org-keyword">return</span> xs[i]
+<span class="linenr">11: </span>
+<span class="linenr">12: </span><span class="org-keyword">def</span> <span class="org-function-name">is_power_of_two</span>(n: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">bool</span>:
+<span class="linenr">13: </span>    <span class="org-doc">'''post: __return__ if n &gt; 0 else False'''</span>
+<span class="linenr">14: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
+<span class="linenr">15: </span></span>    <span class="org-keyword">return</span> (n <span class="org-operator">&amp;</span> (n <span class="org-operator">-</span> 1)) <span class="org-operator">==</span> 0
+<span class="linenr">16: </span>
+<span class="linenr">17: </span><span class="org-keyword">def</span> <span class="org-function-name">buggy_sort</span>(xs:<span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
+<span class="linenr">18: </span>    <span class="org-doc">'''post: all(a &lt;= b for a,b in zip(__return__, __return__[1:]))
+<span class="linenr">19: </span>    '''</span>
+<span class="linenr">20: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no sorting/wrong sorting
+<span class="linenr">21: </span></span>    <span class="org-keyword">return</span> xs
+<span class="linenr">22: </span>
+<span class="linenr">23: </span><span class="org-keyword">def</span> <span class="org-function-name">remove_negatives</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
+<span class="linenr">24: </span>    <span class="org-doc">'''post: len(__return__) == sum(x &gt;= 0 for x in __old__.xs)
+<span class="linenr">25: </span>    '''</span>
+<span class="linenr">26: </span>    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> xs:
+<span class="linenr">27: </span>        <span class="org-keyword">if</span> x <span class="org-operator">&lt;</span> 0:
+<span class="linenr">28: </span>            xs.remove(x)
+<span class="linenr">29: </span>    <span class="org-keyword">return</span> xs
+<span class="linenr">30: </span>
+<span class="linenr">31: </span><span class="org-keyword">def</span> <span class="org-function-name">append_one</span>(a: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], b: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>:
+<span class="linenr">32: </span>    <span class="org-doc">'''post[]: True
+<span class="linenr">33: </span>    '''</span>             <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: empty [] - nothing is mutated
+<span class="linenr">34: </span></span>    a.append(1)     <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: a is mutated, counter-example:  [0] -&gt; [0, 1]
+<span class="linenr">35: </span></span>
+<span class="linenr">36: </span><span class="org-keyword">def</span> <span class="org-function-name">remove_spaces</span>(s: <span class="org-builtin">str</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">str</span>:
+<span class="linenr">37: </span>    <span class="org-doc">'''
+<span class="linenr">38: </span>    post: ' ' not in __return__
+<span class="linenr">39: </span>    '''</span>
+<span class="linenr">40: </span>    <span class="org-keyword">return</span> s.strip()  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: spaces in the middle are not removed: remove_spaces('\x00 &#161;')
+<span class="linenr">41: </span></span>
+<span class="linenr">42: </span><span class="org-variable-name">State0</span>, <span class="org-variable-name">State1</span> <span class="org-operator">=</span> 0, 1
+<span class="linenr">43: </span><span class="org-keyword">class</span> <span class="org-type">Parser</span>:
+<span class="linenr">44: </span>    <span class="org-doc">'''inv: self.state in (State0, State1)
+<span class="linenr">45: </span>    '''</span>
+<span class="linenr">46: </span>    <span class="org-variable-name">state</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> State0
+<span class="linenr">47: </span>    <span class="org-keyword">def</span> <span class="org-function-name">parse</span>(<span class="org-keyword">self</span>, s:<span class="org-builtin">str</span>):
+<span class="linenr">48: </span>        <span class="org-keyword">if</span> <span class="org-variable-name">s</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> State0
+<span class="linenr">49: </span>        <span class="org-keyword">elif</span> s <span class="org-operator">==</span> <span class="org-string">'a'</span>: <span class="org-keyword">self</span>.<span class="org-variable-name">state</span> <span class="org-operator">=</span> State1
+<span class="linenr">50: </span>        <span class="org-keyword">else</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> 10  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: invariant is violated with parse(Parser(), '') !</span>
 </pre>
 </div>
 
@@ -3677,11 +3690,12 @@ Very similar to previous:
 
 <pre class="example">
 /tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
-/tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
-/tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
-/tmp/tmp21.py:15: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
-/tmp/tmp21.py:26: error: Error while evaluating post condition: "&lt;unknown&gt;" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
-/tmp/tmp21.py:35: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
+/tmp/tmp21.py:10: error: IndexError:  when calling index([0], 1)
+/tmp/tmp21.py:13: error: false when calling is_power_of_two(0) (which returns True)
+/tmp/tmp21.py:18: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
+/tmp/tmp21.py:31: error: Error while evaluating post condition: "&lt;unknown&gt;" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
+/tmp/tmp21.py:38: error: false when calling remove_spaces('\x00 ¡') (which returns '\x00 ¡')
+/tmp/tmp21.py:47: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
 </pre>
 
 
@@ -3713,6 +3727,7 @@ Syntax is standard for Python, though:
 <li>assertions</li>
 <li>dictionary lookups</li>
 <li>integer properties</li>
+<li>string operations</li>
 </ul></li>
 </ul>
 </div>
@@ -3731,7 +3746,7 @@ produce Python (and Go, and Javascript, and &#x2026;) code which is verified by 
 contracts:
 </p>
 
-<pre class="example" id="org1c950a6">
+<pre class="example" id="orge38c384">
                 compilation
      +-------+               +---------+
      | Dafny |  __________\  |  Python |  
@@ -3739,15 +3754,15 @@ contracts:
      +-------+               +---------+
 
      
-                Dafny source
-                     ↓
-           verification conditions
-                     ↓
-               Z3 proves them
-                     ↓
-              verified program
-                     ↓
-  compiles to Python/Go/Javascript/C#/Java
+               Dafny source
+                    ↓
+          verification conditions
+                    ↓
+              Z3 proves them
+                    ↓
+             verified program
+                    ↓
+ compiles to Python/Go/Javascript/C#/Java
 </pre>
 
 <p>
@@ -3785,6 +3800,30 @@ This is very "Pythonish" code:
 <p>
 but it is&#x2026; Scala.
 </p>
+</div>
+</div>
+<div id="outline-container-orgcca1bda" class="outline-2">
+<h2 id="orgcca1bda">How to try it by self</h2>
+<div class="outline-text-2" id="text-orgcca1bda">
+<div class="org-src-container">
+<pre class="src src-shell">$ python -m venv .venv
+
+$ pip install -r requirements.txt
+
+$ cat requirements.txt
+pyright[nodejs]
+pydantic
+hypothesis
+hypothesis[cli]
+crosshair-tool
+typeguard
+mypy
+
+$ source .venv/bin/activate
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">HAPPY TYPING :)</span>
+</pre>
+</div>
 </div>
 </div>
 </div>

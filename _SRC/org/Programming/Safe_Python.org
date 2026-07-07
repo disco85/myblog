@@ -217,7 +217,7 @@ Hypothesis effectively manipulates a stream of bytes and interprets it as struct
 Conceptually:
 
 #+begin_verse
-    bytes
+   bytes
      ↓
   strategy
      ↓
@@ -2068,22 +2068,26 @@ Very similar to previous:
 #+begin_src python -n :eval no :exports both :results none :tangle /tmp/tmp21.py
 def average(xs: list[int]) -> float:
     '''post: True'''
-    # BUG: Crosshair finds when ZeroDivisionError will bee thrown - xs==[]:
+    # BUG: Crosshair finds when ZeroDivisionError will be thrown: xs==[]:
     return sum(xs) / len(xs)
+
 def index(xs: list[int], i: int) -> int:
     '''post: True'''
-    # BUG: Crosshair finds that xs==[0], i==1 will step over assert and throw IndexError
+    # BUG: Crosshair finds that xs==[0], i==1 will step over the assert and throw IndexError
     assert 0 <= i <= len(xs)
     return xs[i]
+
 def is_power_of_two(n: int) -> bool:
     '''post: __return__ if n > 0 else False'''
     # BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
     return (n & (n - 1)) == 0
+
 def buggy_sort(xs:list[int]) -> list[int]:
     '''post: all(a <= b for a,b in zip(__return__, __return__[1:]))
     '''
     # BUG: no sorting/wrong sorting
     return xs
+
 def remove_negatives(xs: list[int]) -> list[int]:
     '''post: len(__return__) == sum(x >= 0 for x in __old__.xs)
     '''
@@ -2091,10 +2095,18 @@ def remove_negatives(xs: list[int]) -> list[int]:
         if x < 0:
             xs.remove(x)
     return xs
+
 def append_one(a: list[int], b: list[int]) -> None:
     '''post[]: True
     '''             # TIP: empty [] - nothing is mutated
     a.append(1)     # BUG: a is mutated, counter-example:  [0] -> [0, 1]
+
+def remove_spaces(s: str) -> str:
+    '''
+    post: ' ' not in __return__
+    '''
+    return s.strip()  # BUG: spaces in the middle are not removed: remove_spaces('\x00 ¡')
+
 State0, State1 = 0, 1
 class Parser:
     '''inv: self.state in (State0, State1)
@@ -2112,11 +2124,12 @@ crosshair check --analysis_kind=asserts,PEP316,deal /tmp/tmp21.py 2>&1 || :
 
 #+RESULTS:
 : /tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
-: /tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
-: /tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
-: /tmp/tmp21.py:15: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
-: /tmp/tmp21.py:26: error: Error while evaluating post condition: "<unknown>" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
-: /tmp/tmp21.py:35: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
+: /tmp/tmp21.py:10: error: IndexError:  when calling index([0], 1)
+: /tmp/tmp21.py:13: error: false when calling is_power_of_two(0) (which returns True)
+: /tmp/tmp21.py:18: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
+: /tmp/tmp21.py:31: error: Error while evaluating post condition: "<unknown>" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
+: /tmp/tmp21.py:38: error: false when calling remove_spaces('\x00 ¡') (which returns '\x00 ¡')
+: /tmp/tmp21.py:47: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
 
 Syntax is standard for Python, though:
 
@@ -2136,6 +2149,7 @@ Syntax is standard for Python, though:
   - assertions
   - dictionary lookups
   - integer properties
+  - string operations
   
 * Dafny, Coq, etc extracting of Python code
 
@@ -2154,15 +2168,15 @@ contracts:
      +-------+               +---------+
 
      
-                Dafny source
-                     ↓
-           verification conditions
-                     ↓
-               Z3 proves them
-                     ↓
-              verified program
-                     ↓
-  compiles to Python/Go/Javascript/C#/Java
+               Dafny source
+                    ↓
+          verification conditions
+                    ↓
+              Z3 proves them
+                    ↓
+             verified program
+                    ↓
+ compiles to Python/Go/Javascript/C#/Java
 #+end_example
 
 Similar: Coq, LEAN, etc... but they call "compilation" phase - "extraction".
@@ -2191,3 +2205,24 @@ class Layer(i: Int):
 #+end_src
 
 but it is... Scala.
+
+* How to try it by self
+
+#+begin_src shell :eval no :exports both :results no
+$ python -m venv .venv
+
+$ pip install -r requirements.txt
+
+$ cat requirements.txt
+pyright[nodejs]
+pydantic
+hypothesis
+hypothesis[cli]
+crosshair-tool
+typeguard
+mypy
+
+$ source .venv/bin/activate
+
+# HAPPY TYPING :)
+#+end_src
