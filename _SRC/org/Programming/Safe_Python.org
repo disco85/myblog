@@ -1256,7 +1256,7 @@ pyright /tmp/tmp9.py || :
 #+end_example
 
 Example modeling animal breeding. We have species: a lion, a tiger, a donkey, a horse,
-and some of them can have offsprings, some - cannot:
+and some of them can have offsprings, some - cannot. The table of breeding:
 
 | male   | female | offspring |
 |--------+--------+-----------|
@@ -1287,7 +1287,8 @@ S = typing.TypeVar('S', bound=Species) # HINT: Species is kind of S
 class Animal(typing.Generic[S]):
     nick: str
 
-# Play role of type-level functions:
+# Play role of type-level functions encoding the table of breeding
+# statically in type-check time (not runtime!):
 
 @typing.overload
 def offspring(male: Animal[Lion], female: Animal[Tiger], nick: str) -> Animal[Liger]: ...
@@ -1413,8 +1414,8 @@ class LibTcpSrc:
     port = 8080
     ip = '127.0.0.1'
 
-class UnsuitableTcpSrc:
-    port_number = 8080
+class UnsuitableTcpSrc:                   # HINT: does not support TcpSource protocol:
+    port_number = 8080                    # there are no expected properties of it !
     def get_ip(self): return '127.0.0.1'
     
 print(read_from_net(LibTcpSrc()))         # OK: can be treated as TcpSource
@@ -2017,7 +2018,7 @@ print(result.data)   # OUT: Weather(city='Paris', temperature=22)
 
 * CrossHair
 
-Formal verification/symbolic execution tool for Python, it supports IDEs, as
+Formal verification/symbolic execution tool for Python, it supports IDEs, also
 Web-broswer playground, can be included in CI, to "watch" source directory, to be
 integrated to LSP, to find difference between behavior of 2 version, etc:
 
@@ -2071,7 +2072,7 @@ def average(xs: list[int]) -> float:
     return sum(xs) / len(xs)
 def index(xs: list[int], i: int) -> int:
     '''post: True'''
-    # BUG: Crosshai finds that xs==[0], i==1 will step over assert and throw IndexError
+    # BUG: Crosshair finds that xs==[0], i==1 will step over assert and throw IndexError
     assert 0 <= i <= len(xs)
     return xs[i]
 def is_power_of_two(n: int) -> bool:
