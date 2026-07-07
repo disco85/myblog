@@ -31,7 +31,7 @@ Useful like in C, C++, etc:
 #+begin_src python :eval yes-export :exports both :results output verbatim
 import sys, traceback
 def area(x, y):
-    assert x and y, 'No any area!'   # HINT: or raise ValueError (exposed/API functions)
+    assert x and y, 'No any area!'   # TIP: or raise ValueError (exposed/API functions)
     return x * y
 try:
     area(2, 0)
@@ -217,7 +217,7 @@ Hypothesis effectively manipulates a stream of bytes and interprets it as struct
 Conceptually:
 
 #+begin_verse
-   bytes
+    bytes
      ↓
   strategy
      ↓
@@ -1281,7 +1281,7 @@ class Horse(Species): ...
 class Mule(Species): ...
 class Hinny(Species): ...
 
-S = typing.TypeVar('S', bound=Species) # HINT: Species is kind of S
+S = typing.TypeVar('S', bound=Species) # TIP: Species is kind of S
 
 @dataclasses.dataclass
 class Animal(typing.Generic[S]):
@@ -1334,14 +1334,14 @@ pyright /tmp/tmp10_0.py || :
 #+RESULTS:
 #+begin_example
 /tmp/tmp10_0.py
-  /tmp/tmp10_0.py:40:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
+  /tmp/tmp10_0.py:41:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
     Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
       "int" is not assignable to "Species" (reportInvalidTypeArguments)
-  /tmp/tmp10_0.py:44:20 - information: Type of "o1" is "Animal[Mule]"
-  /tmp/tmp10_0.py:48:20 - information: Type of "o2" is "Animal[Hinny]"
-  /tmp/tmp10_0.py:52:20 - information: Type of "o3" is "Animal[Horse]"
-  /tmp/tmp10_0.py:53:6 - error: No overloads for "offspring" match the provided arguments (reportCallIssue)
-  /tmp/tmp10_0.py:54:16 - error: Argument of type "Animal[Tiger]" cannot be assigned to parameter "female" of type "Animal[S@offspring]" in function "offspring"
+  /tmp/tmp10_0.py:45:20 - information: Type of "o1" is "Animal[Mule]"
+  /tmp/tmp10_0.py:49:20 - information: Type of "o2" is "Animal[Hinny]"
+  /tmp/tmp10_0.py:53:20 - information: Type of "o3" is "Animal[Horse]"
+  /tmp/tmp10_0.py:54:6 - error: No overloads for "offspring" match the provided arguments (reportCallIssue)
+  /tmp/tmp10_0.py:55:16 - error: Argument of type "Animal[Tiger]" cannot be assigned to parameter "female" of type "Animal[S@offspring]" in function "offspring"
     "Animal[Tiger]" is not assignable to "Animal[Horse]"
       Type parameter "S@Animal" is invariant, but "Tiger" is not the same as "Horse" (reportArgumentType)
 3 errors, 0 warnings, 3 informations
@@ -1414,7 +1414,7 @@ class LibTcpSrc:
     port = 8080
     ip = '127.0.0.1'
 
-class UnsuitableTcpSrc:                   # HINT: does not support TcpSource protocol:
+class UnsuitableTcpSrc:                   # TIP: does not support TcpSource protocol:
     port_number = 8080                    # there are no expected properties of it !
     def get_ip(self): return '127.0.0.1'
     
@@ -1618,7 +1618,7 @@ def report_error(error:str, exception:None=None) -> None: ...
 def report_error(error:str, exception:None|type[Exception]=None) -> None:
     if exception is None:
         print(f'ERROR HAPPENS, GUYS: {error}')
-        return None                       # HINT: to satisfy MyPy
+        return None                       # TIP: to satisfy MyPy
     else:
         raise exception(error)
 
@@ -1869,7 +1869,7 @@ def add(x:list[tuple[int,bool]], f:bool):
     x.append((len(x), f))
 try:
     x = []
-    y:list[tuple[bool,str]] = [(False,'hi!')] # HINT: empty mutable containers are not checked!
+    y:list[tuple[bool,str]] = [(False,'hi!')] # TIP: empty mutable containers are not checked!
     add(x, True)
     add(y, True)                              # BUG: y contains unexpected item type
 except Exception as x:
@@ -2038,7 +2038,7 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 def div1(a: int, b: int) -> int:
     '''
     post: True
-    '''                            # HINT: "post: True" - will be checked!
+    '''                            # TIP: "post: True" - will be checked!
     return a // b                  # BUG: can lead to zero division (non-totality/partial function)!
 
 def div2(a: int, b: int) -> int:
@@ -2079,23 +2079,85 @@ def is_power_of_two(n: int) -> bool:
     '''post: __return__ if n > 0 else False'''
     # BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
     return (n & (n - 1)) == 0
+def buggy_sort(xs:list[int]) -> list[int]:
+    '''post: all(a <= b for a,b in zip(__return__, __return__[1:]))
+    '''
+    # BUG: no sorting/wrong sorting
+    return xs
+def remove_negatives(xs: list[int]) -> list[int]:
+    '''post: len(__return__) == sum(x >= 0 for x in __old__.xs)
+    '''
+    for x in xs:
+        if x < 0:
+            xs.remove(x)
+    return xs
+def append_one(a: list[int], b: list[int]) -> None:
+    '''post[]: True
+    '''             # TIP: empty [] - nothing is mutated
+    a.append(1)     # BUG: a is mutated, counter-example:  [0] -> [0, 1]
+State0, State1 = 0, 1
+class Parser:
+    '''inv: self.state in (State0, State1)
+    '''
+    state:int = State0
+    def parse(self, s:str):
+        if s: self.state = State0
+        elif s == 'a': self.state = State1
+        else: self.state = 10  # BUG: invariant is violated with parse(Parser(), '') !
 #+end_src
 
-Crosshair finds errors **faster** then property tests - it's symbolic "execution"
-(with stubs) using Satisfiability Modulo Theories (SMT) solver (~Z3~ in the case).
-
 #+begin_src shell :eval yes-export :exports both :results output verbatim
-crosshair check --analysis_kind=asserts,PEP316,icontract,deal /tmp/tmp21.py 2>&1 || :
+crosshair check --analysis_kind=asserts,PEP316,deal /tmp/tmp21.py 2>&1 || :
 #+end_src
 
 #+RESULTS:
 : /tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
 : /tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
 : /tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
+: /tmp/tmp21.py:15: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
+: /tmp/tmp21.py:26: error: Error while evaluating post condition: "<unknown>" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
+: /tmp/tmp21.py:35: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
 
-* Dafny, coq, ... generating of Python code
+Syntax is standard for Python, though:
 
-# TODO
+- [[https://peps.python.org/pep-0316/][PEP 316: Programming by contracts for Python]]
+- [[https://icontract.readthedocs.io/en/latest/usage.html][icontract: design-by-contract for Python 3]]
+
+- Good: Crosshair finds errors **faster** then property tests - it's symbolic "execution"
+(with stubs) using Satisfiability Modulo Theories (SMT) solver (~Z3~ in the case)
+- Bad:
+  - Crosshair is still limited and not mature enough (0.0.107)
+  - it seems it cannot detect possible aliasing (see ~append_one()~)
+  - it works bad with impure functions (which is expected, btw)
+- but it works well with:
+  - arithmetic
+  - indexing
+  - bounds
+  - assertions
+  - dictionary lookups
+  - integer properties
+  
+* Dafny, coq, etc extracting of Python code
+
+#+begin_example
+                compilation
+  +----------+               +---------+
+  |Dafny/Coq |  __________\  |  Python |  
+  | programm |            /  | program |
+  +----------+               +---------+
+
+                Dafny source
+                     ↓
+            verification conditions
+                     ↓
+               Z3 proves them
+                     ↓
+              verified program
+                     ↓
+  compiles to Python/Go/Javascript/C#/Java
+#+end_example
+
+Similar: Coq, LEAN, etc... but they call "compilation" phase - "extraction".
 
 * Stronger "Python" is...
 

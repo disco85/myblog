@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-07 Tue 08:22 -->
+<!-- 2026-07-07 Tue 19:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -388,7 +388,7 @@ function toggleTheme() {
 </ul>
 </li>
 <li><a href="#org368e073">CrossHair</a></li>
-<li><a href="#org8f8b15b">Dafny, coq, &#x2026; generating of Python code</a></li>
+<li><a href="#orgeb46a4c">Dafny, coq, etc extracting of Python code</a></li>
 <li><a href="#orgc57fa91">Stronger "Python" is&#x2026;</a></li>
 </ul>
 </div>
@@ -415,7 +415,7 @@ Useful like in C, C++, etc:
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">import</span> sys, traceback
 <span class="org-keyword">def</span> <span class="org-function-name">area</span>(x, y):
-    <span class="org-keyword">assert</span> x <span class="org-keyword">and</span> y, <span class="org-string">'No any area!'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: or raise ValueError (exposed/API functions)
+    <span class="org-keyword">assert</span> x <span class="org-keyword">and</span> y, <span class="org-string">'No any area!'</span>   <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: or raise ValueError (exposed/API functions)
 </span>    <span class="org-keyword">return</span> x <span class="org-operator">*</span> y
 <span class="org-keyword">try</span>:
     area(2, 0)
@@ -466,7 +466,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="org40fdcb7">
+<pre class="example" id="org20979b2">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -531,7 +531,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org415b10b">
+<pre class="example" id="org3a31da2">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -652,7 +652,7 @@ Conceptually:
 </p>
 
 <p class="verse">
-&#xa0;bytes<br />
+&#xa0;&#xa0;bytes<br />
 &#xa0;&#xa0;&#xa0;↓<br />
 strategy<br />
 &#xa0;&#xa0;&#xa0;↓<br />
@@ -1005,7 +1005,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgae6cda9">
+<pre class="example" id="orgfcf227c">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1215,7 +1215,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="org89cd325">
+<pre class="example" id="org4642ef4">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -2148,7 +2148,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-orgcd24df5" class="outline-4">
 <h4 id="orgcd24df5">Typing KungFu</h4>
 <div class="outline-text-4" id="text-orgcd24df5">
-<pre class="example" id="org9483f1a">
+<pre class="example" id="orgba41e9f">
        S I M P L E   U S A G E   O F   T Y P E S
      [v e r y   s h o r t   c o d e    r o u t e]
 
@@ -2181,7 +2181,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="orgcdaa493">
+<pre class="example" id="org76e2a99">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2270,7 +2270,7 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 </pre>
 </div>
 
-<pre class="example" id="org1bd3f60">
+<pre class="example" id="org1b9f877">
 /tmp/tmp9.py
   /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
@@ -2359,7 +2359,7 @@ and animals will have nicknames. Let's model it:
 <span class="linenr">10: </span><span class="org-keyword">class</span> <span class="org-type">Mule</span>(Species): ...
 <span class="linenr">11: </span><span class="org-keyword">class</span> <span class="org-type">Hinny</span>(Species): ...
 <span class="linenr">12: </span>
-<span class="linenr">13: </span><span class="org-variable-name">S</span> <span class="org-operator">=</span> typing.TypeVar(<span class="org-string">'S'</span>, bound<span class="org-operator">=</span>Species) <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: Species is kind of S
+<span class="linenr">13: </span><span class="org-variable-name">S</span> <span class="org-operator">=</span> typing.TypeVar(<span class="org-string">'S'</span>, bound<span class="org-operator">=</span>Species) <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: Species is kind of S
 <span class="linenr">14: </span></span>
 <span class="linenr">15: </span><span class="org-type">@dataclasses.dataclass</span>
 <span class="linenr">16: </span><span class="org-keyword">class</span> <span class="org-type">Animal</span>(typing.Generic[S]):
@@ -2411,7 +2411,7 @@ and animals will have nicknames. Let's model it:
 </pre>
 </div>
 
-<pre class="example" id="org20979b2">
+<pre class="example" id="org97db344">
 /tmp/tmp10_0.py
   /tmp/tmp10_0.py:41:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
     Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
@@ -2503,7 +2503,7 @@ You qualify (by a type) existing (library) classes for type-check time:
 <span class="linenr">28: </span>    <span class="org-variable-name">port</span> <span class="org-operator">=</span> 8080
 <span class="linenr">29: </span>    <span class="org-variable-name">ip</span> <span class="org-operator">=</span> <span class="org-string">'127.0.0.1'</span>
 <span class="linenr">30: </span>
-<span class="linenr">31: </span><span class="org-keyword">class</span> <span class="org-type">UnsuitableTcpSrc</span>:                   <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: does not support TcpSource protocol:
+<span class="linenr">31: </span><span class="org-keyword">class</span> <span class="org-type">UnsuitableTcpSrc</span>:                   <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: does not support TcpSource protocol:
 <span class="linenr">32: </span></span>    <span class="org-variable-name">port_number</span> <span class="org-operator">=</span> 8080                    <span class="org-comment-delimiter"># </span><span class="org-comment">there are no expected properties of it !
 <span class="linenr">33: </span></span>    <span class="org-keyword">def</span> <span class="org-function-name">get_ip</span>(<span class="org-keyword">self</span>): <span class="org-keyword">return</span> <span class="org-string">'127.0.0.1'</span>
 <span class="linenr">34: </span>    
@@ -2747,7 +2747,7 @@ Terminal branches leading to unreachable code:
 <span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">report_error</span>(error:<span class="org-builtin">str</span>, exception:<span class="org-constant">None</span><span class="org-operator">|</span><span class="org-builtin">type</span>[<span class="org-type">Exception</span>]<span class="org-operator">=</span><span class="org-constant">None</span>) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>:
 <span class="linenr"> 8: </span>    <span class="org-keyword">if</span> exception <span class="org-keyword">is</span> <span class="org-constant">None</span>:
 <span class="linenr"> 9: </span>        <span class="org-builtin">print</span>(f<span class="org-string">'ERROR HAPPENS, GUYS: </span>{error}<span class="org-string">'</span>)
-<span class="linenr">10: </span>        <span class="org-keyword">return</span> <span class="org-constant">None</span>                       <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: to satisfy MyPy
+<span class="linenr">10: </span>        <span class="org-keyword">return</span> <span class="org-constant">None</span>                       <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: to satisfy MyPy
 <span class="linenr">11: </span></span>    <span class="org-keyword">else</span>:
 <span class="linenr">12: </span>        <span class="org-keyword">raise</span> exception(error)
 <span class="linenr">13: </span>
@@ -2865,7 +2865,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgbeefa17">
+<pre class="example" id="org978e51c">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2875,7 +2875,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="orgb86a38e">
+<pre class="example" id="orgb9e3303">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3376,7 +3376,7 @@ Example with generics:
     x.append((<span class="org-builtin">len</span>(x), f))
 <span class="org-keyword">try</span>:
     <span class="org-variable-name">x</span> <span class="org-operator">=</span> []
-    <span class="org-variable-name">y</span>:<span class="org-builtin">list</span>[<span class="org-builtin">tuple</span>[<span class="org-builtin">bool</span>,<span class="org-builtin">str</span>]] <span class="org-operator">=</span> [(<span class="org-constant">False</span>,<span class="org-string">'hi!'</span>)] <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: empty mutable containers are not checked!
+    <span class="org-variable-name">y</span>:<span class="org-builtin">list</span>[<span class="org-builtin">tuple</span>[<span class="org-builtin">bool</span>,<span class="org-builtin">str</span>]] <span class="org-operator">=</span> [(<span class="org-constant">False</span>,<span class="org-string">'hi!'</span>)] <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: empty mutable containers are not checked!
 </span>    add(x, <span class="org-constant">True</span>)
     add(y, <span class="org-constant">True</span>)                              <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: y contains unexpected item type
 </span><span class="org-keyword">except</span> <span class="org-type">Exception</span> <span class="org-keyword">as</span> x:
@@ -3501,7 +3501,7 @@ text chaos.
 <li>Reliable API wrappers around LLMs</li>
 </ul>
 
-<pre class="example" id="orga1f6405">
+<pre class="example" id="org1257b73">
              TRADITIONAL LLM CODE:
                                            +----------+
  Extract name     +-----+                  | parse to |
@@ -3595,7 +3595,7 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 <pre class="src src-python"><span class="linenr"> 1: </span><span class="org-keyword">def</span> <span class="org-function-name">div1</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
 <span class="linenr"> 2: </span>    <span class="org-doc">'''
 <span class="linenr"> 3: </span>    post: True
-<span class="linenr"> 4: </span>    '''</span>                            <span class="org-comment-delimiter"># </span><span class="org-comment">HINT: "post: True" - will be checked!
+<span class="linenr"> 4: </span>    '''</span>                            <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: "post: True" - will be checked!
 <span class="linenr"> 5: </span></span>    <span class="org-keyword">return</span> a <span class="org-operator">//</span> b                  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: can lead to zero division (non-totality/partial function)!
 <span class="linenr"> 6: </span></span>
 <span class="linenr"> 7: </span><span class="org-keyword">def</span> <span class="org-function-name">div2</span>(a: <span class="org-builtin">int</span>, b: <span class="org-builtin">int</span>) <span class="org-operator">-&gt;</span> <span class="org-builtin">int</span>:
@@ -3642,16 +3642,36 @@ Very similar to previous:
 <span class="linenr">11: </span>    <span class="org-doc">'''post: __return__ if n &gt; 0 else False'''</span>
 <span class="linenr">12: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: property is wrong for n==0: 0 is not 2**X, Crosshair finds it
 <span class="linenr">13: </span></span>    <span class="org-keyword">return</span> (n <span class="org-operator">&amp;</span> (n <span class="org-operator">-</span> 1)) <span class="org-operator">==</span> 0
+<span class="linenr">14: </span><span class="org-keyword">def</span> <span class="org-function-name">buggy_sort</span>(xs:<span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
+<span class="linenr">15: </span>    <span class="org-doc">'''post: all(a &lt;= b for a,b in zip(__return__, __return__[1:]))
+<span class="linenr">16: </span>    '''</span>
+<span class="linenr">17: </span>    <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: no sorting/wrong sorting
+<span class="linenr">18: </span></span>    <span class="org-keyword">return</span> xs
+<span class="linenr">19: </span><span class="org-keyword">def</span> <span class="org-function-name">remove_negatives</span>(xs: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]:
+<span class="linenr">20: </span>    <span class="org-doc">'''post: len(__return__) == sum(x &gt;= 0 for x in __old__.xs)
+<span class="linenr">21: </span>    '''</span>
+<span class="linenr">22: </span>    <span class="org-keyword">for</span> x <span class="org-keyword">in</span> xs:
+<span class="linenr">23: </span>        <span class="org-keyword">if</span> x <span class="org-operator">&lt;</span> 0:
+<span class="linenr">24: </span>            xs.remove(x)
+<span class="linenr">25: </span>    <span class="org-keyword">return</span> xs
+<span class="linenr">26: </span><span class="org-keyword">def</span> <span class="org-function-name">append_one</span>(a: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>], b: <span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-constant">None</span>:
+<span class="linenr">27: </span>    <span class="org-doc">'''post[]: True
+<span class="linenr">28: </span>    '''</span>             <span class="org-comment-delimiter"># </span><span class="org-comment">TIP: empty [] - nothing is mutated
+<span class="linenr">29: </span></span>    a.append(1)     <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: a is mutated, counter-example:  [0] -&gt; [0, 1]
+<span class="linenr">30: </span></span><span class="org-variable-name">State0</span>, <span class="org-variable-name">State1</span> <span class="org-operator">=</span> 0, 1
+<span class="linenr">31: </span><span class="org-keyword">class</span> <span class="org-type">Parser</span>:
+<span class="linenr">32: </span>    <span class="org-doc">'''inv: self.state in (State0, State1)
+<span class="linenr">33: </span>    '''</span>
+<span class="linenr">34: </span>    <span class="org-variable-name">state</span>:<span class="org-builtin">int</span> <span class="org-operator">=</span> State0
+<span class="linenr">35: </span>    <span class="org-keyword">def</span> <span class="org-function-name">parse</span>(<span class="org-keyword">self</span>, s:<span class="org-builtin">str</span>):
+<span class="linenr">36: </span>        <span class="org-keyword">if</span> <span class="org-variable-name">s</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> State0
+<span class="linenr">37: </span>        <span class="org-keyword">elif</span> s <span class="org-operator">==</span> <span class="org-string">'a'</span>: <span class="org-keyword">self</span>.<span class="org-variable-name">state</span> <span class="org-operator">=</span> State1
+<span class="linenr">38: </span>        <span class="org-keyword">else</span>: <span class="org-keyword">self</span>.<span class="org-type">state</span> <span class="org-operator">=</span> 10  <span class="org-comment-delimiter"># </span><span class="org-comment">BUG: invariant is violated with parse(Parser(), '') !</span>
 </pre>
 </div>
 
-<p>
-Crosshair finds errors <b><b>faster</b></b> then property tests - it's symbolic "execution"
-(with stubs) using Satisfiability Modulo Theories (SMT) solver (<code>Z3</code> in the case).
-</p>
-
 <div class="org-src-container">
-<pre class="src src-shell">crosshair check --analysis_kind=asserts,PEP316,icontract,deal /tmp/tmp21.py 2&gt;&amp;1 || :
+<pre class="src src-shell">crosshair check --analysis_kind=asserts,PEP316,deal /tmp/tmp21.py 2&gt;&amp;1 || :
 </pre>
 </div>
 
@@ -3659,12 +3679,68 @@ Crosshair finds errors <b><b>faster</b></b> then property tests - it's symbolic 
 /tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
 /tmp/tmp21.py:9: error: IndexError:  when calling index([0], 1)
 /tmp/tmp21.py:11: error: false when calling is_power_of_two(0) (which returns True)
+/tmp/tmp21.py:15: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
+/tmp/tmp21.py:26: error: Error while evaluating post condition: "&lt;unknown&gt;" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
+/tmp/tmp21.py:35: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
 </pre>
+
+
+<p>
+Syntax is standard for Python, though:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://peps.python.org/pep-0316/">PEP 316: Programming by contracts for Python</a></li>
+<li><a href="https://icontract.readthedocs.io/en/latest/usage.html">icontract: design-by-contract for Python 3</a></li>
+
+<li>Good: Crosshair finds errors <b><b>faster</b></b> then property tests - it's symbolic "execution"</li>
+</ul>
+<p>
+(with stubs) using Satisfiability Modulo Theories (SMT) solver (<code>Z3</code> in the case)
+</p>
+<ul class="org-ul">
+<li>Bad:
+<ul class="org-ul">
+<li>Crosshair is still limited and not mature enough (0.0.107)</li>
+<li>it seems it cannot detect possible aliasing (see <code>append_one()</code>)</li>
+<li>it works bad with impure functions (which is expected, btw)</li>
+</ul></li>
+<li>but it works well with:
+<ul class="org-ul">
+<li>arithmetic</li>
+<li>indexing</li>
+<li>bounds</li>
+<li>assertions</li>
+<li>dictionary lookups</li>
+<li>integer properties</li>
+</ul></li>
+</ul>
 </div>
 </div>
-<div id="outline-container-org8f8b15b" class="outline-2">
-<h2 id="org8f8b15b">Dafny, coq, &#x2026; generating of Python code</h2>
-<div class="outline-text-2" id="text-org8f8b15b">
+<div id="outline-container-orgeb46a4c" class="outline-2">
+<h2 id="orgeb46a4c">Dafny, coq, etc extracting of Python code</h2>
+<div class="outline-text-2" id="text-orgeb46a4c">
+<pre class="example" id="org47f1b64">
+                compilation
+  +----------+               +---------+
+  |Dafny/Coq |  __________\  |  Python |  
+  | programm |            /  | program |
+  +----------+               +---------+
+
+                Dafny source
+                     ↓
+            verification conditions
+                     ↓
+               Z3 proves them
+                     ↓
+              verified program
+                     ↓
+  compiles to Python/Go/Javascript/C#/Java
+</pre>
+
+<p>
+Similar: Coq, LEAN, etc&#x2026; but they call "compilation" phase - "extraction".
+</p>
 </div>
 </div>
 <div id="outline-container-orgc57fa91" class="outline-2">
