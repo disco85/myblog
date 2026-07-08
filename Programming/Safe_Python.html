@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-07 Tue 19:45 -->
+<!-- 2026-07-08 Wed 20:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Safer Python</title>
@@ -467,7 +467,7 @@ It leads to unexpected exception:
 </pre>
 </div>
 
-<pre class="example" id="orgfccda6f">
+<pre class="example" id="org443937e">
 Trying:
     longest_word('w wow word word123')
 Expecting:
@@ -513,12 +513,12 @@ Expected exception, ellipsis:
 
 <div class="org-src-container">
 <pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">longest_word</span>(s):
-    <span class="org-doc">'''Finds the longest word:
+    <span class="org-doc">'''Finds the longest word. It raises on empty string s:
 
     &gt;&gt;&gt; longest_word('w wow word word123')  # doctest: +ELLIPSIS
     'word...'
 
-    And for empty input string:
+    And for empty input string an exception is expected:
     
     &gt;&gt;&gt; longest_word('')
     Traceback (most recent call last):
@@ -532,7 +532,7 @@ Expected exception, ellipsis:
 </pre>
 </div>
 
-<pre class="example" id="org62a7984">
+<pre class="example" id="orgdbb6417">
 Trying:
     longest_word('w wow word word123')  # doctest: +ELLIPSIS
 Expecting:
@@ -1006,7 +1006,7 @@ instances).
 <li>Better than plain classes: auto-generated magic methods</li>
 </ul>
 
-<pre class="example" id="orgc1e1419">
+<pre class="example" id="orgd00cbfb">
                          INCREASED SAFETY:
 
      tuples        -&gt;       named tuples       -&gt;      dataclasses
@@ -1216,7 +1216,7 @@ type='rectangle' width=10.3 height=14.8
 </pre>
 </div>
 
-<pre class="example" id="orgeecc1ca">
+<pre class="example" id="org928b621">
 {
   "description": "Locally obtained license text",
   "properties": {
@@ -1858,8 +1858,7 @@ Assignment:
 </div>
 
 <pre class="example">
-/tmp/tmp1.py:1: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -1881,9 +1880,7 @@ Incorrect usage of a function possibly returning <code>None</code>:
 </div>
 
 <pre class="example">
-/tmp/tmp2.py:4: error: Unsupported operand types for + ("float" and "None")  [operator]
-/tmp/tmp2.py:4: note: Right operand is of type "float | None"
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -1906,9 +1903,7 @@ Wrong argument's type:
 </div>
 
 <pre class="example">
-/tmp/tmp3.py:4: error: Argument 1 to "size" has incompatible type "int"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
-/tmp/tmp3.py:5: error: Argument 1 to "size" has incompatible type "str | None"; expected "tuple[Any, ...] | list[Any] | str"  [arg-type]
-Found 2 errors in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -1936,9 +1931,7 @@ More precise standard containers:
 </div>
 
 <pre class="example">
-/tmp/tmp4.py:9: error: Incompatible types in assignment (expression has type "str", target has type "float")  [assignment]
-/tmp/tmp4.py:10: error: Invalid index type "str" for "dict[Planet, float]"; expected type "Planet"  [index]
-Found 2 errors in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -1959,8 +1952,7 @@ Final values:
 </div>
 
 <pre class="example">
-/tmp/tmp4_0.py:3: error: Cannot assign to final name "pi"  [misc]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 </div>
 </div>
@@ -2003,8 +1995,7 @@ Wrapper-types for correct algorithms chaining:
 </div>
 
 <pre class="example">
-/tmp/tmp5.py:15: error: Argument 1 to "unique" has incompatible type "list[int]"; expected "SortedList"  [arg-type]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2048,8 +2039,7 @@ Hello    michael   dudikoff  , how are you?
 </div>
 
 <pre class="example">
-/tmp/tmp6.py:16: error: Argument 1 to "greating" has incompatible type "str"; expected "ReadableName"  [arg-type]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2076,8 +2066,7 @@ Refined, strongly typed math:
 </div>
 
 <pre class="example">
-/tmp/tmp7.py:7: error: Argument 1 to "safe_sqrt" has incompatible type "int"; expected "Positive"  [arg-type]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2114,14 +2103,6 @@ But <b><b>here we will use PyRight, because MyPy does not fully support it and i
 </pre>
 </div>
 
-<pre class="example">
-/tmp/tmp8.py
-  /tmp/tmp8.py:14:16 - error: Argument of type "list[int]" cannot be assigned to parameter "n" of type "NonEmptyList[A@safe_max]" in function "safe_max"
-    "list[int]" is not assignable to "NonEmptyList[A@safe_max]" (reportArgumentType)
-1 error, 0 warnings, 0 informations
-</pre>
-
-
 <p>
 Units of measurement:
 </p>
@@ -2149,7 +2130,7 @@ See libraries about refined and phantom types:
 <div id="outline-container-orgcd24df5" class="outline-4">
 <h4 id="orgcd24df5">Typing KungFu</h4>
 <div class="outline-text-4" id="text-orgcd24df5">
-<pre class="example" id="orgfac7598">
+<pre class="example" id="org3f2497d">
        S I M P L E   U S A G E   O F   T Y P E S
      [v e r y   s h o r t   c o d e    r o u t e]
 
@@ -2182,7 +2163,7 @@ be illuminated by a light, and only after illuminating the scene can be rendered
 Transitions between scene's states are:
 </p>
 
-<pre class="example" id="org2fe111b">
+<pre class="example" id="orgf1db36f">
 Empty-Scene       Cluttered            Textured    Illuminated    Rendered
      ║                ║                    ║            ║             ║
      ║----object-----&gt;║----object----.     ║            ║             ║
@@ -2270,23 +2251,6 @@ Empty-Scene       Cluttered            Textured    Illuminated    Rendered
 <pre class="src src-shell">pyright /tmp/tmp9.py || :
 </pre>
 </div>
-
-<pre class="example" id="org84f5699">
-/tmp/tmp9.py
-  /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
-    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
-      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
-        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
-  /tmp/tmp9.py:53:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
-    "Scene[Cluttered]" is not assignable to "Scene[Textured]"
-      Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
-        "Cluttered" is not assignable to type "Textured" (reportArgumentType)
-  /tmp/tmp9.py:59:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
-    "Scene[Textured]" is not assignable to "Scene[Illuminated]"
-      Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
-        "Textured" is not assignable to type "Illuminated" (reportArgumentType)
-3 errors, 0 warnings, 0 informations
-</pre>
 
 <p>
 Example modeling animal breeding. We have species: a lion, a tiger, a donkey, a horse,
@@ -2412,21 +2376,6 @@ and animals will have nicknames. Let's model it:
 </pre>
 </div>
 
-<pre class="example" id="org443937e">
-/tmp/tmp10_0.py
-  /tmp/tmp10_0.py:41:13 - error: Type "int" cannot be assigned to type variable "S@Animal"
-    Type "int" is not assignable to upper bound "Species" for type variable "S@Animal"
-      "int" is not assignable to "Species" (reportInvalidTypeArguments)
-  /tmp/tmp10_0.py:45:20 - information: Type of "o1" is "Animal[Mule]"
-  /tmp/tmp10_0.py:49:20 - information: Type of "o2" is "Animal[Hinny]"
-  /tmp/tmp10_0.py:53:20 - information: Type of "o3" is "Animal[Horse]"
-  /tmp/tmp10_0.py:54:6 - error: No overloads for "offspring" match the provided arguments (reportCallIssue)
-  /tmp/tmp10_0.py:55:16 - error: Argument of type "Animal[Tiger]" cannot be assigned to parameter "female" of type "Animal[S@offspring]" in function "offspring"
-    "Animal[Tiger]" is not assignable to "Animal[Horse]"
-      Type parameter "S@Animal" is invariant, but "Tiger" is not the same as "Horse" (reportArgumentType)
-3 errors, 0 warnings, 3 informations
-</pre>
-
 <p>
 Another similar example:
 </p>
@@ -2453,15 +2402,6 @@ Another similar example:
 <pre class="src src-shell">pyright /tmp/tmp10.py || :
 </pre>
 </div>
-
-<pre class="example">
-/tmp/tmp10.py
-  /tmp/tmp10.py:14:10 - error: No overloads for "join" match the provided arguments (reportCallIssue)
-  /tmp/tmp10.py:14:32 - error: Argument of type "list[str | bytes]" cannot be assigned to parameter "iterable" of type "Iterable[str]" in function "join"
-    "bytes" is not assignable to "str" (reportArgumentType)
-2 errors, 0 warnings, 0 informations
-</pre>
-
 
 <p>
 <b><b>Structural equivalence</b></b> is very useful when you use objects from some libraries that
@@ -2524,16 +2464,6 @@ Read from TcpSource 127.0.0.1:8080
 </pre>
 </div>
 
-<pre class="example">
-/tmp/tmp11.py
-  /tmp/tmp11.py:36:7 - error: No overloads for "read_from_net" match the provided arguments (reportCallIssue)
-  /tmp/tmp11.py:36:21 - error: Argument of type "UnsuitableTcpSrc" cannot be assigned to parameter "src" of type "SocketSource" in function "read_from_net"
-    "UnsuitableTcpSrc" is incompatible with protocol "SocketSource"
-      "socket" is not present (reportArgumentType)
-2 errors, 0 warnings, 0 informations
-</pre>
-
-
 <p>
 Typed dictionaries are another way to typify something traditionally raw and error
 prone - dictionaries. It is useful within business applications full of large JSON
@@ -2581,16 +2511,6 @@ Cannot print to the end {'name': 'John', 'age': 40}: 'email'
 </pre>
 </div>
 
-<pre class="example">
-/tmp/tmp12.py
-  /tmp/tmp12.py:16:67 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
-    "gender" is an undefined item in type "Person" (reportAssignmentType)
-  /tmp/tmp12.py:18:13 - error: Type "dict[str, str | int]" is not assignable to declared type "Person"
-    "email" is required in "Person" (reportAssignmentType)
-2 errors, 0 warnings, 0 informations
-</pre>
-
-
 <p>
 Final cases (reminds Common Lisp's <code>ecase</code> and <code>etypecase</code> but for type-check time,
 more relevant is <b><b>exhaustive switch</b></b> of Java) - very helpful when refactoring happens:
@@ -2629,8 +2549,7 @@ Nick is maverick
 </div>
 
 <pre class="example">
-/tmp/tmp13.py:16: error: Argument 1 to "assert_never" has incompatible type "FullName"; expected "Never"  [arg-type]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2675,9 +2594,7 @@ ERROR: '&gt;=' not supported between instances of 'str' and 'int'
 </div>
 
 <pre class="example">
-/tmp/tmp14.py:17: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
-/tmp/tmp14.py:18: error: Argument 2 to "check_indexes" has incompatible type "object"; expected "Iterable[int]"  [arg-type]
-Found 2 errors in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2728,9 +2645,7 @@ ERROR: 'name'!
 </div>
 
 <pre class="example">
-/tmp/tmp15.py:20: error: Value of type "object" is not indexable  [index]
-/tmp/tmp15.py:21: error: "object" has no attribute "get"  [attr-defined]
-Found 2 errors in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2773,8 +2688,7 @@ Pay attention that I add the option <code>--warn-unreachable</code>:
 </div>
 
 <pre class="example">
-/tmp/tmp16.py:16: error: Statement is unreachable  [unreachable]
-Found 1 error in 1 file (checked 1 source file)
+Found 1 error in 1 file (errors prevented further checking)
 </pre>
 
 
@@ -2866,7 +2780,7 @@ PI: <span class="org-builtin">float</span>
 Location:
 </p>
 
-<pre class="example" id="orgb2113d6">
+<pre class="example" id="org2072b65">
 project/
     shapes.py
     shapes.pyi &lt;- type stub for shapes.py
@@ -2876,7 +2790,7 @@ project/
 If sub-files are located in a separate directory - one of options is:
 </p>
 
-<pre class="example" id="org2aa1427">
+<pre class="example" id="orgc7c5277">
     Directories:           mypy.ini:              pyrightconfig.json:
 ~~~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~~~~~
 project/                   [mypy]                 { "stubPath": "stubs" }
@@ -3359,12 +3273,6 @@ Simple example:
 </pre>
 </div>
 
-<pre class="example">
-typeguard.TypeCheckError: argument "x" (str) is not an instance of int
-
-</pre>
-
-
 <p>
 Example with generics:
 </p>
@@ -3389,12 +3297,6 @@ Example with generics:
 <pre class="src src-shell">python /tmp/tmp18.py
 </pre>
 </div>
-
-<pre class="example">
-typeguard.TypeCheckError: item 1 of item 0 of argument "x" (list) is not an instance of bool
-
-</pre>
-
 
 <p>
 Example with classes:
@@ -3442,13 +3344,6 @@ cnt.increment(2)
 <pre class="src src-shell">python /tmp/tmp19.py
 </pre>
 </div>
-
-<pre class="example">
-typeguard.TypeCheckError: argument "step" (str) is not an instance of int
-
-typeguard.TypeCheckError: argument "n" (bool) is not an instance of str
-
-</pre>
 </div>
 </div>
 </div>
@@ -3502,7 +3397,7 @@ text chaos.
 <li>Reliable API wrappers around LLMs</li>
 </ul>
 
-<pre class="example" id="orgab7f11e">
+<pre class="example" id="org8732ec2">
              TRADITIONAL LLM CODE:
                                            +----------+
  Extract name     +-----+                  | parse to |
@@ -3620,8 +3515,7 @@ Simple example - pre-conditions, post-conditions ("static contracts"):
 </div>
 
 <pre class="example">
-/tmp/tmp20.py:5: error: ZeroDivisionError:  when calling div1(0, 0)
-/tmp/tmp20.py:18: error: PreconditionFailed: Precondition "b != 0" was not satisfied before calling "div2" when calling div3(0, 0)
+File not found: "/tmp/tmp20.py"
 </pre>
 
 
@@ -3689,13 +3583,7 @@ Very similar to previous:
 </div>
 
 <pre class="example">
-/tmp/tmp21.py:4: error: ZeroDivisionError:  when calling average([])
-/tmp/tmp21.py:10: error: IndexError:  when calling index([0], 1)
-/tmp/tmp21.py:13: error: false when calling is_power_of_two(0) (which returns True)
-/tmp/tmp21.py:18: error: false when calling buggy_sort([17869, -400]) (which returns [17869, -400])
-/tmp/tmp21.py:31: error: Error while evaluating post condition: "&lt;unknown&gt;" yields Argument "a" is not marked as mutable, but changed from [0] to [0, 1]
-/tmp/tmp21.py:38: error: false when calling remove_spaces('\x00 ¡') (which returns '\x00 ¡')
-/tmp/tmp21.py:47: error: "'''inv: self.state in (State0, State1)" yields false when calling parse(Parser(), '')
+File not found: "/tmp/tmp21.py"
 </pre>
 
 
@@ -3753,7 +3641,7 @@ produce Python (and Go, and Javascript, and &#x2026;) code which is verified by 
 contracts:
 </p>
 
-<pre class="example" id="org6c22a7a">
+<pre class="example" id="org3a5dfa4">
                 compilation
      +-------+               +---------+
      | Dafny |  __________\  |  Python |  
