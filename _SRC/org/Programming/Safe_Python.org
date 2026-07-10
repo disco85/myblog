@@ -1394,10 +1394,6 @@ class SocketSource(typing.Protocol):
     @property
     def socket(self) -> socket.socket: ...
 
-@typing.overload
-def read_from_net(src:TcpSource) -> str: ...
-@typing.overload
-def read_from_net(src:SocketSource) -> str: ...
 def read_from_net(src:TcpSource|SocketSource) -> str:
     if isinstance(src, TcpSource):
         return f'Read from TcpSource {src.ip}:{src.port}'
@@ -1428,11 +1424,14 @@ pyright /tmp/tmp11.py || :
 
 #+RESULTS:
 : /tmp/tmp11.py
-:   /tmp/tmp11.py:36:7 - error: No overloads for "read_from_net" match the provided arguments (reportCallIssue)
-:   /tmp/tmp11.py:36:21 - error: Argument of type "UnsuitableTcpSrc" cannot be assigned to parameter "src" of type "SocketSource" in function "read_from_net"
-:     "UnsuitableTcpSrc" is incompatible with protocol "SocketSource"
-:       "socket" is not present (reportArgumentType)
-: 2 errors, 0 warnings, 0 informations
+:   /tmp/tmp11.py:32:21 - error: Argument of type "UnsuitableTcpSrc" cannot be assigned to parameter "src" of type "TcpSource | SocketSource" in function "read_from_net"
+:     Type "UnsuitableTcpSrc" is not assignable to type "TcpSource | SocketSource"
+:       "UnsuitableTcpSrc" is incompatible with protocol "TcpSource"
+:         "port" is not present
+:         "ip" is not present
+:       "UnsuitableTcpSrc" is incompatible with protocol "SocketSource"
+:         "socket" is not present (reportArgumentType)
+: 1 error, 0 warnings, 0 informations
 
 Typed dictionaries are another way to typify something traditionally raw and error
 prone - dictionaries. It is useful within business applications full of large JSON
