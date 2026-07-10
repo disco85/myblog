@@ -40,6 +40,8 @@ except Exception as x:
 #+end_src
 
 #+RESULTS:
+: AssertionError: No any area!
+: 
 
 * Doctests
 
@@ -70,6 +72,41 @@ import doctest; doctest.testmod(verbose=True)
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Trying:
+    longest_word('w wow word word123')
+Expecting:
+    'word123'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    None
+,**********************************************************************
+File "<stdin>", line 9, in __main__.longest_word
+Failed example:
+    longest_word('')
+Exception raised:
+    Traceback (most recent call last):
+      File "/usr/lib/python3.13/doctest.py", line 1395, in __run
+        exec(compile(example.source, filename, "single",
+        ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                     compileflags, True), test.globs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "<doctest __main__.longest_word[1]>", line 1, in <module>
+        longest_word('')
+        ~~~~~~~~~~~~^^^^
+      File "<stdin>", line 13, in longest_word
+    ValueError: max() iterable argument is empty
+1 item had no tests:
+    __main__
+,**********************************************************************
+1 item had failures:
+   1 of   2 in __main__.longest_word
+2 tests in 2 items.
+1 passed and 1 failed.
+,***Test Failed*** 1 failure.
+#+end_example
 
 ** More tricky doctests
 
@@ -96,6 +133,27 @@ import doctest; doctest.testmod(verbose=True)
 #+end_src
 
 #+RESULTS:
+#+begin_example
+Trying:
+    longest_word('w wow word word123')  # doctest: +ELLIPSIS
+Expecting:
+    'word...'
+ok
+Trying:
+    longest_word('')
+Expecting:
+    Traceback (most recent call last):
+    ...
+    ValueError: max() iterable argument is empty
+ok
+1 item had no tests:
+    __main__
+1 item passed all tests:
+   2 tests in __main__.longest_word
+2 tests in 2 items.
+2 passed.
+Test passed.
+#+end_example
 
 You can write very complex tests even, integration tests if they use
 "fat" functions, so it looks compact enough
@@ -220,6 +278,11 @@ except Exception as x:
 #+end_src
 
 #+RESULTS:
+: AssertionError
+:  Falsifying example: test_sort(
+:      xs=[0, 0],
+:  )
+: 
 
 *** Input size control
 
@@ -430,6 +493,10 @@ print('Is Go object oriented?', Lang.GO in object_oriented)
 #+end_src
 
 #+RESULTS:
+: Is Distro.DEBIAN a str? True
+: Mx linux!
+: Is Python object oriented? True
+: Is Go object oriented? False
 
 * Dataclasses
 
@@ -491,6 +558,9 @@ print(p1 == p2, p1 == p3)
 #+end_src
 
 #+RESULTS:
+: Hi, John !!
+: How do you do, Joe.
+: False True
 
 They are used for:
 
@@ -530,6 +600,13 @@ except Exception as x:
 #+end_src
 
 #+RESULTS:
+: 2 validation errors for FileLicenseTextSource
+: location.int
+:   Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=123.12, input_type=float]
+:     For further information visit https://errors.pydantic.dev/2.13/v/int_from_float
+: location.str
+:   Input should be a valid string [type=string_type, input_value=123.12, input_type=float]
+:     For further information visit https://errors.pydantic.dev/2.13/v/string_type
 
 *** To JSON
 
@@ -544,6 +621,7 @@ print(flts.model_dump_json())
 #+end_src
 
 #+RESULTS:
+: {"file_url":"https://a.com/MIT.txt","location":123}
 
 *** Nested models
 
@@ -569,6 +647,7 @@ print(user)
 #+end_src
 
 #+RESULTS:
+: name='Alice' age=30 address=Address(city='Sofia', zip=1000)
 
 *** Discriminating unions
 
@@ -595,6 +674,8 @@ print(s2)
 #+end_src
 
 #+RESULTS:
+: type='circle' radius=5.0
+: type='rectangle' width=10.3 height=14.8
 
 *** JSON schema
 
@@ -609,6 +690,37 @@ print(json.dumps(sch, indent=2))
 #+end_src
 
 #+RESULTS:
+#+begin_example
+{
+  "description": "Locally obtained license text",
+  "properties": {
+    "file_url": {
+      "title": "File Url",
+      "type": "string"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    }
+  },
+  "required": [
+    "file_url"
+  ],
+  "title": "FileLicenseTextSource",
+  "type": "object"
+}
+#+end_example
 
 ** Alternatives
 
@@ -894,6 +1006,8 @@ print(unique(sorted_items))
 #+end_src
 
 #+RESULTS:
+: [11, 20, 11, 20, 1, 20, 11, 5, 1]
+: [1, 5, 11, 20]
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 mypy /tmp/tmp5.py || :
@@ -927,6 +1041,10 @@ greating(r)                                         # BUG: expected ReadableName
 #+end_src
 
 #+RESULTS:
+: Hello Michael Dudikoff, how are you?
+: -- Best regards,
+: --  Michael Dudikoff
+: Hello    michael   dudikoff  , how are you?
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 mypy /tmp/tmp6.py || :
@@ -1060,11 +1178,7 @@ SceneState = Empty | Cluttered | Textured | Illuminated | Rendered
 class Scene[T:SceneState=Empty]:  # default constructor produces Empty scene
     objects:list[str]
 
-@typing.overload
-def put_object[T:SceneState](s:Scene[Empty|Cluttered]) -> Scene[Cluttered]: ...
-@typing.overload
-def put_object[T:SceneState](s:Scene[Textured]) -> Scene[Cluttered]: ...
-def put_object[T:SceneState](s:Scene[T]) -> Scene[Cluttered]:
+def put_object(s:Scene[Empty|Cluttered|Textured]) -> Scene[Cluttered]:
     return Scene(objects=s.objects + [f'obj{len(s.objects)}'])
 
 def texture_objects(s:Scene[Cluttered], texture:str) -> Scene[Textured]:
@@ -1110,6 +1224,10 @@ render(texture_objects(
 #+end_src
 
 #+RESULTS:
+: ['OBJ0-BRICK', 'OBJ1-BRICK']
+: ['OBJ0-BRICK', 'OBJ1-BRICK', 'OBJ2']
+: ['OBJ0', 'OBJ1']
+: ['obj0-brick', 'obj1-brick']
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 pyright /tmp/tmp9.py || :
@@ -1118,15 +1236,15 @@ pyright /tmp/tmp9.py || :
 #+RESULTS:
 #+begin_example
 /tmp/tmp9.py
-  /tmp/tmp9.py:45:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+  /tmp/tmp9.py:41:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
       Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
         "Cluttered" is not assignable to type "Textured" (reportArgumentType)
-  /tmp/tmp9.py:53:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
+  /tmp/tmp9.py:49:5 - error: Argument of type "Scene[Cluttered]" cannot be assigned to parameter "s" of type "Scene[Textured]" in function "light"
     "Scene[Cluttered]" is not assignable to "Scene[Textured]"
       Type parameter "T@Scene" is covariant, but "Cluttered" is not a subtype of "Textured"
         "Cluttered" is not assignable to type "Textured" (reportArgumentType)
-  /tmp/tmp9.py:59:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
+  /tmp/tmp9.py:55:8 - error: Argument of type "Scene[Textured]" cannot be assigned to parameter "s" of type "Scene[Illuminated]" in function "render"
     "Scene[Textured]" is not assignable to "Scene[Illuminated]"
       Type parameter "T@Scene" is covariant, but "Textured" is not a subtype of "Illuminated"
         "Textured" is not assignable to type "Illuminated" (reportArgumentType)
@@ -1301,6 +1419,8 @@ print(read_from_net(UnsuitableTcpSrc()))  # BUG: neither SocketSource nor TcpSou
 #+end_src
 
 #+RESULTS:
+: Read from TcpSource 127.0.0.1:8080
+: <nothing>
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 pyright /tmp/tmp11.py || :
@@ -1342,6 +1462,14 @@ print_person(p2)
 #+end_src
 
 #+RESULTS:
+: NAME: Axel
+: EMAIL: axel@fake.com
+: ----------
+: NAME: John, 40
+: EMAIL: john@fake.com
+: ----------
+: NAME: John, 40
+: Cannot print to the end {'name': 'John', 'age': 40}: 'email'
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 pyright /tmp/tmp12.py || :
@@ -1380,6 +1508,7 @@ print_moniker(FullName('Alex Johnson'))      # BUG: nothing printed + assert_nev
 #+end_src
 
 #+RESULTS:
+: Nick is maverick
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 mypy /tmp/tmp13.py || :
@@ -1415,6 +1544,9 @@ except Exception as x:
 #+end_src
 
 #+RESULTS:
+: 1: True
+: 3: True
+: ERROR: '>=' not supported between instances of 'str' and 'int'
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 mypy /tmp/tmp14.py || :
@@ -1455,6 +1587,11 @@ except Exception as x:
 #+end_src
 
 #+RESULTS:
+: Name: John
+: Surname: Doe
+: Name: John
+: Surname: Doe
+: ERROR: 'name'!
 
 #+begin_src shell :eval yes-export :exports both :results output verbatim
 mypy /tmp/tmp15.py || :
@@ -1487,6 +1624,7 @@ report_error('No data')                   # WARN: statement is unreachable!
 #+end_src
 
 #+RESULTS:
+: ERROR HAPPENS, GUYS: No data
 
 Pay attention that I add the option ~--warn-unreachable~:
 
