@@ -1,0 +1,190 @@
+#+title: Packs search
+#+description: Programming
+#+keywords: Programming, Algorithms
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Programming Algorithm
+#+date: <2026-07-17 Fri>
+
+** Packs (or clusters)
+
+Let's consider the problem of recognizing data clusters. Imagine a
+space with a metric that can correspond to the similarity of two
+objects:
+
+#+begin_example
+|   |   | | ||| ||  |    | | ||| |  |   |
+|   |   | | ||| ||  |    | | ||| |  |   |
+        ↑________↑       ↑_______↑  
+#+end_example
+
+For example, it could be a clusterization of colors, texts, etc. - everything having metric.
+
+#+caption: Algorithm demonstration
+#+begin_src octave :eval yes :results none :var dir=(expand-file-name myblog-assets-base-directory)
+function concentrations()
+  file = fullfile(dir, "Packs_Search.svg");
+  ps = [1,7,9,10,11,13,15,16,18,19,25,30,34,36,37,38,39,40,42,43,45,46,49,52,58];
+  # ps = [1,2,10,20,30,40,50,60,70,80,90,100,101]
+  # ps = [1,2,1,1,1,10,20,30,40,50,60,70,80,90,100,101]
+  display('INPUT');
+  disp(ps);
+  clusters = calc_clusters(ps);
+  disp('CLUST');
+  disp(clusters);
+  % Create smaller figure
+  fig = figure('position', [0, 0, 350, 350]); % width, height in pixels
+  ax = axes(fig);
+  scatter(ax, xy(:,1), xy(:,2), 120, c, 'filled');
+  hold(ax, 'on'); % don't removed already drawn
+  plot(ax, xlim(ax), xlim(ax), 'k--', 'LineWidth', 1.5);
+  axis(ax, 'equal');
+  grid(ax, 'on');
+  xlabel(ax, 'X');
+  ylabel(ax, 'Y');
+  title(ax, 'Packs detection');
+  % Styling for cleaner SVG ---
+  set(ax, 'color', 'none');        % transparent axes background
+  set(fig, 'color', 'none');       % transparent figure background
+  % Try to improve SVG output consistency
+  set(ax, 'box', 'off');
+  % Export as SVG
+  print(fig, file, '-dsvg', '-painters');  
+endfunction
+
+function [diffs] = calc_diffs(ps, absolute=false)
+  diffs = diff(ps);
+  if (absolute)
+    diffs = abs(diffs);
+  endif
+endfunction
+
+function [ratio] = calc_ratio(x, y)
+  abs_x = abs(x);
+  abs_y = abs(y);
+  res_sign = sign(x) * sign(y);
+  if (abs_x == 0 && abs_y == 0)
+    ratio = NaN;
+  elseif (abs_x > abs_y)
+    if (abs_y == 0)
+      if (res_sign < 0)
+        ratio = -Inf;
+      else
+        ratio = Inf;
+      endif
+    else
+      ratio = x / y;
+    endif
+  elseif (abs_x < abs_y)
+    if (abs_x == 0)
+      if (res_sign < 0)
+        ratio = -Inf;
+      else
+        ratio = Inf;
+      endif
+    else
+      ratio = y/x;
+    endif
+  else
+    if (abs_x == 0)
+      ratio = NaN;
+    else
+      ratio = res_sign;
+    endif
+  endif
+endfunction
+
+function [needed] = new_rect_is_needed(slice, p, tolerance)
+  if (isempty(slice))
+    error("slice is empty");
+  else
+    slice_max = max(slice);
+    slice_min = min(slice);
+    needed = calc_ratio(p, slice_max) > tolerance || ...
+             calc_ratio(p, slice_min) > tolerance;
+  endif
+endfunction
+
+function [res_ps, res_ranges] = approximate_by_rectangles(ps, tolerance=1.5)
+  res_ps = [];
+  res_ranges = [];
+  slice = [];
+  for p = ps
+    if (isempty(slice))
+      slice = [slice, p];
+    else
+      if (new_rect_is_needed(slice, p, tolerance))
+        slice_avg = mean(slice);
+        res_ps = [res_ps, slice_avg * ones(1, length(slice))];
+        slice = [p];
+      else
+        slice = [slice, p];
+      endif
+    endif
+  endfor
+  if (!isempty(slice))
+    slice_avg = mean(slice);
+    res_ps = [res_ps, slice_avg * ones(1, length(slice))];
+  endif
+  pr = NaN;
+  for i = 1:length(res_ps)
+    r = res_ps(i);
+    if (i == 1)
+      res_ranges = [res_ranges, i];
+    elseif (i != 1 && pr != r)
+      res_ranges = [res_ranges, i];
+    endif
+    pr = r;
+  endfor
+endfunction
+
+function [res] = find_clusters_centers(ranges, isovalues, ratio=2, nesting=0)
+  prev_isovalue = NaN;
+  res = [];
+  max_irange = length(ranges) - 1;
+  for irange = 0:max_irange
+    isovalue = isovalues(ranges(irange + 1) + 1);
+    if (!isnan(prev_isovalue))
+      if (isovalue > prev_isovalue && ...
+          calc_ratio(isovalue, prev_isovalue) >= ratio)
+        % left___/‾‾
+        right = ranges(irange + 1);
+        left = ranges(max(irange - 1, 0) + 1);
+      elseif (isovalue < prev_isovalue && ...
+              calc_ratio(prev_isovalue, isovalue) >= ratio)
+        % ‾‾\___right
+        left = ranges(irange + 1);
+        right = ranges(min(irange + 1, max_irange) + 1);
+      else
+        prev_isovalue = isovalue;
+        continue;
+      endif
+      if (right == left)
+        right = right + 1;
+      endif
+      left = left + nesting;
+      right = right + nesting;
+      if (isempty(res) || res(end,1) != left || res(end,2) != right)
+        res(end + 1, :) = [left, right];
+      endif
+    endif
+    prev_isovalue = isovalue;
+  endfor
+endfunction
+
+function [clusters] = calc_clusters(ps)
+  diffs = calc_diffs(ps);
+  [isovalues, ranges] = approximate_by_rectangles(diffs, 2);
+  clusters = find_clusters_centers(ranges, isovalues, 0);
+endfunction
+#+end_src
+
+[[inline:../../assets/Factorial_perm1.svg,flt-octave-2d-svg]]
+
+
+#+begin_src octave
+xy = P(:,1:2);
+cidx = P(:,3);
+#+end_src
+
