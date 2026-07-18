@@ -3,7 +3,6 @@
 #+keywords: Programming, Algorithms
 #+options: smartquotes:nil
 #+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
-#+property: header-args :eval no-export
 #+tags: Programming Algorithm
 #+date: <2026-07-17 Fri>
 
@@ -24,28 +23,6 @@ objects:
 
 For example, it could be a clusterization of colors, texts, etc. - everything having metric.
 
-#+begin_src octave :session test :results output
-function hello()
-  disp("Hello")
-endfunction
-hello();
-#+end_src
-
-#+RESULTS:
-: Hello
-
-#+begin_src octave :results output
-hello = @() disp("Hello");
-hello();
-## function hello()
-##   disp("Hello!");
-## endfunction
-## hello();
-#+end_src
-
-#+RESULTS:
-: Hello
-
 #+caption: Algorithm demonstration
 #+begin_src octave :eval yes :session *octave* :results output :exports both :var odir=(expand-file-name myblog-assets-base-directory)
 function algorithm_demo(odir)
@@ -61,7 +38,7 @@ function algorithm_demo(odir)
   % Create smaller figure
   close all;
   reset(groot);
-  fig = figure('position', [0, 0, 350, 350]); % width, height in pixels
+  fig = figure('visible', 'off', 'position', [0, 0, 350, 350]); % width, height in pixels
   hold on;
   # Thick cluster segments
   for k = 1:size(clusters,1)
@@ -92,7 +69,8 @@ function algorithm_demo(odir)
   ## % Try to improve SVG output consistency
   ## set(ax, 'box', 'off');
   % Export as SVG
-  print(fig, file, '-dsvg', '-painters');  
+  print(fig, file, '-dsvg', '-painters');
+  close(fig);
 endfunction
 
 function [diffs] = calc_diffs(ps, absolute=false)
@@ -223,79 +201,6 @@ endfunction
 
 algorithm_demo(odir);
 #+end_src
-
-#+RESULTS:
-#+begin_example
-INPUT
- Columns 1 through 16:
-
-    1    7    9   10   11   13   15   16   18   19   25   30   34   36   37   38
-
- Columns 17 through 25:
-
-   39   40   42   43   45   46   49   52   58
-CLUST
-    2   10
-   13   22
-warning: using the gnuplot graphics toolkit is discouraged
-
-The gnuplot graphics toolkit is not actively maintained and has a number
-of limitations that are unlikely to be fixed.  Communication with gnuplot
-uses a one-directional pipe and limited information is passed back to the
-Octave interpreter so most changes made interactively in the plot window
-will not be reflected in the graphics properties managed by Octave.  For
-example, if the plot window is closed with a mouse click, Octave will not
-be notified and will not update its internal list of open figure windows.
-The qt toolkit is recommended instead.
-                                                                               
-                                                                               
-      |                          Packs detection                               
-   1 +|+     %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
-      |      %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.8 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.6 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.4 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.2 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     +|----------------------------------------------------------------------  
-   0 +$+#####%**@&=*****#*$%+#####@#####&####=#**##$%#@&##=*##*+#########$ +   
-     0          10         20          30          40         50          60   
-                                                                               
-                                                                               
-                                                                               
-      |                          Packs detection                               
-   1 +|+     %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
-      |      %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.8 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.6 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.4 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
- 0.2 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
-     +|----------------------------------------------------------------------  
-   0 +$+#####%**@&=*****#*$%+#####@#####&####=#**##$%#@&##=*##*+#########$ +   
-     0          10         20          30          40         50          60
-#+end_example
-
 
 [[inline:../../assets/Packs_Search.svg,flt-octave-2d-svg]]
 
