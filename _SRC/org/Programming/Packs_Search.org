@@ -16,15 +16,40 @@ objects:
 #+begin_example
 |   |   | | ||| ||  |    | | ||| |  |   |
 |   |   | | ||| ||  |    | | ||| |  |   |
-        ↑________↑       ↑_______↑  
+        ↑________↑       ↑_______↑
+        :        :       :       :
+        :        :       :       :
+      left     right   left    right
 #+end_example
 
 For example, it could be a clusterization of colors, texts, etc. - everything having metric.
 
+#+begin_src octave :session test :results output
+function hello()
+  disp("Hello")
+endfunction
+hello();
+#+end_src
+
+#+RESULTS:
+: Hello
+
+#+begin_src octave :results output
+hello = @() disp("Hello");
+hello();
+## function hello()
+##   disp("Hello!");
+## endfunction
+## hello();
+#+end_src
+
+#+RESULTS:
+: Hello
+
 #+caption: Algorithm demonstration
-#+begin_src octave :eval yes :results none :var dir=(expand-file-name myblog-assets-base-directory)
-function concentrations()
-  file = fullfile(dir, "Packs_Search.svg");
+#+begin_src octave :eval yes :session *octave* :results output :exports both :var odir=(expand-file-name myblog-assets-base-directory)
+function algorithm_demo(odir)
+  file = fullfile(odir, 'Packs_Search.svg');
   ps = [1,7,9,10,11,13,15,16,18,19,25,30,34,36,37,38,39,40,42,43,45,46,49,52,58];
   # ps = [1,2,10,20,30,40,50,60,70,80,90,100,101]
   # ps = [1,2,1,1,1,10,20,30,40,50,60,70,80,90,100,101]
@@ -34,21 +59,38 @@ function concentrations()
   disp('CLUST');
   disp(clusters);
   % Create smaller figure
+  close all;
+  reset(groot);
   fig = figure('position', [0, 0, 350, 350]); % width, height in pixels
-  ax = axes(fig);
-  scatter(ax, xy(:,1), xy(:,2), 120, c, 'filled');
-  hold(ax, 'on'); % don't removed already drawn
-  plot(ax, xlim(ax), xlim(ax), 'k--', 'LineWidth', 1.5);
-  axis(ax, 'equal');
-  grid(ax, 'on');
-  xlabel(ax, 'X');
-  ylabel(ax, 'Y');
-  title(ax, 'Packs detection');
-  % Styling for cleaner SVG ---
-  set(ax, 'color', 'none');        % transparent axes background
-  set(fig, 'color', 'none');       % transparent figure background
-  % Try to improve SVG output consistency
-  set(ax, 'box', 'off');
+  hold on;
+  # Thick cluster segments
+  for k = 1:size(clusters,1)
+    x1i = clusters(k,1);
+    x2i = clusters(k,2);
+    x1 = ps(x1i);
+    x2 = ps(x2i);
+    line([x1, x2],[0, 0], ...
+         'LineWidth',8);
+  endfor
+  # Vertical sticks
+  for x = ps
+    line([x, x],[0, 1], ...
+         'LineWidth',1.5);
+  endfor
+  ## ax = axes(fig);
+  ## scatter(ax, xy(:,1), xy(:,2), 120, c, 'filled');
+  ## hold(ax, 'on'); % don't removed already drawn
+  ## plot(ax, xlim(ax), xlim(ax), 'k--', 'LineWidth', 1.5);
+  ## axis(ax, 'equal');
+  ## grid(ax, 'on');
+  ## xlabel(ax, 'X');
+  ## ylabel(ax, 'Y');
+  title('Packs detection');
+  ## % Styling for cleaner SVG ---
+  ## set(ax, 'color', 'none');        % transparent axes background
+  ## set(fig, 'color', 'none');       % transparent figure background
+  ## % Try to improve SVG output consistency
+  ## set(ax, 'box', 'off');
   % Export as SVG
   print(fig, file, '-dsvg', '-painters');  
 endfunction
@@ -178,9 +220,84 @@ function [clusters] = calc_clusters(ps)
   [isovalues, ranges] = approximate_by_rectangles(diffs, 2);
   clusters = find_clusters_centers(ranges, isovalues, 0);
 endfunction
+
+algorithm_demo(odir);
 #+end_src
 
-[[inline:../../assets/Factorial_perm1.svg,flt-octave-2d-svg]]
+#+RESULTS:
+#+begin_example
+INPUT
+ Columns 1 through 16:
+
+    1    7    9   10   11   13   15   16   18   19   25   30   34   36   37   38
+
+ Columns 17 through 25:
+
+   39   40   42   43   45   46   49   52   58
+CLUST
+    2   10
+   13   22
+warning: using the gnuplot graphics toolkit is discouraged
+
+The gnuplot graphics toolkit is not actively maintained and has a number
+of limitations that are unlikely to be fixed.  Communication with gnuplot
+uses a one-directional pipe and limited information is passed back to the
+Octave interpreter so most changes made interactively in the plot window
+will not be reflected in the graphics properties managed by Octave.  For
+example, if the plot window is closed with a mouse click, Octave will not
+be notified and will not update its internal list of open figure windows.
+The qt toolkit is recommended instead.
+                                                                               
+                                                                               
+      |                          Packs detection                               
+   1 +|+     %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
+      |      %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.8 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.6 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.4 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.2 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     +|----------------------------------------------------------------------  
+   0 +$+#####%**@&=*****#*$%+#####@#####&####=#**##$%#@&##=*##*+#########$ +   
+     0          10         20          30          40         50          60   
+                                                                               
+                                                                               
+                                                                               
+      |                          Packs detection                               
+   1 +|+     %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
+      |      %  @&= *  *# $%      @     &    = **# $% @&  =*  *   #      $     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.8 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.6 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.4 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+ 0.2 +|+#####%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     #|######%##@&=#*##*##$%######@#####&####=#**##$%#@&##=*##*##########$     
+     +|----------------------------------------------------------------------  
+   0 +$+#####%**@&=*****#*$%+#####@#####&####=#**##$%#@&##=*##*+#########$ +   
+     0          10         20          30          40         50          60
+#+end_example
+
+
+[[inline:../../assets/Packs_Search.svg,flt-octave-2d-svg]]
 
 
 #+begin_src octave
