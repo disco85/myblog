@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-18 Sat 13:38 -->
+<!-- 2026-07-18 Sat 13:49 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Packs search</title>
@@ -328,7 +328,7 @@ space with a metric that can correspond to the similarity of two
 objects:
 </p>
 
-<pre class="example" id="org92df629">
+<pre class="example" id="orgbe2a220">
 |   |   | | ||| ||  |    | | ||| |  |   |
 |   |   | | ||| ||  |    | | ||| |  |   |
         :........:       :.......:
@@ -352,7 +352,7 @@ The idea of the algorithm is based on a calculation of distance between adjacent
 to process these distances (called "differences"):
 </p>
 
-<pre class="example" id="org85cba2a">
+<pre class="example" id="org00a9328">
                 1             2                                      3
                                                                 +---------+  Result: segments
               +----+   +-------------+                          |rise/fall|     of indexes
@@ -837,18 +837,12 @@ CLUST
 <h2 id="orge705b24">Python implementation</h2>
 <div class="outline-text-2" id="text-orge705b24">
 <p>
-The same algorithm implemented in Python is:
+The same algorithm implemented in Python:
 </p>
 
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 2: </span>Algorithm demonstration with Python</label><pre class="src src-python"><span class="org-doc">'''Finds clusters (concentrations) of points - their centers, ranges
 '''</span>
-<span class="org-keyword">class</span> <span class="org-type">SortedList</span>[T:<span class="org-builtin">int</span><span class="org-operator">|</span><span class="org-builtin">float</span>](<span class="org-builtin">list</span>[T]):
-    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, items:<span class="org-builtin">list</span>[T], already_sorted:<span class="org-builtin">bool</span><span class="org-operator">=</span><span class="org-constant">False</span>):
-        <span class="org-variable-name">sorted_items</span> <span class="org-operator">=</span> items <span class="org-keyword">if</span> already_sorted <span class="org-keyword">else</span> <span class="org-builtin">sorted</span>(items)
-        <span class="org-builtin">super</span>().__init__(sorted_items)
-
-
 <span class="org-keyword">def</span> <span class="org-function-name">calc_avg</span>(ps:<span class="org-builtin">list</span>[<span class="org-builtin">int</span>]) <span class="org-operator">-&gt;</span> <span class="org-builtin">float</span>:
     <span class="org-keyword">return</span> <span class="org-builtin">sum</span>(ps)<span class="org-operator">/</span><span class="org-builtin">len</span>(ps)
 
