@@ -1,0 +1,176 @@
+#+title: The simplest detection of text similarity
+#+description: How to determine that 2 texts are similar with some small difference
+#+keywords: Python, Algorithms
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t
+#+tags: Python Algorithms
+#+date: <2026-07-20 Mon>
+
+* Intro
+
+Lets say we want to compare 2 texts that can be little bit different, for example, one of them
+can be a template text with gaps for names, emails, etc and other text is a text with filled
+gaps and also it can be little bit reformatted. And we want to be able to say that these 2
+texts are very close to each other. Some kind of "fuzzy" comparison of texts...
+
+We can even have a bunch of texts and some of them are "templates" (referent texts) and we
+could distribute all texts among these "templates" - to group them.
+
+There are many algorithms for such a task, one of them is "N-grams". It is very simple
+algorithm and can be very easy implemented in any language.
+
+* Implementation
+
+Simple implementation in Python:
+
+#+begin_src python :session *org-ngram-session* :eval yes-export :exports both :results output
+import pprint
+
+class StrFuzzyCmp:
+    '''N-grams based similarity of texts:
+
+
+    only 'MIT' and 'APACHE' could not be put to 'BSD0' group...
+    '''
+    def __init__(self, ngram_size=3):
+        self._ngram_size = ngram_size
+
+    def ngram(self, sentence, uniq=True):
+        res = []
+        sent_len = len(sentence) - self._ngram_size + 1
+        for i in range(sent_len):
+            res.append(sentence[i:i+self._ngram_size])
+        return set(res) if uniq else res
+
+    def cmp_ngrams(self, a_ngrams, b_ngrams):
+        a_set = set(a_ngrams)
+        b_set = set(b_ngrams)
+        common = a_set & b_set
+        common_number = len(common)
+        denom = len(a_set) + len(b_set)
+        return (2 * common_number / denom if denom else 0.0, common)
+
+    def group_by_sentences(self, ref_sentences, other_sentences):
+        ref_sentences_ngrams = [self.ngram(s) for s in ref_sentences]
+        return self.group_by_ngrams(ref_sentences_ngrams, other_sentences)
+
+    def group_by_ngrams(self, ref_sentences_ngrams, other_sentences):
+        '''Groups sentences to reference sentences ngrams by their similarity to these references:
+        returns groups as a list equivalent to a list of reference sentences.
+        Indexes in this groups-list correspond to indexes of reference sentences list.
+        Every item in this groups-list is a list too - equivalent to collected "other" sentences
+        that are similar to this reference-index:
+
+        groups := [collected-sentences-0, collected-sentences-1, ...]
+        collected-sentences-i := (other-sentence-index, other-sentence)
+        '''
+        other_sentences_ngrams = [self.ngram(s) for s in other_sentences]
+        groups = [[] for _ in ref_sentences_ngrams]
+        for oth_i,other_sentence_ngrams in enumerate(other_sentences_ngrams):
+            cmps = [(ref_i, self.cmp_ngrams(other_sentence_ngrams, ref_sentence_ngrams))
+                    for ref_i, ref_sentence_ngrams in enumerate(ref_sentences_ngrams)]
+            # it is (index-in-ref_sentences_ngrams, (similarity-ratio, common-ngrams)):
+            best_cmp = max(cmps, key=lambda x:x[1][0]) # key: ratio
+            groups[best_cmp[0]].append((oth_i, other_sentences[oth_i]))
+        return groups
+
+# Examples of usage:
+ng = StrFuzzyCmp(3)
+
+r = ng.group_by_sentences(
+    ['Hello world', 'What is the weather', 'No more apples'],
+    ['Hello', 'Hi, world', 'Hello friend', 'What is the price',
+     'what is an apple', 'No more oranges', 'no more food', 'no more pears!'])
+print('EXAMPLE NGRAM (moving window):\n')
+pprint.pprint(ng.ngram('No more apples', False))
+print('\nRESULT (groups of similar sentences):\n')
+pprint.pprint(r)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+EXAMPLE NGRAM (moving window):
+
+['No ',
+ 'o m',
+ ' mo',
+ 'mor',
+ 'ore',
+ 're ',
+ 'e a',
+ ' ap',
+ 'app',
+ 'ppl',
+ 'ple',
+ 'les']
+
+RESULT (groups of similar sentences):
+
+[[(0, 'Hello'), (1, 'Hi, world'), (2, 'Hello friend')],
+ [(3, 'What is the price'), (4, 'what is an apple')],
+ [(5, 'No more oranges'), (6, 'no more food'), (7, 'no more pears!')]]
+#+end_example
+
+And we see in the result that the input was split by 3 referent sentences
+
+1. Hello world
+2. What is the weather
+3. No more apples
+
+to 3 groups containing tuples ~(index-in-input, the-sentence)~. In a real world applications
+you will preprocess input sentences, sure - compress all blank symbols, strip a sentences,
+and (it would be good) convert their case to one - common. The same should be done with
+referent sentences!
+
+Generated N-grams are shown as a list to demonstrate moving, shifting window (see ~False~
+argument in ~ng.ngram('No more apples', False)~ call!), actually it returns a set.
+
+* Thinking about the algorithm
+
+If you compare strings character by character, a small difference will result in the strings
+not being the same. So we have to come up with some more "artificial" comparison. For example,
+we could collect all characters of 1st and 2nd sentences and... and what? To compare 2 lists?
+It will be the same as to compare sentences character by characters, then, maybe to treat
+characters of strings not as lists but as sets? OK, but then:
+
+1. it will be very close to usual natural comparison
+2. this will not take into account small differences, OK, we can introduce some rate - how many
+   characters matched, but then:
+3. long sentences will lead to... comparison of the alphabet with... the alphabet itself.
+
+So, character granulatiry degenerates to an alphabet. Words granularity (split by spaces) will
+not take into account little differences, will not give us "fuzzy" comparison. OK, then we
+could... split into N-characters pseudo-words. Like:
+
+#+begin_example
+ word                set
+------------------------------- 
+bookcase  ->  {bo, ok, ca, se}
+#+end_example
+
+but the set ~{bo, ok, ca, se}~ can form another word too: "casebook".
+
+#+begin_src python :session *org-ngram-session* :eval yes-export :exports both :results output verbatim
+import itertools
+ng = StrFuzzyCmp(2)
+pairs = lambda s: {s[i:i+2] for i in range(0, len(s), 2)}
+print('bookcase pairs:', p1 := pairs('bookcase'))
+print('casebook pairs:', p2 := pairs('casebook'))
+print('comparison result:', '100% equal.' if p1 == p2 else 'not equal.', 'But words are not the same')
+print(n1 := ng.ngram('bookcase'))
+print(n2 := ng.ngram('casebook'))
+print('Comparison using N-grams:', ng.cmp_ngrams(n1, n2))
+#+end_src
+
+#+RESULTS:
+: bookcase pairs: {'bo', 'ok', 'ca', 'se'}
+: casebook pairs: {'bo', 'ca', 'ok', 'se'}
+: comparison result: 100% equal. But words are not the same
+: {'bo', 'kc', 'as', 'se', 'ca', 'oo', 'ok'}
+: {'bo', 'as', 'se', 'ca', 'eb', 'oo', 'ok'}
+: Comparison using N-grams: (0.8571428571428571, {'bo', 'as', 'se', 'ca', 'oo', 'ok'})
+
+TODO  examples
+
+See [[https://en.wikipedia.org/wiki/Word_n-gram_language_model][more about N-gram language model]].
+
+
