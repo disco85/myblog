@@ -1,0 +1,109 @@
+#+title: Python instead of jq
+#+description: How to use Python instead of jq
+#+keywords: Python,jq,JSON
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+tags: Python,jq,JSON
+#+date: <2026-07-22 Wed 20:32>
+
+* jq
+
+To query JSON file like XML with XPath or XQuery, you can use a command line tool called
+[[https://jqlang.org/][jq]]. It's great but you can use Python also.
+
+* Python querying JSON
+
+You can load JSON file very easy:
+
+#+begin_src python :eval no :exports both
+import json
+with open(path_to_json_file, 'rt') as f:
+    json_data = json.load(f)
+#+end_src
+
+but more interesting that you can query it as some DB. Let's say our decoded JSON will
+look in this way:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+dat = {
+    'project': {
+        'name': 'Demo',
+        'config': {
+            'databases': [
+                {
+                    'name': 'DB1',
+                    'primary': {
+                        'host': 'localhost',
+                        'port': 5430
+                    },
+                    'replicas': [
+                        {
+                            'host': 'db1.local',
+                            'port': 5431
+                        },
+                        {
+                            'host': 'db2.local',
+                            'port': 5437
+                        }
+                    ]
+                },
+                {
+                    'name': 'DB2',
+                    'primary': {
+                        'host': 'localhost',
+                        'port': 5433
+                    },
+                    'replicas': [
+                        {
+                            'host': 'db3.local',
+                            'port': 5434
+                        }
+                    ]
+                },
+                {
+                    'name': 'DB3',
+                    'primary': {
+                        'host': 'localhost',
+                        'port': 5435
+                    }
+                }                
+            ]
+        }
+    }
+}
+#+end_src
+
+#+RESULTS:
+
+and let's try some queries:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from itertools import *
+import pprint
+
+databases = dat.get('project',{}).get('config',{}).get('databases',[])
+q = len(databases)
+print(f'Number of databases: {q}')
+
+q = {d.get('name', 'Unnamed') for d in databases}
+print(f'Databases: {q}')
+
+q = {d.get('primary', {}).get('port') for d in databases} \
+  | {r.get('port') for d in databases for r in d.get('replicas',[])}
+print(f'Ports in use (way 1): {q}')
+
+q = { *(d.get('primary', {}).get('port') for d in databases),
+      *(r.get('port') for d in databases for r in d.get('replicas',[])) }
+print(f'Ports in use (way 2): {q}')
+
+q = set(chain((d.get('primary', {}).get('port') for d in databases),
+              (r.get('port') for d in databases for r in d.get('replicas',[]))))
+print(f'Ports in use (way 3): {q}')
+#+end_src
+
+#+RESULTS:
+: Number of databases: 3
+: Databases: {'DB1', 'DB2', 'DB3'}
+: Ports in use (way 1): {5430, 5431, 5433, 5434, 5435, 5437}
+: Ports in use (way 2): {5430, 5431, 5433, 5434, 5435, 5437}
+: Ports in use (way 3): {5430, 5431, 5433, 5434, 5435, 5437}
