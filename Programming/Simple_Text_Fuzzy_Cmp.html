@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-07-21 Tue 13:22 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The simplest detection of text similarity</title>
+<meta name="description" content="How to determine that 2 texts are similar with some small difference" />
+<meta name="keywords" content="Python, Algorithms" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">The simplest detection of text similarity</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgdfb98d2">Intro</a></li>
+<li><a href="#org7da9b4d">Implementation</a></li>
+<li><a href="#org9148c5e">Thinking about the algorithm</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgdfb98d2" class="outline-2">
+<h2 id="orgdfb98d2">Intro</h2>
+<div class="outline-text-2" id="text-orgdfb98d2">
+<p>
+Lets say we want to compare 2 texts that can be little bit different, for example, one of them
+can be a template text with gaps for names, emails, etc and other text is a text with filled
+gaps and also it can be little bit reformatted. And we want to be able to say that these 2
+texts are very close to each other. Some kind of "fuzzy" comparison of texts&#x2026;
+</p>
+
+<p>
+We can even have a bunch of texts and some of them are "templates" (referent texts) and we
+could distribute all texts among these "templates" - to group them.
+</p>
+
+<p>
+There are many algorithms for such a task, one of them is "N-grams". It is very simple
+algorithm and can be very easy implemented in any language.
+</p>
+</div>
+</div>
+<div id="outline-container-org7da9b4d" class="outline-2">
+<h2 id="org7da9b4d">Implementation</h2>
+<div class="outline-text-2" id="text-org7da9b4d">
+<p>
+Simple implementation in Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pprint
+
+<span class="org-keyword">class</span> <span class="org-type">StrFuzzyCmp</span>:
+    <span class="org-doc">'''N-grams based similarity of texts:
+
+
+    only 'MIT' and 'APACHE' could not be put to 'BSD0' group...
+    '''</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">__init__</span>(<span class="org-keyword">self</span>, ngram_size<span class="org-operator">=</span>3):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">_ngram_size</span> <span class="org-operator">=</span> ngram_size
+
+    <span class="org-keyword">def</span> <span class="org-function-name">ngram</span>(<span class="org-keyword">self</span>, sentence, uniq<span class="org-operator">=</span><span class="org-constant">True</span>):
+        <span class="org-variable-name">res</span> <span class="org-operator">=</span> []
+        <span class="org-variable-name">sent_len</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(sentence) <span class="org-operator">-</span> <span class="org-keyword">self</span>._ngram_size <span class="org-operator">+</span> 1
+        <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(sent_len):
+            res.append(sentence[i:i<span class="org-operator">+</span><span class="org-keyword">self</span>._ngram_size])
+        <span class="org-keyword">return</span> <span class="org-builtin">set</span>(res) <span class="org-keyword">if</span> uniq <span class="org-keyword">else</span> res
+
+    <span class="org-keyword">def</span> <span class="org-function-name">cmp_ngrams</span>(<span class="org-keyword">self</span>, a_ngrams, b_ngrams):
+        <span class="org-variable-name">a_set</span> <span class="org-operator">=</span> <span class="org-builtin">set</span>(a_ngrams)
+        <span class="org-variable-name">b_set</span> <span class="org-operator">=</span> <span class="org-builtin">set</span>(b_ngrams)
+        <span class="org-variable-name">common</span> <span class="org-operator">=</span> a_set <span class="org-operator">&amp;</span> b_set
+        <span class="org-variable-name">common_number</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(common)
+        <span class="org-variable-name">denom</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(a_set) <span class="org-operator">+</span> <span class="org-builtin">len</span>(b_set)
+        <span class="org-keyword">return</span> (2 <span class="org-operator">*</span> common_number <span class="org-operator">/</span> denom <span class="org-keyword">if</span> denom <span class="org-keyword">else</span> 0.0, common)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">group_by_sentences</span>(<span class="org-keyword">self</span>, ref_sentences, other_sentences):
+        <span class="org-variable-name">ref_sentences_ngrams</span> <span class="org-operator">=</span> [<span class="org-keyword">self</span>.ngram(s) <span class="org-keyword">for</span> s <span class="org-keyword">in</span> ref_sentences]
+        <span class="org-keyword">return</span> <span class="org-keyword">self</span>.group_by_ngrams(ref_sentences_ngrams, other_sentences)
+
+    <span class="org-keyword">def</span> <span class="org-function-name">group_by_ngrams</span>(<span class="org-keyword">self</span>, ref_sentences_ngrams, other_sentences):
+        <span class="org-doc">'''Groups sentences to reference sentences ngrams by their similarity to these references:
+        returns groups as a list equivalent to a list of reference sentences.
+        Indexes in this groups-list correspond to indexes of reference sentences list.
+        Every item in this groups-list is a list too - equivalent to collected "other" sentences
+        that are similar to this reference-index:
+
+        groups := [collected-sentences-0, collected-sentences-1, ...]
+        collected-sentences-i := (other-sentence-index, other-sentence)
+        '''</span>
+        <span class="org-variable-name">other_sentences_ngrams</span> <span class="org-operator">=</span> [<span class="org-keyword">self</span>.ngram(s) <span class="org-keyword">for</span> s <span class="org-keyword">in</span> other_sentences]
+        <span class="org-variable-name">groups</span> <span class="org-operator">=</span> [[] <span class="org-keyword">for</span> _ <span class="org-keyword">in</span> ref_sentences_ngrams]
+        <span class="org-keyword">for</span> oth_i,other_sentence_ngrams <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(other_sentences_ngrams):
+            <span class="org-variable-name">cmps</span> <span class="org-operator">=</span> [(ref_i, <span class="org-keyword">self</span>.cmp_ngrams(other_sentence_ngrams, ref_sentence_ngrams))
+                    <span class="org-keyword">for</span> ref_i, ref_sentence_ngrams <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(ref_sentences_ngrams)]
+            <span class="org-comment-delimiter"># </span><span class="org-comment">it is (index-in-ref_sentences_ngrams, (similarity-ratio, common-ngrams)):
+</span>            <span class="org-variable-name">best_cmp</span> <span class="org-operator">=</span> <span class="org-builtin">max</span>(cmps, key<span class="org-operator">=</span><span class="org-keyword">lambda</span> x:x[1][0]) <span class="org-comment-delimiter"># </span><span class="org-comment">key: ratio
+</span>            groups[best_cmp[0]].append((oth_i, other_sentences[oth_i]))
+        <span class="org-keyword">return</span> groups
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Examples of usage:
+</span><span class="org-variable-name">ng</span> <span class="org-operator">=</span> StrFuzzyCmp(3)
+
+<span class="org-variable-name">r</span> <span class="org-operator">=</span> ng.group_by_sentences(
+    [<span class="org-string">'Hello world'</span>, <span class="org-string">'What is the weather'</span>, <span class="org-string">'No more apples'</span>],
+    [<span class="org-string">'Hello'</span>, <span class="org-string">'Hi, world'</span>, <span class="org-string">'Hello friend'</span>, <span class="org-string">'What is the price'</span>,
+     <span class="org-string">'what is an apple'</span>, <span class="org-string">'No more oranges'</span>, <span class="org-string">'no more food'</span>, <span class="org-string">'no more pears!'</span>])
+<span class="org-builtin">print</span>(<span class="org-string">'EXAMPLE NGRAM (moving window):</span><span class="org-constant">\n</span><span class="org-string">'</span>)
+pprint.pprint(ng.ngram(<span class="org-string">'No more apples'</span>, <span class="org-constant">False</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">RESULT (groups of similar sentences):</span><span class="org-constant">\n</span><span class="org-string">'</span>)
+pprint.pprint(r)
+</pre>
+</div>
+
+<pre class="example" id="orgac328b5">
+EXAMPLE NGRAM (moving window):
+
+['No ',
+ 'o m',
+ ' mo',
+ 'mor',
+ 'ore',
+ 're ',
+ 'e a',
+ ' ap',
+ 'app',
+ 'ppl',
+ 'ple',
+ 'les']
+
+RESULT (groups of similar sentences):
+
+[[(0, 'Hello'), (1, 'Hi, world'), (2, 'Hello friend')],
+ [(3, 'What is the price'), (4, 'what is an apple')],
+ [(5, 'No more oranges'), (6, 'no more food'), (7, 'no more pears!')]]
+</pre>
+
+<p>
+And we see in the result that the input was split by 3 referent sentences
+</p>
+
+<ol class="org-ol">
+<li>Hello world</li>
+<li>What is the weather</li>
+<li>No more apples</li>
+</ol>
+
+<p>
+to 3 groups containing tuples <code>(index-in-input, the-sentence)</code>. In a real world applications
+you will preprocess input sentences, sure - compress all blank symbols, strip a sentences,
+and (it would be good) convert their case to one - common. The same should be done with
+referent sentences!
+</p>
+
+<p>
+Generated N-grams are shown as a list to demonstrate moving, shifting window (see <code>False</code>
+argument in <code>ng.ngram('No more apples', False)</code> call!), actually it returns a set.
+</p>
+</div>
+</div>
+<div id="outline-container-org9148c5e" class="outline-2">
+<h2 id="org9148c5e">Thinking about the algorithm</h2>
+<div class="outline-text-2" id="text-org9148c5e">
+<p>
+If you compare strings character by character, a small difference will result in the strings
+not being the same. So we have to come up with some more "artificial" comparison. For example,
+we could collect all characters of 1st and 2nd sentences and&#x2026; and what? To compare 2 lists?
+It will be the same as to compare sentences character by characters, then, maybe to treat
+characters of strings not as lists but as sets? OK, but then:
+</p>
+
+<ol class="org-ol">
+<li>it will be very close to usual natural comparison</li>
+<li>this will not take into account small differences, OK, we can introduce some rate - how many
+characters matched, but then:</li>
+<li>long sentences will lead to&#x2026; comparison of the alphabet with&#x2026; the alphabet itself.</li>
+</ol>
+
+<p>
+So, character granulatiry degenerates to an alphabet. Words granularity (split by spaces) will
+not take into account little differences, will not give us "fuzzy" comparison. OK, then we
+could&#x2026; split into N-characters pseudo-words. Like:
+</p>
+
+<pre class="example" id="org7632093">
+ word                set
+------------------------------- 
+bookcase  -&gt;  {bo, ok, ca, se}
+</pre>
+
+<p>
+but the set <code>{bo, ok, ca, se}</code> can form another word too: "casebook". So, this approach will
+lead to 100% matching meaning "bookcase" and "casebook" are the same texts! So, this approach
+also is not perfect, but it's better than comparison of characters. We, can think about
+3-characters letters but then we will hit the same limitation. Bigger - we come to full words,
+no, if to find a way to take into account 2 and 3 at the same time or 3 and 4, or 2 and "link"
+between 2 2-characters grams, like <code>{bo, oo, ok, ...}</code> - do you see this new <code>oo</code> ???
+Wait! This is the <b>moving window</b> exactly!
+</p>
+
+<p>
+And after this isight we have to think about estimating of similarity, some coefficient. No
+reason to keep list to be honest, set is enough.
+</p>
+
+<p>
+That coefficient of "similarity" can be a ration of <code>common grams / all grams</code>. We can
+normalize it even (<code>*2</code> - which is not so important) and lets don't forget about zero division
+(it is 0.0 in this case):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">  <span class="org-variable-name">a_set</span> <span class="org-operator">=</span> <span class="org-builtin">set</span>(a_ngrams)
+  <span class="org-variable-name">b_set</span> <span class="org-operator">=</span> <span class="org-builtin">set</span>(b_ngrams)
+  <span class="org-variable-name">common</span> <span class="org-operator">=</span> a_set <span class="org-operator">&amp;</span> b_set
+  <span class="org-variable-name">common_number</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(common)
+  <span class="org-variable-name">denom</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(a_set) <span class="org-operator">+</span> <span class="org-builtin">len</span>(b_set)
+  <span class="org-keyword">return</span> (2 <span class="org-operator">*</span> common_number <span class="org-operator">/</span> denom <span class="org-keyword">if</span> denom <span class="org-keyword">else</span> 0.0, common)
+</pre>
+</div>
+
+<p>
+&#x2026;or to convert it to percents. Anyway, so let's compare both: 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> itertools
+<span class="org-variable-name">ng</span> <span class="org-operator">=</span> StrFuzzyCmp(2)
+<span class="org-variable-name">pairs</span> <span class="org-operator">=</span> <span class="org-keyword">lambda</span> s: {s[i:i<span class="org-operator">+</span>2] <span class="org-keyword">for</span> i <span class="org-keyword">in</span> <span class="org-builtin">range</span>(0, <span class="org-builtin">len</span>(s), 2)}
+<span class="org-builtin">print</span>(<span class="org-string">'bookcase pairs:'</span>, p1 :<span class="org-operator">=</span> pairs(<span class="org-string">'bookcase'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'casebook pairs:'</span>, p2 :<span class="org-operator">=</span> pairs(<span class="org-string">'casebook'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'comparison result:'</span>, <span class="org-string">'100% equal.'</span> <span class="org-keyword">if</span> p1 <span class="org-operator">==</span> p2 <span class="org-keyword">else</span> <span class="org-string">'not equal.'</span>, <span class="org-string">'But words are not the same!'</span>)
+<span class="org-builtin">print</span>(n1 :<span class="org-operator">=</span> ng.ngram(<span class="org-string">'bookcase'</span>))
+<span class="org-builtin">print</span>(n2 :<span class="org-operator">=</span> ng.ngram(<span class="org-string">'casebook'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'Comparison using N-grams:'</span>, ng.cmp_ngrams(n1, n2))
+</pre>
+</div>
+
+<pre class="example">
+bookcase pairs: {'bo', 'se', 'ca', 'ok'}
+casebook pairs: {'ca', 'bo', 'se', 'ok'}
+comparison result: 100% equal. But words are not the same!
+{'bo', 'kc', 'ca', 'as', 'oo', 'se', 'ok'}
+{'eb', 'bo', 'ca', 'as', 'oo', 'se', 'ok'}
+Comparison using N-grams: (0.8571428571428571, {'bo', 'ca', 'as', 'oo', 'se', 'ok'})
+</pre>
+
+
+<p>
+We see that N-grams - with moving window is more correct: it sees that they are similar but at
+the same time not for 100% - it is 0.86&#x2026;
+</p>
+
+<p>
+There are different improvments of this algorithm but this one is enough to determine that
+texts are similar: I used it to compare that template document with gaps and a document with
+filled gaps - are the same document actually. It's rought, but it works.
+</p>
+
+<p>
+See <a href="https://en.wikipedia.org/wiki/Word_n-gram_language_model">more about N-gram language model</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

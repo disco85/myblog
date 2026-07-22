@@ -1,0 +1,302 @@
+#+title: Safe code without types
+#+description: How to make code safer even without types
+#+keywords: Safe, programming
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t
+#+tags: Safe programming
+#+date: <2026-07-20 Mon>
+
+* Intro
+
+To decrease errors number in the code, the most obvious approach is to use types, see, for
+example [[./Safe_Python.org][types-based safety in Python]], but is it possible to increase safety without types?
+
+There are such approaches - it's possible, but maybe not so much or not in the same way.
+
+Also the difference with the "safety" using types is that violations of established "rules"
+will be reported only at runtime. So, all kind of tests will be very useful.
+
+The first and the simplest way to do it is to use encapsulation even if you think that
+encapsulation is not related directly to safety.
+
+* Encapsulation
+
+The fewer gray areas in the code, the safer it is. Ideally, you should understand the code
+completely: what it does, why it does it that way, and what the effects are. The most obvious
+trick improving code clarify, understandability is diving of code to domains following common
+policies, semantic, concepts and in general dividing big things to smaller ones that are more
+controllable. It is good known trivial concept of *encapsulation*.
+
+Encapsulation icreases safety not only because the big becomes smaller and more observable, but
+also because:
+
+1. it creates an edge: dividing untrusted domain and the internal domain where.
+    1. values are validated
+    2. states are consistent
+    3. actions order is correct
+2. lifting to semantic level from low-level manipulations leading to poor comprehension
+   and cognitive load
+
+** Encapsulation for validation
+
+We never set values inside objects directly, except very specific cases. It allows us to
+split application to 2 domains: trusted and untrusted, and untrusted/invalid values never
+penetrate inside our objects, our application:
+
+#+caption: Example for 1.1 - "values are validated"
+#+begin_src python :eval no :exports both
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    @property
+    def name(self): return self._name
+
+    @name.setter
+    def name(self, value):
+        value = value.strip()
+        if value:
+            self._name = value
+        else:
+            raise ValueError(f'Wrong value for name: "{value}".')
+    
+    @property
+    def age(self): return self._age
+
+    @age.setter
+    def age(self, value):
+        if value >=0 and value < 130:
+            self._age = value
+        else:
+            raise ValueError(f'Wrong value for age: {value}.')
+#+end_src
+
+** Encapsulation for whole object state control
+
+We don't change the state of objects - never, we only ask them to change and they,
+following internal logic, restrictions do it or reject it. They can ignore such requests
+if they are treated as redundant or report them with error codes or exceptions. It allows
+us to be sure that the state of *mutable objects* is always consistent, correct (their
+internal behavior is verified by tests).
+
+#+caption: Example for 1.2 - "states are consistent"
+#+begin_src python :eval no :exports both
+class File:
+    def __init__(self, name):
+        self._name = name
+        self._state = FileState.CLOSED
+    def open(self):
+        if self._state == FileState.CLOSED:
+            # OPEN...
+            self._state = FileState.OPENED
+        else:
+            raise ValueError(f'File {self._name} is already opened')
+#+end_src
+
+** Encapsulation for correct actions order
+
+Instead of allowing complex, but expected, typical scenarios (multi-step actions) to be
+executed externally, it's better to have parameterized scripts. This will not only make the
+code more reliable, but also make life easier for the client using your code: they won't have
+to copy use cases (possibly with errors or unnecessary actions) from the internet or struggle
+to understand the order and method for creating all the necessary objects and how to perform
+the necessary actions on them:
+
+#+caption: Example for 1.3 - "actions order is correct"
+#+begin_src python :eval no :exports both
+class Diff:
+    def diff_files(self, file1, file2, expose_to, colorized=True, logging=False):
+        'Small script, but we can imagine larger and more complex'
+        delta, warnings = differ.cmp(file1, file2)
+        if warnings:
+            mylogger.log(warnings, allowed=logging)
+        if expose_to == ExposeTo.CONSOLE:
+            if colorized:
+                delta = delta.ansi_colorize()
+            print(delta, file=self.get_console())
+        elif expose_to == ExposeTo.WEB:
+            browser = web_utils.get_web_browser()
+            with html_utils.template(self.diff_template, delta, colorized=colorized) as tmp_html_file:
+                browser.open(tmp_html_file)
+#+end_src
+
+Just imagine some complex scenarios (scripts) when you need to do many steps to achive the
+result. You can have many such scenarios prudently prepared for a client of your code. You can
+even parameterize them in some way. This kind of encapsulation hides long "scripts" and
+dependencies between their components. It's better than to expose these scenarios to the user;
+sure it has its own cons too and sure you should not deny user to write its own "scenarios".
+
+So, explicit encapsulation increases safety (and readability, modularity, isolation) of code.
+
+Granularity of effect on an object can be small (to set/mutate some value) and big as well (to
+change whole state ID of an object or to ask it to execute large list of actions) - but always
+it goes through the object and only it decides what is correct and when/how to do it - it
+always can reject it:
+
+#+begin_example
+      s m a l l                                b i g
+ g r a n u l a r i t y        ==>      g r a n u l a r i t y
+
+         enter               change           execute
+         value               state            script
+             \                 |                /
+              `----------.     |     .---------' 
+                         |     |     |
+                        request service
+                         |     |     |
+                         v     v     v
+                     +-------------------+
+                     |   object handles  |
+                     | requests/messages |
+                     | following its own |
+                     |   logic, policy   |
+                     +-------------------+         
+#+end_example
+
+It's typical for classic OOP: [[https://pharo.org/][Smalltalk]], [[https://www.erlang.org/][Erlang]], [[https://www.ponylang.io/][Pony]], [[https://iolanguage.org/][IO]], etc...
+
+Your object is *dynamic schema* then, it encodes the *verified dynamic behavior*. You can
+verify it using tests, model verification tools like [[https://spinroot.com][SPIN]], etc. And the safery of such program
+following this ([[https://en.wikipedia.org/wiki/Actor_model][actor based]]) architecture is safer and such safety can be easy implemented because
+usually you think about each small object in terms:
+
+- they told me X
+- and I react as Y or Z
+
+It does not mean they you will not work on the top-level, but it's easier: links number is
+smaller, dependencies can be simpler from the bottom to the middle level of the application.
+
+** Encapsulation for lifting to higher semantic level
+
+Another way to look at encapsulation is lifting to higher semantic level. Lifting to higher
+semantic level makes sense even for variables, look:
+
+#+caption: Example for 2 - "lifting code to semantic level introducing variables (NAMING IT)"
+#+begin_src python :eval no :exports both
+#        WTF IS HAPPENING HERE ?                 NAMING/VARIABLES LIFT
+#                                             "RAW" FRAGMENTS TO SEMANTIC
+                                                            
+  ang = math.radians(pp[0])                 ;   ang, rad = pp
+  r = (0,0) if orig is None else orig       ;   ang = math.radians(ang)
+  return (pp[1] * math.cos(pp[0]) + r[0],   ;    
+          pp[1] * math.sin(pp[0]) + r[1])   ;   ang, rad = ppy
+                                            ;   ang = math.radians(ang)
+                                            ;   x = rad * math.cos(ang)
+                                            ;   y = rad * math.sin(ang)
+                                            ;   ox, oy = (0,0) if orig is None else orig
+                                            ;   return (x + ox, y + oy)
+#+end_src
+
+And as giving a name to a code fragment lifts it to higher semantic level - you begin to
+understand what it is (/it is an angle, it is X coordinate.../), encapsulation some code in a
+function, a method or a class transforms a raw code to *a named entity*, to a term, to a
+concept, so it's easier to manage such code, to refactor it doing lesser bugs:
+
+#+caption: Example for 2 - "lifting code to semantic level introducing methods (NAMING IT)"
+#+begin_src python :eval no :exports both
+#      WTF IS HAPPENING HERE ?          LOGIC, ENCAPSULATED IN A METHOD 
+#                                    LIFTS STRANGE LOW-LEVEL MANIPULATIONS
+#                                         TO HIGHER, SEMANTIC LEVEL
+  alex.workday_start = 0               ;
+  alex.workday_stop = 0                ;        alex.fire()
+  alex.payments = 3*alex.salary        ;
+#+end_src
+
+So, there may be different motivations behind encapsulation, but ultimately it helps
+to increase the reliability and security of the code even if it is not so obvious.
+
+* FSM
+
+Finite automata (or FSM) is a guard on the edge of mutations the object and change of its state
+(to perform transitions). It's an approach allowing you to write algorithm without errors at
+all! FSM can be designed as a graph or as a table - they cover all reactions/cases and describe
+all transitions.
+
+* Usage of simple diagrams
+
+Diagrams are very helpful in architectural design, but especially in the design of algorithms,
+interactions, and individual components. Diagrams should be simple, UML are not simple,
+alternative is [[../Paradigms/Simple_Diagrams.org]["Simple diagrams"]] designed by me. Diagrams, clear and simple, help to design the
+code even without logical bugs at all.
+
+* Documentation
+
+The code should be provided with documentation describing features, concepts, conventions,
+implemented algorithms, programming tricks. Especially - the features with all related
+subcomponents, subsystems. No, code is not self-documented. Even more, the code cannot explain
+you why the feature was implemented: what the use-case is, why it is restricted is this way,
+why it is turned off by default (but you think it should not be) and so on.
+
+* Comments
+
+What is happening here?
+
+#+begin_example
+c =  ((v & 0xfff) * 0x1001001001001ULL & 0x84210842108421ULL) % 0x1f;
+c += (((v & 0xfff000) >> 12) * 0x1001001001001ULL & 0x84210842108421ULL) 
+     % 0x1f;
+#+end_example
+
+Comments are mandatory!
+
+* Literate programming (LP)
+
+LP turns code with comments to a tale with pictures, diagrams, tables, with details, links,
+quotes, etc. This turn allows to see not raw code reminding hieroglyphs sometimes, but to see
+clear logic with illustrations. The code becomes clear, demonstrative, simple, and
+understandable to people who don't know the language being used. You no longer lose track of
+the logic in the thicket of code. From my personal experience, it allows you to write a code
+without errors at all.
+
+See [[https://en.wikipedia.org/wiki/Literate_programming][more]] about it; the pros of LP: difficulty to be debuged.
+
+* Gray-box integration tests
+
+Integration tests help a lot, when they follow "gray-box" model, they allow to model more
+complex scenarios, even some corner cases! Also it allows you to investigate problems, issues
+deeper. They key word is "grey box".
+
+* Golden tests
+
+Golden tests (a.k.a. snapshot tests) verify that a program's output matches a previously
+approved "golden" output stored in a snapshot file (JSON, XML, binary, etc, etc).
+
+Instead of writing multiple asserts and to fail step by step, we check the whole output versus
+"golden snapshot":
+
+#+begin_src python :eval no :exports both
+import json
+from pathlib import Path
+def test_json():
+    expected = Path('golden.json').read_text()
+    actual = json.dumps(generate(), indent=2, sort_keys=True)
+    assert actual == expected
+#+end_src
+
+They help to find issues in encoding, decoding, constructing complex data, parsing, etc.
+
+* Property tests
+
+See [[./Safe_Python.org::* Property tests][Property tests in Python]] as examples: the idea is simple, property tests engine look for a property
+like $\forall x \in \mathbb{Z},\; P(x)$ (designed in a special way: as a property test) and
+call this ~P(x)~ many-many times with different ~x~ values satisfying its restrictions.
+
+* Doctests
+
+These tests improve readability of the code and are kind of *verified tutorials*: they test
+and they learn.
+
+* Modeling
+
+Before to implement algorithms, we can model them and to verify their expected properties. It's
+especially relevant for distributed algorithms, algorithms including "intensive" logic, complex
+interacting components, and this can be done using modeling tools and languages:
+
+- [[https://netlogo.org][NetLogo]] (simplest, mostly visual, see [[../Paradigms/AB_models.org][AB models]])
+- [[https://www.mathworks.com][Matlab]], [[https://octave.org/][Octave]], [[https://www.scilab.org/][Scilab]] (mathematical modeling, simulation)
+- [[https://spinroot.com][Promela/SPIN]] (Linear Temporal Logic: logic + time + distribution)
+
+These tools are different and the guarantee levels of them are very different too, they should
+be used for different kinds of algorithms.
+
+No reasons to implement complex algorithm if you are not 100% sure in its behavior.
