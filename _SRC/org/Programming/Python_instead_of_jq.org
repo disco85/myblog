@@ -21,8 +21,8 @@ with open(path_to_json_file, 'rt') as f:
     json_data = json.load(f)
 #+end_src
 
-but more interesting that you can query it as some DB. Let's say our decoded JSON will
-look in this way:
+but more interesting is that you can query JSON as some DB. Considering our decoded JSON
+in this way:
 
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
 dat = {
@@ -33,16 +33,16 @@ dat = {
                 {
                     'name': 'DB1',
                     'primary': {
-                        'host': 'localhost',
+                        'host': '10.0.0.5',
                         'port': 5430
                     },
                     'replicas': [
                         {
-                            'host': 'db1.local',
+                            'host': '10.0.0.5',
                             'port': 5431
                         },
                         {
-                            'host': 'db2.local',
+                            'host': '10.0.0.5',
                             'port': 5437
                         }
                     ]
@@ -50,12 +50,12 @@ dat = {
                 {
                     'name': 'DB2',
                     'primary': {
-                        'host': 'localhost',
+                        'host': '10.0.0.12',
                         'port': 5433
                     },
                     'replicas': [
                         {
-                            'host': 'db3.local',
+                            'host': '10.0.0.15',
                             'port': 5434
                         }
                     ]
@@ -63,8 +63,8 @@ dat = {
                 {
                     'name': 'DB3',
                     'primary': {
-                        'host': 'localhost',
-                        'port': 5435
+                        'host': '10.0.0.5',
+                        'port': 5437
                     }
                 }                
             ]
@@ -78,32 +78,64 @@ dat = {
 and let's try some queries:
 
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
-from itertools import *
-import pprint
-
 databases = dat.get('project',{}).get('config',{}).get('databases',[])
 q = len(databases)
-print(f'Number of databases: {q}')
+print(f'NUMBER OF DATABASES: {q}')
 
 q = {d.get('name', 'Unnamed') for d in databases}
-print(f'Databases: {q}')
+print(f'DATABASES: {q}')
 
 q = {d.get('primary', {}).get('port') for d in databases} \
   | {r.get('port') for d in databases for r in d.get('replicas',[])}
-print(f'Ports in use (way 1): {q}')
+print(f'PORTS IN USE (WAY 1): {q}')
 
 q = { *(d.get('primary', {}).get('port') for d in databases),
       *(r.get('port') for d in databases for r in d.get('replicas',[])) }
-print(f'Ports in use (way 2): {q}')
+print(f'PORTS IN USE (WAY 2): {q}')
 
-q = set(chain((d.get('primary', {}).get('port') for d in databases),
-              (r.get('port') for d in databases for r in d.get('replicas',[]))))
-print(f'Ports in use (way 3): {q}')
+q = set( [d.get('primary', {}).get('port') for d in databases] +
+         [r.get('port') for d in databases for r in d.get('replicas',[])])
+print(f'PORTS IN USE (WAY 3): {q}')
+
+q = { (d.get('name', 'Unnamed'), p) for d in databases
+      if (p:=d.get('primary', {}).get('port')) and p > 5430 }
+print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 #+end_src
 
 #+RESULTS:
-: Number of databases: 3
-: Databases: {'DB1', 'DB2', 'DB3'}
-: Ports in use (way 1): {5430, 5431, 5433, 5434, 5435, 5437}
-: Ports in use (way 2): {5430, 5431, 5433, 5434, 5435, 5437}
-: Ports in use (way 3): {5430, 5431, 5433, 5434, 5435, 5437}
+: NUMBER OF DATABASES: 3
+: DATABASES: {'DB1', 'DB2', 'DB3'}
+: PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
+: PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
+: PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
+: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB2', 5433), ('DB3', 5437)}
+
+You see idea - we can use list/set/dict comprehension and ~dict.get(KEY, DEFAULT)~ method (as
+well as different tricks). Let's do something more complex - to query conflicting ports if they
+exist - they should be on the same host:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from collections import defaultdict
+
+d = defaultdict(list)
+
+for k, v in (
+    [((h, p), d.get('name', f'Unnamed{i}'))
+     for i, d in enumerate(databases)
+     if (prim := d.get('primary', {}))
+     and (h := prim.get('host'))
+     and (p := prim.get('port'))]
+    +
+    [((r['host'], r['port']), d.get('name', f'Unnamed{i}'))
+     for i, d in enumerate(databases)
+     for r in d.get('replicas', [])
+     if r.get('host') and r.get('port')]
+): d[k].append(v)
+conflicts = {k:v for k,v in d.items() if len(v) > 1}
+print(f'DATABASES HAVING PORT CONFLICTS: {conflicts}')
+#+end_src
+
+#+RESULTS:
+: DATABASES HAVING PORT CONFLICTS: {('10.0.0.5', 5437): ['DB3', 'DB1']}
+
+But this is not so good query: we pass through ~databases~ 2 times.
