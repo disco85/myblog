@@ -110,7 +110,18 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
 : DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
 
-You see idea - we can use list/set/dict comprehension and ~dict.get(KEY, DEFAULT)~ method (as
+The last query (~DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430~) is this simple set:
+
+$$
+\{name'(d) \mid d \in databases, \exists primary(d), \exists port(primary(d)), port > 5439 \} \\
+$$
+
+\begin{aligned}
+name'(d) &= d \mapsto name(d), &\text{if}\ \exists name(d) \\
+&= d \mapsto \text{Unnamed}, &\text{else}
+\end{aligned}
+
+You see the idea - we can use list/set/dict comprehension and ~dict.get(KEY, DEFAULT)~ method (as
 well as different tricks). Let's do something more complex - to query conflicting ports if they
 exist - they should be on the same host:
 
@@ -137,7 +148,44 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 1): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS: {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+: DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+
+*Tricks*:
+
+- nested "for"-s
+- assignment in "if"-s like ~if (prim := ...)~
+- fallback to default values: ~d.get(.., DEFAULT)~
+  - we can form even long getters: ~d.get('dict1', {}).get('dic2',{}).get('arrays', [])~
+- use of ~defaultdict~ for grouping (~GROUP BY~ in SQL): if you need order and duplicates,
+  use ~list~, else ~set~, but you can you even ~int~
+- ~+~ similarly to ∪ in math (sets union), well, for lists, in the case
+- ~f'Unnamed{i}'~ numbers unnamed databases, giving them unique names, but be careful: if
+  2 ~+~-ed lists are not isomorphic, you will hit problems.
+
+** Correspondence to mathematics
+  
+The Python's query corresponds to the sets:
+
+\begin{gather*}
+Q_p = \{ \langle \langle h, p \rangle, n \rangle \mid d \in databases, prim = primary'(d), \exists h = host(prim), \exists p = port(prim), n = name'(d) \} \\
+\\
+Q_r = \{ \langle \langle h, p \rangle, n \rangle \mid d \in databases, repl = replicas'(d), \exists h = host(repl), \exists p = port(repl), n = name'(d) \} \\
+\\
+Q = Q_p \cup Q_r
+\end{gather*}
+
+\begin{aligned}
+primary'(d) &= d \mapsto primary(d), \exists primary(d) \\
+&= d \mapsto \varnothing
+\end{aligned}
+
+\begin{gather*}
+G(k): \langle h, p \rangle \mapsto \{ n \mid \langle \langle h, p \rangle, n \rangle \in Q \} \\
+\\
+Conflicts = \{ \langle k, G(k) \rangle \mid |G(k)| > 1 \}
+\end{gather*}
+
+where ~G(k)~ is grouping function, actully it is our ~defaultdict~!
 
 But this is not so good query: we pass through ~databases~ 2 times. Lets try to rewrite it:
 
@@ -151,7 +199,7 @@ q = [dd[rec[:2]].add(rec[2])
                 for prim in [d.get('primary', {})]
                 for ph in [prim.get('host')]
                 for pp in [prim.get('port')]
-                for repl in d.get('replicas', [{}])
+                for repl in d.get('replicas', [{}])  # <-- ATTENTION: [{}] else nested "for"-s stop!
                 for rh in [repl.get('host')]
                 for rp in [repl.get('port')]]
      for rec in db if rec[0] and rec[1]]
@@ -162,24 +210,267 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 2): {conflicts}')
 #+RESULTS:
 : DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
 
-As you can see it looks mostly as Haskell's ~do-notation~ for list monad - [[https://www.schoolofhaskell.com/school/starting-with-haskell/basics-of-haskell/13-the-list-monad][example]]!
+"ATTENTION" comment is important and Haskell programmers undertand it better: it allows
+nested "for"-s to work, ~repl~ will exists even if no ~replicas~ for the current
+database. It's OK bcs other "for"-s are also just bindings of ~rh~, ~rp~ (if no replicas,
+then we will get these bidnings as ~None~ - they are missing in ~{}~ empty dict got from
+~[{}]~). But it will allow us to get a tuple with ~name~.
+
+As you can see it looks mostly as Haskell's ~do-notation~ for list monad (see [[https://www.schoolofhaskell.com/school/starting-with-haskell/basics-of-haskell/13-the-list-monad][example]])!
 
 Though, it is not optimal: it iterates over ~databases~ only once, but it recreates the same
 tuples. This can be fixed but only partially - with ~for t1 in [(ph,pp,name)]~. If you need
-performance then you should switch to block-wise code:
+performance then you should switch to block-wise code but it looks not so LINQ-ish:
 
 #+begin_src python :eval no :exports both
 for db in databases:
-    t1 = ...
+    t1 = ...      # create once!
     ...
     for repl in db['replicas']:
-        t2 = ...
+        t2 = ...  # and this one!
         ...
 #+end_src
 
+Another examples:
 
-# TODO
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+q = [d.get('name', 'Unnamed') for d in databases if d.get('replicas', []) == []]
+print(f'DATABASE NAMES WITHOUT REPLICAS: {q}')
+
+q = sum(len(rs) for d in databases for rs in [d.get('replicas', [])]) / len(databases)
+print(f'AVERAGE NUMBER OF REPLICAS PER DATABASE: {q}')
+#+end_src
+
+#+RESULTS:
+: DATABASE NAMES WITHOUT REPLICAS: ['DB3']
+: AVERAGE NUMBER OF REPLICAS PER DATABASE: 1.0
+
+The last example demonstrates simple aggregation (AVG). ~for rs in [d.get()]~ is just a
+trick to bind the list to ~rs~ and it can be written more directly.
+
+Example from [[https://www.baeldung.com/linux/jq-command-json][Baeldung]] (Wikipedia JSON): we will form new dictionaries with a title and
+page description (called ~extract~) nameing them in our own way:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+import pprint
+
+dat2 = {
+  'query': {
+    'pages': [
+      {
+        '21721040': {
+          'pageid': 21721040,
+          'ns': 0,
+          'title': 'Stack Overflow',
+          'extract': 'Some interesting text about Stack Overflow'
+        }
+      },
+      {
+        '21721041': {
+          'pageid': 21721041,
+          'ns': 0,
+          'title': 'Baeldung',
+          'extract': 'A great place to learn about Java'
+        }
+      },
+      {
+        '11111111': {
+          'pageid': 11111111,
+          'ns': 0,
+          'title': 'FAKE'
+        }
+      }      
+    ]
+  }
+}
+q = [{'page_title':t, 'page_description': p.get('extract', '<no description>')}
+     for pages_dict in dat2.get('query',{}).get('pages',[])
+     if (p := next(iter(pages_dict.values()), {}))  # take the 1st value (we see only one always)
+     if (t := p.get('title'))]
+pprint.pprint(q, sort_dicts=False)
+#+end_src
+
+#+RESULTS:
+: [{'page_title': 'Stack Overflow',
+:   'page_description': 'Some interesting text about Stack Overflow'},
+:  {'page_title': 'Baeldung',
+:   'page_description': 'A great place to learn about Java'},
+:  {'page_title': 'FAKE', 'page_description': '<no description>'}]
+
+Pay attention, that with ~if (x := ...)~ we bind but we will skip such iteration if ~x~ is
+false in some way! But in the case of ~extract~ key we fallback to "<no description>".
+
+* More complex queries
+
+Lets try more complex queries. Our next JSON is
+
+#+begin_example
+dict            dict          key
+------------    ------------  -----------------
+Users        🡒  Teams         team_id
+Teams        🡒  Users         lead_id
+Teams        🡒  Projects      project_ids
+Projects     🡒  Repositories  repository_id
+Repositories 🡒  Branches      branch_ids
+Branches     🡒  Branches      parent_id, a tree
+Users        🡒  Tasks         task_ids
+Tasks        🡒  Users         assignee_id
+Tasks        🡒  Projects      project_id
+Tasks        🡒  Tasks         depends_on, a DAG
+#+end_example
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+data = {
+    "users": [
+        {
+            "id": "U1",
+            "name": "Alice",
+            "team_id": "T1",
+            "task_ids": ["K1", "K3"]
+        },
+        {
+            "id": "U2",
+            "name": "Bob",
+            "team_id": "T1",
+            "task_ids": ["K2"]
+        },
+        {
+            "id": "U3",
+            "name": "Carol",
+            "team_id": "T2",
+            "task_ids": ["K4"]
+        }
+    ],
+
+    "teams": [
+        {
+            "id": "T1",
+            "name": "Backend",
+            "lead_id": "U1",
+            "project_ids": ["P1"]
+        },
+        {
+            "id": "T2",
+            "name": "Frontend",
+            "lead_id": "U3",
+            "project_ids": ["P1", "P2"]
+        }
+    ],
+
+    "projects": [
+        {
+            "id": "P1",
+            "name": "Inventory",
+            "repository_id": "R1"
+        },
+        {
+            "id": "P2",
+            "name": "Website",
+            "repository_id": "R2"
+        }
+    ],
+
+    "repositories": [
+        {
+            "id": "R1",
+            "url": "git@example.com:inventory.git",
+            "branch_ids": ["B1", "B2"]
+        },
+        {
+            "id": "R2",
+            "url": "git@example.com:website.git",
+            "branch_ids": ["B3"]
+        }
+    ],
+
+    "branches": [
+        {
+            "id": "B1",
+            "name": "main",
+            "parent_id": None
+        },
+        {
+            "id": "B2",
+            "name": "feature/login",
+            "parent_id": "B1"
+        },
+        {
+            "id": "B3",
+            "name": "main",
+            "parent_id": None
+        }
+    ],
+
+    "tasks": [
+        {
+            "id": "K1",
+            "title": "Design schema",
+            "project_id": "P1",
+            "assignee_id": "U1",
+            "depends_on": []
+        },
+        {
+            "id": "K2",
+            "title": "REST API",
+            "project_id": "P1",
+            "assignee_id": "U2",
+            "depends_on": ["K1"]
+        },
+        {
+            "id": "K3",
+            "title": "Authentication",
+            "project_id": "P2",
+            "assignee_id": "U1",
+            "depends_on": ["K2"]
+        },
+        {
+            "id": "K4",
+            "title": "Landing page",
+            "project_id": "P2",
+            "assignee_id": "U3",
+            "depends_on": []
+        }
+    ]
+}
+#+end_src
+
+** Find all tasks assigned to members of a given team
+TODO
+
+** Detect dangling references (IDs that don't exist)
+TODO
+
+** Find tasks that no one depends on
+TODO
+
+** Compute the dependency depth of each task
+TODO
+
+** Find projects shared by multiple teams
+TODO
+
+** Determine which user has the most transitive task dependencies
+TODO
+
+** Detect dependency cycles (if you intentionally introduce one)
+TODO
+
+** Find repositories used by teams led by a particular user
+TODO
+
+** Count how many tasks belong to each project or team
+TODO
+
+** Build reverse indices (e.g., project → tasks, user → assigned tasks)
 
 * Other options
 
 Other options could be... C# [[https://learn.microsoft.com/en-us/dotnet/csharp/linq/][LINQ]] or Groovy's [[https://groovy-lang.org/using-ginq.html][GINQ]]
+
+* Prettify
+
+Like ~jq~ Python can do it too:
+
+#+begin_src shell :eval no :exports both
+cat yourfile.json | python -m json.tool
+#+end_src
