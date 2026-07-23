@@ -104,11 +104,11 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB1', 'DB2', 'DB3'}
+: DATABASES: {'DB2', 'DB1', 'DB3'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
-: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB2', 5433), ('DB3', 5437)}
+: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
 
 You see idea - we can use list/set/dict comprehension and ~dict.get(KEY, DEFAULT)~ method (as
 well as different tricks). Let's do something more complex - to query conflicting ports if they
@@ -117,25 +117,69 @@ exist - they should be on the same host:
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
 from collections import defaultdict
 
-d = defaultdict(list)
+dd = defaultdict(set)
 
 for k, v in (
-    [((h, p), d.get('name', f'Unnamed{i}'))
+    [((ph, pp), d.get('name', f'Unnamed{i}'))
      for i, d in enumerate(databases)
      if (prim := d.get('primary', {}))
-     and (h := prim.get('host'))
-     and (p := prim.get('port'))]
+     and (ph := prim.get('host'))
+     and (pp := prim.get('port'))]
     +
-    [((r['host'], r['port']), d.get('name', f'Unnamed{i}'))
+    [((rh, rp), d.get('name', f'Unnamed{i}'))
      for i, d in enumerate(databases)
-     for r in d.get('replicas', [])
-     if r.get('host') and r.get('port')]
-): d[k].append(v)
-conflicts = {k:v for k,v in d.items() if len(v) > 1}
-print(f'DATABASES HAVING PORT CONFLICTS: {conflicts}')
+     for repl in d.get('replicas', [])
+     if (rh := repl.get('host'))
+     and (rp := repl.get('port'))]
+): dd[k].add(v)
+conflicts = {k:v for k,v in dd.items() if len(v) > 1}
+print(f'DATABASES HAVING PORT CONFLICTS (WAY 1): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS: {('10.0.0.5', 5437): ['DB3', 'DB1']}
+: DATABASES HAVING PORT CONFLICTS: {('10.0.0.5', 5437): {'DB1', 'DB3'}}
 
-But this is not so good query: we pass through ~databases~ 2 times.
+But this is not so good query: we pass through ~databases~ 2 times. Lets try to rewrite it:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+import pprint
+dd = defaultdict(set)
+q = [dd[rec[:2]].add(rec[2])
+     for db in [[(ph, pp, name), (rh, rp, name)]
+                for i, d in enumerate(databases)
+                for name in [d.get('name', f'Unnamed{i}')]
+                for prim in [d.get('primary', {})]
+                for ph in [prim.get('host')]
+                for pp in [prim.get('port')]
+                for repl in d.get('replicas', [{}])
+                for rh in [repl.get('host')]
+                for rp in [repl.get('port')]]
+     for rec in db if rec[0] and rec[1]]
+conflicts = {k:v for k,v in dd.items() if len(v) > 1}
+print(f'DATABASES HAVING PORT CONFLICTS (WAY 2): {conflicts}')
+#+end_src
+
+#+RESULTS:
+: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+
+As you can see it looks mostly as Haskell's ~do-notation~ for list monad - [[https://www.schoolofhaskell.com/school/starting-with-haskell/basics-of-haskell/13-the-list-monad][example]]!
+
+Though, it is not optimal: it iterates over ~databases~ only once, but it recreates the same
+tuples. This can be fixed but only partially - with ~for t1 in [(ph,pp,name)]~. If you need
+performance then you should switch to block-wise code:
+
+#+begin_src python :eval no :exports both
+for db in databases:
+    t1 = ...
+    ...
+    for repl in db['replicas']:
+        t2 = ...
+        ...
+#+end_src
+
+
+# TODO
+
+* Other options
+
+Other options could be... C# [[https://learn.microsoft.com/en-us/dotnet/csharp/linq/][LINQ]] or Groovy's [[https://groovy-lang.org/using-ginq.html][GINQ]]
