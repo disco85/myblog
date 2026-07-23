@@ -320,7 +320,7 @@ Tasks        🡒  Tasks         depends_on, a DAG
 #+end_example
 
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
-data = {
+cdat = {
     "users": [
         {
             "id": "U1",
@@ -434,7 +434,32 @@ data = {
 }
 #+end_src
 
+#+RESULTS:
+
 ** Find all tasks assigned to members of a given team
+
+This is classical cross join:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+def query(team_name):
+    return [kid
+            for t in cdat.get('teams',[])
+            if (tid := t.get('id'))
+            if (tn := t.get('name')) and tn == team_name
+            for u in cdat.get('users',[])
+            if (uid := u.get('id'))
+            if (uti := u.get('team_id')) and uti == tid
+            for k in cdat.get('tasks',[])
+            if (kid := k.get('id'))
+            if (aid := k.get('assignee_id')) and aid == uid]
+print('TASKS OF BACKEND TEAM:', query('Backend'))
+print('TASKS OF FRONTEND TEAM:', query('Frontend'))
+#+end_src
+
+#+RESULTS:
+: TASKS OF BACKEND TEAM ['K1', 'K3', 'K2']
+: TASKS OF FRONTEND TEAM ['K4']
+
 TODO
 
 ** Detect dangling references (IDs that don't exist)
