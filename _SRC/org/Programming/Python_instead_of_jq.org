@@ -104,11 +104,13 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB2', 'DB1', 'DB3'}
+: DATABASES: {'DB1', 'DB3', 'DB2'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
 : DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
+
+*Tricks*: union of sets with ~|~, unpacking inside a set with ~*~ (star unpacking).
 
 The last query (~DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430~) is this simple set:
 
@@ -457,22 +459,160 @@ print('TASKS OF FRONTEND TEAM:', query('Frontend'))
 #+end_src
 
 #+RESULTS:
-: TASKS OF BACKEND TEAM ['K1', 'K3', 'K2']
-: TASKS OF FRONTEND TEAM ['K4']
-
-TODO
+: TASKS OF BACKEND TEAM: ['K1', 'K3', 'K2']
+: TASKS OF FRONTEND TEAM: ['K4']
 
 ** Detect dangling references (IDs that don't exist)
-TODO
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+import pprint
+q = ({'DANGLED PROJECT_ID IN TASKS':
+      {kpid for k in cdat.get('tasks',[])
+       if (kpid := k.get('project_id'))}
+      -
+      {p.get('id') for p in cdat.get('projects',[])}}
+     |
+     {'DANGLED ASSIGNEE_ID IN TASKS':
+      {aid for k in cdat.get('tasks',[])
+       if (aid := k.get('assignee_id'))}
+      -
+      {u.get('id') for u in cdat.get('users',[])}}
+     |
+     {'DANGLED DEPENDS_ON IN TASKS':
+      {kdon for k in cdat.get('tasks',[])
+       for kdon in k.get('depends_on',[])}
+      -
+      {k.get('id') for k in cdat.get('tasks',[])}}
+     |
+     {'DANGLED PARENT_ID IN BRANCHES':
+      {bpid for b in cdat.get('branches',[])
+       if (bpid := b.get('parent_id'))}
+      -
+      {b.get('id') for b in cdat.get('branches',[])}}
+     |
+     {'DANGLED BRANCH_IDS IN REPOSITORIES':
+      {rbid for r in cdat.get('repositories',[])
+       for rbid in r.get('branch_ids',[])}
+      -
+      {b.get('id') for b in cdat.get('branches',[])}}
+     |
+     {'DANGLED REPOSITORY_ID IN PROJECTS':
+      {prid for p in cdat.get('projects',[])
+       if (prid := p.get('repository_id'))}
+      -
+      {r.get('id') for r in cdat.get('repositories',[])}}
+     |
+     {'DANGLED PROJECT_IDS IN TEAMS':
+      {tpid for t in cdat.get('teams',[])
+       for tpid in t.get('project_ids',[])}
+      -
+      {p.get('id') for p in cdat.get('projects',[])}}
+     |
+     {'DANGLED LEAD_ID IN TEAMS':
+      {tlid for t in cdat.get('teams',[])
+       if (tlid := t.get('lead_id'))}
+      -
+      {u.get('id') for u in cdat.get('users',[])}}
+     |
+     {'DANGLED TASK_IDS IN USERS':
+      {utid for u in cdat.get('users',[])
+       for utid in u.get('task_ids',[])}
+      -
+      {k.get('id') for k in cdat.get('tasks',[])}
+     }
+     |
+     {'DANGLED TEAM_ID IN USERS':
+      {utid for u in cdat.get('users',[])
+       if (utid := u.get('team_id'))}
+      -
+      {t.get('id') for t in cdat.get('teams',[])}}
+    )
+pprint.pprint(q, sort_dicts=False)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+{'DANGLED PROJECT_ID IN TASKS': set(),
+ 'DANGLED ASSIGNEE_ID IN TASKS': set(),
+ 'DANGLED DEPENDS_ON IN TASKS': set(),
+ 'DANGLED PARENT_ID IN BRANCHES': set(),
+ 'DANGLED BRANCH_IDS IN REPOSITORIES': set(),
+ 'DANGLED REPOSITORY_ID IN PROJECTS': set(),
+ 'DANGLED PROJECT_IDS IN TEAMS': set(),
+ 'DANGLED LEAD_ID IN TEAMS': set(),
+ 'DANGLED TASK_IDS IN USERS': set(),
+ 'DANGLED TEAM_ID IN USERS': set()}
+#+end_example
+
+*Tricks*: merge of dictionaries with ~|~, substraction of sets with ~-~.
 
 ** Find tasks that no one depends on
-TODO
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+q = ({k.get('id') for k in cdat.get('tasks',[])}
+     -
+     {kdon for k in cdat.get('tasks',[])
+     for kdon in k.get('depends_on',[])})
+print(f'TASKS THAT NO ONE DEPENDS ON: {q}')
+#+end_src
+
+#+RESULTS:
+: TASKS THAT NO ONE DEPENDS ON: {'K4', 'K3'}
+
+It's simple: ~ALL - DEPENDENCIES~.
 
 ** Compute the dependency depth of each task
 TODO
 
 ** Find projects shared by multiple teams
-TODO
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from functools import *
+from itertools import *
+
+q = {pname for s in starmap(
+    set.intersection,
+    permutations((set(m.get('project_ids',[])) for m in cdat.get('teams',[])),
+                 2))
+     for e in s
+     for p in cdat.get('projects',[])
+     if (pname := p.get('name')) and p.get('id') == e}
+print(q)
+#+end_src
+
+#+RESULTS:
+: {'Inventory'}
+
+It's a straightforward solution:
+
+#+begin_example
+                                permutations:
+{P1}, {P1,P2} -> ⦻ -> ({P1}, {P1,P2}), ({P1,P2}, {P1}) -> ⋂ -> {P1}, {P1} -> {P1}
+
+{P1} -> {Inventory}
+#+end_example
+
+It works, but this ~{P1}, {P1,P2} -> ⦻~ is a problem: a lot of permutations.
+
+We can use ~combinations()~ function, and it will cut it in half. We can use ~Counter~
+class:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from collections import Counter
+
+cnt = Counter(pid for t in cdat.get('teams',[])
+              for pid in t.get('project_ids',[]))
+q = {pname for p in cdat.get('projects',[])
+     if cnt[p['id']] > 1 and (pname := p.get('name'))}
+print(q)
+#+end_src
+
+#+RESULTS:
+: {'Inventory'}
+
+This is the best solution: it just counts all unique items from ~TEAMS.PROJECT_IDS~, ie,
+~key => integer-counter~. Then we select projects which ID is "registered" within ~cnt~
+counter as a value greater than 1.
 
 ** Determine which user has the most transitive task dependencies
 TODO
