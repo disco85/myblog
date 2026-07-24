@@ -104,11 +104,11 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB1', 'DB3', 'DB2'}
+: DATABASES: {'DB1', 'DB2', 'DB3'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
-: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
+: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB2', 5433), ('DB3', 5437)}
 
 *Tricks*: union of sets with ~|~, unpacking inside a set with ~*~ (star unpacking).
 
@@ -557,9 +557,9 @@ print(f'TASKS THAT NO ONE DEPENDS ON: {q}')
 #+end_src
 
 #+RESULTS:
-: TASKS THAT NO ONE DEPENDS ON: {'K4', 'K3'}
+: TASKS THAT NO ONE DEPENDS ON: {'K3', 'K4'}
 
-It's simple: ~ALL - DEPENDENCIES~.
+It's simple: ~ALL \ DEPENDENCIES~.
 
 ** Compute the dependency depth of each task
 TODO
@@ -586,15 +586,15 @@ print(q)
 It's a straightforward solution:
 
 #+begin_example
-                                permutations:
-{P1}, {P1,P2} -> ⦻ -> ({P1}, {P1,P2}), ({P1,P2}, {P1}) -> ⋂ -> {P1}, {P1} -> {P1}
+                      __________permutations_________
+{P1}, {P1,P2} 🡒 ⦻ 🡒 ({P1}, {P1,P2}), ({P1,P2}, {P1}) 🡒 ⋂ 🡒 {P1}, {P1} 🡒 {P1}
 
-{P1} -> {Inventory}
+{P1} 🡒 {Inventory}
 #+end_example
 
 It works, but this ~{P1}, {P1,P2} -> ⦻~ is a problem: a lot of permutations.
 
-We can use ~combinations()~ function, and it will cut it in half. We can use ~Counter~
+We can use ~combinations()~ function, and it will cut it in half. But better is to use ~Counter~
 class:
 
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
@@ -621,7 +621,30 @@ TODO
 TODO
 
 ** Find repositories used by teams led by a particular user
-TODO
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+def query(user_name):
+    q = {(r.get('id'), r.get('url', '<no url>'))
+         for u in cdat.get('users',[])
+         if ((u.get('name') == user_name) and
+             (utid := u.get('team_id')))
+         for t in cdat.get('teams',[])
+         if t.get('id') == utid and u.get('id') == t.get('lead_id')
+         if (tpids := t.get('project_ids',[]))
+         for p in cdat.get('projects',[])
+         if (p.get('id') in tpids and (prid := p.get('repository_id')))
+         for r in cdat.get('repositories',[])
+         if r.get('id') == prid}
+    return q
+print('REPOSITORIES USED BY TEAM LED BY ALICE:', query('Alice'))
+print('REPOSITORIES USED BY TEAM LED BY CAROL:', query('Carol'))
+print('REPOSITORIES USED BY TEAM LED BY BOB:', query('Bob'))
+#+end_src
+
+#+RESULTS:
+: REPOSITORIES USED BY TEAM LED BY ALICE: {('R1', 'git@example.com:inventory.git')}
+: REPOSITORIES USED BY TEAM LED BY CAROL: {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
+: REPOSITORIES USED BY TEAM LED BY BOB: set()
 
 ** Count how many tasks belong to each project or team
 TODO
