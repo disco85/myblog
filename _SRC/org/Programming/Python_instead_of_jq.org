@@ -21,8 +21,12 @@ with open(path_to_json_file, 'rt') as f:
     json_data = json.load(f)
 #+end_src
 
-but more interesting is that you can query JSON as some DB. Considering our decoded JSON
-in this way:
+but more interesting is that you can query JSON as some DB. The idea of examples below is not
+to achieve the best performance - it is not the goal - just demonstration of short queries
+looking as jq, but where the performance is very bad, there are alternative queries, see
+carefully.
+
+Considering our decoded JSON in this way:
 
 #+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
 dat = {
@@ -636,18 +640,36 @@ def query(user_name):
          for r in cdat.get('repositories',[])
          if r.get('id') == prid}
     return q
-print('REPOSITORIES USED BY TEAM LED BY ALICE:', query('Alice'))
-print('REPOSITORIES USED BY TEAM LED BY CAROL:', query('Carol'))
-print('REPOSITORIES USED BY TEAM LED BY BOB:', query('Bob'))
+print('REPOSITORIES USED BY TEAM LED BY ALICE:\n  ', query('Alice'))
+print('REPOSITORIES USED BY TEAM LED BY CAROL:\n  ', query('Carol'))
+print('REPOSITORIES USED BY TEAM LED BY BOB:\n  ', query('Bob'))
 #+end_src
 
 #+RESULTS:
-: REPOSITORIES USED BY TEAM LED BY ALICE: {('R1', 'git@example.com:inventory.git')}
-: REPOSITORIES USED BY TEAM LED BY CAROL: {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
-: REPOSITORIES USED BY TEAM LED BY BOB: set()
+: REPOSITORIES USED BY TEAM LED BY ALICE:
+:    {('R1', 'git@example.com:inventory.git')}
+: REPOSITORIES USED BY TEAM LED BY CAROL:
+:    {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
+: REPOSITORIES USED BY TEAM LED BY BOB:
+:    set()
 
-** Count how many tasks belong to each project or team
-TODO
+** Count how many tasks belong to each team
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+c = Counter(uti for k in cdat.get('tasks',[])
+            if (kaid := k.get('assignee_id'))
+            for u in cdat.get('users',[])
+            if (u.get('id') == kaid and
+                (uti := u.get('team_id'))))
+q = {tn:c[t.get('id')] for t in cdat.get('teams',[])
+     if (tn := t.get('name'))}
+pprint.pprint(q)
+#+end_src
+
+#+RESULTS:
+: {'Backend': 3, 'Frontend': 1}
+
+~Counter~ was used again, it worked up like ~SUM()~ with ~GROUP BY~ in SQL.
 
 ** Build reverse indices (e.g., project → tasks, user → assigned tasks)
 
