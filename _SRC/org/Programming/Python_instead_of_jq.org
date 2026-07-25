@@ -112,7 +112,7 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
-: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB2', 5433), ('DB3', 5437)}
+: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
 
 *Tricks*: union of sets with ~|~, unpacking inside a set with ~*~ (star unpacking).
 
@@ -621,8 +621,82 @@ counter as a value greater than 1.
 ** Determine which user has the most transitive task dependencies
 TODO
 
-** Detect dependency cycles (if you intentionally introduce one)
-TODO
+** Detect dependency cycles
+
+Let's check it with a result from ~cdat~ (~q1~) and other pre-setup results explicitly containing cycles (~q2,3,4~):
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+q1 = [(t.get('id'),d)
+     for t in cdat.get('tasks',[])
+     for d in t.get('depends_on',[])]
+q2 = [('K1', 'K2'),
+      ('K1', 'K3'),
+      ('K2', 'K4'),
+      ('K3', 'K1')]
+q3 = [('K1', 'K3'),
+      ('K1', 'K2'),
+      ('K2', 'K1'),
+      ('K3', 'K4')]
+q4 = [('K1','K4'),
+      ('K1','K2'),
+      ('K2','K5'),
+      ('K2','K3'),
+      ('K3','K6'),
+      ('K3','K1')]
+def cycle1(q, d=None, passed=None):
+    return (next((l for d in q
+                  if (l := cycle1(q, d, []))), None)
+            if d is None
+            else (passed
+                  if d[1] in (p[0] for p in passed)
+                  else next((r for n in filter(lambda x:d[1]==x[0], q)
+                             if (r := cycle1(q, n, passed + [d,n]))), None)))
+for q in (q1, q2, q3, q4):
+    print('Q:', q1, '\n   CYCLES:', cycle1(q))
+#+end_src
+
+#+RESULTS:
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: CYCLES: None
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: CYCLES: [('K1', 'K3'), ('K3', 'K1')]
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: CYCLES: [('K1', 'K2'), ('K2', 'K1')]
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: CYCLES: [('K1', 'K2'), ('K2', 'K3'), ('K2', 'K3'), ('K3', 'K1')]
+
+So, no cycles in the original ~cdat~. Web needed function because we needed recursion. But ~cycle1()~
+allows duplicates. Also maybe it is not so readable, so another version is ~cycle2()~:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+def cycle2(q, d=None, passed=None):
+    if d is None:
+        for d in q:
+            if l := cycle2(q, d, []):
+                return l
+    else:
+        fr,to = d
+        if to in (p[0] for p in passed):
+            return passed
+        else:
+            for n in filter(lambda d:to==d[0], q):
+                if r := cycle2(q, n, passed + ([n] if passed and passed[-1]==d else [d,n])):
+                    return r
+for q in (q1, q2, q3, q4):
+    print('Q:', q1, '\n   CYCLES:', ',  '.join(map(' -> '.join, rs) if (rs:=cycle2(q)) else ['<none>']))
+#+end_src
+
+#+RESULTS:
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+:    CYCLES: <none>
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+:    CYCLES: K1 -> K3,  K3 -> K1
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+:    CYCLES: K1 -> K2,  K2 -> K1
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+:    CYCLES: K1 -> K2,  K2 -> K3,  K3 -> K1
+
+But recusrive queries don't match the initial idea to be more jq-ish...
 
 ** Find repositories used by teams led by a particular user
 
