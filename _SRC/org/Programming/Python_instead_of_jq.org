@@ -108,7 +108,7 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB1', 'DB2', 'DB3'}
+: DATABASES: {'DB3', 'DB2', 'DB1'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
@@ -181,8 +181,8 @@ Q = Q_p \cup Q_r
 \end{gather*}
 
 \begin{aligned}
-primary'(d) &= d \mapsto primary(d), \exists primary(d) \\
-&= d \mapsto \varnothing
+primary'(d) &= d \mapsto primary(d), &\text{if}\ \exists primary(d) \\
+&= d \mapsto \varnothing, &\text{else}
 \end{aligned}
 
 \begin{gather*}
@@ -214,7 +214,7 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 2): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
 
 "ATTENTION" comment is important and Haskell programmers undertand it better: it allows
 nested "for"-s to work, ~repl~ will exists even if no ~replicas~ for the current
@@ -618,8 +618,9 @@ This is the best solution: it just counts all unique items from ~TEAMS.PROJECT_I
 ~key => integer-counter~. Then we select projects which ID is "registered" within ~cnt~
 counter as a value greater than 1.
 
-** Determine which user has the most transitive task dependencies
-TODO
+*The next queries are recursive, the alternative is to make them iterative which is better, because the stack
+depth is limited, but they will look lesser readable.*
+
 
 ** Detect dependency cycles
 
@@ -652,18 +653,18 @@ def cycle1(q, d=None, passed=None):
                   else next((r for n in filter(lambda x:d[1]==x[0], q)
                              if (r := cycle1(q, n, passed + [d,n]))), None)))
 for q in (q1, q2, q3, q4):
-    print('Q:', q1, '\n   CYCLES:', cycle1(q))
+    print('Q:', q, '\n   CYCLES:', cycle1(q))
 #+end_src
 
 #+RESULTS:
 : Q: [('K2', 'K1'), ('K3', 'K2')] 
-: CYCLES: None
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
-: CYCLES: [('K1', 'K3'), ('K3', 'K1')]
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
-: CYCLES: [('K1', 'K2'), ('K2', 'K1')]
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
-: CYCLES: [('K1', 'K2'), ('K2', 'K3'), ('K2', 'K3'), ('K3', 'K1')]
+:    CYCLES: None
+: Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+:    CYCLES: [('K1', 'K3'), ('K3', 'K1')]
+: Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+:    CYCLES: [('K1', 'K2'), ('K2', 'K1')]
+: Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+:    CYCLES: [('K1', 'K2'), ('K2', 'K3'), ('K2', 'K3'), ('K3', 'K1')]
 
 So, no cycles in the original ~cdat~. Web needed function because we needed recursion. But ~cycle1()~
 allows duplicates. Also maybe it is not so readable, so another version is ~cycle2()~:
@@ -683,20 +684,181 @@ def cycle2(q, d=None, passed=None):
                 if r := cycle2(q, n, passed + ([n] if passed and passed[-1]==d else [d,n])):
                     return r
 for q in (q1, q2, q3, q4):
-    print('Q:', q1, '\n   CYCLES:', ',  '.join(map(' -> '.join, rs) if (rs:=cycle2(q)) else ['<none>']))
+    print('Q:', q, '\n   CYCLES:', ',  '.join(map(' -> '.join, rs) if (rs:=cycle2(q)) else ['<none>']))
 #+end_src
 
 #+RESULTS:
 : Q: [('K2', 'K1'), ('K3', 'K2')] 
 :    CYCLES: <none>
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
 :    CYCLES: K1 -> K3,  K3 -> K1
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
 :    CYCLES: K1 -> K2,  K2 -> K1
-: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
 :    CYCLES: K1 -> K2,  K2 -> K3,  K3 -> K1
 
-But recusrive queries don't match the initial idea to be more jq-ish...
+*Tricks*: the code -
+
+#+begin_src python :eval no :exports both
+...
+        for d in q:
+            if l := cycle2(q, d, []):
+                return l
+#+end_src
+
+can be represented as ~next((l for d in q if (l := cycle1(q, d, []))), None)~ but it is lesser readable:
+all queries above can be rewritten with explicit block-wise code.
+
+To be honest, recursive queries don't match the initial idea to be more jq-ish...
+
+** Compute the dependency depth of each task
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+q1 = [(t.get('id'),d)
+     for t in cdat.get('tasks',[])
+     for d in t.get('depends_on',[])]
+q2 = [('K1', 'K2'),
+      ('K1', 'K3'),
+      ('K2', 'K4'),
+      ('K3', 'K1')]
+q3 = [('K1', 'K3'),
+      ('K1', 'K2'),
+      ('K2', 'K1'),
+      ('K3', 'K4')]
+q4 = [('K1','K4'),
+      ('K1','K2'),
+      ('K2','K5'),
+      ('K2','K3'),
+      ('K3','K6'),
+      ('K3','K1')]
+
+def depth(q, root=None, dest=None, nodes=None):
+    if root is None:
+        nodes = defaultdict(set)
+        for root, dest in q:
+            depth(q, root, dest, nodes)
+        return dict(nodes)
+    else:
+        if root != dest:
+            nodes[root].add(dest)
+        for successor in {n[1] for n in q if n[0]==dest}:
+            if successor not in nodes[root]:
+                depth(q, root, successor, nodes)
+    
+for q in (q1, q2, q3, q4):
+    print('Q:', q, '\nTASKS WITH DEPENDENCIES:', depth(q))
+#+end_src
+
+#+RESULTS:
+: Q: [('K2', 'K1'), ('K3', 'K2')] 
+: TASKS WITH DEPENDENCIES: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
+: Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+: TASKS WITH DEPENDENCIES: {'K1': {'K3', 'K4', 'K2'}, 'K2': {'K4'}, 'K3': {'K1', 'K4', 'K2'}}
+: Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+: TASKS WITH DEPENDENCIES: {'K1': {'K3', 'K4', 'K2'}, 'K2': {'K1', 'K3', 'K4'}, 'K3': {'K4'}}
+: Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+: TASKS WITH DEPENDENCIES: {'K1': {'K2', 'K6', 'K4', 'K3', 'K5'}, 'K2': {'K1', 'K6', 'K4', 'K3', 'K5'}, 'K3': {'K2', 'K1', 'K6', 'K4', 'K5'}}
+
+So, the depth is onbvious - it is the size of dependency sets. This is not the most optimal
+due to this ~in {n[1] for n in q if n[0]==dest}~.
+
+But we can rewrite it even in iterative way:
+
+#+begin_src python :eval yes-export :exports both :results output verbatim
+from collections import defaultdict
+
+p1 = [('K1', 'K2'),
+      ('K3', 'K4')]
+p2 = [('K1', 'K2'),
+      ('K1', 'K3'),
+      ('K2', 'K4'),
+      ('K3', 'K1')]
+p3 = [('K1', 'K3'),
+      ('K1', 'K2'),
+      ('K2', 'K1'),
+      ('K3', 'K4')]
+p4 = [('K1', 'K4'),
+      ('K1', 'K2'),
+      ('K2', 'K5'),
+      ('K2', 'K3'),
+      ('K3', 'K6'),
+      ('K3', 'K1')]
+p5 = [('A', 'B'),
+      ('A', 'C'),
+      ('B', 'D'),
+      ('C', 'D'),
+      ('D', 'E')]
+p6 = [('A', 'B'),
+      ('B', 'C'),
+      ('D', 'E')]
+
+def iter_depth(q):
+    if not q:
+        return []
+    deps = defaultdict(set)
+    # `route` is a stack for kind of "backtracking" (return from DFS, Depth-First-Search):
+    route = []
+    look_for = q[0][0]
+    # `q2` is the `q` value to be restored after return from look for `dst` (DFS);
+    # the stack `route` is used as such stack: a tuple with the current `look_for` and an integer -
+    # the position in `q`, - before to dive to look for `dst`:
+    q2 = q
+    # the current position in `q` (needed for restoring after return from DFS)
+    i = 0
+    while 1:
+        for pair in q2:
+            src, dst = pair
+            if (src == look_for and
+                (not route or dst not in deps[route[0][0]])):
+                # found desired src but with avoid of loops - `... and (not route ...)`, ie,
+                # we did not hit the initial `look_for`:
+                route.append((look_for, i+1))
+                deps[look_for].add(dst)
+                # Here we can add `dst` which is = initial `look_for`. It is not bad, bcs
+                # it allows to see loop later. Otherwise, use `if dst != route[0][0]: ...`
+                deps[route[0][0]].add(dst)
+                look_for = dst
+                break
+            i += 1
+        else:  # "if" in "for" was not hit, "for" completed
+            if route:
+                look_for, i = route.pop()
+                q2 = q[i:]  # kind of backtracking
+            else:
+                if q2 and (q2 := [p for p in q2 if p[0] not in deps]):  # or `...in q`
+                    # `q2` now - independent pairs, not children of the initial `look_for`,
+                    # if there are any yet - continue DFS with another, independent `look_for`:
+                    look_for = q2[0][0]
+                    continue
+                else:
+                    # all pair heads in `q2` is already in `deps`, nothing more to search:
+                    break
+    return dict(deps)
+for q in (p1, p2, p3, p4, p5, p6):
+    print('Q:', q, '\n   TASK DEPS:', iter_depth(q))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Q: [('K1', 'K2'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K3', 'K4', 'K2', 'K1'}, 'K2': {'K4'}, 'K3': {'K1'}}
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K3', 'K4', 'K2', 'K1'}, 'K3': {'K4'}, 'K2': {'K1'}}
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K5', 'K4', 'K2', 'K1', 'K6', 'K3'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
+Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
+   TASK DEPS: {'A': {'C', 'D', 'E', 'B'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
+Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
+#+end_example
+
+So, queries required recursive search (even implemented in iterative way) don't look as simple
+~jq~ queries. It can be overcome if to use helper-functions: you wrute them then load this module
+and use them from it. For example the function ~iter_depth~ is DFS common function and works with
+any list of tuples ~(source, destination)~. Python has a lot of ready for use libraries, for search
+too, just look at https://pypi.org/ !
 
 ** Find repositories used by teams led by a particular user
 
@@ -723,7 +885,7 @@ print('REPOSITORIES USED BY TEAM LED BY BOB:\n  ', query('Bob'))
 : REPOSITORIES USED BY TEAM LED BY ALICE:
 :    {('R1', 'git@example.com:inventory.git')}
 : REPOSITORIES USED BY TEAM LED BY CAROL:
-:    {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
+:    {('R2', 'git@example.com:website.git'), ('R1', 'git@example.com:inventory.git')}
 : REPOSITORIES USED BY TEAM LED BY BOB:
 :    set()
 
@@ -745,7 +907,13 @@ pprint.pprint(q)
 
 ~Counter~ was used again, it worked up like ~SUM()~ with ~GROUP BY~ in SQL.
 
+** Determine which user has the most transitive task dependencies
+
+TODO
+
 ** Build reverse indices (e.g., project → tasks, user → assigned tasks)
+
+TODO
 
 * Other options
 
