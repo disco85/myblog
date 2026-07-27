@@ -108,7 +108,7 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB3', 'DB2', 'DB1'}
+: DATABASES: {'DB1', 'DB2', 'DB3'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
@@ -214,7 +214,7 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 2): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
+: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
 
 "ATTENTION" comment is important and Haskell programmers undertand it better: it allows
 nested "for"-s to work, ~repl~ will exists even if no ~replicas~ for the current
@@ -561,12 +561,9 @@ print(f'TASKS THAT NO ONE DEPENDS ON: {q}')
 #+end_src
 
 #+RESULTS:
-: TASKS THAT NO ONE DEPENDS ON: {'K3', 'K4'}
+: TASKS THAT NO ONE DEPENDS ON: {'K4', 'K3'}
 
 It's simple: ~ALL \ DEPENDENCIES~.
-
-** Compute the dependency depth of each task
-TODO
 
 ** Find projects shared by multiple teams
 
@@ -753,11 +750,11 @@ for q in (q1, q2, q3, q4):
 : Q: [('K2', 'K1'), ('K3', 'K2')] 
 : TASKS WITH DEPENDENCIES: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
 : Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K3', 'K4', 'K2'}, 'K2': {'K4'}, 'K3': {'K1', 'K4', 'K2'}}
+: TASKS WITH DEPENDENCIES: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
 : Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K3', 'K4', 'K2'}, 'K2': {'K1', 'K3', 'K4'}, 'K3': {'K4'}}
+: TASKS WITH DEPENDENCIES: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4', 'K1', 'K3'}, 'K3': {'K4'}}
 : Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K2', 'K6', 'K4', 'K3', 'K5'}, 'K2': {'K1', 'K6', 'K4', 'K3', 'K5'}, 'K3': {'K2', 'K1', 'K6', 'K4', 'K5'}}
+: TASKS WITH DEPENDENCIES: {'K1': {'K2', 'K6', 'K5', 'K4', 'K3'}, 'K2': {'K1', 'K6', 'K5', 'K4', 'K3'}, 'K3': {'K1', 'K2', 'K6', 'K5', 'K4'}}
 
 So, the depth is onbvious - it is the size of dependency sets. This is not the most optimal
 due to this ~in {n[1] for n in q if n[0]==dest}~.
@@ -843,13 +840,13 @@ for q in (p1, p2, p3, p4, p5, p6):
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K3', 'K4', 'K2', 'K1'}, 'K2': {'K4'}, 'K3': {'K1'}}
+   TASK DEPS: {'K1': {'K2', 'K1', 'K4', 'K3'}, 'K2': {'K4'}, 'K3': {'K1'}}
 Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-   TASK DEPS: {'K1': {'K3', 'K4', 'K2', 'K1'}, 'K3': {'K4'}, 'K2': {'K1'}}
+   TASK DEPS: {'K1': {'K2', 'K1', 'K4', 'K3'}, 'K3': {'K4'}, 'K2': {'K1'}}
 Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K5', 'K4', 'K2', 'K1', 'K6', 'K3'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
+   TASK DEPS: {'K1': {'K6', 'K2', 'K4', 'K1', 'K3', 'K5'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
 Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
-   TASK DEPS: {'A': {'C', 'D', 'E', 'B'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
+   TASK DEPS: {'A': {'E', 'C', 'B', 'D'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
 Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
    TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
 #+end_example
@@ -885,7 +882,7 @@ print('REPOSITORIES USED BY TEAM LED BY BOB:\n  ', query('Bob'))
 : REPOSITORIES USED BY TEAM LED BY ALICE:
 :    {('R1', 'git@example.com:inventory.git')}
 : REPOSITORIES USED BY TEAM LED BY CAROL:
-:    {('R2', 'git@example.com:website.git'), ('R1', 'git@example.com:inventory.git')}
+:    {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
 : REPOSITORIES USED BY TEAM LED BY BOB:
 :    set()
 
