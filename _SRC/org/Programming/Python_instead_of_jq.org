@@ -108,11 +108,11 @@ print(f'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {q}')
 
 #+RESULTS:
 : NUMBER OF DATABASES: 3
-: DATABASES: {'DB1', 'DB2', 'DB3'}
+: DATABASES: {'DB3', 'DB2', 'DB1'}
 : PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 : PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
-: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB3', 5437), ('DB2', 5433)}
+: DATABASE NAMES WITH PORTS WHERE PRIMARY PORT > 5430: {('DB2', 5433), ('DB3', 5437)}
 
 *Tricks*: union of sets with ~|~, unpacking inside a set with ~*~ (star unpacking).
 
@@ -154,7 +154,7 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 1): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+: DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
 
 *Tricks*:
 
@@ -214,7 +214,7 @@ print(f'DATABASES HAVING PORT CONFLICTS (WAY 2): {conflicts}')
 #+end_src
 
 #+RESULTS:
-: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+: DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
 
 "ATTENTION" comment is important and Haskell programmers undertand it better: it allows
 nested "for"-s to work, ~repl~ will exists even if no ~replicas~ for the current
@@ -743,25 +743,25 @@ def depth(q, root=None, dest=None, nodes=None):
                 depth(q, root, successor, nodes)
     
 for q in (q1, q2, q3, q4):
-    print('Q:', q, '\nTASKS WITH DEPENDENCIES:', depth(q))
+    print('Q:', q, '\nTASK DEPS:', depth(q))
 #+end_src
 
 #+RESULTS:
 : Q: [('K2', 'K1'), ('K3', 'K2')] 
-: TASKS WITH DEPENDENCIES: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
+: TASK DEPS: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
 : Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
+: TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
 : Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4', 'K1', 'K3'}, 'K3': {'K4'}}
+: TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4', 'K1', 'K3'}, 'K3': {'K4'}}
 : Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-: TASKS WITH DEPENDENCIES: {'K1': {'K2', 'K6', 'K5', 'K4', 'K3'}, 'K2': {'K1', 'K6', 'K5', 'K4', 'K3'}, 'K3': {'K1', 'K2', 'K6', 'K5', 'K4'}}
+: TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K2'}, 'K2': {'K4', 'K3', 'K5', 'K6', 'K1'}, 'K3': {'K4', 'K5', 'K6', 'K1', 'K2'}}
 
 So, the depth is onbvious - it is the size of dependency sets. This is not the most optimal
 due to this ~in {n[1] for n in q if n[0]==dest}~.
 
-But we can rewrite it even in iterative way:
+But we can rewrite it even in iterative way, so no Python stack limit - we will test it with more complex examples:
 
-#+begin_src python :eval yes-export :exports both :results output verbatim
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
 from collections import defaultdict
 
 p1 = [('K1', 'K2'),
@@ -840,13 +840,13 @@ for q in (p1, p2, p3, p4, p5, p6):
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K2', 'K1', 'K4', 'K3'}, 'K2': {'K4'}, 'K3': {'K1'}}
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2', 'K1'}, 'K2': {'K4'}, 'K3': {'K1'}}
 Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-   TASK DEPS: {'K1': {'K2', 'K1', 'K4', 'K3'}, 'K3': {'K4'}, 'K2': {'K1'}}
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2', 'K1'}, 'K3': {'K4'}, 'K2': {'K1'}}
 Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K6', 'K2', 'K4', 'K1', 'K3', 'K5'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
+   TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K1', 'K2'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
 Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
-   TASK DEPS: {'A': {'E', 'C', 'B', 'D'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
+   TASK DEPS: {'A': {'D', 'C', 'B', 'E'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
 Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
    TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
 #+end_example
@@ -855,7 +855,62 @@ So, queries required recursive search (even implemented in iterative way) don't 
 ~jq~ queries. It can be overcome if to use helper-functions: you wrute them then load this module
 and use them from it. For example the function ~iter_depth~ is DFS common function and works with
 any list of tuples ~(source, destination)~. Python has a lot of ready for use libraries, for search
-too, just look at https://pypi.org/ !
+too, just look at https://pypi.org/ ! See for example, [[https://networkx.org/en/][NetworkX]].
+
+Example of usage of NetworkX library, pay attention: it does not include loops, so you don't see
+something like ~{'K1': {..., 'K1'}}~:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from networkx import *
+
+p1 = [('K1', 'K2'),
+      ('K3', 'K4')]
+p2 = [('K1', 'K2'),
+      ('K1', 'K3'),
+      ('K2', 'K4'),
+      ('K3', 'K1')]
+p3 = [('K1', 'K3'),
+      ('K1', 'K2'),
+      ('K2', 'K1'),
+      ('K3', 'K4')]
+p4 = [('K1', 'K4'),
+      ('K1', 'K2'),
+      ('K2', 'K5'),
+      ('K2', 'K3'),
+      ('K3', 'K6'),
+      ('K3', 'K1')]
+p5 = [('A', 'B'),
+      ('A', 'C'),
+      ('B', 'D'),
+      ('C', 'D'),
+      ('D', 'E')]
+p6 = [('A', 'B'),
+      ('B', 'C'),
+      ('D', 'E')]
+
+for q in (p1,p2,p3,p4,p5,p6):
+    dg = DiGraph()
+    dg.add_edges_from(q)
+    deps = {n:ds  for n in dg.nodes
+            if (ds := descendants(dg, n))}
+    print('Q:', q, '\n   TASK DEPS:', deps)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Q: [('K1', 'K2'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K3': {'K4'}, 'K2': {'K4', 'K1', 'K3'}}
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K2'}, 'K2': {'K4', 'K3', 'K5', 'K6', 'K1'}, 'K3': {'K4', 'K5', 'K6', 'K1', 'K2'}}
+Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
+   TASK DEPS: {'A': {'D', 'C', 'B', 'E'}, 'B': {'D', 'E'}, 'C': {'D', 'E'}, 'D': {'E'}}
+Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
+#+end_example
 
 ** Find repositories used by teams led by a particular user
 
@@ -906,11 +961,59 @@ pprint.pprint(q)
 
 ** Determine which user has the most transitive task dependencies
 
-TODO
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+q = [(t.get('id'), d)
+     for t in cdat.get('tasks',[])
+     for d in t.get('depends_on',[])]
+q1 = iter_depth(q)
+q2 = defaultdict(int)
+for u,c in ((u.get('name'), 1 + len(q1.get(t.get('id'),[]))) # look at `1 + ...`
+            for u in cdat.get('users',[])
+            for t in cdat.get('tasks',[])
+            if u.get('id') == t.get('assignee_id')):
+    q2[u] += c
+print('TASKS WITH DIRECT DEPS:', q)
+print('TASKS WITH DEPS IN DEPTH:', q1)
+print('USERS AND TASKS NUMBER:', q2)
+print('USER WITH THE MOST TASKS:', max(q2, key=q2.get))
+#+end_src
 
-** Build reverse indices (e.g., project → tasks, user → assigned tasks)
+#+RESULTS:
+: TASKS WITH DIRECT DEPS: [('K2', 'K1'), ('K3', 'K2')]
+: TASKS WITH DEPS IN DEPTH: {'K2': {'K1'}, 'K3': {'K2'}}
+: USERS AND TASKS NUMBER: defaultdict(<class 'int'>, {'Alice': 3, 'Bob': 2, 'Carol': 1})
+: USER WITH THE MOST TASKS: Alice
 
-TODO
+The trick is ~1 + ...~: we collect transitive tasks with ~q1~, so it does not contain direct
+tasks. To take them into account we do this ~1 + ...~. 
+
+** Build reverse indices, e.g., project -> tasks
+
+Project -> tasks (project to a set of tasks):
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+from collections import defaultdict
+inv = defaultdict(set)
+for t in cdat.get('tasks',[]):
+    if tpid := t.get('project_id'):
+        inv[tpid].add(t.get('id'))
+print('PROJECT -> TASKS:', dict(inv))
+#+end_src
+
+#+RESULTS:
+: PROJECT -> TASKS: {'P1': {'K1', 'K2'}, 'P2': {'K4', 'K3'}}
+
+Very similar but as a list comprehension: a list of pairs:
+
+#+begin_src python :session *Python_instead_of_jq* :eval yes-export :exports both :results output verbatim
+inv = [(tpid, t.get('id'))
+       for t in cdat.get('tasks',[])
+       if (tpid := t.get('project_id'))]
+print('PROJECT -> TASKS:', inv)
+#+end_src
+
+#+RESULTS:
+: PROJECT -> TASKS: [('P1', 'K1'), ('P1', 'K2'), ('P2', 'K3'), ('P2', 'K4')]
 
 * Other options
 
