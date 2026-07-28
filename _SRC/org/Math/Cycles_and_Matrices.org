@@ -1,0 +1,194 @@
+#+title: Cycles and matrices
+#+description: Math
+#+keywords: Math, Programming
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Math Programming
+#+date: <2026-07-28 Tue>
+
+** Intro
+
+Traditional way to analyze graphs, paths, to search loops are recursive traversing
+algorithms. But here we will try to use [[https://en.wikipedia.org/wiki/Matrix_(mathematics)][matrices]].
+
+** Adjacency matrix
+
+The idea is simple: we draw a square and put 1 in the cross cell if the top/header cell has a
+path/connection to the row cell:
+
+#+begin_example
+    A | B       same Octave/Matlab:   which means paths/connections:
+--+---+---       A = [0, 0; 1, 0]                 A -> B
+A | 0 | 0               or                  ..and no others
+B | 1 | 0        A = [0 0; 1 0]
+#+end_example
+
+Formally:
+
+\begin{aligned}
+A_{ij} &= 1, &\text{if}\ i \to j\\
+&= 0, &\text{else}
+\end{aligned}
+
+** Path of a length N
+
+
+
+------
+
+Yes. There is a whole area of graph theory that studies cycles using **linear algebra** rather than graph traversals. The catch is that these methods are usually better for proving properties, counting cycles, or analyzing graphs than for simply *finding one dependency cycle*.
+
+Here are the main ideas.
+
+### 1. Powers of the adjacency matrix
+
+Let (A) be the adjacency matrix:
+
+[
+A_{ij} =
+\begin{cases}
+1 & \text{if } i\to j,\
+0 & \text{otherwise.}
+\end{cases}
+]
+
+Then
+
+* ((A^2)_{ij}) = number of paths of length 2 from (i) to (j),
+* ((A^3)_{ij}) = number of paths of length 3,
+* etc.
+
+Most importantly,
+
+[
+(A^k)_{ii}
+]
+
+counts closed walks of length (k) starting and ending at node (i).
+
+So if, for some (k),
+
+[
+\operatorname{trace}(A^k) > 0,
+]
+
+there is at least one closed walk of length (k), hence a cycle.
+
+The drawback is that this detects **walks**, not necessarily simple cycles, and matrix multiplication is much more expensive than DFS.
+
+---
+
+### 2. Nilpotent matrices
+
+This is actually a beautiful characterization.
+
+A directed graph is **acyclic (a DAG)** iff its adjacency matrix is **nilpotent**:
+
+[
+A^n = 0,
+]
+
+where (n) is the number of vertices.
+
+That means every sufficiently long path disappears because no cycles exist.
+
+Conversely, if
+
+[
+A^n \neq 0,
+]
+
+then there is a cycle.
+
+This gives a purely algebraic criterion for acyclicity.
+
+---
+
+### 3. Eigenvalues (spectrum)
+
+The spectrum also contains information.
+
+For a DAG, after topologically sorting the vertices, the adjacency matrix becomes strictly upper triangular:
+
+```text
+0 * * *
+0 0 * *
+0 0 0 *
+0 0 0 0
+```
+
+Such a matrix has **all eigenvalues equal to zero**.
+
+So:
+
+* all eigenvalues are zero ⇒ graph is acyclic,
+* a nonzero eigenvalue ⇒ graph contains a cycle.
+
+This is elegant, though computing eigenvalues is usually overkill for dependency checking.
+
+---
+
+### 4. Determinant identities
+
+There are identities like
+
+[
+\det(I-xA),
+]
+
+whose coefficients encode information about cycles.
+
+This leads into spectral graph theory and the Ihara zeta function of a graph—beautiful mathematics, but not a practical algorithm for dependency resolution.
+
+---
+
+### 5. Transitive closure
+
+You can repeatedly compute
+
+[
+A,\ A^2,\ A^3,\ \ldots
+]
+
+or use Boolean matrix multiplication.
+
+If eventually the diagonal becomes nonzero, you've found a cycle.
+
+Warshall's algorithm (often presented as a triple loop) can also be interpreted as repeated Boolean matrix operations.
+
+---
+
+## Can these methods return the actual cycle?
+
+This is where graph-search algorithms win.
+
+Linear algebra methods naturally answer questions like
+
+* Does a cycle exist?
+* How many closed walks are there?
+* What is the graph's spectrum?
+* What is the transitive closure?
+
+They do **not** naturally return
+
+```text
+k2 → k3 → k7 → k2
+```
+
+To recover the actual sequence of nodes, you usually end up doing some kind of graph traversal anyway.
+
+---
+
+## For dependency graphs
+
+Your recursive DFS is essentially optimal:
+
+* **DFS:** (O(V+E))
+* **Kahn's algorithm:** (O(V+E))
+* **Matrix multiplication:** typically (O(n^3)) (or better with advanced algorithms, but still not competitive for sparse dependency graphs)
+* **Eigenvalue computation:** roughly (O(n^3))
+
+So although matrix methods are mathematically elegant, virtually every package manager, build system, compiler, and scheduler uses DFS or topological sorting to detect dependency cycles.
+
+If you're interested in the mathematics, though, the nilpotency characterization ("a graph is a DAG iff its adjacency matrix is nilpotent") is one of the nicest bridges between graph theory and linear algebra. It's not just an algorithm—it's a theorem connecting the two subjects.
