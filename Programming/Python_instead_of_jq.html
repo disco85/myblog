@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-28 Tue 17:18 -->
+<!-- 2026-07-28 Tue 17:26 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python instead of jq</title>
@@ -743,7 +743,7 @@ false in some way! But in the case of <code>extract</code> key we fallback to "&
 Lets try more complex queries. Our next JSON is
 </p>
 
-<pre class="example" id="org36c9484">
+<pre class="example" id="orgd3dd440">
 dict            dict          key
 ------------    ------------  -----------------
 Users        🡒  Teams         team_id
@@ -974,7 +974,7 @@ pprint.pprint(q, sort_dicts<span class="org-operator">=</span><span class="org-c
 </pre>
 </div>
 
-<pre class="example" id="orgc14974b">
+<pre class="example" id="org1d70f3c">
 {'DANGLED PROJECT_ID IN TASKS': set(),
  'DANGLED ASSIGNEE_ID IN TASKS': set(),
  'DANGLED DEPENDS_ON IN TASKS': set(),
@@ -1041,7 +1041,7 @@ It's simple: <code>ALL \ DEPENDENCIES</code>.
 It's a straightforward solution:
 </p>
 
-<pre class="example" id="orgd7b951c">
+<pre class="example" id="org941f7e3">
                       __________permutations_________
 {P1}, {P1,P2} 🡒 ⦻ 🡒 ({P1}, {P1,P2}), ({P1,P2}, {P1}) 🡒 ⋂ 🡒 {P1}, {P1} 🡒 {P1}
 
@@ -1246,7 +1246,7 @@ TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K2'}, 'K2': {'K4', 'K3', 'K5', 'K6',
 
 
 <p>
-So, the depth is onbvious - it is the size of dependency sets. This is not the most optimal
+So, the depth is obvious - it is the size of dependency sets. This is not the most optimal
 due to this <code>in {n[1] for n in q if n[0]==dest}</code>.
 </p>
 
@@ -1329,7 +1329,7 @@ But we can rewrite it even in iterative way, so no Python stack limit - we will 
 </pre>
 </div>
 
-<pre class="example" id="org540a188">
+<pre class="example" id="orgdc036de">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
@@ -1394,7 +1394,7 @@ something like <code>{'K1': {..., 'K1'}}</code>:
 </pre>
 </div>
 
-<pre class="example" id="org1d70f3c">
+<pre class="example" id="orgf3cebdb">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
@@ -1547,9 +1547,9 @@ PROJECT -&gt; TASKS: [('P1', 'K1'), ('P1', 'K2'), ('P2', 'K3'), ('P2', 'K4')]
 <h2 id="orgaa47529">Performance</h2>
 <div class="outline-text-2" id="text-orgaa47529">
 <p>
-Performance of such short queries often is not too good due to Cartesian product - the idea of the post was
-to demonstrate such kind of "queries". In real life applications you will use optimization tricks: to use
-dicts (mostly), different caching, pre-sort and similar.
+Performance of such short queries often is not too good due to Cartesian product - the
+idea of the post was to demonstrate such kind of "queries". In real life applications you
+will use optimization tricks: dicts (mostly), different caching, pre-sort and similar.
 </p>
 </div>
 </div>
