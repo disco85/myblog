@@ -1,0 +1,1583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-07-28 Tue 17:10 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python instead of jq</title>
+<meta name="description" content="How to use Python instead of jq" />
+<meta name="keywords" content="Python,jq,JSON" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Python instead of jq</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org4c97253">jq</a></li>
+<li><a href="#org879cefa">Python querying JSON</a>
+<ul>
+<li><a href="#org54e5e09">Correspondence to mathematics</a></li>
+</ul>
+</li>
+<li><a href="#orga7781a3">More complex queries</a>
+<ul>
+<li><a href="#orgc8a2fc8">Find all tasks assigned to members of a given team</a></li>
+<li><a href="#orgd2bf73e">Detect dangling references (IDs that don't exist)</a></li>
+<li><a href="#orgb7d72ae">Find tasks that no one depends on</a></li>
+<li><a href="#orgc597aa1">Find projects shared by multiple teams</a></li>
+<li><a href="#org32a471d">Detect dependency cycles</a></li>
+<li><a href="#org9fbae7f">Compute the dependency depth of each task</a></li>
+<li><a href="#org6462a38">Find repositories used by teams led by a particular user</a></li>
+<li><a href="#org2b983b3">Count how many tasks belong to each team</a></li>
+<li><a href="#orgc40c115">Determine which user has the most transitive task dependencies</a></li>
+<li><a href="#orgc632771">Build reverse indices, e.g., project -&gt; tasks</a></li>
+</ul>
+</li>
+<li><a href="#orgaa47529">Performance</a></li>
+<li><a href="#org2ceaf12">Other options</a></li>
+<li><a href="#orgfccdcbc">Prettify</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org4c97253" class="outline-2">
+<h2 id="org4c97253">jq</h2>
+<div class="outline-text-2" id="text-org4c97253">
+<p>
+To query JSON file like XML with XPath or XQuery, you can use a command line tool called
+<a href="https://jqlang.org/">jq</a>. It's great but you can use Python also.
+</p>
+</div>
+</div>
+<div id="outline-container-org879cefa" class="outline-2">
+<h2 id="org879cefa">Python querying JSON</h2>
+<div class="outline-text-2" id="text-org879cefa">
+<p>
+You can load JSON file very easy:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> json
+<span class="org-keyword">with</span> <span class="org-builtin">open</span>(path_to_json_file, <span class="org-string">'rt'</span>) <span class="org-keyword">as</span> f:
+    <span class="org-variable-name">json_data</span> <span class="org-operator">=</span> json.load(f)
+</pre>
+</div>
+
+<p>
+but more interesting is that you can query JSON as some DB. The idea of examples below is not
+to achieve the best performance - it is not the goal - just demonstration of short queries
+looking as jq, but where the performance is very bad, there are alternative queries, see
+carefully.
+</p>
+
+<p>
+Considering our decoded JSON in this way:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">dat</span> <span class="org-operator">=</span> {
+    <span class="org-string">'project'</span>: {
+        <span class="org-string">'name'</span>: <span class="org-string">'Demo'</span>,
+        <span class="org-string">'config'</span>: {
+            <span class="org-string">'databases'</span>: [
+                {
+                    <span class="org-string">'name'</span>: <span class="org-string">'DB1'</span>,
+                    <span class="org-string">'primary'</span>: {
+                        <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.5'</span>,
+                        <span class="org-string">'port'</span>: 5430
+                    },
+                    <span class="org-string">'replicas'</span>: [
+                        {
+                            <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.5'</span>,
+                            <span class="org-string">'port'</span>: 5431
+                        },
+                        {
+                            <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.5'</span>,
+                            <span class="org-string">'port'</span>: 5437
+                        }
+                    ]
+                },
+                {
+                    <span class="org-string">'name'</span>: <span class="org-string">'DB2'</span>,
+                    <span class="org-string">'primary'</span>: {
+                        <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.12'</span>,
+                        <span class="org-string">'port'</span>: 5433
+                    },
+                    <span class="org-string">'replicas'</span>: [
+                        {
+                            <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.15'</span>,
+                            <span class="org-string">'port'</span>: 5434
+                        }
+                    ]
+                },
+                {
+                    <span class="org-string">'name'</span>: <span class="org-string">'DB3'</span>,
+                    <span class="org-string">'primary'</span>: {
+                        <span class="org-string">'host'</span>: <span class="org-string">'10.0.0.5'</span>,
+                        <span class="org-string">'port'</span>: 5437
+                    }
+                }                
+            ]
+        }
+    }
+}
+</pre>
+</div>
+
+<p>
+and let's try some queries:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">databases</span> <span class="org-operator">=</span> dat.get(<span class="org-string">'project'</span>,{}).get(<span class="org-string">'config'</span>,{}).get(<span class="org-string">'databases'</span>,[])
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> <span class="org-builtin">len</span>(databases)
+<span class="org-builtin">print</span>(f<span class="org-string">'NUMBER OF DATABASES: </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> {d.get(<span class="org-string">'name'</span>, <span class="org-string">'Unnamed'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases}
+<span class="org-builtin">print</span>(f<span class="org-string">'DATABASES: </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> {d.get(<span class="org-string">'primary'</span>, {}).get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases} \
+  <span class="org-operator">|</span> {r.get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases <span class="org-keyword">for</span> r <span class="org-keyword">in</span> d.get(<span class="org-string">'replicas'</span>,[])}
+<span class="org-builtin">print</span>(f<span class="org-string">'PORTS IN USE (WAY 1): </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> { <span class="org-operator">*</span>(d.get(<span class="org-string">'primary'</span>, {}).get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases),
+      <span class="org-operator">*</span>(r.get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases <span class="org-keyword">for</span> r <span class="org-keyword">in</span> d.get(<span class="org-string">'replicas'</span>,[])) }
+<span class="org-builtin">print</span>(f<span class="org-string">'PORTS IN USE (WAY 2): </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> <span class="org-builtin">set</span>( [d.get(<span class="org-string">'primary'</span>, {}).get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases] <span class="org-operator">+</span>
+         [r.get(<span class="org-string">'port'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases <span class="org-keyword">for</span> r <span class="org-keyword">in</span> d.get(<span class="org-string">'replicas'</span>,[])])
+<span class="org-builtin">print</span>(f<span class="org-string">'PORTS IN USE (WAY 3): </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> { (d.get(<span class="org-string">'name'</span>, <span class="org-string">'Unnamed'</span>), p) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases
+      <span class="org-keyword">if</span> (p:<span class="org-operator">=</span>d.get(<span class="org-string">'primary'</span>, {}).get(<span class="org-string">'port'</span>)) <span class="org-keyword">and</span> p <span class="org-operator">&gt;</span> 5430 }
+<span class="org-builtin">print</span>(f<span class="org-string">'DATABASE NAMES WITH PORTS WHERE PRIMARY PORT &gt; 5430: </span>{q}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+NUMBER OF DATABASES: 3
+DATABASES: {'DB3', 'DB2', 'DB1'}
+PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
+PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
+PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
+DATABASE NAMES WITH PORTS WHERE PRIMARY PORT &gt; 5430: {('DB2', 5433), ('DB3', 5437)}
+</pre>
+
+
+<p>
+<b>Tricks</b>: union of sets with <code>|</code>, unpacking inside a set with <code>*</code> (star unpacking).
+</p>
+
+<p>
+The last query (<code>DATABASE NAMES WITH PORTS WHERE PRIMARY PORT &gt; 5430</code>) is this simple set:
+</p>
+
+<p>
+\[
+\{name'(d) \mid d \in databases, \exists primary(d), \exists port(primary(d)), port > 5439 \} \\
+\]
+</p>
+
+\begin{aligned}
+name'(d) &= d \mapsto name(d), &\text{if}\ \exists name(d) \\
+&= d \mapsto \text{Unnamed}, &\text{else}
+\end{aligned}
+
+<p>
+You see the idea - we can use list/set/dict comprehension and <code>dict.get(KEY, DEFAULT)</code> method (as
+well as different tricks). Let's do something more complex - to query conflicting ports if they
+exist - they should be on the same host:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> collections <span class="org-keyword">import</span> defaultdict
+
+<span class="org-variable-name">dd</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">set</span>)
+
+<span class="org-keyword">for</span> k, v <span class="org-keyword">in</span> (
+    [((ph, pp), d.get(<span class="org-string">'name'</span>, f<span class="org-string">'Unnamed</span>{i}<span class="org-string">'</span>))
+     <span class="org-keyword">for</span> i, d <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(databases)
+     <span class="org-keyword">if</span> (prim :<span class="org-operator">=</span> d.get(<span class="org-string">'primary'</span>, {}))
+     <span class="org-keyword">and</span> (ph :<span class="org-operator">=</span> prim.get(<span class="org-string">'host'</span>))
+     <span class="org-keyword">and</span> (pp :<span class="org-operator">=</span> prim.get(<span class="org-string">'port'</span>))]
+    <span class="org-operator">+</span>
+    [((rh, rp), d.get(<span class="org-string">'name'</span>, f<span class="org-string">'Unnamed</span>{i}<span class="org-string">'</span>))
+     <span class="org-keyword">for</span> i, d <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(databases)
+     <span class="org-keyword">for</span> repl <span class="org-keyword">in</span> d.get(<span class="org-string">'replicas'</span>, [])
+     <span class="org-keyword">if</span> (rh :<span class="org-operator">=</span> repl.get(<span class="org-string">'host'</span>))
+     <span class="org-keyword">and</span> (rp :<span class="org-operator">=</span> repl.get(<span class="org-string">'port'</span>))]
+): dd[k].add(v)
+<span class="org-variable-name">conflicts</span> <span class="org-operator">=</span> {k:v <span class="org-keyword">for</span> k,v <span class="org-keyword">in</span> dd.items() <span class="org-keyword">if</span> <span class="org-builtin">len</span>(v) <span class="org-operator">&gt;</span> 1}
+<span class="org-builtin">print</span>(f<span class="org-string">'DATABASES HAVING PORT CONFLICTS (WAY 1): </span>{conflicts}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
+</pre>
+
+
+<p>
+<b>Tricks</b>:
+</p>
+
+<ul class="org-ul">
+<li>nested "for"-s</li>
+<li>assignment in "if"-s like <code>if (prim := ...)</code></li>
+<li>fallback to default values: <code>d.get(.., DEFAULT)</code>
+<ul class="org-ul">
+<li>we can form even long getters: <code>d.get('dict1', {}).get('dic2',{}).get('arrays', [])</code></li>
+</ul></li>
+<li>use of <code>defaultdict</code> for grouping (<code>GROUP BY</code> in SQL): if you need order and duplicates,
+use <code>list</code>, else <code>set</code>, but you can you even <code>int</code></li>
+<li><code>+</code> similarly to ∪ in math (sets union), well, for lists, in the case</li>
+<li><code>f'Unnamed{i}'</code> numbers unnamed databases, giving them unique names, but be careful: if
+2 <code>+</code>-ed lists are not isomorphic, you will hit problems.</li>
+</ul>
+</div>
+<div id="outline-container-org54e5e09" class="outline-3">
+<h3 id="org54e5e09">Correspondence to mathematics</h3>
+<div class="outline-text-3" id="text-org54e5e09">
+<p>
+The Python's query corresponds to the sets:
+</p>
+
+\begin{gather*}
+Q_p = \{ \langle \langle h, p \rangle, n \rangle \mid d \in databases, prim = primary'(d), \exists h = host(prim), \exists p = port(prim), n = name'(d) \} \\
+\\
+Q_r = \{ \langle \langle h, p \rangle, n \rangle \mid d \in databases, repl = replicas'(d), \exists h = host(repl), \exists p = port(repl), n = name'(d) \} \\
+\\
+Q = Q_p \cup Q_r
+\end{gather*}
+
+\begin{aligned}
+primary'(d) &= d \mapsto primary(d), &\text{if}\ \exists primary(d) \\
+&= d \mapsto \varnothing, &\text{else}
+\end{aligned}
+
+\begin{gather*}
+G(k): \langle h, p \rangle \mapsto \{ n \mid \langle \langle h, p \rangle, n \rangle \in Q \} \\
+\\
+Conflicts = \{ \langle k, G(k) \rangle \mid |G(k)| > 1 \}
+\end{gather*}
+
+<p>
+where <code>G(k)</code> is grouping function, actully it is our <code>defaultdict</code>!
+</p>
+
+<p>
+But this is not so good query: we pass through <code>databases</code> 2 times. Lets try to rewrite it:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pprint
+<span class="org-variable-name">dd</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">set</span>)
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> [dd[rec[:2]].add(rec[2])
+     <span class="org-keyword">for</span> db <span class="org-keyword">in</span> [[(ph, pp, name), (rh, rp, name)]
+                <span class="org-keyword">for</span> i, d <span class="org-keyword">in</span> <span class="org-builtin">enumerate</span>(databases)
+                <span class="org-keyword">for</span> name <span class="org-keyword">in</span> [d.get(<span class="org-string">'name'</span>, f<span class="org-string">'Unnamed</span>{i}<span class="org-string">'</span>)]
+                <span class="org-keyword">for</span> prim <span class="org-keyword">in</span> [d.get(<span class="org-string">'primary'</span>, {})]
+                <span class="org-keyword">for</span> ph <span class="org-keyword">in</span> [prim.get(<span class="org-string">'host'</span>)]
+                <span class="org-keyword">for</span> pp <span class="org-keyword">in</span> [prim.get(<span class="org-string">'port'</span>)]
+                <span class="org-keyword">for</span> repl <span class="org-keyword">in</span> d.get(<span class="org-string">'replicas'</span>, [{}])  <span class="org-comment-delimiter"># </span><span class="org-comment">&lt;-- ATTENTION: [{}] else nested "for"-s stop!
+</span>                <span class="org-keyword">for</span> rh <span class="org-keyword">in</span> [repl.get(<span class="org-string">'host'</span>)]
+                <span class="org-keyword">for</span> rp <span class="org-keyword">in</span> [repl.get(<span class="org-string">'port'</span>)]]
+     <span class="org-keyword">for</span> rec <span class="org-keyword">in</span> db <span class="org-keyword">if</span> rec[0] <span class="org-keyword">and</span> rec[1]]
+<span class="org-variable-name">conflicts</span> <span class="org-operator">=</span> {k:v <span class="org-keyword">for</span> k,v <span class="org-keyword">in</span> dd.items() <span class="org-keyword">if</span> <span class="org-builtin">len</span>(v) <span class="org-operator">&gt;</span> 1}
+<span class="org-builtin">print</span>(f<span class="org-string">'DATABASES HAVING PORT CONFLICTS (WAY 2): </span>{conflicts}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
+</pre>
+
+
+<p>
+"ATTENTION" comment is important and Haskell programmers undertand it better: it allows
+nested "for"-s to work, <code>repl</code> will exists even if no <code>replicas</code> for the current
+database. It's OK bcs other "for"-s are also just bindings of <code>rh</code>, <code>rp</code> (if no replicas,
+then we will get these bidnings as <code>None</code> - they are missing in <code>{}</code> empty dict got from
+<code>[{}]</code>). But it will allow us to get a tuple with <code>name</code>.
+</p>
+
+<p>
+As you can see it looks mostly as Haskell's <code>do-notation</code> for list monad (see <a href="https://www.schoolofhaskell.com/school/starting-with-haskell/basics-of-haskell/13-the-list-monad">example</a>)!
+</p>
+
+<p>
+Though, it is not optimal: it iterates over <code>databases</code> only once, but it recreates the same
+tuples. This can be fixed but only partially - with <code>for t1 in [(ph,pp,name)]</code>. If you need
+performance then you should switch to block-wise code but it looks not so LINQ-ish:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">for</span> db <span class="org-keyword">in</span> databases:
+    <span class="org-variable-name">t1</span> <span class="org-operator">=</span> ...      <span class="org-comment-delimiter"># </span><span class="org-comment">create once!
+</span>    ...
+    <span class="org-keyword">for</span> repl <span class="org-keyword">in</span> db[<span class="org-string">'replicas'</span>]:
+        <span class="org-variable-name">t2</span> <span class="org-operator">=</span> ...  <span class="org-comment-delimiter"># </span><span class="org-comment">and this one!
+</span>        ...
+</pre>
+</div>
+
+<p>
+Another examples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">q</span> <span class="org-operator">=</span> [d.get(<span class="org-string">'name'</span>, <span class="org-string">'Unnamed'</span>) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases <span class="org-keyword">if</span> d.get(<span class="org-string">'replicas'</span>, []) <span class="org-operator">==</span> []]
+<span class="org-builtin">print</span>(f<span class="org-string">'DATABASE NAMES WITHOUT REPLICAS: </span>{q}<span class="org-string">'</span>)
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> <span class="org-builtin">sum</span>(<span class="org-builtin">len</span>(rs) <span class="org-keyword">for</span> d <span class="org-keyword">in</span> databases <span class="org-keyword">for</span> rs <span class="org-keyword">in</span> [d.get(<span class="org-string">'replicas'</span>, [])]) <span class="org-operator">/</span> <span class="org-builtin">len</span>(databases)
+<span class="org-builtin">print</span>(f<span class="org-string">'AVERAGE NUMBER OF REPLICAS PER DATABASE: </span>{q}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+DATABASE NAMES WITHOUT REPLICAS: ['DB3']
+AVERAGE NUMBER OF REPLICAS PER DATABASE: 1.0
+</pre>
+
+
+<p>
+The last example demonstrates simple aggregation (AVG). <code>for rs in [d.get()]</code> is just a
+trick to bind the list to <code>rs</code> and it can be written more directly.
+</p>
+
+<p>
+Example from <a href="https://www.baeldung.com/linux/jq-command-json">Baeldung</a> (Wikipedia JSON): we will form new dictionaries with a title and
+page description (called <code>extract</code>) nameing them in our own way:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pprint
+
+<span class="org-variable-name">dat2</span> <span class="org-operator">=</span> {
+  <span class="org-string">'query'</span>: {
+    <span class="org-string">'pages'</span>: [
+      {
+        <span class="org-string">'21721040'</span>: {
+          <span class="org-string">'pageid'</span>: 21721040,
+          <span class="org-string">'ns'</span>: 0,
+          <span class="org-string">'title'</span>: <span class="org-string">'Stack Overflow'</span>,
+          <span class="org-string">'extract'</span>: <span class="org-string">'Some interesting text about Stack Overflow'</span>
+        }
+      },
+      {
+        <span class="org-string">'21721041'</span>: {
+          <span class="org-string">'pageid'</span>: 21721041,
+          <span class="org-string">'ns'</span>: 0,
+          <span class="org-string">'title'</span>: <span class="org-string">'Baeldung'</span>,
+          <span class="org-string">'extract'</span>: <span class="org-string">'A great place to learn about Java'</span>
+        }
+      },
+      {
+        <span class="org-string">'11111111'</span>: {
+          <span class="org-string">'pageid'</span>: 11111111,
+          <span class="org-string">'ns'</span>: 0,
+          <span class="org-string">'title'</span>: <span class="org-string">'FAKE'</span>
+        }
+      }      
+    ]
+  }
+}
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> [{<span class="org-string">'page_title'</span>:t, <span class="org-string">'page_description'</span>: p.get(<span class="org-string">'extract'</span>, <span class="org-string">'&lt;no description&gt;'</span>)}
+     <span class="org-keyword">for</span> pages_dict <span class="org-keyword">in</span> dat2.get(<span class="org-string">'query'</span>,{}).get(<span class="org-string">'pages'</span>,[])
+     <span class="org-keyword">if</span> (p :<span class="org-operator">=</span> <span class="org-builtin">next</span>(<span class="org-builtin">iter</span>(pages_dict.values()), {}))  <span class="org-comment-delimiter"># </span><span class="org-comment">take the 1st value (we see only one always)
+</span>     <span class="org-keyword">if</span> (t :<span class="org-operator">=</span> p.get(<span class="org-string">'title'</span>))]
+pprint.pprint(q, sort_dicts<span class="org-operator">=</span><span class="org-constant">False</span>)
+</pre>
+</div>
+
+<pre class="example">
+[{'page_title': 'Stack Overflow',
+  'page_description': 'Some interesting text about Stack Overflow'},
+ {'page_title': 'Baeldung',
+  'page_description': 'A great place to learn about Java'},
+ {'page_title': 'FAKE', 'page_description': '&lt;no description&gt;'}]
+</pre>
+
+
+<p>
+Pay attention, that with <code>if (x := ...)</code> we bind but we will skip such iteration if <code>x</code> is
+false in some way! But in the case of <code>extract</code> key we fallback to "&lt;no description&gt;".
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga7781a3" class="outline-2">
+<h2 id="orga7781a3">More complex queries</h2>
+<div class="outline-text-2" id="text-orga7781a3">
+<p>
+Lets try more complex queries. Our next JSON is
+</p>
+
+<pre class="example" id="org1b6bcea">
+dict            dict          key
+------------    ------------  -----------------
+Users        🡒  Teams         team_id
+Teams        🡒  Users         lead_id
+Teams        🡒  Projects      project_ids
+Projects     🡒  Repositories  repository_id
+Repositories 🡒  Branches      branch_ids
+Branches     🡒  Branches      parent_id, a tree
+Users        🡒  Tasks         task_ids
+Tasks        🡒  Users         assignee_id
+Tasks        🡒  Projects      project_id
+Tasks        🡒  Tasks         depends_on, a DAG
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">cdat</span> <span class="org-operator">=</span> {
+    <span class="org-string">"users"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"U1"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Alice"</span>,
+            <span class="org-string">"team_id"</span>: <span class="org-string">"T1"</span>,
+            <span class="org-string">"task_ids"</span>: [<span class="org-string">"K1"</span>, <span class="org-string">"K3"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"U2"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Bob"</span>,
+            <span class="org-string">"team_id"</span>: <span class="org-string">"T1"</span>,
+            <span class="org-string">"task_ids"</span>: [<span class="org-string">"K2"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"U3"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Carol"</span>,
+            <span class="org-string">"team_id"</span>: <span class="org-string">"T2"</span>,
+            <span class="org-string">"task_ids"</span>: [<span class="org-string">"K4"</span>]
+        }
+    ],
+
+    <span class="org-string">"teams"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"T1"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Backend"</span>,
+            <span class="org-string">"lead_id"</span>: <span class="org-string">"U1"</span>,
+            <span class="org-string">"project_ids"</span>: [<span class="org-string">"P1"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"T2"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Frontend"</span>,
+            <span class="org-string">"lead_id"</span>: <span class="org-string">"U3"</span>,
+            <span class="org-string">"project_ids"</span>: [<span class="org-string">"P1"</span>, <span class="org-string">"P2"</span>]
+        }
+    ],
+
+    <span class="org-string">"projects"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"P1"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Inventory"</span>,
+            <span class="org-string">"repository_id"</span>: <span class="org-string">"R1"</span>
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"P2"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"Website"</span>,
+            <span class="org-string">"repository_id"</span>: <span class="org-string">"R2"</span>
+        }
+    ],
+
+    <span class="org-string">"repositories"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"R1"</span>,
+            <span class="org-string">"url"</span>: <span class="org-string">"git@example.com:inventory.git"</span>,
+            <span class="org-string">"branch_ids"</span>: [<span class="org-string">"B1"</span>, <span class="org-string">"B2"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"R2"</span>,
+            <span class="org-string">"url"</span>: <span class="org-string">"git@example.com:website.git"</span>,
+            <span class="org-string">"branch_ids"</span>: [<span class="org-string">"B3"</span>]
+        }
+    ],
+
+    <span class="org-string">"branches"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"B1"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"main"</span>,
+            <span class="org-string">"parent_id"</span>: <span class="org-constant">None</span>
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"B2"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"feature/login"</span>,
+            <span class="org-string">"parent_id"</span>: <span class="org-string">"B1"</span>
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"B3"</span>,
+            <span class="org-string">"name"</span>: <span class="org-string">"main"</span>,
+            <span class="org-string">"parent_id"</span>: <span class="org-constant">None</span>
+        }
+    ],
+
+    <span class="org-string">"tasks"</span>: [
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"K1"</span>,
+            <span class="org-string">"title"</span>: <span class="org-string">"Design schema"</span>,
+            <span class="org-string">"project_id"</span>: <span class="org-string">"P1"</span>,
+            <span class="org-string">"assignee_id"</span>: <span class="org-string">"U1"</span>,
+            <span class="org-string">"depends_on"</span>: []
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"K2"</span>,
+            <span class="org-string">"title"</span>: <span class="org-string">"REST API"</span>,
+            <span class="org-string">"project_id"</span>: <span class="org-string">"P1"</span>,
+            <span class="org-string">"assignee_id"</span>: <span class="org-string">"U2"</span>,
+            <span class="org-string">"depends_on"</span>: [<span class="org-string">"K1"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"K3"</span>,
+            <span class="org-string">"title"</span>: <span class="org-string">"Authentication"</span>,
+            <span class="org-string">"project_id"</span>: <span class="org-string">"P2"</span>,
+            <span class="org-string">"assignee_id"</span>: <span class="org-string">"U1"</span>,
+            <span class="org-string">"depends_on"</span>: [<span class="org-string">"K2"</span>]
+        },
+        {
+            <span class="org-string">"id"</span>: <span class="org-string">"K4"</span>,
+            <span class="org-string">"title"</span>: <span class="org-string">"Landing page"</span>,
+            <span class="org-string">"project_id"</span>: <span class="org-string">"P2"</span>,
+            <span class="org-string">"assignee_id"</span>: <span class="org-string">"U3"</span>,
+            <span class="org-string">"depends_on"</span>: []
+        }
+    ]
+}
+</pre>
+</div>
+</div>
+<div id="outline-container-orgc8a2fc8" class="outline-3">
+<h3 id="orgc8a2fc8">Find all tasks assigned to members of a given team</h3>
+<div class="outline-text-3" id="text-orgc8a2fc8">
+<p>
+This is classical cross join:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">query</span>(team_name):
+    <span class="org-keyword">return</span> [kid
+            <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+            <span class="org-keyword">if</span> (tid :<span class="org-operator">=</span> t.get(<span class="org-string">'id'</span>))
+            <span class="org-keyword">if</span> (tn :<span class="org-operator">=</span> t.get(<span class="org-string">'name'</span>)) <span class="org-keyword">and</span> tn <span class="org-operator">==</span> team_name
+            <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+            <span class="org-keyword">if</span> (uid :<span class="org-operator">=</span> u.get(<span class="org-string">'id'</span>))
+            <span class="org-keyword">if</span> (uti :<span class="org-operator">=</span> u.get(<span class="org-string">'team_id'</span>)) <span class="org-keyword">and</span> uti <span class="org-operator">==</span> tid
+            <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+            <span class="org-keyword">if</span> (kid :<span class="org-operator">=</span> k.get(<span class="org-string">'id'</span>))
+            <span class="org-keyword">if</span> (aid :<span class="org-operator">=</span> k.get(<span class="org-string">'assignee_id'</span>)) <span class="org-keyword">and</span> aid <span class="org-operator">==</span> uid]
+<span class="org-builtin">print</span>(<span class="org-string">'TASKS OF BACKEND TEAM:'</span>, query(<span class="org-string">'Backend'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'TASKS OF FRONTEND TEAM:'</span>, query(<span class="org-string">'Frontend'</span>))
+</pre>
+</div>
+
+<pre class="example">
+TASKS OF BACKEND TEAM: ['K1', 'K3', 'K2']
+TASKS OF FRONTEND TEAM: ['K4']
+</pre>
+</div>
+</div>
+<div id="outline-container-orgd2bf73e" class="outline-3">
+<h3 id="orgd2bf73e">Detect dangling references (IDs that don't exist)</h3>
+<div class="outline-text-3" id="text-orgd2bf73e">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">import</span> pprint
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> ({<span class="org-string">'DANGLED PROJECT_ID IN TASKS'</span>:
+      {kpid <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+       <span class="org-keyword">if</span> (kpid :<span class="org-operator">=</span> k.get(<span class="org-string">'project_id'</span>))}
+      <span class="org-operator">-</span>
+      {p.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED ASSIGNEE_ID IN TASKS'</span>:
+      {aid <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+       <span class="org-keyword">if</span> (aid :<span class="org-operator">=</span> k.get(<span class="org-string">'assignee_id'</span>))}
+      <span class="org-operator">-</span>
+      {u.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED DEPENDS_ON IN TASKS'</span>:
+      {kdon <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+       <span class="org-keyword">for</span> kdon <span class="org-keyword">in</span> k.get(<span class="org-string">'depends_on'</span>,[])}
+      <span class="org-operator">-</span>
+      {k.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED PARENT_ID IN BRANCHES'</span>:
+      {bpid <span class="org-keyword">for</span> b <span class="org-keyword">in</span> cdat.get(<span class="org-string">'branches'</span>,[])
+       <span class="org-keyword">if</span> (bpid :<span class="org-operator">=</span> b.get(<span class="org-string">'parent_id'</span>))}
+      <span class="org-operator">-</span>
+      {b.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> b <span class="org-keyword">in</span> cdat.get(<span class="org-string">'branches'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED BRANCH_IDS IN REPOSITORIES'</span>:
+      {rbid <span class="org-keyword">for</span> r <span class="org-keyword">in</span> cdat.get(<span class="org-string">'repositories'</span>,[])
+       <span class="org-keyword">for</span> rbid <span class="org-keyword">in</span> r.get(<span class="org-string">'branch_ids'</span>,[])}
+      <span class="org-operator">-</span>
+      {b.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> b <span class="org-keyword">in</span> cdat.get(<span class="org-string">'branches'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED REPOSITORY_ID IN PROJECTS'</span>:
+      {prid <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])
+       <span class="org-keyword">if</span> (prid :<span class="org-operator">=</span> p.get(<span class="org-string">'repository_id'</span>))}
+      <span class="org-operator">-</span>
+      {r.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> r <span class="org-keyword">in</span> cdat.get(<span class="org-string">'repositories'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED PROJECT_IDS IN TEAMS'</span>:
+      {tpid <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+       <span class="org-keyword">for</span> tpid <span class="org-keyword">in</span> t.get(<span class="org-string">'project_ids'</span>,[])}
+      <span class="org-operator">-</span>
+      {p.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED LEAD_ID IN TEAMS'</span>:
+      {tlid <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+       <span class="org-keyword">if</span> (tlid :<span class="org-operator">=</span> t.get(<span class="org-string">'lead_id'</span>))}
+      <span class="org-operator">-</span>
+      {u.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])}}
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED TASK_IDS IN USERS'</span>:
+      {utid <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+       <span class="org-keyword">for</span> utid <span class="org-keyword">in</span> u.get(<span class="org-string">'task_ids'</span>,[])}
+      <span class="org-operator">-</span>
+      {k.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])}
+     }
+     <span class="org-operator">|</span>
+     {<span class="org-string">'DANGLED TEAM_ID IN USERS'</span>:
+      {utid <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+       <span class="org-keyword">if</span> (utid :<span class="org-operator">=</span> u.get(<span class="org-string">'team_id'</span>))}
+      <span class="org-operator">-</span>
+      {t.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])}}
+    )
+pprint.pprint(q, sort_dicts<span class="org-operator">=</span><span class="org-constant">False</span>)
+</pre>
+</div>
+
+<pre class="example" id="org3acfb85">
+{'DANGLED PROJECT_ID IN TASKS': set(),
+ 'DANGLED ASSIGNEE_ID IN TASKS': set(),
+ 'DANGLED DEPENDS_ON IN TASKS': set(),
+ 'DANGLED PARENT_ID IN BRANCHES': set(),
+ 'DANGLED BRANCH_IDS IN REPOSITORIES': set(),
+ 'DANGLED REPOSITORY_ID IN PROJECTS': set(),
+ 'DANGLED PROJECT_IDS IN TEAMS': set(),
+ 'DANGLED LEAD_ID IN TEAMS': set(),
+ 'DANGLED TASK_IDS IN USERS': set(),
+ 'DANGLED TEAM_ID IN USERS': set()}
+</pre>
+
+<p>
+<b>Tricks</b>: merge of dictionaries with <code>|</code>, substraction of sets with <code>-</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb7d72ae" class="outline-3">
+<h3 id="orgb7d72ae">Find tasks that no one depends on</h3>
+<div class="outline-text-3" id="text-orgb7d72ae">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">q</span> <span class="org-operator">=</span> ({k.get(<span class="org-string">'id'</span>) <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])}
+     <span class="org-operator">-</span>
+     {kdon <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+     <span class="org-keyword">for</span> kdon <span class="org-keyword">in</span> k.get(<span class="org-string">'depends_on'</span>,[])})
+<span class="org-builtin">print</span>(f<span class="org-string">'TASKS THAT NO ONE DEPENDS ON: </span>{q}<span class="org-string">'</span>)
+</pre>
+</div>
+
+<pre class="example">
+TASKS THAT NO ONE DEPENDS ON: {'K4', 'K3'}
+</pre>
+
+
+<p>
+It's simple: <code>ALL \ DEPENDENCIES</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc597aa1" class="outline-3">
+<h3 id="orgc597aa1">Find projects shared by multiple teams</h3>
+<div class="outline-text-3" id="text-orgc597aa1">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> functools <span class="org-keyword">import</span> <span class="org-operator">*</span>
+<span class="org-keyword">from</span> itertools <span class="org-keyword">import</span> <span class="org-operator">*</span>
+
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> {pname <span class="org-keyword">for</span> s <span class="org-keyword">in</span> starmap(
+    <span class="org-builtin">set</span>.intersection,
+    permutations((<span class="org-builtin">set</span>(m.get(<span class="org-string">'project_ids'</span>,[])) <span class="org-keyword">for</span> m <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])),
+                 2))
+     <span class="org-keyword">for</span> e <span class="org-keyword">in</span> s
+     <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])
+     <span class="org-keyword">if</span> (pname :<span class="org-operator">=</span> p.get(<span class="org-string">'name'</span>)) <span class="org-keyword">and</span> p.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> e}
+<span class="org-builtin">print</span>(q)
+</pre>
+</div>
+
+<pre class="example">
+{'Inventory'}
+</pre>
+
+
+<p>
+It's a straightforward solution:
+</p>
+
+<pre class="example" id="org0930d3b">
+                      __________permutations_________
+{P1}, {P1,P2} 🡒 ⦻ 🡒 ({P1}, {P1,P2}), ({P1,P2}, {P1}) 🡒 ⋂ 🡒 {P1}, {P1} 🡒 {P1}
+
+{P1} 🡒 {Inventory}
+</pre>
+
+<p>
+It works, but this <code>{P1}, {P1,P2} -&gt; ⦻</code> is a problem: a lot of permutations.
+</p>
+
+<p>
+We can use <code>combinations()</code> function, and it will cut it in half. But better is to use <code>Counter</code>
+class:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> collections <span class="org-keyword">import</span> Counter
+
+<span class="org-variable-name">cnt</span> <span class="org-operator">=</span> Counter(pid <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+              <span class="org-keyword">for</span> pid <span class="org-keyword">in</span> t.get(<span class="org-string">'project_ids'</span>,[]))
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> {pname <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])
+     <span class="org-keyword">if</span> cnt[p[<span class="org-string">'id'</span>]] <span class="org-operator">&gt;</span> 1 <span class="org-keyword">and</span> (pname :<span class="org-operator">=</span> p.get(<span class="org-string">'name'</span>))}
+<span class="org-builtin">print</span>(q)
+</pre>
+</div>
+
+<pre class="example">
+{'Inventory'}
+</pre>
+
+
+<p>
+This is the best solution: it just counts all unique items from <code>TEAMS.PROJECT_IDS</code>, ie,
+<code>key =&gt; integer-counter</code>. Then we select projects which ID is "registered" within <code>cnt</code>
+counter as a value greater than 1.
+</p>
+
+<p>
+<b>The next queries are recursive, the alternative is to make them iterative which is better, because the stack
+depth is limited, but they will look lesser readable.</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org32a471d" class="outline-3">
+<h3 id="org32a471d">Detect dependency cycles</h3>
+<div class="outline-text-3" id="text-org32a471d">
+<p>
+Let's check it with a result from <code>cdat</code> (<code>q1</code>) and other pre-setup results explicitly containing cycles (<code>q2,3,4</code>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">q1</span> <span class="org-operator">=</span> [(t.get(<span class="org-string">'id'</span>),d)
+     <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+     <span class="org-keyword">for</span> d <span class="org-keyword">in</span> t.get(<span class="org-string">'depends_on'</span>,[])]
+<span class="org-variable-name">q2</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">q3</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K1'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">q4</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>,<span class="org-string">'K4'</span>),
+      (<span class="org-string">'K1'</span>,<span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>,<span class="org-string">'K5'</span>),
+      (<span class="org-string">'K2'</span>,<span class="org-string">'K3'</span>),
+      (<span class="org-string">'K3'</span>,<span class="org-string">'K6'</span>),
+      (<span class="org-string">'K3'</span>,<span class="org-string">'K1'</span>)]
+<span class="org-keyword">def</span> <span class="org-function-name">cycle1</span>(q, d<span class="org-operator">=</span><span class="org-constant">None</span>, passed<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">return</span> (<span class="org-builtin">next</span>((l <span class="org-keyword">for</span> d <span class="org-keyword">in</span> q
+                  <span class="org-keyword">if</span> (l :<span class="org-operator">=</span> cycle1(q, d, []))), <span class="org-constant">None</span>)
+            <span class="org-keyword">if</span> d <span class="org-keyword">is</span> <span class="org-constant">None</span>
+            <span class="org-keyword">else</span> (passed
+                  <span class="org-keyword">if</span> d[1] <span class="org-keyword">in</span> (p[0] <span class="org-keyword">for</span> p <span class="org-keyword">in</span> passed)
+                  <span class="org-keyword">else</span> <span class="org-builtin">next</span>((r <span class="org-keyword">for</span> n <span class="org-keyword">in</span> <span class="org-builtin">filter</span>(<span class="org-keyword">lambda</span> x:d[1]<span class="org-operator">==</span>x[0], q)
+                             <span class="org-keyword">if</span> (r :<span class="org-operator">=</span> cycle1(q, n, passed <span class="org-operator">+</span> [d,n]))), <span class="org-constant">None</span>)))
+<span class="org-keyword">for</span> q <span class="org-keyword">in</span> (q1, q2, q3, q4):
+    <span class="org-builtin">print</span>(<span class="org-string">'Q:'</span>, q, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">   CYCLES:'</span>, cycle1(q))
+</pre>
+</div>
+
+<pre class="example">
+Q: [('K2', 'K1'), ('K3', 'K2')] 
+   CYCLES: None
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   CYCLES: [('K1', 'K3'), ('K3', 'K1')]
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   CYCLES: [('K1', 'K2'), ('K2', 'K1')]
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   CYCLES: [('K1', 'K2'), ('K2', 'K3'), ('K2', 'K3'), ('K3', 'K1')]
+</pre>
+
+
+<p>
+So, no cycles in the original <code>cdat</code>. Web needed function because we needed recursion. But <code>cycle1()</code>
+allows duplicates. Also maybe it is not so readable, so another version is <code>cycle2()</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">cycle2</span>(q, d<span class="org-operator">=</span><span class="org-constant">None</span>, passed<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">if</span> d <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+        <span class="org-keyword">for</span> d <span class="org-keyword">in</span> q:
+            <span class="org-keyword">if</span> l :<span class="org-operator">=</span> cycle2(q, d, []):
+                <span class="org-keyword">return</span> l
+    <span class="org-keyword">else</span>:
+        <span class="org-variable-name">fr</span>,<span class="org-variable-name">to</span> <span class="org-operator">=</span> d
+        <span class="org-keyword">if</span> to <span class="org-keyword">in</span> (p[0] <span class="org-keyword">for</span> p <span class="org-keyword">in</span> passed):
+            <span class="org-keyword">return</span> passed
+        <span class="org-keyword">else</span>:
+            <span class="org-keyword">for</span> n <span class="org-keyword">in</span> <span class="org-builtin">filter</span>(<span class="org-keyword">lambda</span> d:to<span class="org-operator">==</span>d[0], q):
+                <span class="org-keyword">if</span> r :<span class="org-operator">=</span> cycle2(q, n, passed <span class="org-operator">+</span> ([n] <span class="org-keyword">if</span> passed <span class="org-keyword">and</span> passed[<span class="org-operator">-</span>1]<span class="org-operator">==</span>d <span class="org-keyword">else</span> [d,n])):
+                    <span class="org-keyword">return</span> r
+<span class="org-keyword">for</span> q <span class="org-keyword">in</span> (q1, q2, q3, q4):
+    <span class="org-builtin">print</span>(<span class="org-string">'Q:'</span>, q, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">   CYCLES:'</span>, <span class="org-string">',  '</span>.join(<span class="org-builtin">map</span>(<span class="org-string">' -&gt; '</span>.join, rs) <span class="org-keyword">if</span> (rs:<span class="org-operator">=</span>cycle2(q)) <span class="org-keyword">else</span> [<span class="org-string">'&lt;none&gt;'</span>]))
+</pre>
+</div>
+
+<pre class="example">
+Q: [('K2', 'K1'), ('K3', 'K2')] 
+   CYCLES: &lt;none&gt;
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   CYCLES: K1 -&gt; K3,  K3 -&gt; K1
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   CYCLES: K1 -&gt; K2,  K2 -&gt; K1
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   CYCLES: K1 -&gt; K2,  K2 -&gt; K3,  K3 -&gt; K1
+</pre>
+
+
+<p>
+<b>Tricks</b>: the code -
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python">...
+        <span class="org-keyword">for</span> d <span class="org-keyword">in</span> q:
+            <span class="org-keyword">if</span> l :<span class="org-operator">=</span> cycle2(q, d, []):
+                <span class="org-keyword">return</span> l
+</pre>
+</div>
+
+<p>
+can be represented as <code>next((l for d in q if (l := cycle1(q, d, []))), None)</code> but it is lesser readable:
+all queries above can be rewritten with explicit block-wise code.
+</p>
+
+<p>
+To be honest, recursive queries don't match the initial idea to be more jq-ish...
+</p>
+</div>
+</div>
+<div id="outline-container-org9fbae7f" class="outline-3">
+<h3 id="org9fbae7f">Compute the dependency depth of each task</h3>
+<div class="outline-text-3" id="text-org9fbae7f">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">q1</span> <span class="org-operator">=</span> [(t.get(<span class="org-string">'id'</span>),d)
+     <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+     <span class="org-keyword">for</span> d <span class="org-keyword">in</span> t.get(<span class="org-string">'depends_on'</span>,[])]
+<span class="org-variable-name">q2</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">q3</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K1'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">q4</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>,<span class="org-string">'K4'</span>),
+      (<span class="org-string">'K1'</span>,<span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>,<span class="org-string">'K5'</span>),
+      (<span class="org-string">'K2'</span>,<span class="org-string">'K3'</span>),
+      (<span class="org-string">'K3'</span>,<span class="org-string">'K6'</span>),
+      (<span class="org-string">'K3'</span>,<span class="org-string">'K1'</span>)]
+
+<span class="org-keyword">def</span> <span class="org-function-name">depth</span>(q, root<span class="org-operator">=</span><span class="org-constant">None</span>, dest<span class="org-operator">=</span><span class="org-constant">None</span>, nodes<span class="org-operator">=</span><span class="org-constant">None</span>):
+    <span class="org-keyword">if</span> root <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+        <span class="org-variable-name">nodes</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">set</span>)
+        <span class="org-keyword">for</span> root, dest <span class="org-keyword">in</span> q:
+            depth(q, root, dest, nodes)
+        <span class="org-keyword">return</span> <span class="org-builtin">dict</span>(nodes)
+    <span class="org-keyword">else</span>:
+        <span class="org-keyword">if</span> root <span class="org-operator">!=</span> dest:
+            nodes[root].add(dest)
+        <span class="org-keyword">for</span> successor <span class="org-keyword">in</span> {n[1] <span class="org-keyword">for</span> n <span class="org-keyword">in</span> q <span class="org-keyword">if</span> n[0]<span class="org-operator">==</span>dest}:
+            <span class="org-keyword">if</span> successor <span class="org-keyword">not</span> <span class="org-keyword">in</span> nodes[root]:
+                depth(q, root, successor, nodes)
+    
+<span class="org-keyword">for</span> q <span class="org-keyword">in</span> (q1, q2, q3, q4):
+    <span class="org-builtin">print</span>(<span class="org-string">'Q:'</span>, q, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">TASK DEPS:'</span>, depth(q))
+</pre>
+</div>
+
+<pre class="example">
+Q: [('K2', 'K1'), ('K3', 'K2')] 
+TASK DEPS: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4', 'K1', 'K3'}, 'K3': {'K4'}}
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K2'}, 'K2': {'K4', 'K3', 'K5', 'K6', 'K1'}, 'K3': {'K4', 'K5', 'K6', 'K1', 'K2'}}
+</pre>
+
+
+<p>
+So, the depth is onbvious - it is the size of dependency sets. This is not the most optimal
+due to this <code>in {n[1] for n in q if n[0]==dest}</code>.
+</p>
+
+<p>
+But we can rewrite it even in iterative way, so no Python stack limit - we will test it with more complex examples:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> collections <span class="org-keyword">import</span> defaultdict
+
+<span class="org-variable-name">p1</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">p2</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">p3</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K1'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">p4</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K5'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K6'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">p5</span> <span class="org-operator">=</span> [(<span class="org-string">'A'</span>, <span class="org-string">'B'</span>),
+      (<span class="org-string">'A'</span>, <span class="org-string">'C'</span>),
+      (<span class="org-string">'B'</span>, <span class="org-string">'D'</span>),
+      (<span class="org-string">'C'</span>, <span class="org-string">'D'</span>),
+      (<span class="org-string">'D'</span>, <span class="org-string">'E'</span>)]
+<span class="org-variable-name">p6</span> <span class="org-operator">=</span> [(<span class="org-string">'A'</span>, <span class="org-string">'B'</span>),
+      (<span class="org-string">'B'</span>, <span class="org-string">'C'</span>),
+      (<span class="org-string">'D'</span>, <span class="org-string">'E'</span>)]
+
+<span class="org-keyword">def</span> <span class="org-function-name">iter_depth</span>(q):
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> q:
+        <span class="org-keyword">return</span> []
+    <span class="org-variable-name">deps</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">set</span>)
+    <span class="org-comment-delimiter"># </span><span class="org-comment">`route` is a stack for kind of "backtracking" (return from DFS, Depth-First-Search):
+</span>    <span class="org-variable-name">route</span> <span class="org-operator">=</span> []
+    <span class="org-variable-name">look_for</span> <span class="org-operator">=</span> q[0][0]
+    <span class="org-comment-delimiter"># </span><span class="org-comment">`q2` is the `q` value to be restored after return from look for `dst` (DFS);
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">the stack `route` is used as such stack: a tuple with the current `look_for` and an integer -
+</span>    <span class="org-comment-delimiter"># </span><span class="org-comment">the position in `q`, - before to dive to look for `dst`:
+</span>    <span class="org-variable-name">q2</span> <span class="org-operator">=</span> q
+    <span class="org-comment-delimiter"># </span><span class="org-comment">the current position in `q` (needed for restoring after return from DFS)
+</span>    <span class="org-variable-name">i</span> <span class="org-operator">=</span> 0
+    <span class="org-keyword">while</span> 1:
+        <span class="org-keyword">for</span> pair <span class="org-keyword">in</span> q2:
+            <span class="org-variable-name">src</span>, <span class="org-variable-name">dst</span> <span class="org-operator">=</span> pair
+            <span class="org-keyword">if</span> (src <span class="org-operator">==</span> look_for <span class="org-keyword">and</span>
+                (<span class="org-keyword">not</span> route <span class="org-keyword">or</span> dst <span class="org-keyword">not</span> <span class="org-keyword">in</span> deps[route[0][0]])):
+                <span class="org-comment-delimiter"># </span><span class="org-comment">found desired src but with avoid of loops - `... and (not route ...)`, ie,
+</span>                <span class="org-comment-delimiter"># </span><span class="org-comment">we did not hit the initial `look_for`:
+</span>                route.append((look_for, i<span class="org-operator">+</span>1))
+                deps[look_for].add(dst)
+                <span class="org-comment-delimiter"># </span><span class="org-comment">Here we can add `dst` which is = initial `look_for`. It is not bad, bcs
+</span>                <span class="org-comment-delimiter"># </span><span class="org-comment">it allows to see loop later. Otherwise, use `if dst != route[0][0]: ...`
+</span>                deps[route[0][0]].add(dst)
+                <span class="org-variable-name">look_for</span> <span class="org-operator">=</span> dst
+                <span class="org-keyword">break</span>
+            <span class="org-variable-name">i</span> <span class="org-operator">+=</span> 1
+        <span class="org-keyword">else</span>:  <span class="org-comment-delimiter"># </span><span class="org-comment">"if" in "for" was not hit, "for" completed
+</span>            <span class="org-keyword">if</span> route:
+                <span class="org-variable-name">look_for</span>, <span class="org-variable-name">i</span> <span class="org-operator">=</span> route.pop()
+                <span class="org-variable-name">q2</span> <span class="org-operator">=</span> q[i:]  <span class="org-comment-delimiter"># </span><span class="org-comment">kind of backtracking
+</span>            <span class="org-keyword">else</span>:
+                <span class="org-keyword">if</span> q2 <span class="org-keyword">and</span> (q2 :<span class="org-operator">=</span> [p <span class="org-keyword">for</span> p <span class="org-keyword">in</span> q2 <span class="org-keyword">if</span> p[0] <span class="org-keyword">not</span> <span class="org-keyword">in</span> deps]):  <span class="org-comment-delimiter"># </span><span class="org-comment">or `...in q`
+</span>                    <span class="org-comment-delimiter"># </span><span class="org-comment">`q2` now - independent pairs, not children of the initial `look_for`,
+</span>                    <span class="org-comment-delimiter"># </span><span class="org-comment">if there are any yet - continue DFS with another, independent `look_for`:
+</span>                    <span class="org-variable-name">look_for</span> <span class="org-operator">=</span> q2[0][0]
+                    <span class="org-keyword">continue</span>
+                <span class="org-keyword">else</span>:
+                    <span class="org-comment-delimiter"># </span><span class="org-comment">all pair heads in `q2` is already in `deps`, nothing more to search:
+</span>                    <span class="org-keyword">break</span>
+    <span class="org-keyword">return</span> <span class="org-builtin">dict</span>(deps)
+<span class="org-keyword">for</span> q <span class="org-keyword">in</span> (p1, p2, p3, p4, p5, p6):
+    <span class="org-builtin">print</span>(<span class="org-string">'Q:'</span>, q, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">   TASK DEPS:'</span>, iter_depth(q))
+</pre>
+</div>
+
+<pre class="example" id="orgfcffab4">
+Q: [('K1', 'K2'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2', 'K1'}, 'K2': {'K4'}, 'K3': {'K1'}}
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2', 'K1'}, 'K3': {'K4'}, 'K2': {'K1'}}
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K1', 'K2'}, 'K2': {'K3', 'K5'}, 'K3': {'K6', 'K1'}}
+Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
+   TASK DEPS: {'A': {'D', 'C', 'B', 'E'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
+Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
+</pre>
+
+<p>
+So, queries required recursive search (even implemented in iterative way) don't look as simple
+<code>jq</code> queries. It can be overcome if to use helper-functions: you wrute them then load this module
+and use them from it. For example the function <code>iter_depth</code> is DFS common function and works with
+any list of tuples <code>(source, destination)</code>. Python has a lot of ready for use libraries, for search
+too, just look at <a href="https://pypi.org/">https://pypi.org/</a> ! See for example, <a href="https://networkx.org/en/">NetworkX</a>.
+</p>
+
+<p>
+Example of usage of NetworkX library, pay attention: it does not include loops, so you don't see
+something like <code>{'K1': {..., 'K1'}}</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> networkx <span class="org-keyword">import</span> <span class="org-operator">*</span>
+
+<span class="org-variable-name">p1</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">p2</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">p3</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K1'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K4'</span>)]
+<span class="org-variable-name">p4</span> <span class="org-operator">=</span> [(<span class="org-string">'K1'</span>, <span class="org-string">'K4'</span>),
+      (<span class="org-string">'K1'</span>, <span class="org-string">'K2'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K5'</span>),
+      (<span class="org-string">'K2'</span>, <span class="org-string">'K3'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K6'</span>),
+      (<span class="org-string">'K3'</span>, <span class="org-string">'K1'</span>)]
+<span class="org-variable-name">p5</span> <span class="org-operator">=</span> [(<span class="org-string">'A'</span>, <span class="org-string">'B'</span>),
+      (<span class="org-string">'A'</span>, <span class="org-string">'C'</span>),
+      (<span class="org-string">'B'</span>, <span class="org-string">'D'</span>),
+      (<span class="org-string">'C'</span>, <span class="org-string">'D'</span>),
+      (<span class="org-string">'D'</span>, <span class="org-string">'E'</span>)]
+<span class="org-variable-name">p6</span> <span class="org-operator">=</span> [(<span class="org-string">'A'</span>, <span class="org-string">'B'</span>),
+      (<span class="org-string">'B'</span>, <span class="org-string">'C'</span>),
+      (<span class="org-string">'D'</span>, <span class="org-string">'E'</span>)]
+
+<span class="org-keyword">for</span> q <span class="org-keyword">in</span> (p1,p2,p3,p4,p5,p6):
+    <span class="org-variable-name">dg</span> <span class="org-operator">=</span> DiGraph()
+    dg.add_edges_from(q)
+    <span class="org-variable-name">deps</span> <span class="org-operator">=</span> {n:ds  <span class="org-keyword">for</span> n <span class="org-keyword">in</span> dg.nodes
+            <span class="org-keyword">if</span> (ds :<span class="org-operator">=</span> descendants(dg, n))}
+    <span class="org-builtin">print</span>(<span class="org-string">'Q:'</span>, q, <span class="org-string">'</span><span class="org-constant">\n</span><span class="org-string">   TASK DEPS:'</span>, deps)
+</pre>
+</div>
+
+<pre class="example" id="orgc14974b">
+Q: [('K1', 'K2'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
+Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K2': {'K4'}, 'K3': {'K4', 'K1', 'K2'}}
+Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K2'}, 'K3': {'K4'}, 'K2': {'K4', 'K1', 'K3'}}
+Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
+   TASK DEPS: {'K1': {'K4', 'K3', 'K5', 'K6', 'K2'}, 'K2': {'K4', 'K3', 'K5', 'K6', 'K1'}, 'K3': {'K4', 'K5', 'K6', 'K1', 'K2'}}
+Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
+   TASK DEPS: {'A': {'D', 'C', 'B', 'E'}, 'B': {'D', 'E'}, 'C': {'D', 'E'}, 'D': {'E'}}
+Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
+</pre>
+</div>
+</div>
+<div id="outline-container-org6462a38" class="outline-3">
+<h3 id="org6462a38">Find repositories used by teams led by a particular user</h3>
+<div class="outline-text-3" id="text-org6462a38">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">def</span> <span class="org-function-name">query</span>(user_name):
+    <span class="org-variable-name">q</span> <span class="org-operator">=</span> {(r.get(<span class="org-string">'id'</span>), r.get(<span class="org-string">'url'</span>, <span class="org-string">'&lt;no url&gt;'</span>))
+         <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+         <span class="org-keyword">if</span> ((u.get(<span class="org-string">'name'</span>) <span class="org-operator">==</span> user_name) <span class="org-keyword">and</span>
+             (utid :<span class="org-operator">=</span> u.get(<span class="org-string">'team_id'</span>)))
+         <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+         <span class="org-keyword">if</span> t.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> utid <span class="org-keyword">and</span> u.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> t.get(<span class="org-string">'lead_id'</span>)
+         <span class="org-keyword">if</span> (tpids :<span class="org-operator">=</span> t.get(<span class="org-string">'project_ids'</span>,[]))
+         <span class="org-keyword">for</span> p <span class="org-keyword">in</span> cdat.get(<span class="org-string">'projects'</span>,[])
+         <span class="org-keyword">if</span> (p.get(<span class="org-string">'id'</span>) <span class="org-keyword">in</span> tpids <span class="org-keyword">and</span> (prid :<span class="org-operator">=</span> p.get(<span class="org-string">'repository_id'</span>)))
+         <span class="org-keyword">for</span> r <span class="org-keyword">in</span> cdat.get(<span class="org-string">'repositories'</span>,[])
+         <span class="org-keyword">if</span> r.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> prid}
+    <span class="org-keyword">return</span> q
+<span class="org-builtin">print</span>(<span class="org-string">'REPOSITORIES USED BY TEAM LED BY ALICE:</span><span class="org-constant">\n</span><span class="org-string">  '</span>, query(<span class="org-string">'Alice'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'REPOSITORIES USED BY TEAM LED BY CAROL:</span><span class="org-constant">\n</span><span class="org-string">  '</span>, query(<span class="org-string">'Carol'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'REPOSITORIES USED BY TEAM LED BY BOB:</span><span class="org-constant">\n</span><span class="org-string">  '</span>, query(<span class="org-string">'Bob'</span>))
+</pre>
+</div>
+
+<pre class="example">
+REPOSITORIES USED BY TEAM LED BY ALICE:
+   {('R1', 'git@example.com:inventory.git')}
+REPOSITORIES USED BY TEAM LED BY CAROL:
+   {('R1', 'git@example.com:inventory.git'), ('R2', 'git@example.com:website.git')}
+REPOSITORIES USED BY TEAM LED BY BOB:
+   set()
+</pre>
+</div>
+</div>
+<div id="outline-container-org2b983b3" class="outline-3">
+<h3 id="org2b983b3">Count how many tasks belong to each team</h3>
+<div class="outline-text-3" id="text-org2b983b3">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">c</span> <span class="org-operator">=</span> Counter(uti <span class="org-keyword">for</span> k <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+            <span class="org-keyword">if</span> (kaid :<span class="org-operator">=</span> k.get(<span class="org-string">'assignee_id'</span>))
+            <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+            <span class="org-keyword">if</span> (u.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> kaid <span class="org-keyword">and</span>
+                (uti :<span class="org-operator">=</span> u.get(<span class="org-string">'team_id'</span>))))
+<span class="org-variable-name">q</span> <span class="org-operator">=</span> {tn:c[t.get(<span class="org-string">'id'</span>)] <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'teams'</span>,[])
+     <span class="org-keyword">if</span> (tn :<span class="org-operator">=</span> t.get(<span class="org-string">'name'</span>))}
+pprint.pprint(q)
+</pre>
+</div>
+
+<pre class="example">
+{'Backend': 3, 'Frontend': 1}
+</pre>
+
+
+<p>
+<code>Counter</code> was used again, it worked up like <code>SUM()</code> with <code>GROUP BY</code> in SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc40c115" class="outline-3">
+<h3 id="orgc40c115">Determine which user has the most transitive task dependencies</h3>
+<div class="outline-text-3" id="text-orgc40c115">
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">q</span> <span class="org-operator">=</span> [(t.get(<span class="org-string">'id'</span>), d)
+     <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+     <span class="org-keyword">for</span> d <span class="org-keyword">in</span> t.get(<span class="org-string">'depends_on'</span>,[])]
+<span class="org-variable-name">q1</span> <span class="org-operator">=</span> iter_depth(q)
+<span class="org-variable-name">q2</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">int</span>)
+<span class="org-keyword">for</span> u,c <span class="org-keyword">in</span> ((u.get(<span class="org-string">'name'</span>), 1 <span class="org-operator">+</span> <span class="org-builtin">len</span>(q1.get(t.get(<span class="org-string">'id'</span>),[]))) <span class="org-comment-delimiter"># </span><span class="org-comment">look at `1 + ...`
+</span>            <span class="org-keyword">for</span> u <span class="org-keyword">in</span> cdat.get(<span class="org-string">'users'</span>,[])
+            <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+            <span class="org-keyword">if</span> u.get(<span class="org-string">'id'</span>) <span class="org-operator">==</span> t.get(<span class="org-string">'assignee_id'</span>)):
+    <span class="org-variable-name">q2</span>[u] <span class="org-operator">+=</span> c
+<span class="org-builtin">print</span>(<span class="org-string">'TASKS WITH DIRECT DEPS:'</span>, q)
+<span class="org-builtin">print</span>(<span class="org-string">'TASKS WITH DEPS IN DEPTH:'</span>, q1)
+<span class="org-builtin">print</span>(<span class="org-string">'USERS AND TASKS NUMBER:'</span>, q2)
+<span class="org-builtin">print</span>(<span class="org-string">'USER WITH THE MOST TASKS:'</span>, <span class="org-builtin">max</span>(q2, key<span class="org-operator">=</span>q2.get))
+</pre>
+</div>
+
+<pre class="example">
+TASKS WITH DIRECT DEPS: [('K2', 'K1'), ('K3', 'K2')]
+TASKS WITH DEPS IN DEPTH: {'K2': {'K1'}, 'K3': {'K2'}}
+USERS AND TASKS NUMBER: defaultdict(&lt;class 'int'&gt;, {'Alice': 3, 'Bob': 2, 'Carol': 1})
+USER WITH THE MOST TASKS: Alice
+</pre>
+
+
+<p>
+The trick is <code>1 + ...</code>: we collect transitive tasks with <code>q1</code>, so it does not contain direct
+tasks. To take them into account we do this <code>1 + ...</code>. 
+</p>
+</div>
+</div>
+<div id="outline-container-orgc632771" class="outline-3">
+<h3 id="orgc632771">Build reverse indices, e.g., project -&gt; tasks</h3>
+<div class="outline-text-3" id="text-orgc632771">
+<p>
+Project -&gt; tasks (project to a set of tasks):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-keyword">from</span> collections <span class="org-keyword">import</span> defaultdict
+<span class="org-variable-name">inv</span> <span class="org-operator">=</span> defaultdict(<span class="org-builtin">set</span>)
+<span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[]):
+    <span class="org-keyword">if</span> tpid :<span class="org-operator">=</span> t.get(<span class="org-string">'project_id'</span>):
+        inv[tpid].add(t.get(<span class="org-string">'id'</span>))
+<span class="org-builtin">print</span>(<span class="org-string">'PROJECT -&gt; TASKS:'</span>, <span class="org-builtin">dict</span>(inv))
+</pre>
+</div>
+
+<pre class="example">
+PROJECT -&gt; TASKS: {'P1': {'K1', 'K2'}, 'P2': {'K4', 'K3'}}
+</pre>
+
+
+<p>
+Very similar but as a list comprehension: a list of pairs:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-variable-name">inv</span> <span class="org-operator">=</span> [(tpid, t.get(<span class="org-string">'id'</span>))
+       <span class="org-keyword">for</span> t <span class="org-keyword">in</span> cdat.get(<span class="org-string">'tasks'</span>,[])
+       <span class="org-keyword">if</span> (tpid :<span class="org-operator">=</span> t.get(<span class="org-string">'project_id'</span>))]
+<span class="org-builtin">print</span>(<span class="org-string">'PROJECT -&gt; TASKS:'</span>, inv)
+</pre>
+</div>
+
+<pre class="example">
+PROJECT -&gt; TASKS: [('P1', 'K1'), ('P1', 'K2'), ('P2', 'K3'), ('P2', 'K4')]
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaa47529" class="outline-2">
+<h2 id="orgaa47529">Performance</h2>
+<div class="outline-text-2" id="text-orgaa47529">
+<p>
+Performance of such short queries often is not too good due to Cartesian product - the idea of the post was
+to demonstrate such kind of "queries". In real life applications you will use optimization tricks: to use
+dicts (mostly), different caching, pre-sort and similar.
+</p>
+</div>
+</div>
+<div id="outline-container-org2ceaf12" class="outline-2">
+<h2 id="org2ceaf12">Other options</h2>
+<div class="outline-text-2" id="text-org2ceaf12">
+<p>
+Other options could be... C# <a href="https://learn.microsoft.com/en-us/dotnet/csharp/linq/">LINQ</a> or Groovy's <a href="https://groovy-lang.org/using-ginq.html">GINQ</a>, LINQ for example, allows query from iterable data
+but also it can compile your query to SQL.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfccdcbc" class="outline-2">
+<h2 id="orgfccdcbc">Prettify</h2>
+<div class="outline-text-2" id="text-orgfccdcbc">
+<p>
+Like <code>jq</code> Python can do it too:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-shell">cat yourfile.json | python -m json.tool
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
