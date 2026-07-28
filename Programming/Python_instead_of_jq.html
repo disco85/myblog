@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-28 Tue 17:10 -->
+<!-- 2026-07-28 Tue 17:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python instead of jq</title>
@@ -743,7 +743,7 @@ false in some way! But in the case of <code>extract</code> key we fallback to "&
 Lets try more complex queries. Our next JSON is
 </p>
 
-<pre class="example" id="org1b6bcea">
+<pre class="example" id="org36c9484">
 dict            dict          key
 ------------    ------------  -----------------
 Users        🡒  Teams         team_id
@@ -974,7 +974,7 @@ pprint.pprint(q, sort_dicts<span class="org-operator">=</span><span class="org-c
 </pre>
 </div>
 
-<pre class="example" id="org3acfb85">
+<pre class="example" id="orgc14974b">
 {'DANGLED PROJECT_ID IN TASKS': set(),
  'DANGLED ASSIGNEE_ID IN TASKS': set(),
  'DANGLED DEPENDS_ON IN TASKS': set(),
@@ -1041,7 +1041,7 @@ It's simple: <code>ALL \ DEPENDENCIES</code>.
 It's a straightforward solution:
 </p>
 
-<pre class="example" id="org0930d3b">
+<pre class="example" id="orgd7b951c">
                       __________permutations_________
 {P1}, {P1,P2} 🡒 ⦻ 🡒 ({P1}, {P1,P2}), ({P1,P2}, {P1}) 🡒 ⋂ 🡒 {P1}, {P1} 🡒 {P1}
 
@@ -1136,7 +1136,7 @@ Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3',
 
 
 <p>
-So, no cycles in the original <code>cdat</code>. Web needed function because we needed recursion. But <code>cycle1()</code>
+So, no cycles in the original <code>cdat</code>. We needed function because we needed recursion. But <code>cycle1()</code>
 allows duplicates. Also maybe it is not so readable, so another version is <code>cycle2()</code>:
 </p>
 
@@ -1329,7 +1329,7 @@ But we can rewrite it even in iterative way, so no Python stack limit - we will 
 </pre>
 </div>
 
-<pre class="example" id="orgfcffab4">
+<pre class="example" id="org540a188">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
@@ -1394,7 +1394,7 @@ something like <code>{'K1': {..., 'K1'}}</code>:
 </pre>
 </div>
 
-<pre class="example" id="orgc14974b">
+<pre class="example" id="org1d70f3c">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
