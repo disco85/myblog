@@ -171,7 +171,15 @@ Bingo: it is exactly the number of 2-step paths from ~A~ to ~B~ - if there is a 
 from ~A~ to ~C~, ~AC~ is 1. If there is 1-step path from ~C~ to ~B~, then ~CB~ is 1. The 2-step
 path from ~A~ to ~B~ is ~1 * 1 = 1~. But if any of these 2 1-step paths is missing then the
 final multiplication will be 0 (zero 2-steps paths from ~A~ to ~B~). The multiplication here
-works as logical "AND". You can check ~y~ cell (or ~CB~) in the same manner.
+works as logical "AND": it's a line of segments and to pass it from the start to the end - all
+segments have to be solid, but "0" means a gap on some of segments - think about it in this way:
+
+#+begin_example
+o---o------o---o    1 * 1 * 1
+o---o      o---o    1 * 0 * 1
+#+end_example
+
+OK, you can check ~y~ cell (or ~CB~) in the same manner.
 
 The same with 4-nodes graph - it is more interesting because we will see a sum:
 
