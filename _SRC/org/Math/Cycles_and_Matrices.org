@@ -56,7 +56,191 @@ And now the first interesting "pattern":
 
 Examples:
 
-TODO
+#+begin_example
+    A           B,cycle
+
+ A -> B          A -> B    
+ B -> C          A -> C
+ B -> D          B -> C
+ D -> E          C -> E
+ E -> C          E -> D
+                 D -> A
+#+end_example
+
+We can write the path ~A -> B~ as ~A-B~ or shorter: ~AB~.
+
+Lets check reachability of nodes for 2, 3, 4 steps (for 1 - is the initial adjacency matrix)
+with ~A~ matrix:
+
+#+begin_src octave :eval yes-export :exports both :results output verbatim
+A = [0 0 0 0 0; 1 0 0 0 0; 0 1 0 0 1; 0 1 0 0 0; 0 0 0 1 0]
+disp("A² (2 stp): AC: AB BC | AD: AB BD | BE: BD DE | DC: DE EC"); A^2
+disp("A³ (3 stp): AE: AB BD DE | BC: BD DE EC"); A^3
+disp("A⁴ (4 stp): AC: AB BD DE EC"); A^4
+X = [0 0 0 0; 1 0 0 0; 0 1 0 1; 1 0 0 0]
+disp("X² (2 stp): AC: AB BC, AD DC"); X^2
+#+end_src
+
+#+RESULTS:
+#+begin_example
+A =
+
+   0   0   0   0   0
+   1   0   0   0   0
+   0   1   0   0   1
+   0   1   0   0   0
+   0   0   0   1   0
+
+A² (2 stp): AC: AB BC | AD: AB BD | BE: BD DE | DC: DE EC
+ans =
+
+   0   0   0   0   0
+   0   0   0   0   0
+   1   0   0   1   0
+   1   0   0   0   0
+   0   1   0   0   0
+
+A³ (3 stp): AE: AB BD DE | BC: BD DE EC
+ans =
+
+   0   0   0   0   0
+   0   0   0   0   0
+   0   1   0   0   0
+   0   0   0   0   0
+   1   0   0   0   0
+
+A⁴ (4 stp): AC: AB BD DE EC
+ans =
+
+   0   0   0   0   0
+   0   0   0   0   0
+   1   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+
+X =
+
+   0   0   0   0
+   1   0   0   0
+   0   1   0   1
+   1   0   0   0
+
+X² (2 stp): AC: AB BC, AD DC
+ans =
+
+   0   0   0   0
+   0   0   0   0
+   2   0   0   0
+   0   0   0   0
+
+#+end_example
+
+At the end you see for some variety an example of 2 2-step paths (fig2, typical "diamond"):
+
+#+begin_example
+      A
+     / \
+    /   \
+   B     C
+    \   /
+     \ /
+      D
+#+end_example
+
+How is this pattern explained?
+
+1. A power is the multiplication of a matrix by itself.
+2. The matrix cells at the top (columns) are named the same as those at the side (rows) - these
+   are the same graph nodes. It means the matrix is square.
+   
+Considering a 3-nodes graph (~A, B, C~ nodes) we get a ~3x3~ /adjacency/ matrix. I call it ~A~
+too, but from the context you will get where a node is, where - a matrix. We will assume that
+we have not loops on nodes (no connections of a node with itself, so I marked a [[https://en.wikipedia.org/wiki/Main_diagonal][main diagonal]]
+with ~0~ - no connections there). Notation: ~A~ row and ~B~ column gives us a cell marked as
+~x~ in the power example. It is a connection of ~B~ node with ~A~ node. If there is a path
+(it's vector, order matters) ~B -> A~ then here we have 1. Else: 0. I use notation ~AB~ for a
+cell ~A~ row, ~B~ column. So, ~x~ cell can be designated as ~AB~. Following the rule of
+multiplication:
+
+#+begin_example
+M A T R I X:
+    "A"
+
+   A B C
+ -+------                                     P O W E R:
+ A|0 · ·     
+ B|· 0 ·                                 
+ C|· · 0                         x = AB = AB*AA + BB*AB + CB*AC = CB*AC
+                                             ||   || 
+                         A B C               0     0
+                       -+------
+                "A"→   A|0 · ·   y = CB = CA*AB + CB*BB + CC*CB = CA*AB
+                 ↓     B|· 0 ·                       ||   ||
+G R A P H:             C|· · 0                       0    0
+                A B C
+              -+------ -+------
+   A          A|0 · ·   |· x · 
+  / \         B|· 0 ·   |· · ·  ← A²=A*A
+ /   \        C|· · 0   |· y · 
+B-----C      
+#+end_example
+
+We agreed to ignore loops on nodes themselves, so ~AA~, ~BB~, ~CC~ cells have 0, so
+the value in the cell ~AB~ in the resulting matrix of ~A*A~ is ~CB*AC~ (other monomials are 0)
+or ~AC*CB~ - it is the same, right?
+
+So, we see: ~AB = AC * CB~ as a result. How to treat it? *Number of path of length 2 (power=2)
+from ~A~ to ~B~ *. Look at the graph: the vector rule of a triangle -
+
+\[
+\overrightarrow{AB} = \overrightarrow{AC} + \overrightarrow{CB}
+\]
+
+Bingo: it is exactly the number of 2-step paths from ~A~ to ~B~ - if there is a 1-step path
+from ~A~ to ~C~, ~AC~ is 1. If there is 1-step path from ~C~ to ~B~, then ~CB~ is 1. The 2-step
+path from ~A~ to ~B~ is ~1 * 1 = 1~. But if any of these 2 1-step paths is missing then the
+final multiplication will be 0 (zero 2-steps paths from ~A~ to ~B~). The multiplication here
+works as logical "AND". You can check ~y~ cell (or ~CB~) in the same manner.
+
+The same with 4-nodes graph - it is more interesting because we will see a sum:
+
+#+begin_example
+ M A T R I X:
+     "A"
+
+   A B C D
+ -+-------                                          P O W E R:
+ A|0 · · ·    
+ B|· 0 · ·                                
+ C|· · 0 ·                      x = AC = AA*AC + AB*BC + AC*CC + AD*DC = AB*BC + AD*DC
+ D|· · · 0                               ||                 || 
+                           A B C D       0                  0
+                         -+-------
+                  "A"→   A|0 · · ·
+                   ↓     B|· 0 · ·
+ G R A P H:              C|· · 0 ·
+                         D|· · · 0
+     A           A B C D
+    /|\        -+------- -+-------
+   / | \       A|0 · · ·  |· · x ·
+  D  |  B      B|· 0 · ·  |· · · ·  ← A²=A*A
+   \ | /       C|· · 0 ·  |· · · ·
+    \|/        D|· · · 0  |· · · ·
+     C
+#+end_example     
+
+So, the number of 2-step paths ~AC~ is a sum of 2 1-step paths ~AB~, ~BC~ and the
+second/alternative 2-step path from ~A~ to ~C~: ~AD~, ~DC~. So, the sum comes from the second -
+alternative path! The same idea is for 3-step paths, etc.
+
+The standard multiplication (there are other "multiplication" operations defined for matrices)
+of matrix is defined in such a way that it corresponds to vectors formed from nodes...
+
+
+#+begin_src octave :eval yes-export :exports both :results output verbatim
+B = [0 0 0 1 0; 1 0 0 0 0; 1 1 0 0 0; 0 0 0 0 1; 0 0 1 0 0]
+#+end_src
+
 
 -----------------------
 
