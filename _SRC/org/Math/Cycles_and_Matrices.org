@@ -11,7 +11,7 @@
 
 Traditional way to analyze graphs, paths, to search loops are recursive traversing
 algorithms. But here we will try to use [[https://en.wikipedia.org/wiki/Matrix_(mathematics)][matrices]]. For example, detect existence of loops (or
-cycles, in other words).
+cycles, in other words, I used here both words as equal).
 
 ** Adjacency matrix
 
@@ -58,7 +58,7 @@ And now the first interesting "pattern":
 Examples:
 
 #+begin_example
-Matrix A
+Graph A:
 
  A -> B    
  B -> C
@@ -118,18 +118,6 @@ ans =
 
 #+end_example
 
-At the end you see for some variety an example of 2 2-step paths (fig2, typical "diamond"):
-
-#+begin_example
-      A
-     / \
-    /   \
-   B     C
-    \   /
-     \ /
-      D
-#+end_example
-
 How is this pattern explained?
 
 1. A power is the multiplication of a matrix by itself.
@@ -159,7 +147,7 @@ M A T R I X:
                             -+------
                      "A"→   A|0 · ·   y = CB = CA*AB + CB*BB + CC*CB = CA*AB
                       ↓     B|· 0 ·                       ||   ||
-G R A P H:                  C|· · 0                       0    0
+G R A P H:                  C|· · 0                       0     0
                      A B C
                    -+------ -+------
    A               A|0 · ·   |· x · 
@@ -197,7 +185,7 @@ The same with 4-nodes graph - it is more interesting because we will see a sum:
  B|· 0 · ·                                   
  C|· · 0 ·                         x = AC = AA*AC + AB*BC + AC*CC + AD*DC = AB*BC + AD*DC
  D|· · · 0                                  ||                 || 
-                              A B C D       0                  0
+                              A B C D       0                   0
                             -+-------
                      "A"→   A|0 · · ·
                       ↓     B|· 0 · ·
@@ -363,37 +351,36 @@ Is B a nilpotent matrix (DAG)?
 ans = 0
 #+end_example
 
-Yes, ~B~ is not DAG (contains loops).
+Yes, ~B~ is not DAG (contains loops). Why do we raise to the power ~n~, equal to the number of
+vertices? The number of edges is ~n - 1~ if a graph does not have cycles - because every 1
+segment needs 2 points:
 
+#+begin_example
+   A                A                A                A
+  / \              /                  \              / \
+ /   \            /                    \            /   \
+B     C          B-----C          B-----C          B-----C
+3 nodes          3 nodes          3 nodes          3 nodes
+2 edges          2 edges          2 edges          3 edges
+#+end_example
+
+but if edges/links are ~n~, then we have a loop. So, loops begin from ~n~ number of edges, and
+to catch even one, we check the minimum power - ~n~:
+
+| Length | What can happen?                                        |
+|--------+---------------------------------------------------------|
+| ≤ n-1  | A walk may visit every vertex once, with no repetition. |
+| n      | A repeated vertex is guaranteed.                        |
+| > n    | More repetitions are unavoidable.                       |
 
 ---------------------------
 
-TODO
-Why?
 
-The key fact is:
-
-The (i,j)-entry of A
-k
- counts the number of directed walks of length k from vertex i to vertex j.
-
-Therefore:
-
-If the graph contains a directed cycle, you can keep going around the cycle indefinitely, producing walks of arbitrarily large length. Hence A
-k
-
-=0 for every k, so A is not nilpotent.
-
-Conversely, if the graph is acyclic, every directed path has length at most n−1, since a longer path would have to repeat a vertex, creating a cycle. Thus there are no directed walks of length n, so
-
-A
-n
-=0.
-
-Hence
-
-DAG⟺A is nilpotent.
 	
+
+Every walk of length at least N contains a cycle.
+Therefore, if a graph has no cycles (i.e., it is a forest), every walk without repeating edges has length at most N−1.
+
 
 -----------------------
 
