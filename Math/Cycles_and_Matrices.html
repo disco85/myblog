@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-30 Thu 19:33 -->
+<!-- 2026-07-30 Thu 21:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cycles and matrices</title>
@@ -372,7 +372,7 @@ The idea is simple: we draw a square and put 1 in the cross cell if the top/head
 path/connection to the row cell:
 </p>
 
-<pre class="example" id="org46e07a5">
+<pre class="example" id="org117ea49">
     A | B       same Octave/Matlab:   which means paths/connections:
 --+---+---       A = [0, 0; 1, 0]                 B -&gt; A
 A | 0 | 0                or                 ..and no others
@@ -389,7 +389,8 @@ A_{ij} &= 1, &\text{if}\ i \to j\\
 \end{aligned}
 
 <p>
-where <code>i</code> is a row, <code>j</code> is a column, but we use "named cells" here.
+where <code>i</code> is a row, <code>j</code> is a column, but we use "named cells" here. The main diagonal is 0 by
+definition.
 </p>
 </div>
 </div>
@@ -401,7 +402,7 @@ Formally it is defined as it is explained <a href="https://en.wikipedia.org/wiki
 case (a square matrix) - it is defined always. A power is the same as with usual integers:
 </p>
 
-<pre class="example" id="org1636107">
+<pre class="example" id="org89c4166">
      n 
     A  = A * ... * A
         :           :
@@ -427,7 +428,7 @@ And now the first interesting "pattern":
 Examples:
 </p>
 
-<pre class="example" id="org999d526">
+<pre class="example" id="org96ff664">
 Graph A:
 
  A -&gt; B    
@@ -454,7 +455,7 @@ disp(<span class="org-string">"A&#8308; (4 stp): AC: AB BD DE EC"</span>)<span c
 </pre>
 </div>
 
-<pre class="example" id="orgfb1f214">
+<pre class="example" id="orgdae8bef">
 A =
 
    0   1   0   0   0
@@ -506,14 +507,18 @@ are the same graph nodes. It means the matrix is square.</li>
 Considering a 3-nodes graph (<code>A, B, C</code> nodes) we get a <code>3x3</code> <i>adjacency</i> matrix. I call it "A"
 too, but from the context you will get where a node is, where - a matrix. We will assume that
 we have not loops on nodes (no connections of a node with itself, so I marked a <a href="https://en.wikipedia.org/wiki/Main_diagonal">main diagonal</a>
-with <code>0</code> - no connections there). Notation: <code>A</code> row and <code>B</code> column gives us a cell marked as
-<code>x</code> in the power example. It is a connection of <code>B</code> node with <code>A</code> node. If there is a path
-(it's vector, order matters) <code>B -&gt; A</code> then here we have 1. Else: 0. I use notation <code>AB</code> for a
-cell <code>A</code> row, <code>B</code> column. So, <code>x</code> cell can be designated as <code>AB</code>. Following the rule of
-multiplication:
+with <code>0</code> - no connections there, and it follows the definition of the adjacency
+matrix).
 </p>
 
-<pre class="example" id="org45e538a">
+<p>
+Notation: <code>A</code> row and <code>B</code> column gives us a cell marked as <code>x</code> in the power example. It is a
+connection of <code>B</code> node with <code>A</code> node. If there is a path (it's vector, order matters) <code>B -&gt; A</code>
+then here we have 1. Else: 0. I use notation <code>AB</code> for a cell <code>A</code> row, <code>B</code> column. So, <code>x</code> cell
+can be designated as <code>AB</code>. Following the rule of multiplication:
+</p>
+
+<pre class="example" id="org099e2aa">
 M A T R I X:
     "A"
 
@@ -562,7 +567,7 @@ works as logical "AND": it's a line of segments and to pass it from the start to
 segments have to be solid, but "0" means a gap on some of segments - think about it in this way:
 </p>
 
-<pre class="example" id="orgcaa237a">
+<pre class="example" id="orge5df4e6">
 o---o------o---o    1 * 1 * 1
 o---o      o---o    1 * 0 * 1
 </pre>
@@ -575,7 +580,7 @@ OK, you can check <code>y</code> cell (or <code>CB</code>) in the same manner.
 The same with 4-nodes graph - it is more interesting because we will see a sum:
 </p>
 
-<pre class="example" id="org5466064">
+<pre class="example" id="org236ac2c">
  M A T R I X:
      "A"
 
@@ -623,7 +628,7 @@ starting and ending at node <code>i</code>.
 Let's check it with a matrix having a cycle:
 </p>
 
-<pre class="example" id="org6493a4c">
+<pre class="example" id="org65d593b">
  Matrix B:
                  &lt;-----5 steps----&gt;
   A -&gt; B         AB, BC, CE, ED, DA
@@ -645,7 +650,7 @@ B<span class="org-builtin">^</span>4
 </pre>
 </div>
 
-<pre class="example" id="orgb493203">
+<pre class="example" id="orgaa74fe1">
 B =
 
    0   1   1   0   0
@@ -736,7 +741,7 @@ disp(<span class="org-string">"Is B a nilpotent matrix (DAG)? "</span>)<span cla
 </pre>
 </div>
 
-<pre class="example" id="orgd19851e">
+<pre class="example" id="org39776be">
 A =
 
    0   1   0   0   0
@@ -781,7 +786,7 @@ vertices? The number of edges is <code>n - 1</code> if a graph does not have cyc
 segment needs 2 points:
 </p>
 
-<pre class="example" id="orgc5fffbc">
+<pre class="example" id="orgd9d76cb">
    A                A                A                A
   / \              /                  \              / \
  /   \            /                    \            /   \
@@ -846,7 +851,7 @@ disp(<span class="org-string">"Is B a DAG?"</span>)<span class="org-builtin">;</
 </pre>
 </div>
 
-<pre class="example" id="orgdae8bef">
+<pre class="example" id="orgda3e9bf">
 A =
 
    0   1   0   0   0
