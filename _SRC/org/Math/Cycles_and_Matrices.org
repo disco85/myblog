@@ -381,6 +381,67 @@ to catch even one, we check the minimum power - ~n~:
 | n      | A repeated vertex is guaranteed.                        |
 | > n    | More repetitions are unavoidable.                       |
 
+** Eigenvalues of matrix and cycles
+
+For any labeling of a DAG, the adjacency matrix has only the [[https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors][eigenvalue]] 0. We can use a
+function ~eig()~ to find eigenvalue:
+
+#+begin_src octave :eval yes-export :exports both :results output verbatim
+A = [0 1 0 0 0; 0 0 1 1 0; 0 0 0 0 0; 0 0 0 0 1; 0 0 1 0 0]
+B = [0 1 1 0 0; 0 0 1 0 0; 0 0 0 0 1; 1 0 0 0 0; 0 0 0 1 0]
+disp("Eigenvalue of A:"); C=eig(A)
+disp("Is A a DAG?"); nnz(C) == 0
+disp("Eigenvalue of B:"); C=eig(B)
+disp("Is B a DAG?"); nnz(C) == 0
+#+end_src
+
+#+RESULTS:
+#+begin_example
+A =
+
+   0   1   0   0   0
+   0   0   1   1   0
+   0   0   0   0   0
+   0   0   0   0   1
+   0   0   1   0   0
+
+B =
+
+   0   1   1   0   0
+   0   0   1   0   0
+   0   0   0   0   1
+   1   0   0   0   0
+   0   0   0   1   0
+
+Eigenvalue of A:
+C =
+
+   0
+   0
+   0
+   0
+   0
+
+Is A a DAG?
+ans = 1
+Eigenvalue of B:
+C =
+
+   1.1673 +      0i
+   0.1812 + 1.0840i
+   0.1812 - 1.0840i
+  -0.7649 + 0.3525i
+  -0.7649 - 0.3525i
+
+Is B a DAG?
+ans = 0
+#+end_example
+
+So, using eigenvalue of a matrix, we also can detect a cycle/cycles: ~A~ has not cycles (it is
+a DAG), but ~B~ is not a DAG (it has cycles). ~C~ (eigenvalue) contains complex numbers due to
+a solution of a corresponding quadratic equation.
+
+
 ---------------------------
 
 
