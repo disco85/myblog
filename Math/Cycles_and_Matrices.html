@@ -1,0 +1,912 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-07-30 Thu 17:10 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cycles and matrices</title>
+<meta name="description" content="Math" />
+<meta name="keywords" content="Math, Programming" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Cycles and matrices</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orge7d0c0a">Intro</a></li>
+<li><a href="#orga441a4c">Adjacency matrix</a></li>
+<li><a href="#orge78a6f9">Product of matrices</a></li>
+<li><a href="#org55f461c">Path of a length N</a></li>
+<li><a href="#org2e5b9e3">Nilpotent matrices and cycles</a></li>
+<li><a href="#org6cb40b0">Eigenvalues of matrix and cycles</a></li>
+<li><a href="#orgabbf41b">Conclusion</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge7d0c0a" class="outline-2">
+<h2 id="orge7d0c0a">Intro</h2>
+<div class="outline-text-2" id="text-orge7d0c0a">
+<p>
+Traditional way to analyze graphs, paths, to search loops are recursive traversing
+algorithms. But here we will try to use <a href="https://en.wikipedia.org/wiki/Matrix_(mathematics)">matrices</a>. For example, detect existence of loops (or
+cycles, in other words, I used here both words as equal).
+</p>
+</div>
+</div>
+<div id="outline-container-orga441a4c" class="outline-2">
+<h2 id="orga441a4c">Adjacency matrix</h2>
+<div class="outline-text-2" id="text-orga441a4c">
+<p>
+The idea is simple: we draw a square and put 1 in the cross cell if the top/header cell has a
+path/connection to the row cell:
+</p>
+
+<pre class="example" id="orgbc07ee2">
+    A | B       same Octave/Matlab:   which means paths/connections:
+--+---+---       A = [0, 0; 1, 0]                 A -&gt; B
+A | 0 | 0                or                 ..and no others
+B | 1 | 0        A = [0 0; 1 0]
+</pre>
+
+<p>
+Formally:
+</p>
+
+\begin{aligned}
+A_{ij} &= 1, &\text{if}\ i \to j\\
+&= 0, &\text{else}
+\end{aligned}
+
+<p>
+where <code>i</code> is a row, <code>j</code> is a column, but we use "named cells" here.
+</p>
+</div>
+</div>
+<div id="outline-container-orge78a6f9" class="outline-2">
+<h2 id="orge78a6f9">Product of matrices</h2>
+<div class="outline-text-2" id="text-orge78a6f9">
+<p>
+Formally it is defined as it is explained <a href="https://en.wikipedia.org/wiki/Matrix_(mathematics)#Matrix_multiplication">here</a> and it is not defined for all cases. But for our
+case (a square matrix) - it is defined always. A power is the same as with usual integers:
+</p>
+
+<pre class="example" id="org22588f2">
+     n 
+    A  = A * ... * A
+        :           :
+        :--n times--:
+</pre>
+</div>
+</div>
+<div id="outline-container-org55f461c" class="outline-2">
+<h2 id="org55f461c">Path of a length N</h2>
+<div class="outline-text-2" id="text-org55f461c">
+<p>
+And now the first interesting "pattern":
+</p>
+
+<ul class="org-ul">
+<li>\(A^2_{ij}\) - the number of paths of length 2 from <code>i</code> to <code>j</code> node</li>
+<li>\(A^3_{ij}\) - the number of paths of length 3 from <code>i</code> to <code>j</code> node</li>
+<li>\(A^n_{ij}\) - the number of paths of length n from <code>i</code> to <code>j</code> node</li>
+<li>...</li>
+</ul>
+
+<p>
+Examples:
+</p>
+
+<pre class="example" id="org11d31c5">
+Graph A:
+
+ A -&gt; B    
+ B -&gt; C
+ B -&gt; D
+ D -&gt; E
+ E -&gt; C
+</pre>
+
+<p>
+We can write the path <code>A -&gt; B</code> as <code>A-B</code> or shorter: <code>AB</code>.
+</p>
+
+<p>
+Lets check reachability of nodes for 2, 3, 4 steps (for 1 - is the initial adjacency matrix)
+with <code>A</code> matrix:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-octave">A <span class="org-builtin">=</span> [0 1 0 0 0<span class="org-builtin">;</span> 0 0 1 1 0<span class="org-builtin">;</span> 0 0 0 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 0 0 1 0 0]
+disp(<span class="org-string">"A&#178; (2 stp): AC: AB BC | AD: AB BD | BE: BD DE | DC: DE EC"</span>)<span class="org-builtin">;</span> A<span class="org-builtin">^</span>2
+disp(<span class="org-string">"A&#179; (3 stp): AE: AB BD DE | BC: BD DE EC"</span>)<span class="org-builtin">;</span> A<span class="org-builtin">^</span>3
+disp(<span class="org-string">"A&#8308; (4 stp): AC: AB BD DE EC"</span>)<span class="org-builtin">;</span> A<span class="org-builtin">^</span>4
+</pre>
+</div>
+
+<pre class="example" id="org7bbb836">
+A =
+
+   0   1   0   0   0
+   0   0   1   1   0
+   0   0   0   0   0
+   0   0   0   0   1
+   0   0   1   0   0
+
+A² (2 stp): AC: AB BC | AD: AB BD | BE: BD DE | DC: DE EC
+ans =
+
+   0   0   1   1   0
+   0   0   0   0   1
+   0   0   0   0   0
+   0   0   1   0   0
+   0   0   0   0   0
+
+A³ (3 stp): AE: AB BD DE | BC: BD DE EC
+ans =
+
+   0   0   0   0   1
+   0   0   1   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+
+A⁴ (4 stp): AC: AB BD DE EC
+ans =
+
+   0   0   1   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+
+</pre>
+
+<p>
+How is this pattern explained?
+</p>
+
+<ol class="org-ol">
+<li>A power is the multiplication of a matrix by itself.</li>
+<li>The matrix cells at the top (columns) are named the same as those at the side (rows) - these
+are the same graph nodes. It means the matrix is square.</li>
+</ol>
+
+<p>
+Considering a 3-nodes graph (<code>A, B, C</code> nodes) we get a <code>3x3</code> <i>adjacency</i> matrix. I call it "A"
+too, but from the context you will get where a node is, where - a matrix. We will assume that
+we have not loops on nodes (no connections of a node with itself, so I marked a <a href="https://en.wikipedia.org/wiki/Main_diagonal">main diagonal</a>
+with <code>0</code> - no connections there). Notation: <code>A</code> row and <code>B</code> column gives us a cell marked as
+<code>x</code> in the power example. It is a connection of <code>B</code> node with <code>A</code> node. If there is a path
+(it's vector, order matters) <code>B -&gt; A</code> then here we have 1. Else: 0. I use notation <code>AB</code> for a
+cell <code>A</code> row, <code>B</code> column. So, <code>x</code> cell can be designated as <code>AB</code>. Following the rule of
+multiplication:
+</p>
+
+<pre class="example" id="org9accbba">
+M A T R I X:
+    "A"
+
+   A B C
+ -+------                                          P O W E R:
+ A|0 · ·          
+ B|· 0 ·                                      
+ C|· · 0                              x = AB = AB*AA + BB*AB + CB*AC = CB*AC
+                                                  ||   || 
+                              A B C               0     0
+                            -+------
+                     "A"→   A|0 · ·   y = CB = CA*AB + CB*BB + CC*CB = CA*AB
+                      ↓     B|· 0 ·                       ||   ||
+G R A P H:                  C|· · 0                       0     0
+                     A B C
+                   -+------ -+------
+   A               A|0 · ·   |· x · 
+  / \              B|· 0 ·   |· · ·  ← A²=A*A
+ /   \             C|· · 0   |· y · 
+B-----C      
+</pre>
+
+<p>
+We agreed to ignore loops on nodes themselves, so <code>AA</code>, <code>BB</code>, <code>CC</code> cells have 0, so
+the value in the cell <code>AB</code> in the resulting matrix of <code>A*A</code> is <code>CB*AC</code> (other monomials are 0)
+or <code>AC*CB</code> - it is the same, right?
+</p>
+
+<p>
+So, we see: <code>AB = AC * CB</code> as a result. How to treat it? <b>Number of path of length 2 (power=2)
+from <code>A</code> to <code>B</code></b>. Look at the graph: the vector rule of a triangle -
+</p>
+
+<p>
+\[
+\overrightarrow{AB} = \overrightarrow{AC} + \overrightarrow{CB}
+\]
+</p>
+
+<p>
+Bingo: it is exactly the number of 2-step paths from <code>A</code> to <code>B</code> - if there is a 1-step path
+from <code>A</code> to <code>C</code>, <code>AC</code> is 1. If there is 1-step path from <code>C</code> to <code>B</code>, then <code>CB</code> is 1. The 2-step
+path from <code>A</code> to <code>B</code> is <code>1 * 1 = 1</code>. But if any of these 2 1-step paths is missing then the
+final multiplication will be 0 (zero 2-steps paths from <code>A</code> to <code>B</code>). The multiplication here
+works as logical "AND": it's a line of segments and to pass it from the start to the end - all
+segments have to be solid, but "0" means a gap on some of segments - think about it in this way:
+</p>
+
+<pre class="example" id="orge397f43">
+o---o------o---o    1 * 1 * 1
+o---o      o---o    1 * 0 * 1
+</pre>
+
+<p>
+OK, you can check <code>y</code> cell (or <code>CB</code>) in the same manner.
+</p>
+
+<p>
+The same with 4-nodes graph - it is more interesting because we will see a sum:
+</p>
+
+<pre class="example" id="org8cc29ef">
+ M A T R I X:
+     "A"
+
+   A B C D    
+ -+-------                                             P O W E R:
+ A|0 · · ·       
+ B|· 0 · ·                                   
+ C|· · 0 ·                         x = AC = AA*AC + AB*BC + AC*CC + AD*DC = AB*BC + AD*DC
+ D|· · · 0                                  ||                 || 
+                              A B C D       0                   0
+                            -+-------
+                     "A"→   A|0 · · ·
+                      ↓     B|· 0 · ·
+ G R A P H:                 C|· · 0 ·
+                            D|· · · 0
+     A              A B C D
+    /|\           -+------- -+-------
+   / | \          A|0 · · ·  |· · x ·
+  D  |  B         B|· 0 · ·  |· · · ·  ← A²=A*A
+   \ | /          C|· · 0 ·  |· · · ·
+    \|/           D|· · · 0  |· · · ·
+     C
+</pre>
+
+<p>
+So, the number of 2-step paths <code>AC</code> is a sum of 2 1-step paths <code>AB</code>, <code>BC</code> and the
+second/alternative 2-step path from <code>A</code> to <code>C</code>: <code>AD</code>, <code>DC</code>. So, the sum comes from the second -
+alternative path! The same idea is for 3-step paths, etc.
+</p>
+
+<p>
+The standard multiplication (there are other "multiplication" operations defined for matrices)
+of matrix is defined in such a way that it corresponds to vectors formed from nodes...
+</p>
+
+<p>
+We assumed the case when no any loops on nodes. So, adjacency matrix had 0 in <code>Aₗₗ</code> (if to
+return to our notation: in <code>AA</code>, <code>BB</code>, <code>CC</code>, <code>DD</code>, etc - are "0"). When we raise to a power
+<code>N</code>, we consider paths of length <code>N</code>, and we can have "1" from some node to itself but not
+directly, i.e., indirectly, transitively: \(A^{k}_{ii}\) counts closed walks of length <code>k</code>
+starting and ending at node <code>i</code>.
+</p>
+
+<p>
+Let's check it with a matrix having a cycle:
+</p>
+
+<pre class="example" id="org07d48a0">
+ Matrix B:
+                 &lt;---4 steps------&gt;
+  A -&gt; B         AB, BC, CE, ED, DA
+  A -&gt; C         |               |
+  B -&gt; C         `-----cycle-----' 
+  C -&gt; E
+  E -&gt; D
+  D -&gt; A
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-octave">B <span class="org-builtin">=</span> [0 1 1 0 0<span class="org-builtin">;</span> 0 0 1 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 1 0 0 0 0<span class="org-builtin">;</span> 0 0 0 1 0]
+disp(<span class="org-string">"B&#178; (2 stp): no loops - no 1 on main diagonal"</span>)<span class="org-builtin">;</span> B<span class="org-builtin">^</span>2
+disp(<span class="org-string">"B&#179; (3 stp): no loops - no 1 on main diagonal"</span>)<span class="org-builtin">;</span> B<span class="org-builtin">^</span>3
+disp(<span class="org-string">"B&#8308; (4 stp): 4 loops - (A): AC,CE,ED,DA | (C): CE,ED,DA,AC"</span>)<span class="org-builtin">;</span>
+disp(<span class="org-string">"                      (D): DA,AC,CE,ED | (E): ED,DA,AC,CE"</span>)
+B<span class="org-builtin">^</span>4
+</pre>
+</div>
+
+<pre class="example" id="org12f03ca">
+B =
+
+   0   1   1   0   0
+   0   0   1   0   0
+   0   0   0   0   1
+   1   0   0   0   0
+   0   0   0   1   0
+
+B² (2 stp): no loops - no 1 on main diagonal
+ans =
+
+   0   0   1   0   1
+   0   0   0   0   1
+   0   0   0   1   0
+   0   1   1   0   0
+   1   0   0   0   0
+
+B³ (3 stp): no loops - no 1 on main diagonal
+ans =
+
+   0   0   0   1   1
+   0   0   0   1   0
+   1   0   0   0   0
+   0   0   1   0   1
+   0   1   1   0   0
+
+B⁴ (4 stp): 4 loops - (A): AC,CE,ED,DA | (C): CE,ED,DA,AC
+                      (D): DA,AC,CE,ED | (E): ED,DA,AC,CE
+ans =
+
+   1   0   0   1   0
+   1   0   0   0   0
+   0   1   1   0   0
+   0   0   0   1   1
+   0   0   1   0   1
+
+</pre>
+
+<p>
+Pay attention: we cannot find the paths leading to loops using matrix power! I wrote the paths
+only because I knew it from the beginning: I drew such graph with such loop. Examples, how to
+determine paths leading to cycles see
+<a href="../Programming/Python_instead_of_jq.html#org32a471d">Detect dependency cycles</a>
+</p>
+
+<p>
+But the power operation allows us to determine that there are 4-step loops (power=4) on nodes
+<code>A, C, D, E</code> (no on the node <code>B</code>: <code>BB = 0</code>). And using this property, you can:
+</p>
+
+<ol class="org-ol">
+<li>build adjacency matrix.</li>
+<li>then to iterate for <code>N</code> steps raising it in a power <code>1, 2, ...N</code> and if you found "1" on the
+main diagonal, then this node has a loop. If no one, no loops of 1..N-steps.</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org2e5b9e3" class="outline-2">
+<h2 id="org2e5b9e3">Nilpotent matrices and cycles</h2>
+<div class="outline-text-2" id="text-org2e5b9e3">
+<p>
+<a href="https://en.wikipedia.org/wiki/Nilpotent_matrix">Nilpotent matrix</a> is a square matrix <code>N</code> such that \(N^k = 0\) (where <code>k &gt; 0</code>, <code>0</code> - is a <a href="https://en.wikipedia.org/wiki/Zero_matrix">zero
+matrix</a>).  We have 2 5x5 matrices: <code>A</code> (without cycles, we call it <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</a>) and <code>B</code> - with cycles.
+</p>
+
+<p>
+A directed graph is <b>acyclic (a DAG)</b> iff its adjacency matrix is <b>nilpotent</b>: \(A^n = 0\), where
+<code>n</code> is the number of nodes (aka, vertices), i.e.:
+</p>
+
+<p>
+\[
+A^n \neq 0 \Rightarrow \text{cycle}
+\]
+</p>
+
+<p>
+Let's demonstrate it (<i>nnz() is the number of non 0 elements</i>):
+</p>
+
+<div class="org-src-container">
+<pre class="src src-octave">A <span class="org-builtin">=</span> [0 1 0 0 0<span class="org-builtin">;</span> 0 0 1 1 0<span class="org-builtin">;</span> 0 0 0 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 0 0 1 0 0]
+C <span class="org-builtin">=</span> A<span class="org-builtin">^</span>5
+disp(<span class="org-string">"Is A a nilpotent matrix (DAG)? "</span>)<span class="org-builtin">;</span> nnz(C) <span class="org-builtin">==</span> 0
+B <span class="org-builtin">=</span> [0 1 1 0 0<span class="org-builtin">;</span> 0 0 1 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 1 0 0 0 0<span class="org-builtin">;</span> 0 0 0 1 0]
+C <span class="org-builtin">=</span> B<span class="org-builtin">^</span>5
+disp(<span class="org-string">"Is B a nilpotent matrix (DAG)? "</span>)<span class="org-builtin">;</span> nnz(C) <span class="org-builtin">==</span> 0
+</pre>
+</div>
+
+<pre class="example" id="org1cee1b4">
+A =
+
+   0   1   0   0   0
+   0   0   1   1   0
+   0   0   0   0   0
+   0   0   0   0   1
+   0   0   1   0   0
+
+C =
+
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+   0   0   0   0   0
+
+Is A a nilpotent matrix (DAG)? 
+ans = 1
+B =
+
+   0   1   1   0   0
+   0   0   1   0   0
+   0   0   0   0   1
+   1   0   0   0   0
+   0   0   0   1   0
+
+C =
+
+   1   1   1   0   0
+   0   1   1   0   0
+   0   0   1   0   1
+   1   0   0   1   0
+   0   0   0   1   1
+
+Is B a nilpotent matrix (DAG)? 
+ans = 0
+</pre>
+
+<p>
+Yes, <code>B</code> is not DAG (contains loops). Why do we raise to the power <code>n</code>, equal to the number of
+vertices? The number of edges is <code>n - 1</code> if a graph does not have cycles - because every 1
+segment needs 2 points:
+</p>
+
+<pre class="example" id="org238c5b7">
+   A                A                A                A
+  / \              /                  \              / \
+ /   \            /                    \            /   \
+B     C          B-----C          B-----C          B-----C
+3 nodes          3 nodes          3 nodes          3 nodes
+2 edges          2 edges          2 edges          3 edges
+</pre>
+
+<p>
+but if edges/links are <code>n</code>, then we have a loop. So, loops begin from <code>n</code> number of edges, and
+to catch even one, we check the minimum power - <code>n</code>:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Length</th>
+<th scope="col" class="org-left">What can happen?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">≤ n-1</td>
+<td class="org-left">A walk may visit every vertex once, with no repetition.</td>
+</tr>
+
+<tr>
+<td class="org-left">n</td>
+<td class="org-left">A repeated vertex is guaranteed.</td>
+</tr>
+
+<tr>
+<td class="org-left">&gt; n</td>
+<td class="org-left">More repetitions are unavoidable.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org6cb40b0" class="outline-2">
+<h2 id="org6cb40b0">Eigenvalues of matrix and cycles</h2>
+<div class="outline-text-2" id="text-org6cb40b0">
+<p>
+For any labeling of a DAG, the adjacency matrix has only the <a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors">eigenvalues</a> 0. We can use a
+function <code>eig()</code> to find eigenvalues:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-octave">A <span class="org-builtin">=</span> [0 1 0 0 0<span class="org-builtin">;</span> 0 0 1 1 0<span class="org-builtin">;</span> 0 0 0 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 0 0 1 0 0]
+B <span class="org-builtin">=</span> [0 1 1 0 0<span class="org-builtin">;</span> 0 0 1 0 0<span class="org-builtin">;</span> 0 0 0 0 1<span class="org-builtin">;</span> 1 0 0 0 0<span class="org-builtin">;</span> 0 0 0 1 0]
+disp(<span class="org-string">"Eigenvalue of A:"</span>)<span class="org-builtin">;</span> C<span class="org-builtin">=</span>eig(A)
+disp(<span class="org-string">"Is A a DAG?"</span>)<span class="org-builtin">;</span> nnz(C) <span class="org-builtin">==</span> 0
+disp(<span class="org-string">"Eigenvalue of B:"</span>)<span class="org-builtin">;</span> C<span class="org-builtin">=</span>eig(B)
+disp(<span class="org-string">"Is B a DAG?"</span>)<span class="org-builtin">;</span> nnz(C) <span class="org-builtin">==</span> 0
+</pre>
+</div>
+
+<pre class="example" id="org554989c">
+A =
+
+   0   1   0   0   0
+   0   0   1   1   0
+   0   0   0   0   0
+   0   0   0   0   1
+   0   0   1   0   0
+
+B =
+
+   0   1   1   0   0
+   0   0   1   0   0
+   0   0   0   0   1
+   1   0   0   0   0
+   0   0   0   1   0
+
+Eigenvalue of A:
+C =
+
+   0
+   0
+   0
+   0
+   0
+
+Is A a DAG?
+ans = 1
+Eigenvalue of B:
+C =
+
+   1.1673 +      0i
+   0.1812 + 1.0840i
+   0.1812 - 1.0840i
+  -0.7649 + 0.3525i
+  -0.7649 - 0.3525i
+
+Is B a DAG?
+ans = 0
+</pre>
+
+<p>
+So, using eigenvalue of a matrix, we also can detect a cycle/cycles: <code>A</code> has not cycles (it is
+a DAG) - all 5 eigenvalues are 0, but <code>B</code> is not a DAG (it has cycles). <code>C</code> (5 eigenvalues)
+contains complex numbers due to a solution of a corresponding quadratic equation.
+</p>
+</div>
+</div>
+<div id="outline-container-orgabbf41b" class="outline-2">
+<h2 id="orgabbf41b">Conclusion</h2>
+<div class="outline-text-2" id="text-orgabbf41b">
+<p>
+Matrix based methods allow to determine when a graph has a cycle (or cycles) but these methods
+have drastically worse performance than traversal algorithms on graphs that also report a path
+leading to a cycle.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

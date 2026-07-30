@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-07-28 Tue 19:44 -->
+<!-- 2026-07-30 Thu 17:12 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Python instead of jq</title>
@@ -486,7 +486,7 @@ and let's try some queries:
 
 <pre class="example">
 NUMBER OF DATABASES: 3
-DATABASES: {'DB1', 'DB2', 'DB3'}
+DATABASES: {'DB3', 'DB2', 'DB1'}
 PORTS IN USE (WAY 1): {5430, 5431, 5433, 5434, 5437}
 PORTS IN USE (WAY 2): {5430, 5431, 5433, 5434, 5437}
 PORTS IN USE (WAY 3): {5430, 5431, 5433, 5434, 5437}
@@ -543,7 +543,7 @@ exist - they should be on the same host:
 </div>
 
 <pre class="example">
-DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+DATABASES HAVING PORT CONFLICTS (WAY 1): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
 </pre>
 
 
@@ -619,7 +619,7 @@ But this is not so good query: we pass through <code>databases</code> 2 times. L
 </div>
 
 <pre class="example">
-DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB1', 'DB3'}}
+DATABASES HAVING PORT CONFLICTS (WAY 2): {('10.0.0.5', 5437): {'DB3', 'DB1'}}
 </pre>
 
 
@@ -743,7 +743,7 @@ false in some way! But in the case of <code>extract</code> key we fallback to "&
 Lets try more complex queries. Our next JSON is
 </p>
 
-<pre class="example" id="orge0d219c">
+<pre class="example" id="org785e3d5">
 dict            dict          key
 ------------    ------------  -----------------
 Users        🡒  Teams         team_id
@@ -974,7 +974,7 @@ pprint.pprint(q, sort_dicts<span class="org-operator">=</span><span class="org-c
 </pre>
 </div>
 
-<pre class="example" id="orgf3cebdb">
+<pre class="example" id="orgfeabdfc">
 {'DANGLED PROJECT_ID IN TASKS': set(),
  'DANGLED ASSIGNEE_ID IN TASKS': set(),
  'DANGLED DEPENDS_ON IN TASKS': set(),
@@ -1041,7 +1041,7 @@ It's simple: <code>ALL \ DEPENDENCIES</code>.
 It's a straightforward solution:
 </p>
 
-<pre class="example" id="orgdce884f">
+<pre class="example" id="org046e8c2">
                       __________permutations_________
 {P1}, {P1,P2} 🡒 ⦻ 🡒 ({P1}, {P1,P2}), ({P1,P2}, {P1}) 🡒 ⋂ 🡒 {P1}, {P1} 🡒 {P1}
 
@@ -1191,6 +1191,10 @@ all queries above can be rewritten with explicit block-wise code.
 <p>
 To be honest, recursive queries don't match the initial idea to be more jq-ish...
 </p>
+
+<p>
+<a href="../Math/Cycles_and_Matrices.html">Linear algerba (matrices)</a> allows also to determine if a graph has a cycle but without to define the path of it.
+</p>
 </div>
 </div>
 <div id="outline-container-org9fbae7f" class="outline-3">
@@ -1235,13 +1239,13 @@ To be honest, recursive queries don't match the initial idea to be more jq-ish..
 
 <pre class="example">
 Q: [('K2', 'K1'), ('K3', 'K2')] 
-TASK DEPS: {'K2': {'K1'}, 'K3': {'K1', 'K2'}}
+TASK DEPS: {'K2': {'K1'}, 'K3': {'K2', 'K1'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-TASK DEPS: {'K1': {'K2', 'K4', 'K3'}, 'K2': {'K4'}, 'K3': {'K1', 'K2', 'K4'}}
+TASK DEPS: {'K1': {'K4', 'K2', 'K3'}, 'K2': {'K4'}, 'K3': {'K4', 'K2', 'K1'}}
 Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-TASK DEPS: {'K1': {'K2', 'K4', 'K3'}, 'K2': {'K1', 'K4', 'K3'}, 'K3': {'K4'}}
+TASK DEPS: {'K1': {'K4', 'K2', 'K3'}, 'K2': {'K4', 'K1', 'K3'}, 'K3': {'K4'}}
 Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-TASK DEPS: {'K1': {'K6', 'K5', 'K4', 'K2', 'K3'}, 'K2': {'K1', 'K6', 'K5', 'K4', 'K3'}, 'K3': {'K1', 'K6', 'K5', 'K4', 'K2'}}
+TASK DEPS: {'K1': {'K4', 'K2', 'K5', 'K6', 'K3'}, 'K2': {'K4', 'K5', 'K1', 'K6', 'K3'}, 'K3': {'K4', 'K5', 'K2', 'K1', 'K6'}}
 </pre>
 
 
@@ -1329,19 +1333,19 @@ But we can rewrite it even in iterative way, so no Python stack limit - we will 
 </pre>
 </div>
 
-<pre class="example" id="org58c06d8">
+<pre class="example" id="org754acf5">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K1', 'K2', 'K4', 'K3'}, 'K2': {'K4'}, 'K3': {'K1'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K1', 'K3'}, 'K2': {'K4'}, 'K3': {'K1'}}
 Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-   TASK DEPS: {'K1': {'K1', 'K2', 'K4', 'K3'}, 'K3': {'K4'}, 'K2': {'K1'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K1', 'K3'}, 'K3': {'K4'}, 'K2': {'K1'}}
 Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K1', 'K6', 'K5', 'K4', 'K2', 'K3'}, 'K2': {'K5', 'K3'}, 'K3': {'K1', 'K6'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K5', 'K1', 'K6', 'K3'}, 'K2': {'K5', 'K3'}, 'K3': {'K1', 'K6'}}
 Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
-   TASK DEPS: {'A': {'B', 'C', 'E', 'D'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
+   TASK DEPS: {'A': {'C', 'D', 'E', 'B'}, 'B': {'D'}, 'D': {'E'}, 'C': {'D'}}
 Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
-   TASK DEPS: {'A': {'B', 'C'}, 'B': {'C'}, 'D': {'E'}}
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
 </pre>
 
 <p>
@@ -1394,19 +1398,19 @@ something like <code>{'K1': {..., 'K1'}}</code>:
 </pre>
 </div>
 
-<pre class="example" id="org8fa29d8">
+<pre class="example" id="org75f45df">
 Q: [('K1', 'K2'), ('K3', 'K4')] 
    TASK DEPS: {'K1': {'K2'}, 'K3': {'K4'}}
 Q: [('K1', 'K2'), ('K1', 'K3'), ('K2', 'K4'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K2', 'K4', 'K3'}, 'K2': {'K4'}, 'K3': {'K1', 'K2', 'K4'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K3'}, 'K2': {'K4'}, 'K3': {'K4', 'K2', 'K1'}}
 Q: [('K1', 'K3'), ('K1', 'K2'), ('K2', 'K1'), ('K3', 'K4')] 
-   TASK DEPS: {'K1': {'K2', 'K4', 'K3'}, 'K3': {'K4'}, 'K2': {'K1', 'K4', 'K3'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K3'}, 'K3': {'K4'}, 'K2': {'K4', 'K1', 'K3'}}
 Q: [('K1', 'K4'), ('K1', 'K2'), ('K2', 'K5'), ('K2', 'K3'), ('K3', 'K6'), ('K3', 'K1')] 
-   TASK DEPS: {'K1': {'K6', 'K5', 'K4', 'K2', 'K3'}, 'K2': {'K1', 'K6', 'K5', 'K4', 'K3'}, 'K3': {'K1', 'K6', 'K5', 'K4', 'K2'}}
+   TASK DEPS: {'K1': {'K4', 'K2', 'K5', 'K6', 'K3'}, 'K2': {'K4', 'K5', 'K1', 'K6', 'K3'}, 'K3': {'K4', 'K5', 'K2', 'K1', 'K6'}}
 Q: [('A', 'B'), ('A', 'C'), ('B', 'D'), ('C', 'D'), ('D', 'E')] 
-   TASK DEPS: {'A': {'B', 'D', 'E', 'C'}, 'B': {'E', 'D'}, 'C': {'E', 'D'}, 'D': {'E'}}
+   TASK DEPS: {'A': {'C', 'D', 'E', 'B'}, 'B': {'D', 'E'}, 'C': {'D', 'E'}, 'D': {'E'}}
 Q: [('A', 'B'), ('B', 'C'), ('D', 'E')] 
-   TASK DEPS: {'A': {'B', 'C'}, 'B': {'C'}, 'D': {'E'}}
+   TASK DEPS: {'A': {'C', 'B'}, 'B': {'C'}, 'D': {'E'}}
 </pre>
 </div>
 </div>
@@ -1521,7 +1525,7 @@ Project -&gt; tasks (project to a set of tasks):
 </div>
 
 <pre class="example">
-PROJECT -&gt; TASKS: {'P1': {'K1', 'K2'}, 'P2': {'K4', 'K3'}}
+PROJECT -&gt; TASKS: {'P1': {'K2', 'K1'}, 'P2': {'K4', 'K3'}}
 </pre>
 
 
