@@ -1,0 +1,1143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-08-31 Mon 19:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Multidimensional Time</title>
+<meta name="description" content="Models where time is not 1 dimension" />
+<meta name="keywords" content="multidimensionality,time" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Multidimensional Time</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org128331d">Intro</a></li>
+<li><a href="#org66ee002">The time is a strange "dimension"</a></li>
+<li><a href="#orgd20fd1d">What if time is not 1 dimension?</a></li>
+<li><a href="#orgcceb711">Esoteric interpretation of multidimensional time</a>
+<ul>
+<li><a href="#orgfe16644">Ouspensky's multidimensial time</a></li>
+<li><a href="#org1202e11">Criticism of the Ouspensky's model</a></li>
+<li><a href="#org23e844a">Antiquity</a></li>
+</ul>
+</li>
+<li><a href="#orged0ccb4">Scientific view of multidimensional time</a></li>
+<li><a href="#org105ea63">In the context of the theory of relativity</a></li>
+<li><a href="#org8358541">Problems with 2T</a></li>
+<li><a href="#org222fc07">Returning time back to the dimensions</a>
+<ul>
+<li><a href="#org8ff2f8b">More exotic dimension</a></li>
+</ul>
+</li>
+<li><a href="#org205c240">2T and Black holes</a></li>
+<li><a href="#org618b3da">In cinema</a></li>
+<li><a href="#orgf95d072">Time to go crazy</a></li>
+<li><a href="#org8bf517c">The most mind-bending possibility</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org128331d" class="outline-2">
+<h2 id="org128331d">Intro</h2>
+<div class="outline-text-2" id="text-org128331d">
+<p>
+In the article <a href="./Time.html">Is time a dimension?</a> I tried to describe an understanding that time is not
+a dimension. And in that article I promised to describe opposite option. But first let's
+clarify the arguments against time as a dimension.
+</p>
+
+<p>
+We looked at the situation with a car running over a cat. To survive, at least one
+coordinate of the cat had to mismatch with the corresponding coordinate of the car. And if
+time were a coordinate, then all the cat's spatial coordinates could coincide, except for
+one - the time coordinate, and this would help the cat to escape. And such speculation
+exists: it is claimed that the cat's coordinates could have been the same as those of a
+car passing by the cat's house, but the cat was here, at this same point in space,
+yesterday! That is, the time coordinates didn't match, and the cat is alive. This line of
+reasoning can be refuted as follows:
+</p>
+
+<p>
+just ask, <b>where is the cat now when a car passes this place on the road where it was
+yesterday?</b> Indeed, if it was here yesterday, then today it's somewhere else, for
+example, sitting next to the road and looking at a car. And it's alive: because at least
+one of its coordinates - depth - doesn't match the car's. And yesterday it didn’t die not
+because its time coordinate was different, but because yesterday its spatial coordinates
+again didn’t coincide with the spatial coordinates of the car.
+</p>
+
+<p>
+So, that was yesterday. And today the cat is somewhere again, sitting next to the road,
+and <b>what makes you think its in a different time coordinate than the car's?!</b>
+</p>
+
+<p>
+Yesterday, when it was saved, being in a different place again, <b>was cat's time coordinate
+different from the car's?</b> Why?! Just because the cat was walking in this place on this road,
+and the car was parked on the side of the road, nearby?
+</p>
+
+<p>
+Physics thinks differently, it had the same time coordinates (and from the point of view
+of the theory of relativity, too).
+</p>
+</div>
+</div>
+<div id="outline-container-org66ee002" class="outline-2">
+<h2 id="org66ee002">The time is a strange "dimension"</h2>
+<div class="outline-text-2" id="text-org66ee002">
+<p>
+Whether time is "really" a dimension in the same ontological sense as space is still open
+to interpretation. To identify a point of an axis we need a coordinate - to find it, it is
+an "address" of a point. If somewhere something happened, to identify this <i>event</i> we need
+its "coordinates". They are <code>(x, y, z, t)</code>. This forces us to interpret time as a
+coordinate.
+</p>
+
+<p>
+Space dimensions allow you to move along some of them independently, without to change
+your other coordinates, the time is different: changing your "x", you change always your
+"t" coordinate, so phisicists came to <a href="https://en.wikipedia.org/wiki/Lorentz_transformation">Lorenz transformations</a> and to the concept of
+<a href="https://en.wikipedia.org/wiki/Spacetime">Spacetime</a>. So, 3 space dimensions and 1 non-spatial dimension form this, "new" object -
+"Spacetime continuum"...
+</p>
+</div>
+</div>
+<div id="outline-container-orgd20fd1d" class="outline-2">
+<h2 id="orgd20fd1d">What if time is not 1 dimension?</h2>
+<div class="outline-text-2" id="text-orgd20fd1d">
+<p>
+The idea that time might have more than 1 dimension is a real idea in theoretical
+physics - not established fact, but something that has appeared in several serious
+frameworks. There are different ideas, theories of multidimensional "time" (I quoted it!),
+in general, some of them talk about additional time-dimensions, treating it as multiple
+yesterdays, tomorrows, and another theories just talk about non-spatial dimensions (they
+can be not exact time or something else)...
+</p>
+
+<p>
+Let's start from esoteric view of the multidimensional time ideas.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcceb711" class="outline-2">
+<h2 id="orgcceb711">Esoteric interpretation of multidimensional time</h2>
+<div class="outline-text-2" id="text-orgcceb711">
+<p>
+First theory is the theory of Russian esoteric <a href="https://en.wikipedia.org/wiki/P._D._Ouspensky">Piotr Ouspensky</a> (1878) - a Russian philosopher and
+esotericist known for his expositions of the early work of the Greek-Armenian teacher of
+esoteric doctrine George Gurdjieff. He devoted quite a lot of attention to this issue and
+described in detail what he means by "multidimensial time". Next I will briefly describe
+his ideas.
+</p>
+</div>
+<div id="outline-container-orgfe16644" class="outline-3">
+<h3 id="orgfe16644">Ouspensky's multidimensial time</h3>
+<div class="outline-text-3" id="text-orgfe16644">
+<p>
+Ouspensky looked at the time axis:
+</p>
+
+<pre class="example" id="org8f0a105">
+                  now
+past &lt;---- -  - ---+--- -  - ----&gt; future
+        my                   my
+      birth                 death
+</pre>
+
+<p>
+and he asked himself, what if we have another dimension of the time? Then it would look
+as:
+</p>
+
+<pre class="example" id="orga3c06ac">
+     _ _ _ _￪_ _ _ _
+     _ _ _ _|_ _ _ _
+     _ _ _ _|_ _ _ _ 
+past -------+--------&gt; future
+</pre>
+
+<p>
+ok, but what are these parallel lines? He thought that if we look at a regular axis, we
+see numbers on it. On a parallel axis, we see the same numbers - the numbers make up the
+axis. This is a definition from mathematics. It's key moment, lets remember it!
+</p>
+
+<p>
+And he then reasoned as follows: on this axis we have time - the events of our lives are
+isomorphic to it. OK, then the parralel lines? They <b>repeat</b> the same numbers... the same
+events in our life. How to call the 2nd time dimension (5th dimension in such esoteric
+"spacetime")? He called it <i>Eternity</i> and... "recurrence". Yes, it is about <a href="https://en.wikipedia.org/wiki/Eternal_return">eternal
+return</a>. Here, Ouspensky made some interesting conclusion: looking at REPEATED time axis
+(forming the time plane) he said - it is naturally recurrent! Time axis look as naturally
+recurrent structure, like "laid cord". Look how it can be "proven": 
+</p>
+
+<pre class="example" id="org2cb04aa">
+     _ _ _ _￪_ _ _ _              who is living here?!
+     _ _ _ _|_ _ _ _              and here too...?
+     _ _ _ _|_ _ _ _
+past -------+--------&gt; future     you are living here!
+</pre>
+
+<p>
+So, your timeline is "obvious" - you are experiencing, living it! But others? Who are
+experiencing them?! Not John (you), but some Kemal? Why??? They are parallel and <b>NO
+DIFFERENCE BETWEEN THEM</b>. I think, we can suggest that John (you) are living them too,
+but... when if you are here and you and the one?! We can suppose that it happens
+some...where... You have one consciousness. No your duplicates (it is also very deep
+philosophical problem: identity, ability to have full "copies", highly likely it is
+impossible). So, Ouspensky suggested that your consciousness is here, on your
+timeline. Then, some day (when? he suggested after the death), you will be able to pass
+throung another, parallel timeline. The vertical time dimension is called "Eternity"
+because every now goes on forever vertically. And it is called "recurrence" because
+parallel timelines REPEAT EACH OTHER and the uniqueness of consciousness ensures
+"repeatability" (recurrence) - but, to be honest, it is not 100% necessary (if
+consciousnesses can be cloned, copied, be isolated). 
+</p>
+
+<p>
+So, the a human history looks as:
+</p>
+
+<pre class="example" id="org0459115">
+birth event1 event2 ... event3 event4 death, then
+birth event1 event2 ... event3 event4 death, then
+birth event1 event2 ... event3 event4 death, then
+...again and again
+</pre>
+
+<p>
+Then Ouspensky thought, hm, OK, it looks like torture (he didn't know about the movie
+"Groundhog Day", but he invented its script), what can help here? Yet another time
+dimension! And now we have 3 time dimensions:
+</p>
+
+<pre class="example" id="org9e60d7a">
+           eternity
+              .
+   +------+  .
+  /      /| . 
+ +------+ |.
+ |      | +
+ |      |/
+ +------+ · · · · · timeline
+        |
+        :
+        :
+        :
+  possibilities
+</pre>
+
+<p>
+The new dimension gives totality of possibility - it forms parallel time planes, you can
+make decision, to choose your destiny:
+</p>
+
+<pre class="example" id="orga7a4e40">
+         B
+        /
+A------o-------&gt; C
+        \
+         D
+</pre>
+
+<p>
+British writer <a href="https://en.wikipedia.org/wiki/John_G._Bennett">J.G. Bennett</a> supported these ideas.
+</p>
+</div>
+</div>
+<div id="outline-container-org1202e11" class="outline-3">
+<h3 id="org1202e11">Criticism of the Ouspensky's model</h3>
+<div class="outline-text-3" id="text-org1202e11">
+<p>
+First,
+</p>
+
+<p>
+why are events the same on parallel timelines? Why are not possibilities actualized
+immediately in the parallel timelines? If one timeline is <code>{event1, event2, event3, ...}</code>
+then another one could be <code>{event5, event6, event7, ...}</code>.
+</p>
+
+<p>
+Ouspensky answered it: <b>"The 5th dimension is repetition of the actualized."</b> But 5
+dimensions alone do not mathematically imply recurrence. So, this position is accepted as
+is - this follows from the definition of the 5th dimension introduced by him. He did it
+using this his definition:
+</p>
+
+<blockquote>
+<p>
+5th dimension - eternity - is the infinite existence of every moment of time.
+</p>
+</blockquote>
+
+<p>
+The second,
+</p>
+
+<p>
+if he used this logic, then it can be used with vertical planes too, with the 6th
+dimension (3rd time dimension), why not? Then we could have all 3 time dimensions as
+repeating of one timeline - it is <b>underdetermination problem</b>: the geometry doesn't
+uniquely determine which temporal coordinate represents recurrence and which represents
+possibility, they both can represent reccurence!
+</p>
+
+<p>
+There is an even deeper <b>symmetry problem</b>: suppose we rotate this 6-dimensional
+coordinate system. In ordinary geometry, there's nothing intrinsically special about <code>0x</code>
+versus <code>0y</code>, <b>if the geometry is <i>isotropic</i>, we can rotate our axes</b>.
+</p>
+
+<p>
+So, I could answer:
+</p>
+
+<ul class="org-ul">
+<li>it is so by the definition of Ouspensky</li>
+<li>his system is <i>anisotropic</i> by definition</li>
+</ul>
+
+<p>
+His vision is:
+</p>
+
+<ul class="org-ul">
+<li>3D = space</li>
+<li>4D = time</li>
+<li>5D = eternity or recurrence</li>
+<li>6D = possibility</li>
+</ul>
+
+<p>
+and then the "period" is complete (he said it explicitly). <b>Ouspensky made a specific
+metaphysical choice about what the additional dimensions mean.</b>
+</p>
+</div>
+</div>
+<div id="outline-container-org23e844a" class="outline-3">
+<h3 id="org23e844a">Antiquity</h3>
+<div class="outline-text-3" id="text-org23e844a">
+<p>
+It's very interesting but the idea if eternal return existed in the antiquity even! First,
+Pythagoras believed in such possibility. Eudemus of Rhodes repeated it, the Stoics also
+tought that "...the universe is periodically destroyed in an immense conflagration
+(ekpyrosis), and then experiences a rebirth (palingenesis). These cycles continue for
+eternity, and <b>the same events are exactly repeated in every cycle.</b>" So, here we have
+eternity again, but no wording about other dimensions of times. Does "eternity" imply the
+existence of an additional dimension of time?
+</p>
+
+<p>
+The answer is that many schools and philosophers thought about time and saw it as
+different structures but maybe only Ouspensky did it in so geometric manner allowed us to
+talk about time dimensions directly, explicitly. All others (Hindu cosmology, Yoga
+Vedanta, Buddhism, Greek philosophy, Neoplatonism, Hermetic traditions, Gnosticism,
+Kabbalah even, Nietzsche...) did not talk about DIMENSIONS of TIME. They used other
+terminology, not geometric one.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orged0ccb4" class="outline-2">
+<h2 id="orged0ccb4">Scientific view of multidimensional time</h2>
+<div class="outline-text-2" id="text-orged0ccb4">
+<p>
+Ordinary physics has 3 dimensions of space + 1 dimension of time: <code>3+1</code>. Some theories
+explore <code>3+2</code>, <code>4+2</code>, or even more dimensions, where more than one coordinate behaves like a
+time dimension. <code>nT</code> notation is also used: <code>1T</code>, <code>2T</code> etc.
+</p>
+
+<p>
+Wikipedia:
+</p>
+
+<blockquote>
+<p>
+The additional dimensions may be similar to conventional time, compactified like the
+additional spatial dimensions in string theory, or components of a complex time
+(sometimes referred to as kime).
+</p>
+</blockquote>
+
+<p>
+2T spacetime can have 2 equivalent time dimensions as well as 1 real time dimension and
+one <a href="https://en.wikipedia.org/wiki/Imaginary_time">imaginary time dimension</a> - in this case we have complex time plane (similarly to
+usual, space complex plane).
+</p>
+
+<p>
+Mathematically, imaginary time allows to avoid singularity:
+</p>
+
+<blockquote>
+<p>
+...appears as a singularity in ordinary time but, when modelled with imaginary time, the
+singularity can be removed and the Big Bang functions like any other point in
+four-dimensional spacetime.
+</p>
+</blockquote>
+
+<p>
+Turkish theoretical physicist <a href="https://en.wikipedia.org/wiki/Itzhak_Bars">Itzhak Bars</a> popularized the idea of 2T:
+</p>
+
+<blockquote>
+<p>
+[He] has proposed models of a two-time physics, noting in 2001 that "The 2T-physics
+approach in <code>d + 2</code> dimensions offers a highly symmetric and unified version of the
+phenomena described by 1T-physics in d dimensions."
+</p>
+</blockquote>
+
+<p>
+Another example is Vladilen S. Barashenkov.
+</p>
+
+<p>
+Vladilen S. Barashenkov was a Soviet/Russian theoretical physicist at JINR in Dubna,
+working in nuclear and particle physics.
+</p>
+
+<p>
+He explicitly developed a 6-dimensional Spacetime with a 3-dimensional vector of time:
+\(\hat{t} = (t1,t2,t3)\) and ordinary 3-space: \( x=(x,y,z) \).
+</p>
+
+<p>
+His 1999 paper was literally called <a href="https://journals.tubitak.gov.tr/physics/vol23/iss5/2/">"Multitime generalization of Maxwell electrodynamics
+and gravity."</a> he derived equations using a 6-dimensional space with a 3-dimensional
+time vector.
+</p>
+
+<p>
+Then in 2004 he and collaborators published <a href="https://www.researchgate.net/publication/242235885_QUANTUM_FIELD_THEORY_WITH_THREE-DIMENSIONAL_VECTOR_TIME">"Quantum Field Theory with Three-Dimensional
+Vector Time."</a> The model treats particles as moving along arbitrary trajectories in the
+6-dimensional spacetime.
+</p>
+
+<p>
+Also he had a popular book called "The Universe in an Electron" where he discusses
+explosions, nuclear physics, cosmology, and even asks why space is 3-dimensional while
+time is 1-dimensional.
+</p>
+
+<p>
+His 6-dimensional metric is:
+</p>
+
+\begin{aligned}
+d\hat{x}^2 = dx^2 - d\hat{t}^2 \quad \text{where} \\
+d\hat{t}^2 = dt_1^2 + dt_2^2 + dt_3^2
+\end{aligned}
+
+<p>
+Other Russian/Soviet literature on three-dimensional time, additionally to Barashenkov
+could be:
+</p>
+
+<ul class="org-ul">
+<li>V. S. Barashenkov</li>
+<li>R. L. Bartini</li>
+<li>A. P. Yefremov</li>
+<li>N. A. Zhuk</li>
+<li>I. A. Urusovsky</li>
+<li>D. G. Pavlov</li>
+<li>and others.</li>
+</ul>
+
+<p>
+Another scientists is E.A.B. Cole. Cole proposed treating 3 temporal coordinates ti as
+independent, with proper time t acting as a parameter defining a trajectory through the
+3-dimensional time space. This was already being discussed around 1980.
+</p>
+</div>
+</div>
+<div id="outline-container-org105ea63" class="outline-2">
+<h2 id="org105ea63">In the context of the theory of relativity</h2>
+<div class="outline-text-2" id="text-org105ea63">
+<p>
+In the theory of relativity every moving "coordinate system" has its own local time and a
+British philosopher <a href="https://en.wikipedia.org/wiki/J._W._Dunne">J.W. Dunne</a> suggested that, in the context of a "block" spacetime as
+modelled by General Relativity, a second dimension of time was needed in order to measure
+the speed of one's progress along one's own timeline. This leaded to an infinite regress,
+but as we saw before, 2T systems exist.
+</p>
+</div>
+</div>
+<div id="outline-container-org8358541" class="outline-2">
+<h2 id="org8358541">Problems with 2T</h2>
+<div class="outline-text-2" id="text-org8358541">
+<p>
+The second real (not imaginary) time dimension could lad to:
+</p>
+
+<ul class="org-ul">
+<li>negative-norm states</li>
+<li>instabilities</li>
+<li>problems defining probabilities</li>
+<li>causality problems</li>
+<li>particles with unusual energy behavior</li>
+<li>difficulty defining a sensible initial-value problem</li>
+</ul>
+
+<p>
+It is like "nature seems to strongly prefer one time direction" if to believe that time
+exists at all.
+</p>
+
+<p>
+Example - "violation of causality":
+</p>
+
+<pre class="example" id="orga01b149">
+ t₂
+  ↑
+  |   C     D
+  |   :   ⋰
+  |   : ⋰
+  |   A·····B
+  +-----------→ t₁
+</pre>
+
+<p>
+If there was an event <code>A</code> and 2 equivalent time dimensions then after <code>A</code> can happen even
+<code>B</code>, but also it can be something totally unexpected: <code>C</code> looking for t<sub>1</sub> as an event
+happening at the same time as <code>A</code>. Also there are possibilities of complex timelines -
+like the event <code>D</code>. But again: maybe the paradoxes of elementary particles and quantum
+mechanics explained by this? Another point defending multiple equivalent time dimensions
+could be the next reasoning: maybe we already live in such Mutlitime-Space but we treat
+<code>(t1, t2, ...)</code> cootdinates as one complex coordinate <code>t</code>? Sure, such fantasy requires
+strong definitions... I mean, 1T physics could emerge from 2T physics, because of special
+constraints, symmetries, an observer could effectively experience: 3+1 Spacetime.
+</p>
+
+<p>
+This is somewhat analogous to how a 3D object could cast a 2D shadow.
+</p>
+
+<p>
+Extra time dimensions, which are (apparently) not observed in the macrocosm, are
+considered compactified (folded up), similar to the extra spatial dimensions in string
+theory. They exist, and they could create problems, but they are too small. A dimension
+can't be small; it is infinite by definition, but given the possibility of space
+curvature, such a curling up, folding is permissible.
+</p>
+
+<p>
+Also multiple time directions can introduce states with problematic signs - sometimes
+called ghost states. Ghost state is a state whose mathematical properties can cause the
+theory to have negative probabilities or catastrophic instabilities. But again, don't we
+observe them in quantum physics?
+</p>
+
+<p>
+Additional time dimensions can make a lot of problems
+</p>
+
+<ul class="org-ul">
+<li>what determines motion in \(t_1\)?</li>
+<li>what determines motion in \(t_2\)?</li>
+<li>what is causality?</li>
+<li>what determines the observer's proper time?</li>
+<li>how does quantum mechanics work?</li>
+<li>how do particles propagate?</li>
+<li>how is energy defined?</li>
+<li>why don't we observe violations of causality?</li>
+<li>why do macroscopic systems appear to have one time direction?</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org222fc07" class="outline-2">
+<h2 id="org222fc07">Returning time back to the dimensions</h2>
+<div class="outline-text-2" id="text-org222fc07">
+<p>
+<a href="./Time.html">Here</a> I shared my thoughts on why time is not like a dimension. Let's try to look at it as
+a dimension. The problem was that kinematics equations look as:
+</p>
+
+\begin{aligned}
+x(t) = \ldots \\
+y(t) = \ldots \\
+z(t) = \ldots
+\end{aligned}
+
+<p>
+and <code>t</code> is a parameter (argument), not an individual dimension, just a parameter. Funny,
+but at the same time we describe some event (something happened somewhere and sometime) as
+\((x, y, z, t)\) and <code>t</code> here looks as usual coordinate... Actually, we don't need \(x, y,
+z\) if we know the equations of the motion, but usually we don't (and cannot) know them.
+</p>
+
+<p>
+Well, to get out of this situation we can imagine:
+</p>
+
+\begin{aligned}
+x(t_2) = \ldots \\
+y(t_2) = \ldots \\
+z(t_2) = \ldots \\
+t_1(t_2) = \ldots
+\end{aligned}
+
+<p>
+This primitive trick injects a time dimension \(t_1\) which looks like \(x, y, z\) and they
+all now depend on some another time which is again a parameter (\(t_2\)). Mysterious. But
+pay attention: now we have 2 time dimensions. What time would we measure in this case?
+Maybe \(t_1\). Or \(t_2\). Or \(\hat{t} = (t_1, t_2)\). Some physicists introduce 3 time
+dimensions, and the event's coordinates look then: \(E = (x, y, z, t_1, t_2, t_3)\). It
+means that you can have a lot of New Year's Eve parties at a club in New York! What would
+be the difference between them? Well... \(E1 = (x, y, z, t_1, t_2, t_3)\) and \(E2 = (x,
+y, z, t_1, t_4, t_5)\) - maybe they have difference in furnishings or lighting or... it is
+about <i>probability</i>, I am thinking about quantum world now... imagine that \(t_2\) can have
+any value in \([0, 1]\) range (let's talk about 2T) and if \(t_2 = 1\) - the event is
+happening now! If \(t_2\) is lesser, then... so, it can be about probability as well.
+</p>
+</div>
+<div id="outline-container-org8ff2f8b" class="outline-3">
+<h3 id="org8ff2f8b">More exotic dimension</h3>
+<div class="outline-text-3" id="text-org8ff2f8b">
+<p>
+When talking about time, people always note its unidirectionality - it is like an arrow
+and always follows the growth of entropy. Debunking the concept that the time is a
+dimension, I said that the idea of time actually is reduced to speed. Motion and speed. My
+idea was that we have space with 3 dimensions and ability to move there and time appears
+only as some artificial, instrumental concept to help us to distinct body speeds.
+</p>
+
+<p>
+People have the illusion that time is a river that flows constantly. You can stop moving
+along the <code>x</code>-axis, but you can't stop moving along the time axis. Let's take this metaphor
+further remembering about speed.
+</p>
+
+<p>
+We know about the theoretical limitation of the maximum speed of light. All other speeds
+are lower. It's like moving at an angle. Imagine a person trying to swim to the shore, but
+being carried away by a river current perpendicular to their movement:
+</p>
+
+<pre class="example" id="orga81e895">
+∵∴∵∴∵∴∵∴∵∴∵∴∵∴∵∴∵∴∵ shore
+    &lt;----           extra-"path" due time "current"  ^
+    \   ↑           intended path                    |
+your \  :                                            |
+eff.  \◜:   ↜〜〜〜  "river current"              0x axis
+"path" \:                                            |  
+        ▲           you                              |
+</pre>
+
+<p>
+Now imagine that the "river current" - perpendicular force is some mysterious force
+shifting you - this force is parallel to the <b>time dimension</b>. It is perpendicular to <code>0x</code>
+because it is another dimension: they all are perpendicular to each other. You spend a lot
+of energy to reach your destination point and your effective, final, apparent "path" is
+longer due to the "river current" - strange current always existing - it is time! I quoted
+the "path" because you swime among <code>0x</code> - it is <code>:</code> trajectory and you don't move to the
+left actually - you are 3D object and you cannot shift to another dimension! But you need
+more energy as you would pass this longer "your eff. path". Extra-"path" also is quoted,
+it is as you passed it but you did not - you just spent additional energy without to be
+able to left your spatial dimensions - you are 3D, spatial body.
+</p>
+
+<p>
+This force-current (or you can imagine "wind") is along <code>t</code>-axis. What is this extra-path,
+correctly to call it "shift"? It is along <code>t</code>-axis, so you cannot see it even. You only see
+that you have inertia, your speed is limited, your effective speed is a projection. And it
+happens along every axis: <code>0x</code>, <code>0y</code>, <code>0z</code>: because <code>t</code>-axis is perpendicular to all axes! 
+</p>
+
+<p>
+You can try to imagine the same with 2+1 spacetime: any motion in your world (the plane)
+will happen under "pressure" of a mysterious wind in <code>0z</code> dimension.
+</p>
+
+<p>
+This model makes the time dimension more close to spatial dimensions but not exactly:
+</p>
+
+<ul class="org-ul">
+<li>it has some constant force</li>
+<li>you cannot move along this dimension (<i>but to be honest, I think, we could reject even
+this restriction</i>)</li>
+</ul>
+
+<p>
+So, this metaphor returns time to dimensions assuming some constant force effecting all
+bodies in 3D spatial world. What could it be? Aether's wind? Some "dark energy"? Here we
+are limited only by our imagination.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org205c240" class="outline-2">
+<h2 id="org205c240">2T and Black holes</h2>
+<div class="outline-text-2" id="text-org205c240">
+<blockquote>
+<p>
+...the properties of spacetime near a singularity change even more radically and remain
+poorly understood.  It is believed that their description is only possible with the
+development of a quantum theory of gravity, which describes gravitational interactions at
+distances on the order of the Planck length.  For an external observer, the
+worldlines of particles falling into a black hole end at the gravitational radius, and all
+events for them lie above the event horizon. Anything that happens to the falling observer
+below the gravitational radius appears nonexistent to the external observer, since events
+below the horizon are unobservable. Thus, a falling observer experiences time that does
+not exist for an external observer, while time seems to stop at the event horizon.
+</p>
+
+<p>
+This situation can be interpreted as follows. There are mutually perpendicular time axes,
+i.e., two times: one flows for the observer above the event horizon, and the other flows
+below it.  The time coordinate below the event horizon is independent of and orthogonal to
+external time.
+</p>
+
+<p>
+These two times have a single point of intersection on the event horizon. Thus, the
+absolute future in the spatiotemporal manifold (STM) of an external observer is a moment
+in time orthogonal to the original STM, and all events beyond the absolute future occur in
+a time orthogonal to the time of the external observer.
+</p>
+
+<p>
+-- The multidimensional time hypothesis in the context of problems of modern physics,
+   Artemenko, Spaskov, 2007
+</p>
+</blockquote>
+
+<p>
+Singularities, quantum world are cases looking very promising in light of the theory of
+multidimensional time.
+</p>
+</div>
+</div>
+<div id="outline-container-org618b3da" class="outline-2">
+<h2 id="org618b3da">In cinema</h2>
+<div class="outline-text-2" id="text-org618b3da">
+<ul class="org-ul">
+<li><a href="https://www.imdb.com/title/tt5453522/">Alien Code</a> (multidimensional alien beings having non-linear time caught a human to
+contact with his "impossible" from their point of view consciousness)</li>
+<li><a href="https://www.imdb.com/title/tt2543164/">Arrival</a> (multidimensional alien beings arrived to Eart and try to contact with humans)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgf95d072" class="outline-2">
+<h2 id="orgf95d072">Time to go crazy</h2>
+<div class="outline-text-2" id="text-orgf95d072">
+<p>
+Multidimensional time ("time cube") created by Otis Eugene "Gene" Ray diagnosed with
+schizophrenia: <a href="https://en.wikipedia.org/wiki/Time_Cube">https://en.wikipedia.org/wiki/Time_Cube</a>. He posits that each day actually
+consists of 4 days occurring simultaneously. Ray died in March 2015.
+</p>
+</div>
+</div>
+<div id="outline-container-org8bf517c" class="outline-2">
+<h2 id="org8bf517c">The most mind-bending possibility</h2>
+<div class="outline-text-2" id="text-org8bf517c">
+<p>
+Here's a speculative picture - not established physics, but useful for thinking. Imagine
+that what we call: "the Universe evolving in time" is actually a lower-dimensional
+manifestation of a more complicated structure.
+</p>
+
+<p>
+Perhaps fundamental reality looks more like: \((x, y, z, t_1,t_2, ...)\) and the particular
+physical conditions of our universe select one effective temporal direction.
+</p>
+
+<p>
+Then "the passage of time" could be analogous to the way a lower-dimensional observer
+experiences a trajectory through a higher-dimensional structure. In that picture, time as
+we experience it wouldn't necessarily be fundamental. It would be an emergent feature of
+the way our physical world sits inside a deeper geometry.
+</p>
+
+<p>
+It could be a script for a sci-fi movie.
+</p>
+
+<p>
+Multiple-time theories are speculative theoretical possibilities. That's not the same
+thing as saying they're nonsense.
+</p>
+
+<p>
+There are many ideas in theoretical physics that are mathematically sophisticated and
+worth investigating without having experimental confirmation...
+</p>
+
+<hr />
+
+<p>
+See also:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://www.gurdjieff.org/ouspensky2.htm">P. D. Ouspensky. A Biographical Outline</a></li>
+<li><a href="https://gurdjieff.work/texts/nmotu/chap10b.html">A New Model of the Universe by P. D. Ouspensky</a></li>
+<li><a href="https://tianmu.org/good-work-library/aquarian/fourth-way-and-ouspensky/tertium-organum-pd-ouspensky">Tertium Organum --- P.D. Ouspensky</a></li>
+<li><a href="https://www.ouspenskytoday.org/media/cl/h-Vol-VII-Recurrence-2.pdf">RECURRENCE - Dimensions, P.D. Ouspensky</a></li>
+<li><a href="https://www.ouspenskytoday.org/media/cl/h-Vol-VII-Recurrence-5.pdf">RECURRENCE - Time enfoldment</a></li>
+<li><a href="https://www.universalfreemasonry.org/en/library/tertium-organum/chapter-v">Tertium Organum, Chapter V, P.D. Ouspensky</a></li>
+<li><a href="https://www.bloomingrosepress.com/parallel-existences.html">Parallel Existences</a></li>
+<li><a href="https://www.globalgreyebooks.com/online-ebooks/p-d-ouspensky_tertium-organum_complete-text.html">Tertium Organum by P. D. Ouspensky</a></li>
+<li><a href="https://www.globalgreyebooks.com/online-ebooks/p-d-ouspensky_in-search-of-the-miraculous_complete-text.html">In Search of the Miraculous by P. D. Ouspensky</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Eternal_return">Eternal return concept</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Eternalism_(philosophy_of_time)">Eternalism</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Multiple_time_dimensions">Multiple time dimensions</a></li>
+<li><a href="https://www.researchgate.net/publication/2084994_Two-Time_Physics">Two time physics</a></li>
+<li><a href="https://arxiv.org/abs/hep-th/9809034">Two-Time Physics, Itzhak Bars</a></li>
+<li><a href="https://www.youtube.com/watch?v=hFba6A52An0">Youtube video: Two Time Physics</a></li>
+<li><a href="https://journals.tubitak.gov.tr/physics/vol23/iss5/2/">Multitime generalization of Maxwell electrodynamics and gravity Authors: VLADILEN BARASHENKOV</a></li>
+<li><a href="https://studyoftime.org/">The International Society for the Study of Time</a></li>
+<li><a href="https://phys.org/news/2025-06-theory-dimensions-space-secondary-effect.html">New theory proposes time has three dimensions, with space as a secondary effect by Rod Boyce, University of Alaska Fairbanks</a></li>
+<li><a href="https://arxiv.org/abs/2601.14134">Multidimensional arrow of time Sergey G. Rubin</a></li>
+<li><a href="https://iopscience.iop.org/article/10.1088/0305-4470/13/11/002">On multidimensional time J Strnad</a></li>
+<li><a href="https://www.socr.umich.edu/spacekime/">Research project: The 5D Universe of 3D Space &amp; 2D Complex Time</a></li>
+<li><a href="https://wp.towson.edu/5dstm/">The 5D Space-Time-Matter Consortium</a></li>
+<li><a href="https://www.youtube.com/watch?v=kkKviAkWb4I">Youtube video: Multidimensional Time</a></li>
+<li><a href="https://tetrahedral.blogspot.com/2011/12/privileged-character-of-31-spacetime.html">The Privileged Character of 3+1 Spacetime</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
