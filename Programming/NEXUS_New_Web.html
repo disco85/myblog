@@ -1,0 +1,2294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-09-05 Sat 18:43 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NEXUS - the new Web</title>
+<meta name="description" content="Alternative to the modern Web" />
+<meta name="keywords" content="Web,Alternative,AI" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">NEXUS - the new Web</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org0c0fdfc">Modern Web</a></li>
+<li><a href="#orgda888de">What were the initial ideas</a></li>
+<li><a href="#org73c40af">What happened next</a></li>
+<li><a href="#orgb1771d4">What were the alternatives</a></li>
+<li><a href="#org1261542">User's point of view</a></li>
+<li><a href="#orgcdd98f7">Developer's point of view</a></li>
+<li><a href="#orgd797654">What is the root of problems with the Web</a></li>
+<li><a href="#orga85793b">The solution is obvious</a></li>
+<li><a href="#org1dbf353">Can the next "Web" come?</a></li>
+<li><a href="#org5a6685c">AI creating new Web</a>
+<ul>
+<li><a href="#org1cccf95">NEXUS - New Web</a></li>
+<li><a href="#org5ce1bce">1. The fundamental mistake of today's Web</a></li>
+<li><a href="#org3939a5b">2. One unified application language</a></li>
+<li><a href="#orgb0a474c">3. CSS disappears</a></li>
+<li><a href="#org2d67657">4. Layout becomes a constraint-solving problem</a>
+<ul>
+<li><a href="#org65bba5c">Desktop</a></li>
+<li><a href="#org20199f8">Mobile</a></li>
+</ul>
+</li>
+<li><a href="#org99df312">5. But I wouldn't remove styling</a>
+<ul>
+<li><a href="#org3395b14">Consistency.</a></li>
+</ul>
+</li>
+<li><a href="#org3ae25bf">6. Components become first-class concepts</a></li>
+<li><a href="#orgb2ab799">7. State becomes declarative</a></li>
+<li><a href="#orge0873b8">8. Events disappear into actions</a></li>
+<li><a href="#orgfd16625">9. Accessibility becomes impossible to forget</a></li>
+<li><a href="#org9b19982">10. Responsive design becomes intrinsic</a></li>
+<li><a href="#org27a2c5d">12. Networking should also disappear</a></li>
+<li><a href="#orgba625e5">12. Offline-first by default</a></li>
+<li><a href="#org34ad8dc">13. Security becomes capability-based</a></li>
+<li><a href="#orge3ab796">14. No URLs as the fundamental application architecture</a></li>
+<li><a href="#orga711ae0">15. Documents and applications become different things</a>
+<ul>
+<li><a href="#org50cca0b">Document</a></li>
+<li><a href="#org8741f05">Application</a></li>
+</ul>
+</li>
+<li><a href="#org77d6328">16. AI would sit above the whole system</a></li>
+<li><a href="#org12fbfb9">17. The compiler becomes radically smarter</a></li>
+<li><a href="#org2450ef6">18. AI could eliminate huge categories of code</a></li>
+<li><a href="#org77dd410">19. The rendering engine becomes adaptive</a></li>
+<li><a href="#orgf6990c2">20. And yes: JavaScript could disappear completely</a></li>
+<li><a href="#orgf683d63">The really radical idea</a></li>
+<li><a href="#orga72b7bb">And this changes the fundamental unit of software</a></li>
+<li><a href="#orge16c9e7">If I had to summarize the philosophy</a></li>
+</ul>
+</li>
+<li><a href="#org1357b2d">My (human) conclusions</a></li>
+<li><a href="#org4fbfe04">Politics: current and main problem with the Web</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0c0fdfc" class="outline-2">
+<h2 id="org0c0fdfc">Modern Web</h2>
+<div class="outline-text-2" id="text-org0c0fdfc">
+<p>
+It is super simplified picture from the above.
+</p>
+
+<p>
+I will use the term "Web" for technologies providing representation of information in
+Internet and methods to work with this information (to modify it, etc): it is what you see
+and sometimes, able to change or to react to it.
+</p>
+
+<p>
+The main "window" to this "information" (that can be a game, news site, wiki article,
+image board, video platform, etc) is a Web browser.
+</p>
+
+<p>
+To do it, Web browser implements a set of standards, formats, protocols. The communication
+through the Internet consists of 2 parts: "frontend" (it runs inside your browser) and
+"backend" (it runs on some remote server) - backend sends some information to your Web
+browser and it interprets it in some special way (also there is communication between
+them, etc, but my goal is to focus on the frontend).
+</p>
+
+<p>
+The information got by frontend is represented in some "formats", main of them are:
+</p>
+
+<ul class="org-ul">
+<li>HTML</li>
+<li>CSS</li>
+<li>Javascript</li>
+</ul>
+
+<p>
+HTML is needed to represent "elements" on your screen. CSS - to make "styling" (location,
+colors, fonts, etc), Javascript - logic, it's a program, doing something behind the scene.
+</p>
+
+<p>
+They are usually called "languages", at least, Javascript is classical programming
+language. All of them today are very complex, and people working with them always make a
+lot of errors because of their complexity and ambiguity.
+</p>
+</div>
+</div>
+<div id="outline-container-orgda888de" class="outline-2">
+<h2 id="orgda888de">What were the initial ideas</h2>
+<div class="outline-text-2" id="text-orgda888de">
+<ol class="org-ol">
+<li>Communication: you send a letter, a mail and wait for an answer</li>
+<li>You publish some information like on a newspaper sheets, on an adware board, tabloid,
+magazine, etc.</li>
+<li>Etc (FTP, Telnet, NTP...)</li>
+</ol>
+
+<p>
+The 1 gave a birth to <a href="https://en.wikipedia.org/wiki/Email">email</a>. The 2 leaded to <a href="https://en.wikipedia.org/wiki/Gopher_(protocol)">Gopher</a> (the modern alternative is
+<a href="https://en.wikipedia.org/wiki/Gemini_(protocol)">Gemini</a>). The idea was sinless initially. OK, behind the Gopher you have a way to read some
+documents, to list their catalogs, etc.
+</p>
+</div>
+</div>
+<div id="outline-container-org73c40af" class="outline-2">
+<h2 id="org73c40af">What happened next</h2>
+<div class="outline-text-2" id="text-org73c40af">
+<p>
+Sending text to the client software (prototype of our Web browsers) humans understood that
+they could send pictures, then pictures can be placed in different parts of the "pages",
+to send more "styled" text (it leaded to introduction of CSS that became more and more
+complex), they began to repeat publishing systems and even more. Then they decided that
+they want some interactivity: ability to do some actions over, with the information on
+their screens, it leaded to logic: logic has split to a server side logic, requiring a
+network transmissions to (and from) server and, they got that some logic, though can be
+done locally, without to communicate with a server, for example, validation of data. You
+can also imagine a Web application for editing of text: do you need a communication with a
+server when you change a font of a text or its color? So, humans decided that they need
+1001-th programming language (yeah, separate one!) for this logic - Netscape invented one,
+yes, it was (and it is) very fragile but it is used still today (Javascript). 
+</p>
+
+<p>
+Humans reinvented desktop applications but now they run in the Web browser. The Web
+stopped to be just a publishing system, like a newspaper, it became a "platform" for
+applications. "Platform" is too marketing word: actually just a Web-browser that should be
+able to:
+</p>
+
+<ul class="org-ul">
+<li>visualize text, video, graphical, 3D data</li>
+<li>support any custom styling</li>
+<li>run code locally, on your computer</li>
+<li>and to run that code in a "safe" way (sandboxing it, else the code can hack your
+computer, steal your private data, etc)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgb1771d4" class="outline-2">
+<h2 id="orgb1771d4">What were the alternatives</h2>
+<div class="outline-text-2" id="text-orgb1771d4">
+<p>
+Here I will just say some keywords, they are not alternatives but some alternative
+"visions", concepts - let's call them in this way: <a href="https://www.rebol.com/">REBOL</a>, <a href="https://en.wikipedia.org/wiki/Semantic_Web">Web 3.0</a>, <a href="https://0install.net/">ZeroInstall</a>, <a href="https://openjfx.io/">JavaFX</a>,
+<a href="https://anygui.sourceforge.net/">AnyGUI</a>, etc:
+</p>
+
+<blockquote>
+<p>
+<b>JavaFX - One framework to rule them all</b>
+</p>
+
+<p>
+JavaFX applications can target desktop, mobile and embedded systems. Libraries and
+software are available for the entire life-cycle of an application.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org1261542" class="outline-2">
+<h2 id="org1261542">User's point of view</h2>
+<div class="outline-text-2" id="text-org1261542">
+<p>
+Everything became too complex. What is the benefit?
+</p>
+
+<p>
+The main "benefits" are that you:
+</p>
+
+<ol class="org-ol">
+<li>can run application "without to install it"</li>
+<li>and that application is "sandboxed"</li>
+<li>and it "works on any computer, any OS"</li>
+</ol>
+
+<p>
+Is it 100% true? What are alternatives?
+</p>
+
+<ol class="org-ol">
+<li>Applications are "cached" on your computer, so they pass kind of "installation" but
+behind the scene - you cannot remove them from the cache easy, you often hit problems
+with their versions, especially after their upgrade, so sometimes you should "CLEAR
+YOUR BROWSER CACHE", "RUN IN ANOTHER BROWSER", but in this case you lost your cached
+inputs too.
+<b>Such problem usually does not exist in the case of using of standard package manager
+where you fully control installation of an application and its removal</b></li>
+<li>Applications are really "sandboxed" but this technology still has security holes,
+vulnerabilities.
+<b>Usual desktop applications have real sandboxing solutions more-more secure and safe</b></li>
+<li>Applications try to work on any computer, but:
+<ul class="org-ul">
+<li><b>a number of languages provide the same cross-platform ability: Java, Python, Ruby,
+etc.</b></li>
+<li>Web "applications" usually <b>have problems with different resolutions</b> and very often
+you have to create a separate "views" for mobile devices.</li>
+</ul></li>
+</ol>
+
+<p>
+Can the Web be replaced here, in this context? Yes. Better package managers and sandbox
+solutions could replace the Web completely:
+</p>
+
+<ul class="org-ul">
+<li>package managers should be able to work ideally with dependencies and to be able to get
+dependencies from more than one OS repositories set, like some "meta-package managers"
+do it, fetching from Flatpak, AppImages, etc. Sure, they should be able to support
+different versions of dependencies per application. <b>All of these already exist in some
+package managers</b></li>
+<li>sandbox solutions should <b>be super-simple in usage</b>, Docker is not good here</li>
+</ul>
+
+<p>
+But it is from the user point of view. What about a programmer's one?
+</p>
+</div>
+</div>
+<div id="outline-container-orgcdd98f7" class="outline-2">
+<h2 id="orgcdd98f7">Developer's point of view</h2>
+<div class="outline-text-2" id="text-orgcdd98f7">
+<p>
+Here we hit complexity and ambiguity of CSS, Javascript. Typescript did not help the
+situation - it is just one "wrapper" over Javascript, and the question is: why do we need
+such kind of logic (general "logic") on a client? Can we avoid it at all?
+</p>
+
+<p>
+CSS is another source of pain - it became very crazy in some cases. HTML also is too
+complicated, to error prune. And no way to guarantee that everything will "work" (and
+look) in the same way everywhere - still, even today :)
+</p>
+
+<p>
+From one side: it is good - it gives developers job. But from another side - can it be
+better and still to give job? Can the Web be fixed?
+</p>
+</div>
+</div>
+<div id="outline-container-orgd797654" class="outline-2">
+<h2 id="orgd797654">What is the root of problems with the Web</h2>
+<div class="outline-text-2" id="text-orgd797654">
+<p>
+The Web duplicated existing approaches and solutions. We already have:
+</p>
+
+<ul class="org-ul">
+<li>a lot of languages, markups, styling systems</li>
+<li>a lot of VMs, sandboxing approaches: from "fat" ones to "lightweight" solutions</li>
+<li>a lot of package managers and alternative ways to deliver applications to users in
+reusable way (dependencies can be shared, reused), with full control on installed
+software</li>
+<li>different solutions to have cross-platform and even cross UI/GUI subsystems!</li>
+</ul>
+
+<p>
+Nothing of this was reused!!! <b>It demonstrates that the Web is COUNTER-IT TECHNOLOGY. Yeah,
+this is the correct conclusion - it reinvented everything since 1991-92 ignoring IT
+achievements and creating parallel technology stack</b>.
+</p>
+
+<p>
+Support of modern Javascript, CSS, HTML is very big pain: a lot of libraries, sometimes a
+simple Web application requires more than 1Gb Javascript dependencies! It cannot
+justified.
+</p>
+
+<p>
+The roots of the problem with the modern Web:
+</p>
+
+<ol class="org-ol">
+<li>Logic on client. Should be avoided</li>
+<li>Complex "styling" with very complex CSS. Can be avoided.</li>
+<li>Complex HTML without semantic: pages are still raw and not way to extract data from
+them, but HTML plays a role of a complex unique "drawing" tool for always repeated
+layouts and "page elements"</li>
+<li>Repeat of technologies. A lot of things were just reinvented.</li>
+<li>Too "fat", universal browsers, today they are like little OSes. It is not easy to
+create a new one (super difficult!).</li>
+</ol>
+
+<p>
+Can it be solved? Some companies think that WebAssembly could fix 1. It is better than the
+existing status quo but it is very far from real fix.
+</p>
+</div>
+</div>
+<div id="outline-container-orga85793b" class="outline-2">
+<h2 id="orga85793b">The solution is obvious</h2>
+<div class="outline-text-2" id="text-orga85793b">
+<p>
+It is total reject of the modern Web. Is it difficult? No, it's super easy and cheap: we
+did it many times before. We introduced Java applets, then - Flash technology, then -
+VBScript and Javascript. Then will be something else... We had plain HTML, then CSS1, CSS2
+etc. We used Mosaic browser, Netscape, then Opera browser, Mozilla, after it Seamonkey,
+Firefox, Chrome, etc... All of these can be very easy replaced.
+</p>
+
+<p>
+What can be the new approach? It is obvious:
+</p>
+
+<ul class="org-ul">
+<li>the new Web should be <b>SEMANTIC</b>: servers should serve data, knowledge, now cute
+"magazine" pages. Today's scrappers will disappear. Data should be open if it is served,
+if you see it, the data was delivered to you, so the question is only: is it in usable
+form or some shit pretending to be data for you, user, for usage</li>
+<li>the Web development must be <b>PURELY DECLARATIVE</b>: when everyone solves always very
+similar tasks, they can be lifted to declarative, semantic level. It was done many-many
+years ago in RAD tools, in data or model oriented architecture in enterprise world.</li>
+</ul>
+
+<p>
+And I asked AI then, what is his opinion?...
+</p>
+</div>
+</div>
+<div id="outline-container-org1dbf353" class="outline-2">
+<h2 id="org1dbf353">Can the next "Web" come?</h2>
+<div class="outline-text-2" id="text-org1dbf353">
+<p>
+Will it happen? Yes, it will happen 100%, absolutely no doubt: AI will be used more and
+more, it will replace a lot of code, usually it will not use even our, <i>HUMAN-ORIENTED</i>
+programming languages and will introduce totally new architecture. I asked this:
+</p>
+
+<blockquote>
+<p>
+If I asked you to develop a solution, system, architecture (let's imagine this) that could
+serve as an alternative to complex HTML, incredibly complex CSS, and primitive and
+redundant JavaScript, what concepts, ideas, approaches, architecture would you propose?
+Imagine that you (artificial intelligence) completely took over the IT industry - now you
+write all the code: how would you replace the modern web and its HTML, CSS, JS?
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org5a6685c" class="outline-2">
+<h2 id="org5a6685c">AI creating new Web</h2>
+<div class="outline-text-2" id="text-org5a6685c">
+<p>
+The next is the new "Web", as AI sees it - AI preferred to call it not "Web" but "NEXUS":
+</p>
+</div>
+<div id="outline-container-org1cccf95" class="outline-3">
+<h3 id="org1cccf95">NEXUS - New Web</h3>
+<div class="outline-text-3" id="text-org1cccf95">
+<p>
+Yes. If we throw away <b>backward compatibility, browser history, existing tooling, and
+human-written source code</b> and ask:
+</p>
+
+<blockquote>
+<p>
+"What would an AI-designed application/web platform look like if we could start from zero?"
+</p>
+</blockquote>
+
+<p>
+I would <b>not</b> try to invent "HTML 2 + CSS 2 + JavaScript 2."
+</p>
+
+<p>
+I'd eliminate the separation itself.
+</p>
+
+<p>
+The core idea would be:
+</p>
+
+<blockquote>
+<p>
+<b>Describe the application semantically and declaratively; let the runtime/AI compiler
+determine structure, layout, interaction, rendering, networking, accessibility, and
+optimization.</b>
+</p>
+</blockquote>
+
+<p>
+I'd call the imaginary system <b>NEXUS</b> for now.
+</p>
+</div>
+</div>
+<div id="outline-container-org5ce1bce" class="outline-3">
+<h3 id="org5ce1bce">1. The fundamental mistake of today's Web</h3>
+<div class="outline-text-3" id="text-org5ce1bce">
+<p>
+Today's web has three largely separate languages:
+</p>
+
+<pre class="example" id="org096211e">
+HTML       → What exists
+CSS        → How it looks
+JavaScript → What it does
+</pre>
+
+<p>
+And then humans glue them together.
+</p>
+
+<p>
+A trivial button can become something like:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span class="org-function-name">button</span> <span class="org-variable-name">class</span>=<span class="org-string">"primary-button"</span> <span class="org-variable-name">id</span>=<span class="org-string">"submit"</span>&gt;
+    Submit
+&lt;/<span class="org-function-name">button</span>&gt;
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-css"><span class="org-css-selector">.primary-button</span> {
+    <span class="org-css-property">display</span>: inline-flex;
+    <span class="org-css-property">align-items</span>: center;
+    ...
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-javascript">document
+  .getElementById(<span class="org-string">"submit"</span>)
+  .addEventListener(<span class="org-string">"click"</span>, <span class="org-keyword">async</span> () =&gt; {
+      ...
+  });
+</pre>
+</div>
+
+<p>
+This is <b>absurdly low-level for the intent</b>.
+</p>
+
+<p>
+The developer's actual intention was:
+</p>
+
+<blockquote>
+<p>
+"There is a primary action called Submit. When activated, submit the form."
+</p>
+</blockquote>
+
+<p>
+Everything else is implementation machinery.
+</p>
+
+<p>
+So NEXUS would start from <b>intent</b>, not markup.
+</p>
+</div>
+</div>
+<div id="outline-container-org3939a5b" class="outline-3">
+<h3 id="org3939a5b">2. One unified application language</h3>
+<div class="outline-text-3" id="text-org3939a5b">
+<p>
+Instead of:
+</p>
+
+<p>
+<code>HTML + CSS + JS</code>
+</p>
+
+<p>
+I'd have:
+</p>
+
+<p>
+<code>NEXUS</code>
+</p>
+
+<p>
+One strongly typed, declarative language describing:
+</p>
+
+<pre class="example" id="org330487c">
+Application
+ ├── data
+ ├── state
+ ├── actions
+ ├── entities
+ ├── views
+ ├── relationships
+ ├── constraints
+ └── behavior
+</pre>
+
+<p>
+For example:
+</p>
+
+<pre class="example" id="orga2409b3">
+app InvoiceManager {
+
+    data invoices: Invoice[]
+
+    view Dashboard {
+
+        title "Invoices"
+
+        table invoices {
+            column customer
+            column amount
+            column status
+
+            action "Pay" when status == "unpaid" {
+                pay(invoice)
+            }
+        }
+    }
+
+    action pay(invoice) {
+        invoices.update(invoice, status: "paid")
+    }
+}
+</pre>
+
+<p>
+That's essentially the whole application.
+</p>
+
+<p>
+No:
+</p>
+
+<pre class="example" id="orgaeb3093">
+&lt;div&gt;
+&lt;span&gt;
+class=
+display:
+margin:
+padding:
+onclick=
+addEventListener()
+querySelector()
+</pre>
+</div>
+</div>
+<div id="outline-container-orgb0a474c" class="outline-3">
+<h3 id="orgb0a474c">3. CSS disappears</h3>
+<div class="outline-text-3" id="text-orgb0a474c">
+<p>
+This is where I'd make the biggest philosophical change.
+</p>
+
+<p>
+<b>Don't describe pixels. Describe constraints and intent.</b>
+</p>
+
+<p>
+Today's CSS frequently says:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-css"><span class="org-css-property">display</span>: flex;
+<span class="org-css-property">justify-content</span>: space-between;
+<span class="org-css-property">align-items</span>: center;
+<span class="org-css-property">gap</span>: 12px;
+<span class="org-css-property">padding</span>: 16px;
+</pre>
+</div>
+
+<p>
+But what did the developer actually want?
+</p>
+
+<p>
+Probably:
+</p>
+
+<blockquote>
+<p>
+"Put these things in a horizontal toolbar with sensible spacing."
+</p>
+</blockquote>
+
+<p>
+So I'd write:
+</p>
+
+<pre class="example" id="org604fb02">
+toolbar {
+    layout: horizontal
+}
+</pre>
+
+<p>
+Or even:
+</p>
+
+<pre class="example" id="org1caa0b8">
+toolbar actions
+</pre>
+
+<p>
+The renderer determines:
+</p>
+
+<ul class="org-ul">
+<li>spacing</li>
+<li>alignment</li>
+<li>wrapping</li>
+<li>typography</li>
+<li>touch target sizes</li>
+<li>responsive behavior</li>
+<li>accessibility</li>
+<li>RTL</li>
+<li>high contrast</li>
+<li>screen size</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2d67657" class="outline-3">
+<h3 id="org2d67657">4. Layout becomes a constraint-solving problem</h3>
+<div class="outline-text-3" id="text-org2d67657">
+<p>
+Rather than CSS's gigantic pile of interacting rules, I'd make layout fundamentally:
+</p>
+
+<pre class="example" id="org0a55918">
+constraints
++
+priorities
++
+semantics
+</pre>
+
+<p>
+For example:
+</p>
+
+<pre class="example" id="org31331e3">
+view Product {
+
+    image product.image
+
+    title product.name
+
+    price product.price
+
+    action "Buy"
+}
+</pre>
+
+<p>
+The runtime knows:
+</p>
+
+<pre class="example" id="org6197c55">
+image → visual media
+title → heading
+price → monetary value
+action → interactive control
+</pre>
+
+<p>
+It can automatically determine:
+</p>
+</div>
+<div id="outline-container-org65bba5c" class="outline-4">
+<h4 id="org65bba5c">Desktop</h4>
+<div class="outline-text-4" id="text-org65bba5c">
+<pre class="example" id="org8a41931">
+┌───────────────┬──────────────────────┐
+│               │ Product name         │
+│     IMAGE     │ $199                 │
+│               │                      │
+│               │ [ Buy ]              │
+└───────────────┴──────────────────────┘
+</pre>
+</div>
+</div>
+<div id="outline-container-org20199f8" class="outline-4">
+<h4 id="org20199f8">Mobile</h4>
+<div class="outline-text-4" id="text-org20199f8">
+<pre class="example" id="orgb638be8">
+┌──────────────────┐
+│      IMAGE       │
+├──────────────────┤
+│ Product name     │
+│ $199             │
+│                  │
+│ [      Buy      ]│
+└──────────────────┘
+</pre>
+
+<p>
+Without the developer writing:
+</p>
+
+<pre class="example" id="org62b4fbd">
+@media ...
+flex-direction...
+grid-template...
+min-width...
+max-width...
+</pre>
+
+<p>
+The <b>layout engine is solving the problem</b>, rather than executing a pile of stylistic instructions.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org99df312" class="outline-3">
+<h3 id="org99df312">5. But I wouldn't remove styling</h3>
+<div class="outline-text-3" id="text-org99df312">
+<p>
+I'd replace <b>styling rules with design semantics</b>.
+</p>
+
+<p>
+Instead of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-css"><span class="org-css-property">color</span>: <span class="custom">#3478f6</span>;
+<span class="org-css-property">font-size</span>: 14px;
+<span class="org-css-property">font-weight</span>: 600;
+<span class="org-css-property">border-radius</span>: 8px;
+<span class="org-css-property">box-shadow</span>: ...
+</pre>
+</div>
+
+<p>
+you'd have:
+</p>
+
+<pre class="example" id="orgafe3489">
+theme {
+
+    primary: blue
+    density: comfortable
+    personality: modern
+    emphasis: moderate
+}
+</pre>
+
+<p>
+And semantic components:
+</p>
+
+<ul class="org-ul">
+<li>button primary</li>
+<li>button destructive</li>
+<li>heading</li>
+<li>warning</li>
+<li>price</li>
+<li>metadata</li>
+<li>navigation</li>
+</ul>
+
+<p>
+The platform owns the visual system.
+</p>
+
+<p>
+This gives us something CSS never really achieved:
+</p>
+</div>
+<div id="outline-container-org3395b14" class="outline-4">
+<h4 id="org3395b14">Consistency.</h4>
+<div class="outline-text-4" id="text-org3395b14">
+<p>
+A developer doesn't independently reinvent:
+</p>
+
+<ul class="org-ul">
+<li>button</li>
+<li>modal</li>
+<li>dropdown</li>
+<li>tooltip</li>
+<li>form</li>
+<li>table</li>
+<li>tabs</li>
+<li>menu</li>
+<li>datepicker</li>
+<li>toast</li>
+</ul>
+
+<p>
+every time.
+</p>
+
+<p>
+They're platform primitives.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3ae25bf" class="outline-3">
+<h3 id="org3ae25bf">6. Components become first-class concepts</h3>
+<div class="outline-text-3" id="text-org3ae25bf">
+<p>
+Today's web eventually reinvented components:
+</p>
+
+<ul class="org-ul">
+<li>React</li>
+<li>Vue</li>
+<li>Angular</li>
+<li>Svelte</li>
+<li>Web Components</li>
+<li>...</li>
+</ul>
+
+<p>
+That's evidence that the underlying platform abstraction was wrong.
+</p>
+
+<p>
+I'd make components native.
+</p>
+
+<pre class="example" id="org3ba45b9">
+component UserCard(user: User) {
+
+    avatar user.photo
+
+    heading user.name
+
+    text user.email
+
+    action "Message" {
+        openConversation(user)
+    }
+}
+</pre>
+
+<p>
+And importantly:
+</p>
+
+<p>
+<b>components have semantics, state, accessibility, layout and behavior as one object.</b>
+</p>
+
+<p>
+Not:
+</p>
+
+<pre class="example" id="org8a97442">
+HTML component
++
+CSS component
++
+JS component
++
+state management
++
+event handlers
++
+accessibility hacks
+</pre>
+</div>
+</div>
+<div id="outline-container-orgb2ab799" class="outline-3">
+<h3 id="orgb2ab799">7. State becomes declarative</h3>
+<div class="outline-text-3" id="text-orgb2ab799">
+<p>
+Modern UI code is full of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">setLoading(<span class="org-constant">true</span>)
+setError(<span class="org-constant">null</span>)
+setData(...)
+setLoading(<span class="org-constant">false</span>)
+</pre>
+</div>
+
+<p>
+Then the framework figures out what changed.
+</p>
+
+<p>
+I'd eliminate that entirely.
+</p>
+
+<p>
+Define state:
+</p>
+
+<pre class="example" id="orgf799ee2">
+data {
+
+    users: User[]
+
+    selectedUser: User?
+
+    loading: boolean
+}
+</pre>
+
+<p>
+Define relationships:
+</p>
+
+<pre class="example" id="org657c116">
+visibleUsers =
+    users.filter(search.matches)
+</pre>
+
+<p>
+Define derived state:
+</p>
+
+<pre class="example" id="org048301a">
+total =
+    cart.items.sum(item.price * item.quantity)
+</pre>
+
+<p>
+The runtime builds a dependency graph.
+</p>
+
+<pre class="example" id="org8b30420">
+users
+  │
+  ├──→ visibleUsers
+  │
+  └──→ userCount
+</pre>
+
+<p>
+Change <code>users</code> and everything dependent updates automatically.
+</p>
+
+<p>
+No manual DOM manipulation.
+</p>
+
+<p>
+No virtual DOM.
+</p>
+
+<p>
+No React hooks.
+</p>
+
+<p>
+No effects.
+</p>
+</div>
+</div>
+<div id="outline-container-orge0873b8" class="outline-3">
+<h3 id="orge0873b8">8. Events disappear into actions</h3>
+<div class="outline-text-3" id="text-orge0873b8">
+<p>
+Instead of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">button.addEventListener(<span class="org-string">"click"</span>, ...)
+</pre>
+</div>
+
+<p>
+you declare:
+</p>
+
+<pre class="example" id="orgdbf96ae">
+action buy(product)
+</pre>
+
+<p>
+and bind it:
+</p>
+
+<pre class="example" id="org55ece26">
+button "Buy" → buy(product)
+</pre>
+
+<p>
+Even better, interaction could be semantic:
+</p>
+
+<pre class="example" id="org1caa9c3">
+action buy(product)
+    triggered by primaryAction(product)
+</pre>
+
+<p>
+The runtime knows how keyboard, mouse, touch, voice, switch devices, accessibility technologies, etc. invoke it.
+</p>
+</div>
+</div>
+<div id="outline-container-orgfd16625" class="outline-3">
+<h3 id="orgfd16625">9. Accessibility becomes impossible to forget</h3>
+<div class="outline-text-3" id="text-orgfd16625">
+<p>
+This is a major benefit of semantic UI.
+</p>
+
+<p>
+Today's:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span class="org-function-name">div</span> <span class="org-variable-name">onclick</span>=<span class="org-string">"..."</span>&gt;
+</pre>
+</div>
+
+<p>
+could mean almost anything.
+</p>
+
+<p>
+The browser can't necessarily know whether it is:
+</p>
+
+<ul class="org-ul">
+<li>a button</li>
+<li>menu</li>
+<li>checkbox</li>
+<li>dialog</li>
+<li>navigation</li>
+<li>decorative element</li>
+</ul>
+
+<p>
+In NEXUS:
+</p>
+
+<pre class="example" id="orgfc5dcea">
+action "Delete"
+</pre>
+
+<p>
+is intrinsically an action.
+</p>
+
+<p>
+The runtime automatically generates appropriate:
+</p>
+
+<ul class="org-ul">
+<li>keyboard interaction</li>
+<li>accessibility tree</li>
+<li>focus behavior</li>
+<li>screen reader semantics</li>
+<li>touch behavior</li>
+<li>voice interaction</li>
+</ul>
+
+<p>
+Accessibility becomes <b>part of the type system</b>, rather than a compliance project.
+</p>
+</div>
+</div>
+<div id="outline-container-org9b19982" class="outline-3">
+<h3 id="org9b19982">10. Responsive design becomes intrinsic</h3>
+<div class="outline-text-3" id="text-org9b19982">
+<p>
+I'd kill media queries for most normal applications.
+</p>
+
+<p>
+Instead of:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-css"><span class="org-builtin">@media</span> (max-width: 768px) { ... }
+</pre>
+</div>
+
+<p>
+components would declare priorities.
+</p>
+
+<pre class="example" id="orga78f396">
+toolbar {
+    actions {
+        priority:
+            save = essential
+            export = useful
+            print = optional
+    }
+}
+</pre>
+
+<p>
+The layout engine decides what happens as space disappears.
+</p>
+
+<p>
+Conceptually:
+</p>
+
+<pre class="example" id="orgae8faea">
+available space
+       ↓
+constraint solver
+       ↓
+semantic priorities
+       ↓
+optimal arrangement
+</pre>
+
+<p>
+That's far more powerful than:
+</p>
+
+<pre class="example" id="orgf2e541b">
+if viewport &lt; 768px
+</pre>
+</div>
+</div>
+<div id="outline-container-org27a2c5d" class="outline-3">
+<h3 id="org27a2c5d">12. Networking should also disappear</h3>
+<div class="outline-text-3" id="text-org27a2c5d">
+<p>
+This is another huge source of today's complexity.
+</p>
+
+<p>
+Today:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">fetch(<span class="org-string">"/api/users"</span>)
+</pre>
+</div>
+
+<p>
+then:
+</p>
+
+<ul class="org-ul">
+<li>JSON</li>
+<li>validation</li>
+<li>loading state</li>
+<li>error handling</li>
+<li>cache</li>
+<li>retry</li>
+<li>serialization</li>
+<li>authentication</li>
+</ul>
+
+<p>
+I'd make data remote references first-class.
+</p>
+
+<pre class="example" id="orga83e4f4">
+data users: User[]
+    source server.Users
+</pre>
+
+<p>
+The runtime knows:
+</p>
+
+<ul class="org-ul">
+<li>serialization</li>
+<li>caching</li>
+<li>synchronization</li>
+<li>offline operation</li>
+<li>retries</li>
+<li>authentication</li>
+<li>incremental updates</li>
+<li>optimistic changes</li>
+</ul>
+
+<p>
+The application describes <b>what data it needs</b>, not HTTP mechanics.
+</p>
+</div>
+</div>
+<div id="outline-container-orgba625e5" class="outline-3">
+<h3 id="orgba625e5">12. Offline-first by default</h3>
+<div class="outline-text-3" id="text-orgba625e5">
+<p>
+Today's web frequently assumes:
+</p>
+
+<pre class="example" id="org494b2fc">
+ internet exists
+       ↓
+    request
+       ↓
+    response
+</pre>
+
+<p>
+I'd reverse it.
+</p>
+
+<p>
+Every application has a local state model.
+</p>
+
+<pre class="example" id="orge307189">
+             ┌─────────────┐
+             │ Local State │
+             └──────┬──────┘
+                    │
+          synchronization engine
+              ↙           ↘
+        local device     server
+</pre>
+
+<p>
+The app works offline automatically.
+</p>
+
+<p>
+When connectivity returns:
+</p>
+
+<ul class="org-ul">
+<li>merge</li>
+<li>resolve conflicts</li>
+<li>synchronize</li>
+</ul>
+
+<p>
+The developer shouldn't have to reinvent this.
+</p>
+</div>
+</div>
+<div id="outline-container-org34ad8dc" class="outline-3">
+<h3 id="org34ad8dc">13. Security becomes capability-based</h3>
+<div class="outline-text-3" id="text-org34ad8dc">
+<p>
+This is another place where I'd redesign everything.
+</p>
+
+<p>
+Instead of arbitrary code having access to enormous APIs, applications receive explicit capabilities:
+</p>
+
+<pre class="example" id="org856d74c">
+permissions {
+    camera
+    location
+    contacts
+    notifications
+}
+</pre>
+
+<p>
+And perhaps individual components receive narrower capabilities.
+</p>
+
+<pre class="example" id="orgc3c3cfd">
+Application
+ │
+ ├── camera capability
+ │
+ ├── payment capability
+ │
+ └── network capability
+</pre>
+
+<p>
+The runtime enforces them.
+</p>
+
+<p>
+No weird historical accumulation of:
+</p>
+
+<ul class="org-ul">
+<li>same-origin</li>
+<li>CORS</li>
+<li>CSP</li>
+<li>CSRF</li>
+<li>cookies</li>
+<li>localStorage</li>
+<li>service workers</li>
+<li>sandbox</li>
+<li>permissions</li>
+<li>...</li>
+</ul>
+
+<p>
+Some of these concepts will still exist internally, but <b>developers shouldn't need to
+understand their accidental historical complexity.</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orge3ab796" class="outline-3">
+<h3 id="orge3ab796">14. No URLs as the fundamental application architecture</h3>
+<div class="outline-text-3" id="text-orge3ab796">
+<p>
+I'd also question the URL.
+</p>
+
+<p>
+URLs are excellent for documents.
+</p>
+
+<p>
+They're not necessarily the ideal primitive for applications.
+</p>
+
+<p>
+Instead:
+</p>
+
+<pre class="example" id="org3bc616e">
+Application identity
+       ↓
+ typed resources
+       ↓
+  capabilities
+       ↓
+     views
+</pre>
+
+<p>
+Navigation becomes:
+</p>
+
+<pre class="example" id="org84a79d9">
+open User(481)
+</pre>
+
+<p>
+rather than:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-javascript">window.history.pushState(...)
+</pre>
+</div>
+
+<p>
+The runtime can still generate URLs for sharing, indexing and interoperability.
+</p>
+
+<p>
+But URLs wouldn't dictate application architecture.
+</p>
+</div>
+</div>
+<div id="outline-container-orga711ae0" class="outline-3">
+<h3 id="orga711ae0">15. Documents and applications become different things</h3>
+<div class="outline-text-3" id="text-orga711ae0">
+<p>
+This is important.
+</p>
+
+<p>
+The Web currently treats:
+</p>
+
+<ul class="org-ul">
+<li>Wikipedia article</li>
+<li>Gmail</li>
+<li>YouTube</li>
+<li>Photoshop-like web app</li>
+<li>shopping cart</li>
+<li>PDF</li>
+<li>blog</li>
+<li>game</li>
+</ul>
+
+<p>
+as variations of:
+</p>
+
+<blockquote>
+<p>
+"a document loaded at a URL."
+</p>
+</blockquote>
+
+<p>
+That's weird.
+</p>
+
+<p>
+I'd have two related primitives:
+</p>
+
+<ol class="org-ol">
+<li>DOCUMENT</li>
+<li>APPLICATION</li>
+</ol>
+</div>
+<div id="outline-container-org50cca0b" class="outline-4">
+<h4 id="org50cca0b">Document</h4>
+<div class="outline-text-4" id="text-org50cca0b">
+<p>
+Semantic content:
+</p>
+
+<pre class="example" id="org5110303">
+document {
+    heading ...
+    paragraph ...
+    image ...
+}
+</pre>
+</div>
+</div>
+<div id="outline-container-org8741f05" class="outline-4">
+<h4 id="org8741f05">Application</h4>
+<div class="outline-text-4" id="text-org8741f05">
+<p>
+State + actions + views:
+</p>
+
+<pre class="example" id="org58187f4">
+application {
+    state ...
+    actions ...
+    views ...
+}
+</pre>
+
+<p>
+The runtime optimizes each appropriately.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org77d6328" class="outline-3">
+<h3 id="org77d6328">16. AI would sit above the whole system</h3>
+<div class="outline-text-3" id="text-org77d6328">
+<p>
+This is where your premise becomes particularly interesting.
+</p>
+
+<p>
+If <b>AI writes all the code</b>, we don't need to optimize the programming language around human typing speed.
+</p>
+
+<p>
+Instead:
+</p>
+
+<pre class="example" id="org81fa65d">
+    Human intent
+         ↓
+         AI
+         ↓
+semantic application model
+         ↓
+      compiler
+         ↓
+optimized executable
+</pre>
+
+<p>
+A human might say:
+</p>
+
+<blockquote>
+<p>
+"Build me an invoice management system. It needs customers, invoices, PDF export,
+payments, audit history and role-based permissions. Make it feel like a clean enterprise
+application."
+</p>
+</blockquote>
+
+<p>
+The AI produces the semantic model.
+</p>
+
+<p>
+Humans don't need to manually choose:
+</p>
+
+<ul class="org-ul">
+<li>React?</li>
+<li>Vue?</li>
+<li>Next?</li>
+<li>Tailwind?</li>
+<li>Redux?</li>
+<li>REST?</li>
+<li>GraphQL?</li>
+<li>Postgres?</li>
+<li>Redis?</li>
+<li>WebSockets?</li>
+</ul>
+
+<p>
+Those are <b>implementation decisions</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org12fbfb9" class="outline-3">
+<h3 id="org12fbfb9">17. The compiler becomes radically smarter</h3>
+<div class="outline-text-3" id="text-org12fbfb9">
+<p>
+Today's compilation pipeline:
+</p>
+
+<pre class="example" id="org1dbdd19">
+    source
+      ↓
+   compiler
+      ↓
+JavaScript/WASM
+      ↓
+   browser
+</pre>
+
+<p>
+I'd make it:
+</p>
+
+<pre class="example" id="org949e5b4">
+ semantic application
+          ↓
+     optimization
+          ↓
+  dependency analysis
+          ↓
+  security analysis
+          ↓
+ accessibility analysis
+          ↓
+  layout optimization
+          ↓
+ network optimization
+          ↓
+device-specific compilation
+          ↓
+   native execution
+</pre>
+
+<p>
+The runtime can know the <b>meaning</b> of the application.
+</p>
+
+<p>
+That's incredibly powerful.
+</p>
+
+<p>
+For example:
+</p>
+
+<pre class="example" id="org7f0acd4">
+price
+</pre>
+
+<p>
+isn't merely:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-html">&lt;<span class="org-function-name">span</span>&gt;$19.99&lt;/<span class="org-function-name">span</span>&gt;
+</pre>
+</div>
+
+<p>
+It's a <b>monetary value</b>.
+</p>
+
+<p>
+Therefore the system knows:
+</p>
+
+<ul class="org-ul">
+<li>localization</li>
+<li>currency formatting</li>
+<li>accessibility</li>
+<li>sorting</li>
+<li>numerical comparison</li>
+<li>input validation</li>
+<li>right-to-left considerations</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2450ef6" class="outline-3">
+<h3 id="org2450ef6">18. AI could eliminate huge categories of code</h3>
+<div class="outline-text-3" id="text-org2450ef6">
+<p>
+Suppose you say:
+</p>
+
+<blockquote>
+<p>
+"Users should be able to search invoices."
+</p>
+</blockquote>
+
+<p>
+You don't necessarily need to specify:
+</p>
+
+<ul class="org-ul">
+<li>search input</li>
+<li>debounce</li>
+<li>query parameter</li>
+<li>loading spinner</li>
+<li>empty state</li>
+<li>error state</li>
+<li>pagination</li>
+<li>cache</li>
+<li>keyboard shortcut</li>
+<li>mobile layout</li>
+</ul>
+
+<p>
+The platform knows that <b>search</b> is a standard interaction.
+</p>
+
+<p>
+So:
+</p>
+
+<pre class="example" id="orgffb44f9">
+search invoices
+</pre>
+
+<p>
+could automatically produce all of it.
+</p>
+
+<p>
+This is where AI and declarative systems become much more interesting together.
+</p>
+</div>
+</div>
+<div id="outline-container-org77dd410" class="outline-3">
+<h3 id="org77dd410">19. The rendering engine becomes adaptive</h3>
+<div class="outline-text-3" id="text-org77dd410">
+<p>
+Instead of forcing everything into:
+</p>
+
+<pre class="example" id="orgee1618a">
+DOM → CSS → pixels
+</pre>
+
+<p>
+I'd allow multiple rendering strategies.
+</p>
+
+<pre class="example" id="orga06cad7">
+Semantic application
+        ↓
+   presentation IR
+        ↓
+ ┌──────┼────────┐
+ ↓      ↓        ↓
+DOM   native    GPU
+      widgets   scene
+</pre>
+
+<p>
+A table-heavy enterprise app might use native-style rendering.
+</p>
+
+<p>
+A game might use GPU rendering.
+</p>
+
+<p>
+An article might use document rendering.
+</p>
+
+<p>
+A 3D application might use a scene graph.
+</p>
+
+<p>
+<b>The developer shouldn't care.</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgf6990c2" class="outline-3">
+<h3 id="orgf6990c2">20. And yes: JavaScript could disappear completely</h3>
+<div class="outline-text-3" id="text-orgf6990c2">
+<p>
+The final architecture could look like:
+</p>
+
+<pre class="example" id="org01902d5">
+                  HUMAN
+                    │
+              natural language
+                    │
+                    ▼
+                   AI
+                    │
+                    ▼
+          Semantic Application IR
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+      STATE      ACTIONS        UI
+        │           │           │
+        └───────────┼───────────┘
+                    │
+                    ▼
+             NEXUS compiler
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+     Security    Layout     Optimization
+        │           │           │
+        └───────────┼───────────┘
+                    ▼
+              Native runtime
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+       GPU        Device       Network
+</pre>
+
+<p>
+There is <b>no HTML/CSS/JS boundary</b>.
+</p>
+
+<p>
+They're historical implementation details.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf683d63" class="outline-3">
+<h3 id="orgf683d63">The really radical idea</h3>
+<div class="outline-text-3" id="text-orgf683d63">
+<p>
+I'd actually go one step further.
+</p>
+
+<p>
+<b>Don't make NEXUS the language. Make NEXUS an intermediate representation.</b>
+</p>
+
+<p>
+Humans don't necessarily write it.
+</p>
+
+<p>
+AI generates it.
+</p>
+
+<pre class="example" id="org60b2983">
+              Human
+                │
+       "Make me a banking app"
+                │
+                ▼
+               AI
+                │
+                ▼
+       Semantic Application IR
+                │
+                ▼
+       ┌────────┴────────┐
+       │                 │
+   server IR          client IR
+       │                 │
+       ▼                 ▼
+    native            native
+    code              runtime
+</pre>
+
+<p>
+Then the "source language" doesn't matter much anymore.
+</p>
+
+<p>
+You could even regenerate the implementation continuously as the application evolves.
+</p>
+</div>
+</div>
+<div id="outline-container-orga72b7bb" class="outline-3">
+<h3 id="orga72b7bb">And this changes the fundamental unit of software</h3>
+<div class="outline-text-3" id="text-orga72b7bb">
+<p>
+Today's unit is roughly:
+</p>
+
+<blockquote>
+<p>
+<b>a file containing code</b>
+</p>
+</blockquote>
+
+<p>
+My proposed system's unit is:
+</p>
+
+<blockquote>
+<p>
+<b>a semantic capability</b>
+</p>
+</blockquote>
+
+<p>
+For example:
+</p>
+
+<pre class="example" id="org1d6d9fb">
+Invoice
+ ├── identity
+ ├── customer
+ ├── line items
+ ├── total
+ ├── status
+ ├── permissions
+ ├── actions
+ └── presentation
+</pre>
+
+<p>
+The compiler/AI can turn that into whatever representation is optimal.
+</p>
+</div>
+</div>
+<div id="outline-container-orge16c9e7" class="outline-3">
+<h3 id="orge16c9e7">If I had to summarize the philosophy</h3>
+<div class="outline-text-3" id="text-orge16c9e7">
+<p>
+I'd replace:
+</p>
+
+<p>
+<b>HTML</b>
+</p>
+
+<blockquote>
+<p>
+"What tags are in this document?"
+</p>
+</blockquote>
+
+<p>
+with:
+</p>
+
+<blockquote>
+<p>
+<b>What entities and information exist?</b>
+</p>
+</blockquote>
+
+<p>
+<b>CSS</b>
+</p>
+
+<blockquote>
+<p>
+"What exact rendering rules should I apply?"
+</p>
+</blockquote>
+
+<p>
+with:
+</p>
+
+<blockquote>
+<p>
+<b>What presentation constraints and design intent exist?</b>
+</p>
+</blockquote>
+
+<p>
+<b>JavaScript</b>
+</p>
+
+<blockquote>
+<p>
+"What code should execute when this event happens?"
+</p>
+</blockquote>
+
+<p>
+with:
+</p>
+
+<blockquote>
+<p>
+<b>What state, capabilities and actions exist?</b>
+</p>
+</blockquote>
+
+<p>
+And replace all three with:
+</p>
+
+<blockquote>
+<p>
+<b>A typed semantic model of the application.</b>
+</p>
+</blockquote>
+
+<p>
+Then let <b>AI + compiler + runtime</b> figure out the implementation.
+</p>
+
+<p>
+That's the direction I'd bet on if we were genuinely starting the Web over today.
+</p>
+
+<p>
+And the interesting part is that <b>WebAssembly is already pointing in this direction</b>, but
+only at the bottom of the stack. The missing piece isn't really another programming
+language---it is a <b>semantic application runtime above the machine code and below the
+human-facing application description</b>.
+</p>
+
+<p>
+That, in my view, is the architecture that could genuinely make HTML, CSS, JS feel as
+obsolete as machine-level GUI programming feels today.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org1357b2d" class="outline-2">
+<h2 id="org1357b2d">My (human) conclusions</h2>
+<div class="outline-text-2" id="text-org1357b2d">
+<p>
+It was funny, but expected, my ideas also were around <b>declarative</b> + <b>semantic</b> Web, not
+this salad that we have today. It will remove general purpose language like Javascript,
+and developers and designers will stop to solve always the same problems again and again
+and to build super-similar architecture again and again. Will the replacement of the Web
+look in this way? I think it could. But I expect:
+</p>
+
+<ol class="org-ol">
+<li>The word, term "Web" will be completely replaced by another one</li>
+<li>It will not contain human oriented protocols and languages (markup, logic, styling,
+text based Internet protocols...) - all of this will be replaced by machine binary
+(encrypted) blobs.</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org4fbfe04" class="outline-2">
+<h2 id="org4fbfe04">Politics: current and main problem with the Web</h2>
+<div class="outline-text-2" id="text-org4fbfe04">
+<p>
+Due to political conflicts and manipulations, the modern Web is dying: it fragments and
+falls apart. So called "West" spreads brutal propaganda, fakes, calls for terrorism and
+murders, racism, nationalism against non-Western nations. The "Global South" responses to
+it with conspiracy theories (unfortunately, sometimes true), fakes, different
+manipulations and the same propaganda of hate in their home states. So, to protect
+themselves, authorities, the power in many countries decides to close their societies in
+an informational bubble, where the information will match the main line of the ruling
+clique. So called "Global South" and "West" - both - introduce total control in the Web.
+</p>
+
+<p>
+<b>We may see the death of the Web as we knew it in the 90s.</b>
+</p>
+
+<p>
+Free speech and anonymity: people should be able to keep anonymity in the next "net" and
+to be able to share their opinion. Free speech can set on fire riots and "color
+revolutions" and to avoid it, the education of people must be adequate. Today, many
+(most?) nations have not even history lessons, propaganda is instead of them. People are
+not able to distinct lie and truth, propaganda and real concerns.  Without free anonymous
+speech in the Web, it will completely die and will turn into the newspaper "Pravda" a
+newspaper that no one read, but people were forced to buy to sponsor the party.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1342 @@
+#+title: NEXUS - the new Web
+#+description: Alternative to the modern Web
+#+keywords: Web,Alternative,AI
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Web Alternative AI
+#+date: <2026-09-05 Sat 11:04>
+
+* Modern Web
+
+It is super simplified picture from the above.
+
+I will use the term "Web" for technologies providing representation of information in
+Internet and methods to work with this information (to modify it, etc): it is what you see
+and sometimes, able to change or to react to it.
+
+The main "window" to this "information" (that can be a game, news site, wiki article,
+image board, video platform, etc) is a Web browser.
+
+To do it, Web browser implements a set of standards, formats, protocols. The communication
+through the Internet consists of 2 parts: "frontend" (it runs inside your browser) and
+"backend" (it runs on some remote server) - backend sends some information to your Web
+browser and it interprets it in some special way (also there is communication between
+them, etc, but my goal is to focus on the frontend).
+
+The information got by frontend is represented in some "formats", main of them are:
+
+- HTML
+- CSS
+- Javascript
+
+HTML is needed to represent "elements" on your screen. CSS - to make "styling" (location,
+colors, fonts, etc), Javascript - logic, it's a program, doing something behind the scene.
+
+They are usually called "languages", at least, Javascript is classical programming
+language. All of them today are very complex, and people working with them always make a
+lot of errors because of their complexity and ambiguity.
+
+* What were the initial ideas
+
+1. Communication: you send a letter, a mail and wait for an answer
+2. You publish some information like on a newspaper sheets, on an adware board, tabloid,
+  magazine, etc.
+3. Etc (FTP, Telnet, NTP...)
+
+The 1 gave a birth to [[https://en.wikipedia.org/wiki/Email][email]]. The 2 leaded to [[https://en.wikipedia.org/wiki/Gopher_(protocol)][Gopher]] (the modern alternative is
+[[https://en.wikipedia.org/wiki/Gemini_(protocol)][Gemini]]). The idea was sinless initially. OK, behind the Gopher you have a way to read some
+documents, to list their catalogs, etc.
+
+* What happened next
+
+Sending text to the client software (prototype of our Web browsers) humans understood that
+they could send pictures, then pictures can be placed in different parts of the "pages",
+to send more "styled" text (it leaded to introduction of CSS that became more and more
+complex), they began to repeat publishing systems and even more. Then they decided that
+they want some interactivity: ability to do some actions over, with the information on
+their screens, it leaded to logic: logic has split to a server side logic, requiring a
+network transmissions to (and from) server and, they got that some logic, though can be
+done locally, without to communicate with a server, for example, validation of data. You
+can also imagine a Web application for editing of text: do you need a communication with a
+server when you change a font of a text or its color? So, humans decided that they need
+1001-th programming language (yeah, separate one!) for this logic - Netscape invented one,
+yes, it was (and it is) very fragile but it is used still today (Javascript). 
+
+Humans reinvented desktop applications but now they run in the Web browser. The Web
+stopped to be just a publishing system, like a newspaper, it became a "platform" for
+applications. "Platform" is too marketing word: actually just a Web-browser that should be
+able to:
+
+- visualize text, video, graphical, 3D data
+- support any custom styling
+- run code locally, on your computer
+- and to run that code in a "safe" way (sandboxing it, else the code can hack your
+  computer, steal your private data, etc)
+
+* What were the alternatives
+
+Here I will just say some keywords, they are not alternatives but some alternative
+"visions", concepts - let's call them in this way: [[https://www.rebol.com/][REBOL]], [[https://en.wikipedia.org/wiki/Semantic_Web][Web 3.0]], [[https://0install.net/][ZeroInstall]], [[https://openjfx.io/][JavaFX]],
+[[https://anygui.sourceforge.net/][AnyGUI]], etc:
+
+#+begin_quote
+*JavaFX - One framework to rule them all*
+
+JavaFX applications can target desktop, mobile and embedded systems. Libraries and
+software are available for the entire life-cycle of an application.
+#+end_quote
+
+* User's point of view
+
+Everything became too complex. What is the benefit?
+
+The main "benefits" are that you:
+
+1. can run application "without to install it"
+2. and that application is "sandboxed"
+3. and it "works on any computer, any OS"
+
+Is it 100% true? What are alternatives?
+
+1. Applications are "cached" on your computer, so they pass kind of "installation" but
+   behind the scene - you cannot remove them from the cache easy, you often hit problems
+   with their versions, especially after their upgrade, so sometimes you should "CLEAR
+   YOUR BROWSER CACHE", "RUN IN ANOTHER BROWSER", but in this case you lost your cached
+   inputs too.
+   *Such problem usually does not exist in the case of using of standard package manager
+   where you fully control installation of an application and its removal*
+2. Applications are really "sandboxed" but this technology still has security holes,
+   vulnerabilities.
+   *Usual desktop applications have real sandboxing solutions more-more secure and safe*
+3. Applications try to work on any computer, but:
+   - *a number of languages provide the same cross-platform ability: Java, Python, Ruby,
+     etc.*
+   - Web "applications" usually *have problems with different resolutions* and very often
+     you have to create a separate "views" for mobile devices.
+
+Can the Web be replaced here, in this context? Yes. Better package managers and sandbox
+solutions could replace the Web completely:
+
+- package managers should be able to work ideally with dependencies and to be able to get
+  dependencies from more than one OS repositories set, like some "meta-package managers"
+  do it, fetching from Flatpak, AppImages, etc. Sure, they should be able to support
+  different versions of dependencies per application. *All of these already exist in some
+  package managers*
+- sandbox solutions should *be super-simple in usage*, Docker is not good here
+
+But it is from the user point of view. What about a programmer's one?
+
+* Developer's point of view
+
+Here we hit complexity and ambiguity of CSS, Javascript. Typescript did not help the
+situation - it is just one "wrapper" over Javascript, and the question is: why do we need
+such kind of logic (general "logic") on a client? Can we avoid it at all?
+
+CSS is another source of pain - it became very crazy in some cases. HTML also is too
+complicated, to error prune. And no way to guarantee that everything will "work" (and
+look) in the same way everywhere - still, even today :)
+
+From one side: it is good - it gives developers job. But from another side - can it be
+better and still to give job? Can the Web be fixed?
+
+* What is the root of problems with the Web
+
+The Web duplicated existing approaches and solutions. We already have:
+
+- a lot of languages, markups, styling systems
+- a lot of VMs, sandboxing approaches: from "fat" ones to "lightweight" solutions
+- a lot of package managers and alternative ways to deliver applications to users in
+  reusable way (dependencies can be shared, reused), with full control on installed
+  software
+- different solutions to have cross-platform and even cross UI/GUI subsystems!
+
+Nothing of this was reused!!! *It demonstrates that the Web is COUNTER-IT TECHNOLOGY. Yeah,
+this is the correct conclusion - it reinvented everything since 1991-92 ignoring IT
+achievements and creating parallel technology stack*.
+
+Support of modern Javascript, CSS, HTML is very big pain: a lot of libraries, sometimes a
+simple Web application requires more than 1Gb Javascript dependencies! It cannot
+justified.
+
+The roots of the problem with the modern Web:
+
+1. Logic on client. Should be avoided
+2. Complex "styling" with very complex CSS. Can be avoided.
+3. Complex HTML without semantic: pages are still raw and not way to extract data from
+  them, but HTML plays a role of a complex unique "drawing" tool for always repeated
+  layouts and "page elements"
+4. Repeat of technologies. A lot of things were just reinvented.
+5. Too "fat", universal browsers, today they are like little OSes. It is not easy to
+   create a new one (super difficult!).
+
+Can it be solved? Some companies think that WebAssembly could fix 1. It is better than the
+existing status quo but it is very far from real fix.
+
+* The solution is obvious
+
+It is total reject of the modern Web. Is it difficult? No, it's super easy and cheap: we
+did it many times before. We introduced Java applets, then - Flash technology, then -
+VBScript and Javascript. Then will be something else... We had plain HTML, then CSS1, CSS2
+etc. We used Mosaic browser, Netscape, then Opera browser, Mozilla, after it Seamonkey,
+Firefox, Chrome, etc... All of these can be very easy replaced.
+
+What can be the new approach? It is obvious:
+
+- the new Web should be *SEMANTIC*: servers should serve data, knowledge, now cute
+  "magazine" pages. Today's scrappers will disappear. Data should be open if it is served,
+  if you see it, the data was delivered to you, so the question is only: is it in usable
+  form or some shit pretending to be data for you, user, for usage
+- the Web development must be *PURELY DECLARATIVE*: when everyone solves always very
+  similar tasks, they can be lifted to declarative, semantic level. It was done many-many
+  years ago in RAD tools, in data or model oriented architecture in enterprise world.
+
+And I asked AI then, what is his opinion?...
+
+* Can the next "Web" come?
+
+Will it happen? Yes, it will happen 100%, absolutely no doubt: AI will be used more and
+more, it will replace a lot of code, usually it will not use even our, /HUMAN-ORIENTED/
+programming languages and will introduce totally new architecture. I asked this:
+
+#+begin_quote
+If I asked you to develop a solution, system, architecture (let's imagine this) that could
+serve as an alternative to complex HTML, incredibly complex CSS, and primitive and
+redundant JavaScript, what concepts, ideas, approaches, architecture would you propose?
+Imagine that you (artificial intelligence) completely took over the IT industry - now you
+write all the code: how would you replace the modern web and its HTML, CSS, JS?
+#+end_quote
+
+* AI creating new Web
+
+The next is the new "Web", as AI sees it - AI preferred to call it not "Web" but "NEXUS":
+
+** NEXUS - New Web
+
+Yes. If we throw away *backward compatibility, browser history, existing tooling, and
+human-written source code* and ask:
+
+#+begin_quote
+"What would an AI-designed application/web platform look like if we could start from zero?"
+#+end_quote
+
+I would *not* try to invent "HTML 2 + CSS 2 + JavaScript 2."
+
+I'd eliminate the separation itself.
+
+The core idea would be:
+
+#+begin_quote
+*Describe the application semantically and declaratively; let the runtime/AI compiler
+determine structure, layout, interaction, rendering, networking, accessibility, and
+optimization.*
+#+end_quote
+
+I'd call the imaginary system *NEXUS* for now.
+
+** 1. The fundamental mistake of today's Web
+
+Today's web has three largely separate languages:
+
+#+begin_example
+HTML       → What exists
+CSS        → How it looks
+JavaScript → What it does
+#+end_example
+
+And then humans glue them together.
+
+A trivial button can become something like:
+
+#+begin_src html :eval no :exports code
+<button class="primary-button" id="submit">
+    Submit
+</button>
+#+end_src
+
+#+begin_src css :eval no :exports code
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    ...
+}
+#+end_src
+
+#+begin_src javascript :eval no :exports code
+document
+  .getElementById("submit")
+  .addEventListener("click", async () => {
+      ...
+  });
+#+end_src
+
+This is *absurdly low-level for the intent*.
+
+The developer's actual intention was:
+
+#+begin_quote
+"There is a primary action called Submit. When activated, submit the form."
+#+end_quote
+
+Everything else is implementation machinery.
+
+So NEXUS would start from *intent*, not markup.
+
+** 2. One unified application language
+
+Instead of:
+
+~HTML + CSS + JS~
+
+I'd have:
+
+~NEXUS~
+
+One strongly typed, declarative language describing:
+
+#+begin_example
+Application
+ ├── data
+ ├── state
+ ├── actions
+ ├── entities
+ ├── views
+ ├── relationships
+ ├── constraints
+ └── behavior
+#+end_example
+
+For example:
+
+#+begin_example
+app InvoiceManager {
+
+    data invoices: Invoice[]
+
+    view Dashboard {
+
+        title "Invoices"
+
+        table invoices {
+            column customer
+            column amount
+            column status
+
+            action "Pay" when status == "unpaid" {
+                pay(invoice)
+            }
+        }
+    }
+
+    action pay(invoice) {
+        invoices.update(invoice, status: "paid")
+    }
+}
+#+end_example
+
+That's essentially the whole application.
+
+No:
+
+#+begin_example
+<div>
+<span>
+class=
+display:
+margin:
+padding:
+onclick=
+addEventListener()
+querySelector()
+#+end_example
+
+** 3. CSS disappears
+
+This is where I'd make the biggest philosophical change.
+
+*Don't describe pixels. Describe constraints and intent.*
+
+Today's CSS frequently says:
+
+#+begin_src css :eval no :exports code
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 12px;
+padding: 16px;
+#+end_src
+
+But what did the developer actually want?
+
+Probably:
+
+#+begin_quote
+"Put these things in a horizontal toolbar with sensible spacing."
+#+end_quote
+
+So I'd write:
+
+#+begin_example
+toolbar {
+    layout: horizontal
+}
+#+end_example
+
+Or even:
+
+#+begin_example
+toolbar actions
+#+end_example
+
+The renderer determines:
+
+- spacing
+- alignment
+- wrapping
+- typography
+- touch target sizes
+- responsive behavior
+- accessibility
+- RTL
+- high contrast
+- screen size
+
+** 4. Layout becomes a constraint-solving problem
+
+Rather than CSS's gigantic pile of interacting rules, I'd make layout fundamentally:
+
+#+begin_example
+constraints
++
+priorities
++
+semantics
+#+end_example
+
+For example:
+
+#+begin_example
+view Product {
+
+    image product.image
+
+    title product.name
+
+    price product.price
+
+    action "Buy"
+}
+#+end_example
+
+The runtime knows:
+
+#+begin_example
+image → visual media
+title → heading
+price → monetary value
+action → interactive control
+#+end_example
+
+It can automatically determine:
+
+*** Desktop
+
+#+begin_example
+┌───────────────┬──────────────────────┐
+│               │ Product name         │
+│     IMAGE     │ $199                 │
+│               │                      │
+│               │ [ Buy ]              │
+└───────────────┴──────────────────────┘
+#+end_example
+
+*** Mobile
+
+#+begin_example
+┌──────────────────┐
+│      IMAGE       │
+├──────────────────┤
+│ Product name     │
+│ $199             │
+│                  │
+│ [      Buy      ]│
+└──────────────────┘
+#+end_example
+
+Without the developer writing:
+
+#+begin_example
+@media ...
+flex-direction...
+grid-template...
+min-width...
+max-width...
+#+end_example
+
+The *layout engine is solving the problem*, rather than executing a pile of stylistic instructions.
+
+** 5. But I wouldn't remove styling
+
+I'd replace *styling rules with design semantics*.
+
+Instead of:
+
+#+begin_src css :eval no :exports code
+color: #3478f6;
+font-size: 14px;
+font-weight: 600;
+border-radius: 8px;
+box-shadow: ...
+#+end_src
+
+you'd have:
+
+#+begin_example
+theme {
+
+    primary: blue
+    density: comfortable
+    personality: modern
+    emphasis: moderate
+}
+#+end_example
+
+And semantic components:
+
+- button primary
+- button destructive
+- heading
+- warning
+- price
+- metadata
+- navigation
+
+The platform owns the visual system.
+
+This gives us something CSS never really achieved:
+
+*** Consistency.
+
+A developer doesn't independently reinvent:
+
+- button
+- modal
+- dropdown
+- tooltip
+- form
+- table
+- tabs
+- menu
+- datepicker
+- toast
+
+every time.
+
+They're platform primitives.
+
+** 6. Components become first-class concepts
+
+Today's web eventually reinvented components:
+
+- React
+- Vue
+- Angular
+- Svelte
+- Web Components
+- ...
+
+That's evidence that the underlying platform abstraction was wrong.
+
+I'd make components native.
+
+#+begin_example
+component UserCard(user: User) {
+
+    avatar user.photo
+
+    heading user.name
+
+    text user.email
+
+    action "Message" {
+        openConversation(user)
+    }
+}
+#+end_example
+
+And importantly:
+
+*components have semantics, state, accessibility, layout and behavior as one object.*
+
+Not:
+
+#+begin_example
+HTML component
++
+CSS component
++
+JS component
++
+state management
++
+event handlers
++
+accessibility hacks
+#+end_example
+
+** 7. State becomes declarative
+
+Modern UI code is full of:
+
+#+begin_src javascript :eval no :exports code
+setLoading(true)
+setError(null)
+setData(...)
+setLoading(false)
+#+end_src
+
+Then the framework figures out what changed.
+
+I'd eliminate that entirely.
+
+Define state:
+
+#+begin_example
+data {
+
+    users: User[]
+
+    selectedUser: User?
+
+    loading: boolean
+}
+#+end_example
+
+Define relationships:
+
+#+begin_example
+visibleUsers =
+    users.filter(search.matches)
+#+end_example
+
+Define derived state:
+
+#+begin_example
+total =
+    cart.items.sum(item.price * item.quantity)
+#+end_example
+
+The runtime builds a dependency graph.
+
+#+begin_example
+users
+  │
+  ├──→ visibleUsers
+  │
+  └──→ userCount
+#+end_example
+
+Change ~users~ and everything dependent updates automatically.
+
+No manual DOM manipulation.
+
+No virtual DOM.
+
+No React hooks.
+
+No effects.
+
+** 8. Events disappear into actions
+
+Instead of:
+
+#+begin_src javascript :eval no :exports code
+button.addEventListener("click", ...)
+#+end_src
+
+you declare:
+
+#+begin_example
+action buy(product)
+#+end_example
+
+and bind it:
+
+#+begin_example
+button "Buy" → buy(product)
+#+end_example
+
+Even better, interaction could be semantic:
+
+#+begin_example
+action buy(product)
+    triggered by primaryAction(product)
+#+end_example
+
+The runtime knows how keyboard, mouse, touch, voice, switch devices, accessibility technologies, etc. invoke it.
+
+** 9. Accessibility becomes impossible to forget
+
+This is a major benefit of semantic UI.
+
+Today's:
+
+#+begin_src html :eval no :exports code
+<div onclick="...">
+#+end_src
+
+could mean almost anything.
+
+The browser can't necessarily know whether it is:
+
+- a button
+- menu
+- checkbox
+- dialog
+- navigation
+- decorative element
+
+In NEXUS:
+
+#+begin_example
+action "Delete"
+#+end_example
+
+is intrinsically an action.
+
+The runtime automatically generates appropriate:
+
+- keyboard interaction
+- accessibility tree
+- focus behavior
+- screen reader semantics
+- touch behavior
+- voice interaction
+
+Accessibility becomes *part of the type system*, rather than a compliance project.
+
+** 10. Responsive design becomes intrinsic
+
+I'd kill media queries for most normal applications.
+
+Instead of:
+
+#+begin_src css :eval no :exports code
+@media (max-width: 768px) { ... }
+#+end_src
+
+components would declare priorities.
+
+#+begin_example
+toolbar {
+    actions {
+        priority:
+            save = essential
+            export = useful
+            print = optional
+    }
+}
+#+end_example
+
+The layout engine decides what happens as space disappears.
+
+Conceptually:
+
+#+begin_example
+available space
+       ↓
+constraint solver
+       ↓
+semantic priorities
+       ↓
+optimal arrangement
+#+end_example
+
+That's far more powerful than:
+
+#+begin_example
+if viewport < 768px
+#+end_example
+
+** 12. Networking should also disappear
+
+This is another huge source of today's complexity.
+
+Today:
+
+#+begin_src javascript :eval no :exports code
+fetch("/api/users")
+#+end_src
+
+then:
+
+- JSON
+- validation
+- loading state
+- error handling
+- cache
+- retry
+- serialization
+- authentication
+
+I'd make data remote references first-class.
+
+#+begin_example
+data users: User[]
+    source server.Users
+#+end_example
+
+The runtime knows:
+
+- serialization
+- caching
+- synchronization
+- offline operation
+- retries
+- authentication
+- incremental updates
+- optimistic changes
+
+The application describes *what data it needs*, not HTTP mechanics.
+
+** 12. Offline-first by default
+
+Today's web frequently assumes:
+
+#+begin_example
+ internet exists
+       ↓
+    request
+       ↓
+    response
+#+end_example
+
+I'd reverse it.
+
+Every application has a local state model.
+
+#+begin_example
+             ┌─────────────┐
+             │ Local State │
+             └──────┬──────┘
+                    │
+          synchronization engine
+              ↙           ↘
+        local device     server
+#+end_example
+
+The app works offline automatically.
+
+When connectivity returns:
+
+- merge
+- resolve conflicts
+- synchronize
+
+The developer shouldn't have to reinvent this.
+
+** 13. Security becomes capability-based
+
+This is another place where I'd redesign everything.
+
+Instead of arbitrary code having access to enormous APIs, applications receive explicit capabilities:
+
+#+begin_example
+permissions {
+    camera
+    location
+    contacts
+    notifications
+}
+#+end_example
+
+And perhaps individual components receive narrower capabilities.
+
+#+begin_example
+Application
+ │
+ ├── camera capability
+ │
+ ├── payment capability
+ │
+ └── network capability
+#+end_example
+
+The runtime enforces them.
+
+No weird historical accumulation of:
+
+- same-origin
+- CORS
+- CSP
+- CSRF
+- cookies
+- localStorage
+- service workers
+- sandbox
+- permissions
+- ...
+
+Some of these concepts will still exist internally, but *developers shouldn't need to
+understand their accidental historical complexity.*
+
+** 14. No URLs as the fundamental application architecture
+
+I'd also question the URL.
+
+URLs are excellent for documents.
+
+They're not necessarily the ideal primitive for applications.
+
+Instead:
+
+#+begin_example
+Application identity
+       ↓
+ typed resources
+       ↓
+  capabilities
+       ↓
+     views
+#+end_example
+
+Navigation becomes:
+
+#+begin_example
+open User(481)
+#+end_example
+
+rather than:
+
+#+begin_src javascript :eval no :exports code
+window.history.pushState(...)
+#+end_src
+
+The runtime can still generate URLs for sharing, indexing and interoperability.
+
+But URLs wouldn't dictate application architecture.
+
+** 15. Documents and applications become different things
+
+This is important.
+
+The Web currently treats:
+
+- Wikipedia article
+- Gmail
+- YouTube
+- Photoshop-like web app
+- shopping cart
+- PDF
+- blog
+- game
+
+as variations of:
+
+#+begin_quote
+"a document loaded at a URL."
+#+end_quote
+
+That's weird.
+
+I'd have two related primitives:
+
+1. DOCUMENT
+2. APPLICATION
+
+*** Document
+
+Semantic content:
+
+#+begin_example
+document {
+    heading ...
+    paragraph ...
+    image ...
+}
+#+end_example
+
+*** Application
+
+State + actions + views:
+
+#+begin_example
+application {
+    state ...
+    actions ...
+    views ...
+}
+#+end_example
+
+The runtime optimizes each appropriately.
+
+** 16. AI would sit above the whole system
+
+This is where your premise becomes particularly interesting.
+
+If *AI writes all the code*, we don't need to optimize the programming language around human typing speed.
+
+Instead:
+
+#+begin_example
+    Human intent
+         ↓
+         AI
+         ↓
+semantic application model
+         ↓
+      compiler
+         ↓
+optimized executable
+#+end_example
+
+A human might say:
+
+#+begin_quote
+"Build me an invoice management system. It needs customers, invoices, PDF export,
+payments, audit history and role-based permissions. Make it feel like a clean enterprise
+application."
+#+end_quote
+
+The AI produces the semantic model.
+
+Humans don't need to manually choose:
+
+- React?
+- Vue?
+- Next?
+- Tailwind?
+- Redux?
+- REST?
+- GraphQL?
+- Postgres?
+- Redis?
+- WebSockets?
+
+Those are *implementation decisions*.
+
+** 17. The compiler becomes radically smarter
+
+Today's compilation pipeline:
+
+#+begin_example
+    source
+      ↓
+   compiler
+      ↓
+JavaScript/WASM
+      ↓
+   browser
+#+end_example
+
+I'd make it:
+
+#+begin_example
+ semantic application
+          ↓
+     optimization
+          ↓
+  dependency analysis
+          ↓
+  security analysis
+          ↓
+ accessibility analysis
+          ↓
+  layout optimization
+          ↓
+ network optimization
+          ↓
+device-specific compilation
+          ↓
+   native execution
+#+end_example
+
+The runtime can know the *meaning* of the application.
+
+That's incredibly powerful.
+
+For example:
+
+#+begin_example
+price
+#+end_example
+
+isn't merely:
+
+#+begin_src html :eval no :exports code
+<span>$19.99</span>
+#+end_src
+
+It's a *monetary value*.
+
+Therefore the system knows:
+
+- localization
+- currency formatting
+- accessibility
+- sorting
+- numerical comparison
+- input validation
+- right-to-left considerations
+
+** 18. AI could eliminate huge categories of code
+
+Suppose you say:
+
+#+begin_quote
+"Users should be able to search invoices."
+#+end_quote
+
+You don't necessarily need to specify:
+
+- search input
+- debounce
+- query parameter
+- loading spinner
+- empty state
+- error state
+- pagination
+- cache
+- keyboard shortcut
+- mobile layout
+
+The platform knows that *search* is a standard interaction.
+
+So:
+
+#+begin_example
+search invoices
+#+end_example
+
+could automatically produce all of it.
+
+This is where AI and declarative systems become much more interesting together.
+
+** 19. The rendering engine becomes adaptive
+
+Instead of forcing everything into:
+
+#+begin_example
+DOM → CSS → pixels
+#+end_example
+
+I'd allow multiple rendering strategies.
+
+#+begin_example
+Semantic application
+        ↓
+   presentation IR
+        ↓
+ ┌──────┼────────┐
+ ↓      ↓        ↓
+DOM   native    GPU
+      widgets   scene
+#+end_example
+
+A table-heavy enterprise app might use native-style rendering.
+
+A game might use GPU rendering.
+
+An article might use document rendering.
+
+A 3D application might use a scene graph.
+
+*The developer shouldn't care.*
+
+** 20. And yes: JavaScript could disappear completely
+
+The final architecture could look like:
+
+#+begin_example
+                  HUMAN
+                    │
+              natural language
+                    │
+                    ▼
+                   AI
+                    │
+                    ▼
+          Semantic Application IR
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+      STATE      ACTIONS        UI
+        │           │           │
+        └───────────┼───────────┘
+                    │
+                    ▼
+             NEXUS compiler
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+     Security    Layout     Optimization
+        │           │           │
+        └───────────┼───────────┘
+                    ▼
+              Native runtime
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+       GPU        Device       Network
+#+end_example
+
+There is *no HTML/CSS/JS boundary*.
+
+They're historical implementation details.
+
+** The really radical idea
+
+I'd actually go one step further.
+
+*Don't make NEXUS the language. Make NEXUS an intermediate representation.*
+
+Humans don't necessarily write it.
+
+AI generates it.
+
+#+begin_example
+              Human
+                │
+       "Make me a banking app"
+                │
+                ▼
+               AI
+                │
+                ▼
+       Semantic Application IR
+                │
+                ▼
+       ┌────────┴────────┐
+       │                 │
+   server IR          client IR
+       │                 │
+       ▼                 ▼
+    native            native
+    code              runtime
+#+end_example
+
+Then the "source language" doesn't matter much anymore.
+
+You could even regenerate the implementation continuously as the application evolves.
+
+** And this changes the fundamental unit of software
+
+Today's unit is roughly:
+
+#+begin_quote
+*a file containing code*
+#+end_quote
+
+My proposed system's unit is:
+
+#+begin_quote
+*a semantic capability*
+#+end_quote
+
+For example:
+
+#+begin_example
+Invoice
+ ├── identity
+ ├── customer
+ ├── line items
+ ├── total
+ ├── status
+ ├── permissions
+ ├── actions
+ └── presentation
+#+end_example
+
+The compiler/AI can turn that into whatever representation is optimal.
+
+** If I had to summarize the philosophy
+
+I'd replace:
+
+*HTML*
+
+#+begin_quote
+"What tags are in this document?"
+#+end_quote
+
+with:
+
+#+begin_quote
+*What entities and information exist?*
+#+end_quote
+
+*CSS*
+
+#+begin_quote
+"What exact rendering rules should I apply?"
+#+end_quote
+
+with:
+
+#+begin_quote
+*What presentation constraints and design intent exist?*
+#+end_quote
+
+*JavaScript*
+
+#+begin_quote
+"What code should execute when this event happens?"
+#+end_quote
+
+with:
+
+#+begin_quote
+*What state, capabilities and actions exist?*
+#+end_quote
+
+And replace all three with:
+
+#+begin_quote
+*A typed semantic model of the application.*
+#+end_quote
+
+Then let *AI + compiler + runtime* figure out the implementation.
+
+That's the direction I'd bet on if we were genuinely starting the Web over today.
+
+And the interesting part is that *WebAssembly is already pointing in this direction*, but
+only at the bottom of the stack. The missing piece isn't really another programming
+language—it is a *semantic application runtime above the machine code and below the
+human-facing application description*.
+
+That, in my view, is the architecture that could genuinely make HTML, CSS, JS feel as
+obsolete as machine-level GUI programming feels today.
+
+* My (human) conclusions
+
+It was funny, but expected, my ideas also were around *declarative* + *semantic* Web, not
+this salad that we have today. It will remove general purpose language like Javascript,
+and developers and designers will stop to solve always the same problems again and again
+and to build super-similar architecture again and again. Will the replacement of the Web
+look in this way? I think it could. But I expect:
+
+1. The word, term "Web" will be completely replaced by another one
+2. It will not contain human oriented protocols and languages (markup, logic, styling,
+   text based Internet protocols...) - all of this will be replaced by machine binary
+   (encrypted) blobs. 
+
+* Politics: current and main problem with the Web
+
+Due to political conflicts and manipulations, the modern Web is dying: it fragments and
+falls apart. So called "West" spreads brutal propaganda, fakes, calls for terrorism and
+murders, racism, nationalism against non-Western nations. The "Global South" responses to
+it with conspiracy theories (unfortunately, sometimes true), fakes, different
+manipulations and the same propaganda of hate in their home states. So, to protect
+themselves, authorities, the power in many countries decides to close their societies in
+an informational bubble, where the information will match the main line of the ruling
+clique. So called "Global South" and "West" - both - introduce total control in the Web.
+
+*We may see the death of the Web as we knew it in the 90s.*
+
+Free speech and anonymity: people should be able to keep anonymity in the next "net" and
+to be able to share their opinion. Free speech can set on fire riots and "color
+revolutions" and to avoid it, the education of people must be adequate. Today, many
+(most?) nations have not even history lessons, propaganda is instead of them. People are
+not able to distinct lie and truth, propaganda and real concerns.  Without free anonymous
+speech in the Web, it will completely die and will turn into the newspaper "Pravda" a
+newspaper that no one read, but people were forced to buy to sponsor the party.
