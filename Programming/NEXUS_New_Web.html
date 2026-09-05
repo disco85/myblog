@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-09-05 Sat 19:18 -->
+<!-- 2026-09-05 Sat 23:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>NEXUS - the new Web</title>
@@ -364,7 +364,6 @@ function toggleTheme() {
 </ul>
 </li>
 <li><a href="#org1357b2d">My (human) conclusions</a></li>
-<li><a href="#org4fbfe04">Politics: current and main problem with the Web</a></li>
 </ul>
 </div>
 </div>
@@ -721,7 +720,7 @@ I'd call the imaginary system <b>NEXUS</b> for now.
 Today's web has three largely separate languages:
 </p>
 
-<pre class="example" id="org46a67d4">
+<pre class="example" id="org8325680">
 HTML       → What exists
 CSS        → How it looks
 JavaScript → What it does
@@ -806,7 +805,7 @@ I'd have:
 One strongly typed, declarative language describing:
 </p>
 
-<pre class="example" id="org6f522cd">
+<pre class="example" id="orgf1b4250">
 Application
  ├── data
  ├── state
@@ -822,7 +821,7 @@ Application
 For example:
 </p>
 
-<pre class="example" id="org0fa9a15">
+<pre class="example" id="org38d37cb">
 app InvoiceManager {
 
     data invoices: Invoice[]
@@ -856,7 +855,7 @@ That's essentially the whole application.
 No:
 </p>
 
-<pre class="example" id="org48a93e3">
+<pre class="example" id="org7dbecc6">
 &lt;div&gt;
 &lt;span&gt;
 class=
@@ -911,7 +910,7 @@ Probably:
 So I'd write:
 </p>
 
-<pre class="example" id="org758687d">
+<pre class="example" id="orgfb72b7f">
 toolbar {
     layout: horizontal
 }
@@ -921,7 +920,7 @@ toolbar {
 Or even:
 </p>
 
-<pre class="example" id="org293fb42">
+<pre class="example" id="orgc2404d1">
 toolbar actions
 </pre>
 
@@ -950,7 +949,7 @@ The renderer determines:
 Rather than CSS's gigantic pile of interacting rules, I'd make layout fundamentally:
 </p>
 
-<pre class="example" id="org3a65393">
+<pre class="example" id="orga505981">
 constraints
 +
 priorities
@@ -962,7 +961,7 @@ semantics
 For example:
 </p>
 
-<pre class="example" id="orgb1d4bc1">
+<pre class="example" id="org5e0f61f">
 view Product {
 
     image product.image
@@ -979,7 +978,7 @@ view Product {
 The runtime knows:
 </p>
 
-<pre class="example" id="orgd47794f">
+<pre class="example" id="org8291238">
 image → visual media
 title → heading
 price → monetary value
@@ -993,7 +992,7 @@ It can automatically determine:
 <div id="outline-container-org65bba5c" class="outline-4">
 <h4 id="org65bba5c">Desktop</h4>
 <div class="outline-text-4" id="text-org65bba5c">
-<pre class="example" id="org8728f63">
+<pre class="example" id="orgb9f7c20">
 ┌───────────────┬──────────────────────┐
 │               │ Product name         │
 │     IMAGE     │ $199                 │
@@ -1006,7 +1005,7 @@ It can automatically determine:
 <div id="outline-container-org20199f8" class="outline-4">
 <h4 id="org20199f8">Mobile</h4>
 <div class="outline-text-4" id="text-org20199f8">
-<pre class="example" id="orgaa39705">
+<pre class="example" id="org3bcea77">
 ┌──────────────────┐
 │      IMAGE       │
 ├──────────────────┤
@@ -1021,7 +1020,7 @@ It can automatically determine:
 Without the developer writing:
 </p>
 
-<pre class="example" id="orgfc3765e">
+<pre class="example" id="org07d7916">
 @media ...
 flex-direction...
 grid-template...
@@ -1059,7 +1058,7 @@ Instead of:
 you'd have:
 </p>
 
-<pre class="example" id="org23fa3fc">
+<pre class="example" id="orgd6831e1">
 theme {
 
     primary: blue
@@ -1145,7 +1144,7 @@ That's evidence that the underlying platform abstraction was wrong.
 I'd make components native.
 </p>
 
-<pre class="example" id="orgbdffefd">
+<pre class="example" id="org4af47aa">
 component UserCard(user: User) {
 
     avatar user.photo
@@ -1172,7 +1171,7 @@ And importantly:
 Not:
 </p>
 
-<pre class="example" id="orgbdf2c68">
+<pre class="example" id="org233eb93">
 HTML component
 +
 CSS component
@@ -1214,7 +1213,7 @@ I'd eliminate that entirely.
 Define state:
 </p>
 
-<pre class="example" id="orga57bdb0">
+<pre class="example" id="org9e08010">
 data {
 
     users: User[]
@@ -1229,7 +1228,7 @@ data {
 Define relationships:
 </p>
 
-<pre class="example" id="orgdd5ea26">
+<pre class="example" id="orgc608457">
 visibleUsers =
     users.filter(search.matches)
 </pre>
@@ -1238,7 +1237,7 @@ visibleUsers =
 Define derived state:
 </p>
 
-<pre class="example" id="org4dd4fc1">
+<pre class="example" id="orgb3c3089">
 total =
     cart.items.sum(item.price * item.quantity)
 </pre>
@@ -1247,7 +1246,7 @@ total =
 The runtime builds a dependency graph.
 </p>
 
-<pre class="example" id="orgc31132f">
+<pre class="example" id="orgbf162f6">
 users
   │
   ├──→ visibleUsers
@@ -1292,7 +1291,7 @@ Instead of:
 you declare:
 </p>
 
-<pre class="example" id="org12b0621">
+<pre class="example" id="orgc21f036">
 action buy(product)
 </pre>
 
@@ -1300,7 +1299,7 @@ action buy(product)
 and bind it:
 </p>
 
-<pre class="example" id="orgc205435">
+<pre class="example" id="orgaa60156">
 button "Buy" → buy(product)
 </pre>
 
@@ -1308,7 +1307,7 @@ button "Buy" → buy(product)
 Even better, interaction could be semantic:
 </p>
 
-<pre class="example" id="org5a606ce">
+<pre class="example" id="orgf3a4343">
 action buy(product)
     triggered by primaryAction(product)
 </pre>
@@ -1355,7 +1354,7 @@ The browser can't necessarily know whether it is:
 In NEXUS:
 </p>
 
-<pre class="example" id="org4cac45e">
+<pre class="example" id="org372392c">
 action "Delete"
 </pre>
 
@@ -1401,7 +1400,7 @@ Instead of:
 components would declare priorities.
 </p>
 
-<pre class="example" id="org3fe752c">
+<pre class="example" id="orgcbf0442">
 toolbar {
     actions {
         priority:
@@ -1420,7 +1419,7 @@ The layout engine decides what happens as space disappears.
 Conceptually:
 </p>
 
-<pre class="example" id="org73cbe17">
+<pre class="example" id="org552c6d2">
 available space
        ↓
 constraint solver
@@ -1434,7 +1433,7 @@ optimal arrangement
 That's far more powerful than:
 </p>
 
-<pre class="example" id="orgb70651b">
+<pre class="example" id="orgb78d4f2">
 if viewport &lt; 768px
 </pre>
 </div>
@@ -1474,7 +1473,7 @@ then:
 I'd make data remote references first-class.
 </p>
 
-<pre class="example" id="orga3654d0">
+<pre class="example" id="org648a9a1">
 data users: User[]
     source server.Users
 </pre>
@@ -1506,7 +1505,7 @@ The application describes <b>what data it needs</b>, not HTTP mechanics.
 Today's web frequently assumes:
 </p>
 
-<pre class="example" id="orge8c7cee">
+<pre class="example" id="org6d31212">
  internet exists
        ↓
     request
@@ -1522,7 +1521,7 @@ I'd reverse it.
 Every application has a local state model.
 </p>
 
-<pre class="example" id="orgac5b1c7">
+<pre class="example" id="org2c92e32">
              ┌─────────────┐
              │ Local State │
              └──────┬──────┘
@@ -1562,7 +1561,7 @@ This is another place where I'd redesign everything.
 Instead of arbitrary code having access to enormous APIs, applications receive explicit capabilities:
 </p>
 
-<pre class="example" id="orgf2310ae">
+<pre class="example" id="org44a8447">
 permissions {
     camera
     location
@@ -1575,7 +1574,7 @@ permissions {
 And perhaps individual components receive narrower capabilities.
 </p>
 
-<pre class="example" id="orgfd1ea41">
+<pre class="example" id="orge75afc7">
 Application
  │
  ├── camera capability
@@ -1631,7 +1630,7 @@ They're not necessarily the ideal primitive for applications.
 Instead:
 </p>
 
-<pre class="example" id="org0a700c0">
+<pre class="example" id="org930b27a">
 Application identity
        ↓
  typed resources
@@ -1645,7 +1644,7 @@ Application identity
 Navigation becomes:
 </p>
 
-<pre class="example" id="orgdd79a62">
+<pre class="example" id="org22d3a48">
 open User(481)
 </pre>
 
@@ -1719,7 +1718,7 @@ I'd have two related primitives:
 Semantic content:
 </p>
 
-<pre class="example" id="orgd5bbac2">
+<pre class="example" id="org4b3e49b">
 document {
     heading ...
     paragraph ...
@@ -1735,7 +1734,7 @@ document {
 State + actions + views:
 </p>
 
-<pre class="example" id="orgc14fb8a">
+<pre class="example" id="org9855041">
 application {
     state ...
     actions ...
@@ -1764,7 +1763,7 @@ If <b>AI writes all the code</b>, we don't need to optimize the programming lang
 Instead:
 </p>
 
-<pre class="example" id="org69f1b82">
+<pre class="example" id="orgf6b6157">
     Human intent
          ↓
          AI
@@ -1821,7 +1820,7 @@ Those are <b>implementation decisions</b>.
 Today's compilation pipeline:
 </p>
 
-<pre class="example" id="org3e7cf06">
+<pre class="example" id="org84f4ed7">
     source
       ↓
    compiler
@@ -1835,7 +1834,7 @@ JavaScript/WASM
 I'd make it:
 </p>
 
-<pre class="example" id="orgd9c3bbf">
+<pre class="example" id="org1ceb4bd">
  semantic application
           ↓
      optimization
@@ -1867,7 +1866,7 @@ That's incredibly powerful.
 For example:
 </p>
 
-<pre class="example" id="org39a305f">
+<pre class="example" id="orgb16c886">
 price
 </pre>
 
@@ -1937,7 +1936,7 @@ The platform knows that <b>search</b> is a standard interaction.
 So:
 </p>
 
-<pre class="example" id="org004fffa">
+<pre class="example" id="orga43f41e">
 search invoices
 </pre>
 
@@ -1957,7 +1956,7 @@ This is where AI and declarative systems become much more interesting together.
 Instead of forcing everything into:
 </p>
 
-<pre class="example" id="orge537ac2">
+<pre class="example" id="org7d43992">
 DOM → CSS → pixels
 </pre>
 
@@ -1965,7 +1964,7 @@ DOM → CSS → pixels
 I'd allow multiple rendering strategies.
 </p>
 
-<pre class="example" id="orge5ecb55">
+<pre class="example" id="org2a2ff6e">
 Semantic application
         ↓
    presentation IR
@@ -2004,7 +2003,7 @@ A 3D application might use a scene graph.
 The final architecture could look like:
 </p>
 
-<pre class="example" id="orgd90b3fb">
+<pre class="example" id="orgf475c5f">
                   HUMAN
                     │
               natural language
@@ -2065,7 +2064,7 @@ Humans don't necessarily write it.
 AI generates it.
 </p>
 
-<pre class="example" id="orgb21f567">
+<pre class="example" id="org5e27008">
               Human
                 │
        "Make me a banking app"
@@ -2122,7 +2121,7 @@ My proposed system's unit is:
 For example:
 </p>
 
-<pre class="example" id="orgddf7686">
+<pre class="example" id="org4d99d93">
 Invoice
  ├── identity
  ├── customer
@@ -2255,35 +2254,6 @@ look in this way? I think it could. But I expect:
 text based Internet protocols...) - all of this will be replaced by machine binary
 (encrypted) blobs.</li>
 </ol>
-</div>
-</div>
-<div id="outline-container-org4fbfe04" class="outline-2">
-<h2 id="org4fbfe04">Politics: current and main problem with the Web</h2>
-<div class="outline-text-2" id="text-org4fbfe04">
-<p>
-Due to political conflicts and manipulations, the modern Web is dying: it fragments and
-falls apart. So called "West" spreads brutal propaganda, fakes, calls for terrorism and
-murders, racism, nationalism against non-Western nations. The "Global South" responses to
-it with conspiracy theories (unfortunately, sometimes true), fakes, different
-manipulations and the same propaganda of hate in their home states. So, to protect
-themselves, authorities, the power in many countries decides to close their societies in
-an informational bubble, where the information will match the main line of the ruling
-clique. So called "Global South" and "West" - both - introduce total control in the Web.
-</p>
-
-<p>
-<b>We may see the death of the Web as we knew it in the 90s.</b>
-</p>
-
-<p>
-Free speech and anonymity: people should be able to keep anonymity in the next "net" and
-to be able to share their opinion. Free speech can set on fire riots and "color
-revolutions" and to avoid it, the education of people must be adequate. Today, many
-(most?) nations have not even history lessons, propaganda is instead of them. People are
-not able to distinct lie and truth, propaganda and real concerns.  Without free anonymous
-speech in the Web, it will completely die and will turn into the newspaper "Pravda" a
-newspaper that no one read, but people were forced to buy to sponsor the party.
-</p>
 </div>
 </div>
 </div>
