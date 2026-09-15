@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-09-15 Tue 20:19 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Setup F* on Linux</title>
+<meta name="description" content="setup of f* on Linux" />
+<meta name="keywords" content="F*,Linux" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Setup F* on Linux</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org1c78f69">F*</a>
+<ul>
+<li><a href="#orgcedcc96">HACL*, ValeCrypt, and EverCrypt</a></li>
+<li><a href="#org87d103d">EverParse</a></li>
+</ul>
+</li>
+<li><a href="#orgaf8d288">Installation and a simple project on Linux</a>
+<ul>
+<li><a href="#orgc0402fa">Installation</a></li>
+<li><a href="#org1f2add5">Simple project</a></li>
+<li><a href="#orgcf5957c">What is it?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1c78f69" class="outline-2">
+<h2 id="org1c78f69">F*</h2>
+<div class="outline-text-2" id="text-org1c78f69">
+<p>
+There is a language <a href="https://fstar-lang.org/">F*</a> used for safe, "proven" programming (similarly to <a href="https://leanprover.github.io/">LEAN</a> but more
+practice-oriented). It was used for real world applications like:
+</p>
+</div>
+<div id="outline-container-orgcedcc96" class="outline-3">
+<h3 id="orgcedcc96">HACL*, ValeCrypt, and EverCrypt</h3>
+<div class="outline-text-3" id="text-orgcedcc96">
+<p>
+<a href="https://github.com/hacl-star/hacl-star/tree/main/vale">HACL*</a> is a library of high-assurance cryptographic primitives, written in F* and extracted
+to C. <a href="https://hacl-star.github.io/">ValeCrypt</a> provides formally proven implementations of cryptographic primitives in
+Vale, a framework for verified assembly language programming embedded in F*. EverCrypt
+combines them into a single cryptographic provider. Code from these projects is now used
+in production in several projects, including <a href="https://blog.mozilla.org/security/2017/09/13/verified-cryptography-firefox-57/">Mozilla Firefox</a>, <a href="https://github.com/torvalds/linux/blob/0f2a4af27b649c13ba76431552fe49c60120d0f6/lib/crypto/curve25519-hacl64.c#L1">the Linux kernel</a>, <a href="https://github.com/python/cpython/issues/99108">Python</a>,
+mbedTLS, the <a href="https://www.reddit.com/r/tezos/comments/8hrsz2/tezos_switches_cryptographic_libraries_from/">Tezos blockchain</a>, the <a href="https://electionguard.vote/">ElectionGuard electronic voting SDK</a>, and the <a href="https://www.wireguard.com/">Wireguard VPN</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-org87d103d" class="outline-3">
+<h3 id="org87d103d">EverParse</h3>
+<div class="outline-text-3" id="text-org87d103d">
+<p>
+<a href="https://project-everest.github.io/everparse/">EverParse</a> is a parser generator for binary formats that produces C code extracted from
+formally proven F*. Parsers from EverParse are used in production in several projects,
+including in <a href="https://www.microsoft.com/en-us/research/blog/everparse-hardening-critical-attack-surfaces-with-formally-proven-message-parsers/">Windows Hyper-V</a>, where every network packet passing through the Azure cloud
+platform is parsed and validated first by code generated by EverParse. EverParse is also
+used in other production settings, including <a href="https://github.com/microsoft/ebpf-for-windows">ebpf-for-windows</a>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgaf8d288" class="outline-2">
+<h2 id="orgaf8d288">Installation and a simple project on Linux</h2>
+<div class="outline-text-2" id="text-orgaf8d288">
+</div>
+<div id="outline-container-orgc0402fa" class="outline-3">
+<h3 id="orgc0402fa">Installation</h3>
+<div class="outline-text-3" id="text-orgc0402fa">
+<p>
+First, install F* with its dependencies in your <code>$HOME</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">curl -fsSL https://aka.ms/install-fstar | bash -s -- --release
+</pre>
+</div>
+
+<p>
+Then build the missing library:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span class="org-builtin">cd</span> ~/.local/fstar/lib/krml/dist/generic
+<span class="org-comment-delimiter"># </span><span class="org-comment">Check such line, it must exist:
+</span>grep -n <span class="org-string">"libkrmllib"</span> Makefile.basic
+<span class="org-comment-delimiter"># </span><span class="org-comment">If yes, then let's build the library:
+</span>make -f Makefile.basic
+<span class="org-comment-delimiter"># </span><span class="org-comment">Now check that it was built:
+</span>ls -l libkrmllib.a
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1f2add5" class="outline-3">
+<h3 id="org1f2add5">Simple project</h3>
+<div class="outline-text-3" id="text-org1f2add5">
+<p>
+Create some a directory for your project. Then, inside it we should build a directory
+structure like:
+</p>
+
+<pre class="example" id="orgbe06fc2">
+p1/                        &lt;-- this is my project's directory
+├── Makefile
+├── fstar/
+│   └── Simple.fst
+├── c/
+│   └── main.c
+└── build/
+    ├── cache/
+    └── out/
+</pre>
+
+<p>
+So:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">mkdir -p build/{cache,out}
+mkdir c fstar
+</pre>
+</div>
+
+<p>
+Put in <code>fstar/</code> folder a file <code>Simple.fst</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-fstar">module Simple
+open FStar.UInt32
+
+let square (x:UInt32.t) : UInt32.t =
+  x *%^ x
+</pre>
+</div>
+
+<p>
+Put in <code>c/main.c</code> file this code:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdint.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">&lt;stdio.h&gt;</span>
+<span class="org-preprocessor">#include</span> <span class="org-string">"Simple.h"</span>
+
+<span class="org-type">int</span> <span class="org-function-name">main</span>(<span class="org-type">void</span>)
+{
+    <span class="org-type">uint32_t</span> <span class="org-variable-name">x</span> = 12;
+    <span class="org-type">uint32_t</span> <span class="org-variable-name">y</span> = Simple_square(x);
+    printf(<span class="org-string">"square(%u) = %u\n"</span>, x, y);
+    <span class="org-keyword">return</span> 0;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-makefile"><span class="org-variable-name">FSTAR</span> := fstar.exe
+<span class="org-variable-name">KRML</span>  := krml
+
+<span class="org-variable-name">BUILD</span> := build
+<span class="org-variable-name">CACHE</span> := $(<span class="org-variable-name">BUILD</span>)/cache
+<span class="org-variable-name">OUT</span>   := $(<span class="org-variable-name">BUILD</span>)/out
+
+<span class="org-variable-name">FSTAR_SRC</span> := fstar/Simple.fst
+<span class="org-variable-name">KRML_SRC</span>  := $(<span class="org-variable-name">OUT</span>)/out.krml
+
+<span class="org-makefile-targets">.PHONY</span>: all clean
+
+<span class="org-makefile-targets">all</span>: $(<span class="org-variable-name">BUILD</span>)/demo
+
+<span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">BUILD</span></span><span class="org-makefile-targets">)</span>:
+        mkdir -p $(<span class="org-variable-name">BUILD</span>)
+
+<span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">CACHE</span></span><span class="org-makefile-targets">)</span>:
+        mkdir -p $(<span class="org-variable-name">CACHE</span>)
+
+<span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">OUT</span></span><span class="org-makefile-targets">)</span>:
+        mkdir -p $(<span class="org-variable-name">OUT</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">1. Verify the F* module
+</span><span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">CACHE</span></span><span class="org-makefile-targets">)/Simple.fst.checked</span>: $(<span class="org-variable-name">FSTAR_SRC</span>) | $(<span class="org-variable-name">CACHE</span>) $(<span class="org-variable-name">OUT</span>)
+        $(<span class="org-variable-name">FSTAR</span>) \
+                --cache_checked_modules \
+                --cache_dir $(<span class="org-variable-name">CACHE</span>) \
+                --odir $(<span class="org-variable-name">OUT</span>) \
+                --ext fly_deps=false \
+                $(<span class="org-variable-name">FSTAR_SRC</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">2. F* -&gt; KaRaMeL .krml
+</span><span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">KRML_SRC</span></span><span class="org-makefile-targets">)</span>: $(<span class="org-variable-name">CACHE</span>)/Simple.fst.checked
+        $(<span class="org-variable-name">FSTAR</span>) \
+                --cache_checked_modules \
+                --cache_dir $(<span class="org-variable-name">CACHE</span>) \
+                --odir $(<span class="org-variable-name">OUT</span>) \
+                --ext fly_deps=false \
+                --codegen krml \
+                $(<span class="org-variable-name">FSTAR_SRC</span>)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">3. KaRaMeL -&gt; C -&gt; executable
+</span><span class="org-makefile-targets">$(</span><span class="org-variable-name"><span class="org-makefile-targets">BUILD</span></span><span class="org-makefile-targets">)/demo</span>: $(<span class="org-variable-name">KRML_SRC</span>) c/main.c
+        $(<span class="org-variable-name">KRML</span>) \
+                -tmpdir $(<span class="org-variable-name">OUT</span>) \
+                $(<span class="org-variable-name">KRML_SRC</span>) \
+                c/main.c \
+                -o $(<span class="org-variable-name">BUILD</span>)/demo
+
+<span class="org-makefile-targets">clean</span>:
+        rm -rf $(<span class="org-variable-name">BUILD</span>)
+</pre>
+</div>
+
+<p>
+Return to the project's directory and build the project with <code>make</code> command (just type
+<code>make</code>). You will get now this structure:
+</p>
+
+<pre class="example" id="orgefe4dbf">
+build
+├── cache
+│   └── Simple.fst.checked      &lt;-- result of proving
+├── demo*                       &lt;-- executable file (from main.c)
+└── out
+    ├── compile_flags.txt
+    ├── main.o
+    ├── Makefile.basic
+    ├── Makefile.include
+    ├── out.krml
+    ├── Simple.c                &lt;-- generated C code
+    ├── Simple.h                &lt;-- C header file for API
+    └── Simple.o
+</pre>
+</div>
+</div>
+<div id="outline-container-orgcf5957c" class="outline-3">
+<h3 id="orgcf5957c">What is it?</h3>
+<div class="outline-text-3" id="text-orgcf5957c">
+<p>
+F* checked the code (well, current code is primitive kiddish code, nothing to prove there,
+currently, but this is a skeleton only), then it used the result of checking and it
+"extracted" (this is the term, not "translated") C code (<code>Simple.c</code>, <code>Simple.h</code>) and,
+finally, it called <code>gcc</code> compiler which produced <code>demo</code> binary file. It is small, 21752
+bytes, because it's a result of usual C code compiled by <code>gcc</code>.
+</p>
+
+<p>
+The resulting extracted C code is also super-simple:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-c"><span class="org-comment-delimiter">/*</span><span class="org-comment">
+  This file was generated by KaRaMeL <a href="https://github.com/FStarLang/karamel&gt;
+  KaRaMeL invocation: krml -tmpdir build/out build/out/out.krml c/main.c -o build/demo
+  F* version: &lt;unknown">&lt;https://github.com/FStarLang/karamel&gt;
+  KaRaMeL invocation: krml -tmpdir build/out build/out/out.krml c/main.c -o build/demo
+  F* version: &lt;unknown&gt;</a>
+  KaRaMeL version: 9abbb865b10a0cd5c557da81c024c3965cb6ff53
+</span><span class="org-comment-delimiter"> */</span>
+
+<span class="org-preprocessor">#include</span> <span class="org-string">"Simple.h"</span>
+
+<span class="org-type">uint32_t</span> <span class="org-function-name">Simple_square</span>(<span class="org-type">uint32_t</span> <span class="org-variable-name">x</span>)
+{
+  <span class="org-keyword">return</span> x * x;
+}
+</pre>
+</div>
+
+<p>
+It is not always so simple and plain, but usually it is. Actually, it depends on the
+complexity of the input F* code.
+</p>
+
+<p>
+The workflow is:
+</p>
+
+<pre class="example" id="org9b24450">
+
+                  Simple.fst
+                      |
+                      | F* verification
+                      v
+             Simple.fst.checked
+                      |
+                      | F* extraction
+                      v
+                  out.krml
+                      |
+                      | KaRaMeL
+                      v
+                Simple.c/.h
+                      |
+                      | GCC
+                      v
+                  demo
+                      |
+                      v
+              square(12) = 144
+</pre>
+
+<p>
+<code>KaRaMeK</code> is the "extractor", other extractions are also supported:
+</p>
+
+<blockquote>
+<p>
+Various fragments of F* can also be extracted to F#, to C or Wasm by a tool called
+KaRaMeL, or to assembly using the Vale toolchain. F* is implemented in F* and bootstrapped
+using OCaml.
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
