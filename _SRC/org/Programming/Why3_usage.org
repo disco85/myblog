@@ -49,8 +49,35 @@ So, the collaboration between theorem provers and AI/LLM today looks as:
 | Proof generation                  | Invents a proof                            | Checks it                                                       |
 | Proof correction                  | Proposes another proof after failure       | Identifies invalid steps                                        |
 | Result/formalization verification | Translates a human result into formal math | Determines whether the formal statement/proof is actually valid |
-  
-* Why3
+
+So, one of the scenario is:
+
+#+begin_example
+             Human/AI
+                 |
+                 v
+       Natural-language result
+                 |
+                 v
+       .------------------.
+       |   LLM / Agent     ‖
+       | autoformalization ‖
+       `====================
+                |
+                v
+  Lean, Isabelle, Rocq, Metamath
+                |
+        .-------+--------.
+        |                |
+      VALID           INVALID
+        |                |
+        v                v
+   accept result    feedback to AI
+                         |
+                         `--> revise
+#+end_example
+
+* Why Why3
 
 [[https://why3.org/][Why3]] is such a tool: you describe your "model" (of a program) then its properties then you
 prove them. If successfully then your software (different pieces of your code) is safe (as you
@@ -64,6 +91,10 @@ automated and interactive, to discharge verification conditions.
 
 -- https://why3.org/
 #+end_quote
+
+** Why3 features
+
+TODO  WhyDo etc
 
 * Other tools
 
@@ -92,29 +123,50 @@ After proof, your code may still contain errors. This is due to:
 
 - you did not enumerate all important properties, you missed something
 - there are "not logical" bugs, for example, error (additive, for example) is too large, ie,
-  the software is not accurate enough
+  the software is not accurate enough in numerical calculation
+- bugs happen outside of verified code - in the effectful world (API, network, libraries, OS...)
 - serious performance problems
+- policy related errors: bad UX, strange behavior on errors, weird understanding of the domain
+  problems...
+- bad design
 - sometimes even proof can be not good enough (the probability of this is low: automatic
   verification checks the correctness of the proof)
 
 After proof usually you get:
 
-- More correct code (or even significantly more correct)
+- More correct code (or even significantly more correct, sometimes - code without bugs at all)
 - You better understand your code and its corner cases, features, its pros and cons
 
 * Setup of Why3 on Linux
 
-TODO
+Why3 can be installed from your distribution package manager. Also it comes with its default
+SMT solvers. Currently, it is CVC4, but it is not so good, and you can hit problems with
+it. So, I'd recommend to install Z3 SMT solver from the package manager and then to configure
+Why3 to "see" it:
+
+#+begin_example
+$ why3 config detect
+$ why3 config list-provers   # and you should see Z3 now in the list
+# After it use can use z3 during prooving woth "-P z3" option
+#+end_example
 
 * Why proving is "metaprogramming"
 
-TODO
+There is such a term - [[https://en.wikipedia.org/wiki/Metaprogramming][metaprogramming]] and logic "lives between liens of code" or on the top of
+it, not participating in computation but checking/verifying it: *it is a program about program*.
 
 * Extraction
 
-Why3 supports extraction too, see [[https://why3.org/doc/manpages.html#the-extract-command][this]] and [[https://why3.org/doc/exec.html#sec-extract][this]].
+Why3 supports extraction too, see [[https://why3.org/doc/manpages.html#the-extract-command][this]] and [[https://why3.org/doc/exec.html#sec-extract][this]]. It can translate (correct term is EXTRACT
+though) your WhyML program to Ocaml, Java, C, CakeML.
 
-TODO
+* Usage scenarios
+
+Main are:
+
+- proving of existing code
+- proving of idea, algorithm including distributed one ([[https://github.com/haslab/why3do/tree/main/examples/paxos][PAXOS verified with WhyML]])
+- extracting of verified code to be used in an existing project
 
 * Program and logic: computational and logic code
 
@@ -132,11 +184,71 @@ So, logical world (code) is metaprogramming. Computational (or program) world (c
 program. Also it matters in extraction phase - logical code will not generate Ocaml, C output,
 in short.
 
-* SMT, SAT
+* Solver, SMT, SAT...
 
-About SMT and SAT in [[https://en.wikipedia.org/wiki/Satisfiability_modulo_theories][Wikipedia]]. AI hints us that:
+About SMT and SAT in [[https://en.wikipedia.org/wiki/Satisfiability_modulo_theories][Wikipedia]].
 
-TODO
+** SAT
+
+SAT solves boolean "satisfiability" answering the question: "Can I assign true/false to these
+boolean variables so that the whole formula becomes true?", example:
+
+#+begin_example
+Input formula :            (A OR B) AND (NOT A OR C)
+
+A SAT solver might find :  A = false
+                           B = true
+                           C = false
+
+                           
+#+end_example
+
+It's kind of utility helper in the world of automatic logic. SAT works fundamentally with
+~true/false~, ~AND, OR, NOT~... It is something like "constraint programming over boolean
+domain".
+
+#+begin_quote
+A SAT solver doesn't inherently understand things like:
+
+x + 1 > x
+
+because ~x~ there isn't a boolean variable.
+#+end_quote
+
+** SMT
+
+SMT means "Satisfiability Modulo Theories", it answers the question: "Is there an assignment
+that makes this formula true?", but SMT allows variables from particular mathematical theories.
+
+For example, integer arithmetic:
+
+#+begin_example
+Input :                   x: Int
+                          y: Int
+                          x > 10
+                          y = x + 5
+                          y < 20
+
+                          
+SMT solver might find :   x = 11
+                          y = 16
+#+end_example
+
+SMT works in domains:
+
+- integers and real numbers
+- arithmetic
+- arrays
+- bit-vectors
+- equality
+- uninterpreted functions
+- sometimes strings (CVC 4 (strings), etc), floating point, etc.
+
+Modern SMT solvers combine: Boolean reasoning of SAT with its own standard Theory reasoning,
+i.e., SAT today is usually embedded part of SMT.
+
+Why3, Dafny, F*, etc, delegate "simple" work to SMT. Rocq, LEAN - do not (they can do all work
+by self, but they allow to use external solvers).
 
 ** How Why3 communicate with SMT
 
@@ -175,7 +287,7 @@ solvers     |     ‖     |     ‖     | Ergo ‖
                |           |           |
                `-----------+-----------'
                            |
-                       SAT / UNSAT
+                       SAT, UNSAT
                            |
                            v
                 .---------------------.
@@ -345,13 +457,11 @@ looping constructions are such ones. Sure, exceptions of this are supported (~di
 keyword). OK, so here: ~variant { length ps - 1 - !i }~ we say that this "thing" (expression)
 becomes smaller and smaller, considering the length of ~ps~ is 3:
 
-#+begin_example
-  !i     |     3 - 1 - !i (ie, length ps - 1 - !i)
----------+----------------------------------------
-   0     |     2
-   1     |     1
-   2     |     0  <-- the SMALLEST, STOP IS HERE!
-#+end_example
+| !i | 3 - 1 - !i (ie, length ps - 1 - !i) | treating                    |
+|----+-------------------------------------+-----------------------------|
+|  0 |                                   2 | search further...           |
+|  1 |                                   1 | search further...           |
+|  2 |                                   0 | 0 = SMALLEST, STOP IS HERE! |
 
 Theorem provers know: if we hit the smallest "thing" (and it checks the code sure, that it's
 true), then we reach the end of the looping. It means - no infinite loop here.
