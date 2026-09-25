@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-09-25 Fri 19:41 -->
+<!-- 2026-09-25 Fri 20:34 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Using Why3 for software verification</title>
@@ -474,7 +474,7 @@ So, the collaboration between theorem provers and AI/LLM today looks as:
 So, one of the scenario is:
 </p>
 
-<pre class="example" id="org1121091">
+<pre class="example" id="org097d325">
              Human/AI
                  |
                  v
@@ -552,7 +552,7 @@ Why3 has a lot of features. Lets group them:
 <div id="outline-container-org384e22e" class="outline-4">
 <h4 id="org384e22e">WhyML (language)</h4>
 <div class="outline-text-4" id="text-org384e22e">
-<pre class="example" id="org45b3054">
+<pre class="example" id="org86ebd7b">
 ⬤ ML-style functions         ⬤ anonymous functions             
 ⬤ algebraic data types       ⬤ recursion                       
 ⬤ records                    ⬤ partial/non-terminating programs
@@ -571,7 +571,7 @@ Why3 has a lot of features. Lets group them:
 <div id="outline-container-org2149e3b" class="outline-4">
 <h4 id="org2149e3b">Logic, specification</h4>
 <div class="outline-text-4" id="text-org2149e3b">
-<pre class="example" id="org2dfeb6c">
+<pre class="example" id="org8c39c1e">
 ⬤ propositions                      ⬤ maps                                           
 ⬤ quantified formulas               ⬤ relations                                      
 ⬤ logical functions                 ⬤ arrays                                         
@@ -590,7 +590,7 @@ Why3 has a lot of features. Lets group them:
 <div id="outline-container-org7d612d1" class="outline-4">
 <h4 id="org7d612d1">Program verification</h4>
 <div class="outline-text-4" id="text-org7d612d1">
-<pre class="example" id="org2a013c5">
+<pre class="example" id="org2509c8e">
 ⬤ functional correctness                   ⬤ contracts                                                             
 ⬤ memory/state reasoning                   ⬤ refinement                                                            
 ⬤ array reasoning                          ⬤ data-structure invariants                                             
@@ -621,7 +621,7 @@ Alt-Ergo, Z3, CVC4/CVC5, E-prover, Vampire, Rocq (former Coq), Isabelle.
 <div id="outline-container-org1064c5d" class="outline-4">
 <h4 id="org1064c5d">Proof transformations</h4>
 <div class="outline-text-4" id="text-org1064c5d">
-<pre class="example" id="org108544b">
+<pre class="example" id="org4d5e17c">
 ⬤ split conjunctions               ⬤ perform case analysis              
 ⬤ split goals                      ⬤ transform array reasoning          
 ⬤ introduce hypotheses             ⬤ remove unused hypotheses           
@@ -643,7 +643,7 @@ options for checking annotations during execution...
 Counterexamples show you a state where failure happens, it can print something like:
 </p>
 
-<pre class="example" id="orgfffc91a">
+<pre class="example" id="org5192ec2">
 x = ...
 i = ...
 my_array = ...
@@ -993,7 +993,7 @@ KaRaMeL then translates verified Low* programs into C.
 VST scenario:
 </p>
 
-<pre class="example" id="orge9a03fa">
+<pre class="example" id="orgf62534a">
    existing C
        |
        v
@@ -1013,7 +1013,7 @@ VST separation logic
 F* scenario:
 </p>
 
-<pre class="example" id="org98315c6">
+<pre class="example" id="org894c6bc">
          specification
                |
                v
@@ -1243,7 +1243,7 @@ it. So, I'd recommend to install Z3 SMT solver from the package manager and then
 Why3 to "see" it:
 </p>
 
-<pre class="example" id="orga22f711">
+<pre class="example" id="org8395750">
 $ why3 config detect
 $ why3 config list-provers   # and you should see Z3 now in the list
 # After it use can use z3 during prooving woth "-P z3" option
@@ -1260,6 +1260,15 @@ why3 prove -P ${<span class="org-variable-name">WHY3_PROVER</span>:-z3} -t ${<sp
 echo <span class="org-string">'-----------------------------------------------------'</span>
 grep -P -B 2 <span class="org-string">'^Prover result is: (?!Valid)'</span> _<span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span>.proven | tee _<span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span>.error
 [ $<span class="org-constant">?</span> -eq 0 ] &amp;&amp; { echo; echo <span class="org-string">'*** ERROR: NOT PROVEN! ***'</span>; exit 1; } || exit 0
+</pre>
+</div>
+
+<p>
+Example of call:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ <span class="org-variable-name">WHY3_SPLITVC</span>= sh prove.sh Test1.mlw
 </pre>
 </div>
 </div>
@@ -1336,7 +1345,7 @@ SAT solves boolean "satisfiability" answering the question: "Can I assign true/f
 boolean variables so that the whole formula becomes true?", example:
 </p>
 
-<pre class="example" id="org78c1c2f">
+<pre class="example" id="orgc44c165">
 Input formula :            (A OR B) AND (NOT A OR C)
 
 A SAT solver might find :  A = false
@@ -1379,7 +1388,7 @@ that makes this formula true?", but SMT allows variables from particular mathema
 For example, integer arithmetic:
 </p>
 
-<pre class="example" id="org4c066db">
+<pre class="example" id="org37ef712">
 Input :                   x: Int
                           y: Int
                           x &gt; 10
@@ -1419,7 +1428,7 @@ by self, but they allow to use external solvers).
 <div id="outline-container-org1c52751" class="outline-3">
 <h3 id="org1c52751">How Why3 communicate with SMT</h3>
 <div class="outline-text-3" id="text-org1c52751">
-<pre class="example" id="org4984c78">
+<pre class="example" id="org92b9266">
                 .---------------------.
                 |       WhyML         ‖
                 |  program + specs    ‖
@@ -1467,7 +1476,7 @@ solvers     |     ‖     |     ‖     | Ergo ‖
 The "route" of the input WhyML program;
 </p>
 
-<pre class="example" id="org2715f15">
+<pre class="example" id="orgea00457">
 .----------[ WhyML ]-----------.
 |  let f (x: int) : int        ‖    Your WhyML code
 |   ensures { result &gt;= x } =  ‖   
@@ -1492,7 +1501,7 @@ Why3 <b>is not a frontend to a SMT solver</b> - Why3 has its own intermediate lo
 transformation system. It can manipulate a proof goal before handing it to an automated prover:
 </p>
 
-<pre class="example" id="org205735b">
+<pre class="example" id="org58f61c7">
              WhyML
                |
                v
@@ -1521,7 +1530,7 @@ transformation system. It can manipulate a proof goal before handing it to an au
 Also Why3 can combine provers:
 </p>
 
-<pre class="example" id="orga842ac2">
+<pre class="example" id="orgf973823">
          :
         VC
          |
@@ -1560,7 +1569,7 @@ the code and comments them.
 <div id="outline-container-org775af7d" class="outline-3">
 <h3 id="org775af7d">Fragment 1: ADT</h3>
 <div class="outline-text-3" id="text-org775af7d">
-<pre class="example" id="org38cc824">
+<pre class="example" id="org3b2384d">
 1   type num =
 2     | NaN
 3     | MinusInf
@@ -1578,7 +1587,7 @@ these special values internally.
 <div id="outline-container-org1ed4e4f" class="outline-3">
 <h3 id="org1ed4e4f">Fragment 2: pre/postcondition, invariant, variant</h3>
 <div class="outline-text-3" id="text-org1ed4e4f">
-<pre class="example" id="org49854ed">
+<pre class="example" id="org4b8a803">
  1   let calc_diffs (ps: array int) (absolute: bool) : array int =
  2   ensures {
  3     (length ps = 0 -&gt; length result = 0) /\
@@ -1757,7 +1766,7 @@ Let's continue.
 <div id="outline-container-org23f9fa1" class="outline-3">
 <h3 id="org23f9fa1">Fragment 3: recursion and variant</h3>
 <div class="outline-text-3" id="text-org23f9fa1">
-<pre class="example" id="org26917b3">
+<pre class="example" id="org59e3ef7">
  1   let rec list_min (l: L.list int) : int =
  2   requires { l &lt;&gt; L.Nil }
  3   variant  { LL.length l }
@@ -1799,7 +1808,7 @@ an error!</b>
 This is helper-function, needed mostly in logic (so, I could make it ghost, I think):
 </p>
 
-<pre class="example" id="orge71d588">
+<pre class="example" id="org649a183">
   let rec function list_nth (l: L.list int) (n: int): option int =
   requires { 0 &lt;= n &lt; LL.length l }
   ensures {
@@ -1841,7 +1850,7 @@ not only preserving of the length but also that the same elements are on the sam
 see the second <code>ensures</code> on line <code>3</code>:
 </p>
 
-<pre class="example" id="org3a308f5">
+<pre class="example" id="orgb4ace3d">
  1  let list_to_array (l: L.list int) : array int =
  2    ensures { LL.length l = length result }
  3    ensures {
@@ -1870,7 +1879,7 @@ formula, and this formula summarizes the relevant consequences of all previous i
 is like setting of the induction hypothesis like:
 </p>
 
-<pre class="example" id="org91dd7e3">
+<pre class="example" id="org65c9403">
 ∀ k &lt; i →
     a[k] = l[k]
 </pre>
@@ -1879,7 +1888,7 @@ is like setting of the induction hypothesis like:
 roughly, we can use why3 command's option <code>--print-theory</code>:
 </p>
 
-<pre class="example" id="org663cabd">
+<pre class="example" id="orge86c5c3">
    ...
  1   (forall a1:array int.
  2     a1.length = a.length -&gt;
@@ -1904,7 +1913,7 @@ roughly, we can use why3 command's option <code>--print-theory</code>:
 Something like:
 </p>
 
-<pre class="example" id="orge77b68b">
+<pre class="example" id="org94c4b51">
     Assume invariant(i)
             |
             v
@@ -1919,7 +1928,7 @@ This converts an unbounded history problem into a finite induction proof: "Every
 performed so far correctly copied its element." It reminds the usual induction:
 </p>
 
-<pre class="example" id="org53834fe">
+<pre class="example" id="org8221295">
 Base:
     I(S₀, 0)
 
@@ -1944,7 +1953,7 @@ Exit:
 Another helper ghost (see <code>predicate</code>) code:
 </p>
 
-<pre class="example" id="org0ae876e">
+<pre class="example" id="orgf286035">
 1   predicate list_elems_are_correct_index (l: L.list int) (n: int) =
 2   (* The predicate checks that all elements in the list `l` can be index bounded by `n`,
 3    * ie, 0 &lt;= el &lt; n. It is used in `list_elems_are_correct_index__append_singleton` lemma
@@ -1961,7 +1970,7 @@ they are bound by <code>[0..n)</code>. Then - lemma, it is helper-theorem - some
 and later used in other proofs.
 </p>
 
-<pre class="example" id="org22b6c79">
+<pre class="example" id="org2dcf287">
  1   (* This lemma is needed to prove the invariant:
  2    *
  3    *   invariant { list_elems_are_correct_index !res_ranges (length res_ps_arr) }
@@ -2005,7 +2014,7 @@ singleton preserves the property while reasoning about a growing list, the progr
 lemma and use its postcondition. Look:
 </p>
 
-<pre class="example" id="org1aa7af4">
+<pre class="example" id="org0c543fc">
 requires:                              
     P(r) /\ Q
 
@@ -2037,7 +2046,7 @@ postcondition)</li>
 Lets simplify them:
 </p>
 
-<pre class="example" id="org430c4be">
+<pre class="example" id="org23c6b33">
  1   predicate P (l) (n) =
  2     match l with
  3     | Nil -&gt; true
@@ -2101,7 +2110,7 @@ Now Why3 enters <code>| Cons _ r -&gt; foo r x n</code> (<code>foo</code> here i
 <li>and so on... Recursive structure of the verification look as:</li>
 </ul>
 
-<pre class="example" id="org88b33fa">
+<pre class="example" id="orgde8ff83">
 foo [a,b,c] x n
 │
 ├── requires: P([a,b,c],n) /\ 0 ≤ x &lt; n
@@ -2147,7 +2156,7 @@ The ensures of the recursive call is used to prove the ensures of the enclosing 
 <div id="outline-container-org95b3398" class="outline-3">
 <h3 id="org95b3398">Fragment 7: axiom, bounds check</h3>
 <div class="outline-text-3" id="text-org95b3398">
-<pre class="example" id="org516183a">
+<pre class="example" id="orgcc5d4ae">
  1    (* This axiom is workaround for:
  2     *   let isovalue: int = isovalues_arr[ranges_arr[irange]] in
  3     * in `find_clusters_centers`, so Why3 be able to prove bounds violation, it has all info
@@ -2177,7 +2186,7 @@ bounds checking too.
 <div id="outline-container-orgd1b2b28" class="outline-3">
 <h3 id="orgd1b2b28">Fragment 8: complex contract, assert</h3>
 <div class="outline-text-3" id="text-orgd1b2b28">
-<pre class="example" id="orgc16ffc9">
+<pre class="example" id="orgd3bd163">
  1   let approximate_by_rectangles (ps: array int)
  2                                 (tolerance: int) : (L.list int, L.list int) =
  3   requires { tolerance &gt; 0 }
@@ -2272,7 +2281,7 @@ variants because it's naturally limited and asserts. Asserts must end with ";". 
 <div id="outline-container-orgc126fc8" class="outline-3">
 <h3 id="orgc126fc8">Fragment 9: complex bounds check</h3>
 <div class="outline-text-3" id="text-orgc126fc8">
-<pre class="example" id="orgfcae1ab">
+<pre class="example" id="org9ee7b93">
   let find_clusters_centers
     (ranges isovalues: L.list int) (ratio: int) (nesting: int): L.list (int, int) =
   requires { LL.length ranges &lt;= LL.length isovalues }
@@ -2332,7 +2341,7 @@ it, it needs help (that lemma <code>list_elems_are_correct_index__append_singlet
 axiom-workaround!): all indexes are checked! Also we added it to the precondition:
 </p>
 
-<pre class="example" id="org0639ba2">
+<pre class="example" id="orgdfe634b">
   requires { list_elems_are_correct_index ranges (LL.length isovalues) }
 </pre>
 
@@ -2360,7 +2369,7 @@ executing the command establishes the postcondition.
 So, a program can be split to pieces with asserts:
 </p>
 
-<pre class="example" id="orga154c54">
+<pre class="example" id="orgf2dd0a3">
             code...
             code...
   /some state of the program\   P: assert(..)
