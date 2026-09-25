@@ -1,0 +1,351 @@
+#+title: Using Why3 for software verification
+#+description: Introduction to Why3 for software verification
+#+keywords: why3,whyml,theorem,proving
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Why3 WhyML Theorem Proving
+#+date: <2026-09-25 Fri 07:50>
+
+* The idea
+
+Very briefly, because today everyone knows what it is. The idea is that in mathematics, logic,
+you prove theorems but the idea is that it can be done "automatically", well, not absolutely
+automatically but using a computer: see [[https://en.wikipedia.org/wiki/Automated_theorem_proving][Automated theorem proving]]. And this allows to
+mathematicians to state proving more formal, and more strict, "provable". But it is for math.
+
+The idea is that the same approach can be used for proving of some properties of software.
+
+* Why3
+
+[[https://why3.org/][Why3]] is such a tool: you describe your "model" (of a program) then its properties then you
+prove them. If successfully then your software (different pieces of your code) is safe (as you
+described "safety" with those properties), else - you think about your code something, but it
+is something else.
+
+#+begin_quote
+Why3 is a platform for deductive program verification. It provides a rich language for
+specification and programming, called WhyML, and relies on external theorem provers, both
+automated and interactive, to discharge verification conditions.
+
+-- https://why3.org/
+#+end_quote
+
+* Other tools
+
+There are a lot of automatic (computer) provers, their features are different, they work in
+different ways, some of them are:
+
+1. for mathematics
+2. for mathematics and computer science (including software)
+
+My focus is 2nd:
+
+- [[https://why3.org/][Why3/WhyML]]
+- [[https://dafny.org/][Dafny]]
+- [[https://fstar-lang.org/][F*]]
+- [[https://rocq-prover.org/][Rocq]] (former Coq)
+- [[https://lean-lang.org][LEAN]]
+- etc...
+
+* Comparison of tools for computer science
+
+TODO
+
+* How much does this save you from bugs?
+
+After proof, your code may still contain errors. This is due to:
+
+- you did not enumerate all important properties, you missed something
+- there are "not logical" bugs, for example, error (additive, for example) is too large, ie,
+  the software is not accurate enough
+- serious performance problems
+- sometimes even proof can be not good enough (the probability of this is low: automatic
+  verification checks the correctness of the proof)
+
+After proof usually you get:
+
+- More correct code (or even significantly more correct)
+- You better understand your code and its corner cases, features, its pros and cons
+
+* Setup of Why3 on Linux
+
+TODO
+
+* Why proving is "metaprogramming"
+
+TODO
+
+* Extraction
+
+Why3 supports extraction too, see [[https://why3.org/doc/manpages.html#the-extract-command][this]] and [[https://why3.org/doc/exec.html#sec-extract][this]].
+
+TODO
+
+* Program and logic: computational and logic code
+
+All WhyML code is split to 2 pies - WORLDS: a program (computational) "world" and logic
+"world". And... there are constructions living in both "worlds".
+
+- *Program/computational WhyML code* — code that describes computation: functions, mutable
+  state, references, loops, exceptions, I/O, etc. It is executed or compiled.
+- *Logical code* — specifications and mathematical objects used to reason about the program:
+  predicates, propositions, lemmas, axioms, pure functions, mathematical types, etc. It is not
+  executed as program code; it is translated into proof obligations for automated/theorem
+  provers.
+
+So, logical world (code) is metaprogramming. Computational (or program) world (code) is your
+program. Also it matters in extraction phase - logical code will not generate Ocaml, C output,
+in short.
+
+* SMT, SAT
+
+About SMT and SAT in [[https://en.wikipedia.org/wiki/Satisfiability_modulo_theories][Wikipedia]]. AI hints us that:
+
+TODO
+
+** How Why3 communicate with SMT
+
+#+begin_example
+                .---------------------.
+                |       WhyML         ‖
+                |  program + specs    ‖
+                `======================
+                           |
+             verification  |              
+                           v
+                .---------------------.
+                |   Why3 VC Generator ‖
+                |       (VCgen)       ‖
+                `======================
+                           |
+                      Verification
+                    Conditions (VCs)
+                           |
+                           v
+                .---------------------.
+                |   Why3 Transform    ‖
+                |                     ‖
+                | simplify / split /  ‖
+                | instantiate / etc.  ‖
+                `======================
+                           |
+                SMT-LIB    |         
+               .-----------+-----------.
+               |           |           |
+               v           v           v
+            .-----.     .-----.     .------.
+  SMT       | Z3  ‖     |CVC5 ‖     | Alt- ‖
+solvers     |     ‖     |     ‖     | Ergo ‖
+            `======     `======     `=======
+               |           |           |
+               `-----------+-----------'
+                           |
+                       SAT / UNSAT
+                           |
+                           v
+                .---------------------.
+                |        Why3         ‖
+                |    proof result     ‖
+                `======================
+#+end_example
+
+The "route" of the input WhyML program;
+
+#+begin_example
+.------------WhyML-------------.
+|  let f (x: int) : int        ‖  Your WhyML code
+|   ensures { result >= x } =  ‖
+|  x + 1                       ‖
+`===============================
+               |                 Why3 generates VC
+               v                 (verification condition)
+ .------------VC---------------.
+ |     ∀ x:int. x + 1 >= x     ‖
+ `============================== Why3 translates it to the language
+               |                 understood by the selected prover
+               v                 (typically SMT-LIB)
+.-----------Z3-QUERY------------.
+| (declare-const x Int)         ‖
+| (assert (not (>= (+ x 1) x))) ‖
+| (check-sat)                   ‖
+`================================ Why3 gets output from SMT solver...
+#+end_example
+
+Why3 *is not a frontend to a SMT solver* - Why3 has its own intermediate logical language and
+transformation system. It can manipulate a proof goal before handing it to an automated prover:
+
+#+begin_example
+             WhyML
+               |
+               v
+         .------------.   ....
+         |   VCgen    ‖       ⋱
+         `=============        :
+              VC               :
+               |               :
+               v               :
+         .------------.         ⋱  Why3
+         | Transform  ‖         ⋰  work
+         |            ‖        :
+         | split_goal ‖        :
+         | simplify   ‖        :
+         | induction  ‖        :
+         | specialize ‖        :
+         `=============   ....⋰
+               |
+      .--------+--------.
+      v                 v
+  SMT solver       Interactive
+  (Z3/CVC5/...)      prover
+#+end_example
+
+Also Why3 can combine provers:
+
+#+begin_example
+         :
+        VC
+         |
+    .----+----.
+    v         v
+   Z3      Alt-Ergo
+    |         |
+    `----+----'
+         |
+         v
+       proved
+#+end_example
+
+Also Why3 records the resulting proof information so that the verification can be
+checked/replayed later.
+
+* Example
+
+Before, I wrote this ([[./Packs_Search.org][Packs Search]]) simple algorithm. It was written with memory exploitation
+which allows to visualize the algorithm's phases, steps - it could be written in other ways too
+but this way is more "visual". Visualization also is kind of "proving" of an algorithm, but it
+is not real logic-based proof. Let's fill this gap with Why3.
+
+I posted the WhyML proof code [[https://github.com/disco85/packs_verification/blob/main/Packs.mlw][here]]. Let's walk through some fragments of the current state of
+the code and comments them.
+
+** Fragment 1
+
+#+begin_example
+ 1   let calc_diffs (ps: array int) (absolute: bool) : array int =
+ 2   ensures {
+ 3     (length ps = 0 -> length result = 0) /\
+ 4     (length ps > 0 -> length result = length ps - 1)
+ 5   }
+ 6     let diffs_num = max ((length ps) - 1) 0 in
+ 7     let diffs = make diffs_num 0 in
+ 8     let i:ref int = ref 0 in
+ 9     if diffs_num = 0 then
+10       diffs
+11     else begin
+12       while !i <> length ps - 1 do
+13       invariant { 0 <= !i <= length ps - 1 }
+14       invariant { !i <= length diffs }
+15       variant { length ps - 1 - !i }
+16         let diff = ps[!i + 1] - ps[!i] in
+17         let diff = if absolute then abs diff else diff in
+18         diffs[!i] <- diff;
+19         incr i
+20       done;
+21       diffs
+22     end
+#+end_example
+
+First, we see on ~1~ the declaration of the function ~calc_diffs~ which has 2 arguments: an
+array of integers and a boolean, and it returns an array of integers. Also it has one
+post-condition on line ~2~ (see ~ensures {..}~), it could have pre-conditions too...
+
+Post-condition on ~2~ says: there are 2 statements - they are formed as ~first AND second~
+("and" is ~/\~):
+
+1. ~(length ps = 0 -> length result = 0)~
+   If the length of the argument ~ps~ is 0 then the result of the function will have a length 0 too
+2. ~(length ps > 0 -> length result = length ps - 1)~
+   If the argument ~ps~ is not empty then the length of the result is lesser of ~ps~ by 1.
+
+Why3 will check the code of the function and will prove or refute such statements, you can do
+it by self:
+
+1. initially the loop variable ~i~ is 0
+2. it's bound is ~length ps - 1~ (on ~12~)
+
+Why3 does it automatically, for you.
+
+*These properties (post-conditions in the case) are important: you know what to expect from the
+function.*
+
+Also they will be used in proving of other pieces of the code, they are "a contract", and when
+it is called somewhere, Why3 can reason about its result.
+
+Types matter - they are also controlled by Why3 - if an expression violates the declared type,
+it is also reported as an error, obviously.
+
+Inside ~while~ loop we see ~invariant~ and ~variant~ expressions. "Invariant" describes
+something that does not change - it is checked too also this knowledge is remembered as a fact
+and can be used later for further proving. These 2 invariant expressions do state:
+
+- ~invariant { 0 <= !i <= length ps - 1 }~
+  we guarantee inside the loop that ~i~ is always in this diapason, i.e., ~[0..length ps-1]~
+- ~invariant { !i <= length diffs }~
+  also we guarantee that ~i~ is always lesser or equal to the length of the array ~diffs~
+
+Little note: ~!~ in the front of ~i~ is "dereferencing" like "*" in C - "take the content of
+the reference" - to be mutable we declared ~i~ as reference.
+
+OK, also we see "variant". The idea of a variant expression is more interesting: it guarantees
+that something is "decreasing" - it states "what" does it. Why do we need it? Usually it is
+needed in:
+
+- "while"-loop (in "for"-loop it is obvious, so it is redundant and syntactically denied)
+- in recursive functions
+
+"Variants" state that something becomes smaller and smaller and this thing is known as
+something having "ZERO" - the smallest form, it cannot become "smaller" and it guarantees Why3
+that looping construction will complete (it is not forever-running, it will terminate) - most
+looping constructions are such ones. Sure, exceptions of this are supported (~diverges~
+keyword). OK, so here: ~variant { length ps - 1 - !i }~ we say that this "thing" (expression)
+becomes smaller and smaller, considering the length of ~ps~ is 3:
+
+#+begin_example
+  !i     |     3 - 1 - !i (ie, length ps - 1 - !i)
+---------+----------------------------------------
+   0     |     2
+   1     |     1
+   2     |     0  <-- the SMALLEST, STOP IS HERE!
+#+end_example
+
+Theorem provers know: if we hit the smallest "thing" (and it checks the code sure, that it's
+true), then we reach the end of the looping. It means - no infinite loop here.
+
+*Variant expression just focus Why3 what "thing" to check for termination - the decrease of it
+is checked by Why3 itself*
+
+Such "things" can be integers, lists (reaching of ~Nil~ - the empty tail), etc.
+
+And *these "variants" and "invariants" give knowledge about looping constructions: what is true
+on every step/iteration, what does guarantee that the end of the loop or recursion.*
+
+Let's continue.
+
+** Fragment 2
+
+#+begin_example
+ 1   let rec list_min (l: L.list int) : int =
+ 2   requires { l <> L.Nil }
+ 3   variant  { LL.length l }
+ 4     match l with
+ 5     | L.Nil -> absurd
+ 6     | L.Cons x L.Nil -> x
+ 7     | L.Cons x r ->
+ 8         let m = list_min r in
+ 9         if x < m then x else m
+10     end
+#+end_example
+
+New here is that it consumes list, not array. Also it is a "program" (i.e, computational)
+function (due to "let" keyword!). And it is recursive ("rec" keyword).
