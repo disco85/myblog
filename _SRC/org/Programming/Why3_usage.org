@@ -91,9 +91,102 @@ automated and interactive, to discharge verification conditions.
 -- https://why3.org/
 #+end_quote
 
+** Why3 language
+
+By default the input language is ML-based, called WhyML (.mlw extension). It's very beautiful
+language, but other languages are also supported:
+
+- micro-C
+- micro-Python (Python 3 subset)
+- MLCFG
+- Coma
+
+See [[https://why3.org/doc/input_formats.html][more about input languages]].
+
 ** Why3 features
 
-TODO  WhyDo etc
+Why3 has a lot of features. Lets group them:
+
+*** WhyML (language)
+
+#+begin_example
+⬤ ML-style functions         ⬤ anonymous functions             
+⬤ algebraic data types       ⬤ recursion                       
+⬤ records                    ⬤ partial/non-terminating programs
+⬤ pattern matching           ⬤ ghost variables and ghost code  
+⬤ mutable variables          ⬤ abstract types                  
+⬤ mutable record fields      ⬤ program effects                 
+⬤ arrays                     ⬤ preconditions                   
+⬤ references                 ⬤ postconditions                  
+⬤ sequences                  ⬤ assertions                      
+⬤ exceptions                 ⬤ loop invariants                 
+⬤ loops                      ⬤ variants / termination measures 
+⬤ local functions
+#+end_example
+
+*** Logic, specification
+
+#+begin_example
+⬤ propositions                      ⬤ maps                                           
+⬤ quantified formulas               ⬤ relations                                      
+⬤ logical functions                 ⬤ arrays                                         
+⬤ predicates                        ⬤ sequences                                      
+⬤ recursive logical definitions     ⬤ lists                                          
+⬤ inductive predicates              ⬤ finite structures                              
+⬤ algebraic data types              ⬤ integer and real arithmetic                    
+⬤ records                           ⬤ bit-vectors and floating-point related theories
+⬤ equality                          ⬤ axioms                                         
+⬤ arithmetic                        ⬤ lemmas                                         
+⬤ Boolean logic                     ⬤ goals                                          
+⬤ sets
+ #+end_example
+
+*** Program verification
+
+#+begin_example
+⬤ functional correctness                   ⬤ contracts                                                             
+⬤ memory/state reasoning                   ⬤ refinement                                                            
+⬤ array reasoning                          ⬤ data-structure invariants                                             
+⬤ mutable data structures                  ⬤ arithmetic properties                                                 
+⬤ loop invariants                          ⬤ quantified properties                                                 
+⬤ recursive-function verification          ⬤ exception safety/properties                                           
+⬤ termination proofs                       ⬤ floating-point verification                                           
+⬤ partial/non-terminating programs         ⬤ probabilistic-program-related
+⬤ inductive proofs                           developments through libraries/projects 
+⬤ concurrent/distributed verification
+  through extensions such as Why3-do
+#+end_example
+
+Pay attention: CONCURRENT, DISTRIBUTED VERIFICATION is also supported with Why3-do library (aka
+WhyDo) - see [[https://github.com/haslab/why3do/][its Github for examples]].
+
+*** Supported SMT
+
+Alt-Ergo, Z3, CVC4/CVC5, E-prover, Vampire, Rocq (former Coq), Isabelle.
+
+*** Proof transformations
+
+#+begin_example
+⬤ split conjunctions               ⬤ perform case analysis              
+⬤ split goals                      ⬤ transform array reasoning          
+⬤ introduce hypotheses             ⬤ remove unused hypotheses           
+⬤ eliminate definitions            ⬤ instantiate abstractions           
+⬤ simplify formulas                ⬤ manipulate verification conditions 
+⬤ specialize quantified formulas
+#+end_example
+
+*** Other features
+
+Counterexamples, symbolic execution, extraction, interactive proof (Rocq, Isabelle/HOL, PVS),
+options for checking annotations during execution...
+
+Counterexamples show you a state where failure happens, it can print something like:
+
+#+begin_example
+x = ...
+i = ...
+my_array = ...
+#+end_example
 
 * Other tools
 
@@ -105,16 +198,231 @@ different ways, some of them are:
 
 My focus is 2nd:
 
-- [[https://why3.org/][Why3/WhyML]]
-- [[https://dafny.org/][Dafny]]
-- [[https://fstar-lang.org/][F*]]
-- [[https://rocq-prover.org/][Rocq]] (former Coq)
-- [[https://lean-lang.org][LEAN]]
-- etc...
+1. [[https://why3.org/][Why3/WhyML]]
+2. [[https://fstar-lang.org/][F*]]
+3. [[https://dafny.org/][Dafny]]
+
+
+Mathematics oriented theorem provers surprisingly support software verification too:
+
+- [[https://rocq-prover.org/][Rocq]] (former Coq) - supports software verification amazing good
+- [[https://lean-lang.org][LEAN]] - some ports from Rocq, still not completed and not mature
 
 * Comparison of tools for computer science
 
-TODO
+Instead of big comparison, I will show only my impressions: *Why3* is good for verification of
+algorithms and existing software. It's syntax and semantic are simple mostly. Also it supports
+extraction. You can verify C/C++ programs with it, but it is not so low-level and it's more oriented
+on computer science, but again - it is possible sure but it is not its goal, purpose. Also it is
+used for verification of distributed architectures and algorithms.
+
+*F-star* is very close to Why3, the same [[https://www.inria.fr/en][National institute Inria]] is involved, it is ML-based too,
+it supports the same proving features, but additionally it supports dependent types, effects are
+more obvious/explicit, refinement types are explicit (connected to a type, not to a contract), also
+it is better (maybe, not 100% sure) in code extraction, and more important - it supports LOW-LEVEL
+VERIFICATION: C, assembler.
+
+If to compare theorem provers in the context of LOW-LEVEL safe programming (think about OS kernels,
+bare-metal, low-level cryptography, assembler, chips firmware, etc) F* and VST/Rocq have serious
+low-level stories, while Why3 and Dafny are primarily deductive-verification frameworks/languages
+whose low-level support is more indirect. current F* has moved toward Pulse as its
+imperative/separation-logic language; the older Low* sublanguage has been removed from F* releases,
+although the Low* libraries/tooling remain relevant to existing projects.
+
+- Existing C code: VST/Rocq is the most directly purpose-built of these.
+- Writing new low-level C from scratch: F*/Pulse + KaRaMeL is extremely compelling.
+- Handwritten assembly: F* + Vale is the standout here; VST can reason about CompCert's assembly
+  semantics, but VST itself is fundamentally a C verification framework.
+- Mostly ordinary imperative code with some low-level flavor: Dafny is much easier to get started
+  with, and Vale can take it surprisingly far into assembly.
+- SMT-heavy deductive verification, particularly if you want many automated provers: Why3 is
+  excellent, but it is not the tool I'd reach for first for machine-level C/assembly.
+
+Why3 micro-C is mostly for teaching (it's tiny subset of C).
+
+|                                  | Why3    | F* / Pulse | Dafny   | VST / Rocq |
+|----------------------------------+---------+------------+---------+------------|
+| Ordinary functional verification | ★★★★★   | ★★★★★      | ★★★★★   | ★★★        |
+| Existing C                       | ★★      | ★★★★       | ★       | ★★★★★      |
+| New C-like low-level code        | ★★★     | ★★★★★      | ★★★     | ★★★★       |
+| Pointers / aliasing              | ★★–★★★  | ★★★★★      | ★★      | ★★★★★      |
+| Separation logic                 | Limited | ★★★★★      | Limited | ★★★★★      |
+| Machine integers                 | ★★★★    | ★★★★★      | ★★★★    | ★★★★★      |
+| C memory model                   | Limited | ★★★★★      | Limited | ★★★★★      |
+| Assembly                         | ★       | ★★★★★      | ★★★★    | ★★★        |
+| Compiler-correctness story       | ★★      | ★★★★       | ★★      | ★★★★★      |
+| Automation                       | ★★★★★   | ★★★★★      | ★★★★★   | ★★★        |
+| Interactive theorem proving      | ★★★     | ★★★★       | ★       | ★★★★★      |
+| Ease of learning                 | ★★★★    | ★★–★★★     | ★★★★★   | ★★         |
+| Crypto / constant-               | ★★      | ★★★★★      | ★★★★    | ★★★★       |
+| time low-level code              |         |            |         |            |
+
+** VST/Rocq and "low-level" programming
+
+VST / Rocq is very mature and solid here - low-level C is it's home. It was used for verification of
+SHA-256, HMAC, mbedTLS HMAC-DRBG, TweetNaCl / Curve25519 cryptography, garbage collection, graph
+algorithms, concurrent messaging, an HTTP key-value server, differential-equation solvers, and
+Reed–Solomon coding, etc. Canonical VST case study is [[https://www.usenix.org/conference/usenixsecurity15/technical-sessions/presentation/beringer][verification of OpenSSL HMAC + SHA-256]]. The
+work also connected the C-level proof to CompCert's verified compilation to assembly. The authors
+describe it as combining source-program correctness, compiler correctness, and
+cryptographic-security proofs without gaps at the specification interfaces. Additionally to
+cryptography VST is widely used in memory work verification, it supports:
+
+- pointers
+- aliasing
+- ownership
+- memory invariants
+- low-level data structures
+- allocators
+- and so on...
+
+Also it is used for numerical scientific C, [[https://www.cs.princeton.edu/~appel/papers/][a lot of examples]], [[https://blog.poisson.chat/posts/2019-01-14-cpp19-from-c-to-itrees.html][network programming verification]]
+
+See [[https://vst.cs.princeton.edu/][more about VST]].
+
+** F star and "low-level" programming
+
+F* has an unusually strong real-world systems/security track record, arguably more concentrated
+around cryptography, networking, and verified low-level code than VST's.
+
+The important distinction is that many of the projects below are part of the broader Project Everest
+ecosystem: F* is the specification/proof language, while tools such as KaRaMeL and Vale connect the
+proofs to C and assembly. Famous project where the code was verified and extracted is HACL*:
+
+HACL* is a collection of verified cryptographic primitives implemented in F*, with extraction to
+C. It includes algorithms such as:
+
+- Curve25519
+- Ed25519
+- AES
+- SHA-2
+- ChaCha20
+- Poly1305
+- various hash/MAC constructions
+
+It was extracted to C and has been integrated into real software including Firefox, Linux, and
+WireGuard. Another project created with F* is EverCrypt:
+
+EverCrypt is a larger cryptographic provider built on the Everest verification technology. It
+combines verified implementations of cryptographic primitives with:
+
+- algorithm agility,
+- hardware acceleration,
+- architecture-specific implementations,
+- runtime selection,
+- *CONSTANT-TIME GUARANTEES!*
+
+Another project: Vale (verified cryptographic assembly). Vale is designed specifically for verifying
+low-level assembly. It has been used to verify optimized cryptographic implementations, including
+assembly for:
+
+- AES-GCM
+- ChaCha20
+- Poly1305
+- Curve25519-related operations
+- other cryptographic primitives
+
+Vale supports x86/x64 and ARM-family architectures, and its verification is integrated with F* and
+Dafny.
+
+Low*/Pulse was designed to give F* programs a C-like computational model:
+
+- mutable buffers
+- pointers
+- arrays
+- structs
+- machine integers
+- stack/heap memory
+- explicit effects
+- memory safety.
+
+KaRaMeL then translates verified Low* programs into C.
+
+** VST vs F*
+
+VST scenario:
+
+#+begin_example
+   existing C
+       |
+       v
+VST separation logic
+       |
+       v
+     proof
+       |
+       v
+   CompCert
+       |
+       v
+  machine code
+#+end_example
+
+F* scenario:
+
+#+begin_example
+         specification
+               |
+               v
+               F*
+               |
+               v
+low-level verified implementation
+               |
+          .----+-----.
+          |          |
+          C         ASM
+          |          |
+        KaRaMeL    Vale
+#+end_example
+
+VST asks:
+
+#+begin_quote
+"How can I prove this C program?"
+#+end_quote
+
+F* often asks:
+
+#+begin_quote
+"How can I construct an implementation whose relationship to the specification is
+machine-checked, and then extract it to C or connect it to verified assembly?"
+#+end_quote
+
+** Use-cases from AI
+
+#+begin_quote
+For learning formal verification itself, I'd start with Dafny.
+
+For learning automated deductive verification, Dafny or Why3.
+
+For verified systems/security programming, F*.
+
+For deep C/pointer/separation-logic verification, VST/Rocq.
+
+And if your eventual goal is specifically C + handwritten x86-64/ARM assembly, I'd spend the
+learning effort on F + Vale* or VST/CompCert + Vale, rather than trying to make Dafny or Why3 do all
+of it.
+#+end_quote
+
+** Complexity, learning curve
+
+Dafny - very simple. Why3 more complex but not too much. F* - yes, more complex even. Rocq/VST -
+absolute "hardcore", by AI they look as:
+
+| What                         | Dafny         | Why3       | F*           | VST / Rocq |
+|------------------------------+---------------+------------+--------------+------------|
+| Initial learning             | ★             | ★★         | ★★★★         | ★★★★★      |
+| First useful proof           | Very easy     | Easy       | Moderate     | Hard       |
+| SMT automation               | ★★★★★         | ★★★★★      | ★★★★★        | ★★–★★★     |
+| Dependent types              | -             | -          | ★★★★★        | ★★★★★      |
+| Separation logic             | ★             | ★★         | ★★★★–★★★★★   | ★★★★★      |
+| C/memory-model complexity    | ★             | ★★–★★★     | ★★★★         | ★★★★★      |
+| Interactive proof complexity | ★             | ★★–★★★     | ★★★★         | ★★★★★      |
+| Large low-level proofs       | ★★★           | ★★★        | ★★★★         | ★★★★★      |
+| Debugging failed proofs      | Easy–moderate | Moderate   | Hard         | Very hard  |
+| Conceptual ceiling           | ★★★           | ★★★        | ★★★★★        | ★★★★★      |
+| Time to become productive    | Days          | Days–weeks | Weeks–months | Months     |
 
 * How much does this save you from bugs?
 
@@ -148,6 +456,18 @@ $ why3 config detect
 $ why3 config list-provers   # and you should see Z3 now in the list
 # After it use can use z3 during prooving woth "-P z3" option
 #+end_example
+
+** My makefile
+
+#+begin_src makefile :eval no :exports both
+set -o pipefail
+[ -z "$1" ] && { echo 'Arg1: path to .mlw file' ; exit 1; }
+[ "${WHY3_SPLITVC+x}" ] && split_opt='-a split_vc'
+why3 prove -P ${WHY3_PROVER:-z3} -t ${WHY3_TIMEOUT:-10} "$1" $split_opt $WHY3_OPTS | tee _"$1".proven
+echo '-----------------------------------------------------'
+grep -P -B 2 '^Prover result is: (?!Valid)' _"$1".proven | tee _"$1".error
+[ $? -eq 0 ] && { echo; echo '*** ERROR: NOT PROVEN! ***'; exit 1; } || exit 0
+#+end_src
 
 * Why proving is "metaprogramming"
 
@@ -374,7 +694,7 @@ is not real logic-based proof. Let's fill this gap with Why3.
 I posted the WhyML proof code [[https://github.com/disco85/packs_verification/blob/main/Packs.mlw][here]]. Let's walk through some fragments of the current state of
 the code and comments them.
 
-** Fragment 1
+** Fragment 1: ADT
 
 #+begin_example
 1   type num =
@@ -388,7 +708,7 @@ Here we declare [[https://en.wikipedia.org/wiki/Algebraic_data_type][ADT]] which
 Infinity. We use it later, in the original Python code I used float numbers and Python support
 these special values internally.
 
-** Fragment 2
+** Fragment 2: pre/postcondition, invariant, variant
 
 #+begin_example
  1   let calc_diffs (ps: array int) (absolute: bool) : array int =
@@ -453,6 +773,8 @@ and can be used later for further proving. These 2 invariant expressions do stat
 - ~invariant { !i <= length diffs }~
   also we guarantee that ~i~ is always lesser or equal to the length of the array ~diffs~
 
+Invariants also can help proving of other claims - without them some claims will not be proven.
+
 Little note: ~!~ in the front of ~i~ is "dereferencing" like "*" in C - "take the content of
 the reference" - to be mutable we declared ~i~ as reference.
 
@@ -489,7 +811,7 @@ on every step/iteration, what does guarantee that the end of the loop or recursi
 
 Let's continue.
 
-** Fragment 3
+** Fragment 3: recursion and variant
 
 #+begin_example
  1   let rec list_min (l: L.list int) : int =
@@ -521,7 +843,7 @@ context of computational/program code - "check if it is really absurd code and i
 happen". Why3 will check it (in computational context). *If it is not - it will be reported as
 an error!*
 
-** Fragment 4
+** Fragment 4: function
 
 This is helper-function, needed mostly in logic (so, I could make it ghost, I think):
 
@@ -549,7 +871,7 @@ the result exists if it is a member (see ~mem~) of the list ~l~. It sounds stran
 it to expose out the connection between "nth item" and "it is an item of list". It sounds
 strange but provers often need facts obvious to you but not for them.
 
-** Fragment 5
+** Fragment 5: invariant "with history"
 
 I checked Python program where lists have some duality: they are easy accessible by an index
 but at the same time they are like usual lists: you can append items to them, etc. So, I used
@@ -644,7 +966,7 @@ Exit:
 
 /where S is for "a state"/.
 
-** Fragment 6
+** Fragment 6: predicate, lemma with recursive code
 
 Another helper ghost (see ~predicate~) code:
 
@@ -660,7 +982,8 @@ Another helper ghost (see ~predicate~) code:
 #+end_example
 
 It checks that all items in a list can be indexes of some sized object which size is ~n~, i.e.,
-they are bound by ~[0..n)~.
+they are bound by ~[0..n)~. Then - lemma, it is helper-theorem - something that will be proven
+and later used in other proofs.
 
 #+begin_example
  1   (* This lemma is needed to prove the invariant:
@@ -748,7 +1071,7 @@ Lets simplify them:
 15     end
 #+end_example
 
-** Case 1: l = []
+*** Case 1: l = []
 
 Why3 enters ~| Nil -> ()~ - unit, so, NO RECURSIVE CALL: EXECUTE NOTHING, PRODUCE ~()~.
 
@@ -770,7 +1093,7 @@ Why3 enters ~| Nil -> ()~ - unit, so, NO RECURSIVE CALL: EXECUTE NOTHING, PRODUC
 
 Why3 always must prove PRE -> POST, but sometimes also it should execute code, sometimes - no.
 
-** Case 2: l = [y]
+*** Case 2: l = [y] and more
 
 Now Why3 enters ~| Cons _ r -> foo r x n~ (~foo~ here is the recursive call of the lemma).
 ~r = []~, cos ~l = y :: []~. Why3 walks into recursive call:
@@ -814,11 +1137,250 @@ and the top claim is proven:  P([a,b,c],n) /\ 0 ≤ x < n
 The ensures of the recursive call is used to prove the ensures of the enclosing invocation.
 #+end_quote
 
+~requires -> recursive call -> ensured new knowledge~.
+
+** Fragment 7: axiom, bounds check
+
+#+begin_example
+ 1    (* This axiom is workaround for:
+ 2     *   let isovalue: int = isovalues_arr[ranges_arr[irange]] in
+ 3     * in `find_clusters_centers`, so Why3 be able to prove bounds violation, it has all info
+ 4     * for it but it cannot connect separate items (to connect list/array items bound by
+ 5     * `LL.length isovalues`, ie, `ranges/ranges_arr` values are 0..|isovalues|-1).
+ 6     *)
+ 7    
+ 8    axiom list_element_is_valid:
+ 9      forall l:L.list int, n k:int.
+10        list_elems_are_correct_index l n ->
+11        0 <= k < LL.length l ->
+12        match list_nth l k with
+13        | Some x -> 0 <= x < n
+14        | None -> false
+15        end
+#+end_example
+
+In short, if ~list_elems_are_correct_index l n~, then it means that every item of ~l~ (indexed by
+~k ∈ 0..|l|~) is bounded too. I entered it as an axiom (it is just trusted, without to be provev),
+because I had problems with a proof of this obvious fact, yep. But this axiom helps to check bounds
+violations in ~let isovalue: int = isovalues_arr[ranges_arr[irange]]...~ later. Yes, Why3 performs
+bounds checking too.
+
+** Fragment 8: complex contract, assert
+
+#+begin_example
+ 1   let approximate_by_rectangles (ps: array int)
+ 2                                 (tolerance: int) : (L.list int, L.list int) =
+ 3   requires { tolerance > 0 }
+ 4   (* invariants and asserts help to prove `ensures`, else they fail with timeout *)
+ 5   ensures {
+ 6     length ps > 0 ->
+ 7       match result with
+ 8       | (a, b) -> LL.length a > 0 /\ LL.length b > 0
+ 9       end
+10   }
+11   ensures {
+12     match result with
+13     | (a, b) -> LL.length a <= LL.length b
+14     end  
+15   }
+16   ensures {
+17     (* connects 1st,2nd items of the returning tuple: `a` is a list
+18        of indexes in `b` *)
+19     match result with
+20     | (a, b) -> list_elems_are_correct_index a (LL.length b)
+21     end
+22   }
+23     let res_ps: ref (L.list int) = ref L.Nil in
+24     let res_ranges: ref (L.list int) = ref L.Nil in
+25     let slice: ref (L.list int) = ref L.Nil in
+26     for i = 0 to length ps - 1 do
+27     invariant { 0 <= i <= length ps }
+28     invariant { i > 0 -> LL.length !slice > 0 }
+29     (* call of `list_to_array` in loop is horrible performance, but for proving - it
+30      * is not not a problem. It is needed due to duality of Python's list (it is
+31      * translation from Python) - it is indexable but also appendable/extendable *)
+32       let p = ps[i] in
+33       if LL.length !slice = 0 then
+34         slice := !slice ++ (L.Cons p L.Nil)
+35       else if new_rect_is_needed (list_to_array !slice) p tolerance then
+36         begin
+37           let slice_avg = calc_avg (list_to_array !slice) in
+38           res_ps := !res_ps ++ (make_list (LL.length !slice) slice_avg);
+39           slice := make_list 1 p
+40         end
+41       else
+42         slice := !slice ++ (L.Cons p L.Nil)
+43     done;
+44     if LL.length !slice > 0 then
+45       begin
+46         let slice_avg = calc_avg (list_to_array !slice) in
+47         res_ps := !res_ps ++ (make_list (LL.length !slice) slice_avg)
+48       end;
+49     assert { LL.length !slice > 0 -> LL.length !res_ps > 0 };
+50     let pr: ref (option int) = ref None in
+51     let res_ps_arr: array int = list_to_array !res_ps in
+52     assert { length res_ps_arr = LL.length !res_ps };
+53     for i = 0 to length res_ps_arr - 1 do
+54     invariant { 0 <= i <= length res_ps_arr }
+55     invariant { i > 0 -> LL.length !res_ranges > 0 }
+56     invariant { LL.length !res_ranges <= i }  (* this is needed to avoid timeout on 2nd
+57                                                * `ensures` of the function *)
+58     invariant { list_elems_are_correct_index !res_ranges (length res_ps_arr) }
+59       if i = 0 then
+60         res_ranges := !res_ranges ++ (L.Cons i L.Nil)
+61       else if not option_eq !pr (Some res_ps_arr[i]) then
+62         res_ranges := !res_ranges ++ (L.Cons i L.Nil);
+63       pr := Some res_ps_arr[i]
+64     done;
+65     assert { length ps > 0 -> (LL.length !res_ranges > 0) /\ (LL.length !res_ps > 0) };
+66     (!res_ranges, !res_ps)
+#+end_example
+
+This function contains interesting postconditions about resulting 2 lists (combined in a tuple):
+
+- for non-empty input array, both result lists are not empty
+- the second result list is never smaller than the first one
+- the first list contains only indexes of the second list
+
+Also this fragment contains already known invariants (in ~for~), pay attention, ~for~ does not use
+variants because it's naturally limited and asserts. Asserts must end with ";". Asserts:
+
+- are proved
+- are saved as facts in the logical context
+- help to prove some other claims (as well as invariants help too)
+- are kind of DOCUMENTATION about the code
+
+** Fragment 9: complex bounds check
+
+#+begin_example
+  let find_clusters_centers
+    (ranges isovalues: L.list int) (ratio: int) (nesting: int): L.list (int, int) =
+  requires { LL.length ranges <= LL.length isovalues }
+  requires { list_elems_are_correct_index ranges (LL.length isovalues) }
+  if LL.length ranges = 0 || LL.length isovalues = 0 then
+    L.Nil
+  else begin
+    let res: ref (L.list (int, int)) = ref L.Nil in
+    let max_irange: int = LL.length ranges - 1 in
+    let prev_isovalue: ref (option int) = ref None in
+    let ranges_arr: array int = list_to_array ranges in
+    let isovalues_arr: array int = list_to_array isovalues in
+    for irange = 0 to max_irange do
+      let isovalue: int = isovalues_arr[ranges_arr[irange]] in
+      let skip_common: ref bool = ref false in
+      let left: ref int = ref 0 in
+      let right: ref int = ref 0 in    
+      match !prev_isovalue with
+      | None                 -> ()
+      | Some prev_isovalue_v ->
+        if isovalue > prev_isovalue_v &&
+           num_ge (calc_ratio isovalue prev_isovalue_v) (Fin ratio) then
+        begin
+          right := ranges_arr[irange];
+          left := ranges_arr[max (irange - 1) 0]
+        end
+        else if isovalue < prev_isovalue_v &&
+                num_ge (calc_ratio prev_isovalue_v isovalue) (Fin ratio) then
+        begin
+          left := ranges_arr[irange];
+          right := ranges_arr[min (irange + 1) max_irange]
+        end
+        else
+        begin
+          prev_isovalue := Some isovalue;
+          skip_common := true
+        end;
+        if not !skip_common then
+        begin
+          if !right = !left then incr right;
+          left := !left + nesting;
+          right := !right + nesting;
+          if LL.length !res = 0 ||
+             not (option_tuple_eq (list_last !res) (Some (!left, !right))) then
+            res := !res ++ (L.Cons (!left, !right) L.Nil);
+        end
+      end;
+      prev_isovalue := Some isovalue
+    done;
+    !res
+  end
+#+end_example
+
+Why3 checks bounds violation in: ~let isovalue: int = isovalues_arr[ranges_arr[irange]]~. But to do
+it, it needs help (that lemma ~list_elems_are_correct_index__append_singleton~ but mostly the
+axiom-workaround!): all indexes are checked! Also we added it to the precondition:
+
+#+begin_example
+  requires { list_elems_are_correct_index ranges (LL.length isovalues) }
+#+end_example
+
+This is complex bounds check because it should check that all items in ~ranges_arr~ array do not
+violate ~[0..|isovalues_arr|)~. Also Why3 checks that ~irange~ is in ~0..|ranges_arr|~.
+
 * Hoare triples and difference with traditional asserts
 
-https://en.wikipedia.org/wiki/Hoare_logic#Hoare_triple
-TODO
+https://en.wikipedia.org/wiki/Hoare_logic#Hoare_triple :
+
+A Hoare triple is of the form ~{P} C {Q}~, where ~P~ and ~Q~ are assertions and ~C~ is a
+command. ~P~ is named the precondition and ~Q~ the postcondition: when the precondition is met,
+executing the command establishes the postcondition.
+
+So, a program can be split to pieces with asserts:
+
+#+begin_example
+            code...
+            code...
+  /some state of the program\   P: assert(..)
+  \ treated as precondition /
+            code...             C
+            code...
+  /some state of the program\   Q: assert(..)
+  \ treated as postcondition/
+            . . .          
+#+end_example
+
+The difference is that usual asserts is C, Python, etc *are checked in runtime* while asserts in
+Why3 (and similar) are verified, without to run the program! BUT... Why3 support so called RAC:
+runtime assertion checking and Why3 has a lot of options for RAC. It allows to keep assertions at
+runtime too (in extracted code).
+
+OK, so, Python, C assertions live only in so called "instrumental build", and they are removed in
+release builds. But they should not be removed from the code, they are not only for verification in
+runtime, - they also are DOCUMENTATION, CONTRACTS for a programmer who can understand the behavior
+of the program better - they are like "monitors" guarantying that here, in this point the state is
+such one.
 
 * The difference with Rocq, LEAN - dark side
 
-TODO about timeouts, OOM
+Sometimes verification fails with errors "timeout" and "out of memory".
+
+*IT IS TRUE FOR ALL THEOREM PROVERS*.
+
+"Out of memory" and timeout usually mean "the generated verification problem became too hard for the
+prover," not necessarily that the proposition is false or that Why3 is stuck executing your program.
+
+- A timeout says: "I haven't finished."
+- OOM says something closer to: "I generated/constructed too much state."
+
+And even 1, very small change of the WhyML code can lead to timeout or OOM. Their debugging in very
+difficult. 2 mathematically equivalent formulations can have radically different performance. A
+timeout does not mean "the theorem is difficult". Sometimes it can be even obvious to a human (see
+above my axiom-workaround).
+
+This is why Why3 verification often involves proof engineering:
+
+- choose good invariants
+- introduce lemmas
+- control definitions
+- split goals
+- avoid unnecessary quantifiers
+- provide intermediate facts
+- choose appropriate triggers/provers
+- sometimes explicitly instantiate lemmas
+
+Proof engineer not changing the mathematics; he/she changes *the shape of the problem* presented to
+the automated prover.
+
+The control of proving "route" in Rocq, LEAN is more "manual" (it can be automatic, but it can be
+very manual) and there OOM, timeouts happen too, but they allow more control to avoid them - if you
+know how to achieve it.
