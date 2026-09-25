@@ -45,7 +45,6 @@ So, the collaboration between theorem provers and AI/LLM today looks as:
 
 | Use                               | AI does                                    | Theorem prover does                                             |
 |-----------------------------------+--------------------------------------------+-----------------------------------------------------------------|
-|                                   |                                            |                                                                 |
 | Proof generation                  | Invents a proof                            | Checks it                                                       |
 | Proof correction                  | Proposes another proof after failure       | Identifies invalid steps                                        |
 | Result/formalization verification | Translates a human result into formal math | Determines whether the formal statement/proof is actually valid |
@@ -299,23 +298,23 @@ solvers     |     ‖     |     ‖     | Ergo ‖
 The "route" of the input WhyML program;
 
 #+begin_example
-.------------WhyML-------------.
-|  let f (x: int) : int        ‖  Your WhyML code
-|   ensures { result >= x } =  ‖
-|  x + 1                       ‖
-`===============================
-               |                 Why3 generates VC
-               v                 (verification condition)
- .------------VC---------------.
- |     ∀ x:int. x + 1 >= x     ‖
- `============================== Why3 translates it to the language
-               |                 understood by the selected prover
-               v                 (typically SMT-LIB)
-.-----------Z3-QUERY------------.
-| (declare-const x Int)         ‖
-| (assert (not (>= (+ x 1) x))) ‖
-| (check-sat)                   ‖
-`================================ Why3 gets output from SMT solver...
+.----------[ WhyML ]-----------.
+|  let f (x: int) : int        ‖    Your WhyML code
+|   ensures { result >= x } =  ‖   
+|  x + 1                       ‖   
+`===============================   
+               |                   Why3 generates VC
+               v                   (verification condition)
+ .----------[ VC ]-------------.   
+ |     ∀ x:int. x + 1 >= x     ‖   
+ `==============================   Why3 translates it to the language
+               |                   understood by the selected prover
+               v                   (typically SMT-LIB)
+.---------[ Z3 QUERY ]----------.  
+| (declare-const x Int)         ‖  
+| (assert (not (>= (+ x 1) x))) ‖  
+| (check-sat)                   ‖  
+`================================   Why3 gets output from SMT solver...
 #+end_example
 
 Why3 *is not a frontend to a SMT solver* - Why3 has its own intermediate logical language and
@@ -378,6 +377,20 @@ the code and comments them.
 ** Fragment 1
 
 #+begin_example
+1   type num =
+2     | NaN
+3     | MinusInf
+4     | Fin int
+5     | PlusInf
+#+end_example
+
+Here we declare [[https://en.wikipedia.org/wiki/Algebraic_data_type][ADT]] which models Not-a-Number, Minus Infinity, Finite integer (usual), Plus
+Infinity. We use it later, in the original Python code I used float numbers and Python support
+these special values internally.
+
+** Fragment 2
+
+#+begin_example
  1   let calc_diffs (ps: array int) (absolute: bool) : array int =
  2   ensures {
  3     (length ps = 0 -> length result = 0) /\
@@ -404,9 +417,9 @@ the code and comments them.
 
 First, we see on ~1~ the declaration of the function ~calc_diffs~ which has 2 arguments: an
 array of integers and a boolean, and it returns an array of integers. Also it has one
-post-condition on line ~2~ (see ~ensures {..}~), it could have pre-conditions too...
+postcondition on line ~2~ (see ~ensures {..}~), it could have preconditions too...
 
-Post-condition on ~2~ says: there are 2 statements - they are formed as ~first AND second~
+postcondition on ~2~ says: there are 2 statements - they are formed as ~first AND second~
 ("and" is ~/\~):
 
 1. ~(length ps = 0 -> length result = 0)~
@@ -422,7 +435,7 @@ it by self:
 
 Why3 does it automatically, for you.
 
-*These properties (post-conditions in the case) are important: you know what to expect from the
+*These properties (postconditions in the case) are important: you know what to expect from the
 function.*
 
 Also they will be used in proving of other pieces of the code, they are "a contract", and when
@@ -447,7 +460,7 @@ OK, also we see "variant". The idea of a variant expression is more interesting:
 that something is "decreasing" - it states "what" does it. Why do we need it? Usually it is
 needed in:
 
-- "while"-loop (in "for"-loop it is obvious, so it is redundant and syntactically denied)
+- ~while~-loop (in ~for~-loop it is obvious, so it is redundant and syntactically denied)
 - in recursive functions
 
 "Variants" state that something becomes smaller and smaller and this thing is known as
@@ -476,7 +489,7 @@ on every step/iteration, what does guarantee that the end of the loop or recursi
 
 Let's continue.
 
-** Fragment 2
+** Fragment 3
 
 #+begin_example
  1   let rec list_min (l: L.list int) : int =
@@ -492,4 +505,320 @@ Let's continue.
 #+end_example
 
 New here is that it consumes list, not array. Also it is a "program" (i.e, computational)
-function (due to "let" keyword!). And it is recursive ("rec" keyword).
+function (due to ~let~ keyword!). And it is recursive (~rec~ keyword). It has ~requires~
+expression which says that ~list_min~ is allowed to be called only with a non-empty list: Why3
+will check all places where it is called. Also it is a contract meaning: a function will
+guarantee (see ~ensures~) if its requirements will be satisfied.
+
+And you see ~variant~ again focusing Why3 what should be checked for termination - it is the
+length of the list ~l~, also we can write directly ~variant { l }~ - it is the same. It is our
+termination measure, because we call ~list_min~ recursively passing it the tail of the list
+~l~, which means that on every call ~l~ becomes smaller and smaller (we "chop" the list). Can
+we violate the requirement? No, because we stop on line ~6~ and return ~x~ without to dive
+deeper in a recursive call. Also we have pattern matching on ~l~ and it should have a branch
+for empty list - it is line ~5~. What do we do there? We use ~absurd~ which means in the
+context of computational/program code - "check if it is really absurd code and it can never
+happen". Why3 will check it (in computational context). *If it is not - it will be reported as
+an error!*
+
+** Fragment 4
+
+This is helper-function, needed mostly in logic (so, I could make it ghost, I think):
+
+#+begin_example
+  let rec function list_nth (l: L.list int) (n: int): option int =
+  requires { 0 <= n < LL.length l }
+  ensures {
+    match result with
+    | Some el -> LM.mem el l
+    | None    -> false
+    end
+  }
+  variant { n }
+  match l with
+  | L.Cons x tl -> if n = 0 then Some x else list_nth tl (n - 1)
+  | L.Nil -> None
+  end
+#+end_example
+
+How to read it: input argument ~n~ must be in this range being passed to the function (it
+reminds [[https://en.wikipedia.org/wiki/Refinement_type][refinement types]]) and cos it's a recursive function - it have a "measure of
+termination", i.e., ~variant~ expression in its contract: we recursively call ourselves (~rec~)
+with decreasing of ~n~. More interesting is ~ensures~ part of the contract: it guarantees that
+the result exists if it is a member (see ~mem~) of the list ~l~. It sounds strange, but I used
+it to expose out the connection between "nth item" and "it is an item of list". It sounds
+strange but provers often need facts obvious to you but not for them.
+
+** Fragment 5
+
+I checked Python program where lists have some duality: they are easy accessible by an index
+but at the same time they are like usual lists: you can append items to them, etc. So, I used
+arrays and lists in my WhyML - and I feel that it is not the best solution :)
+
+Anyway, so, I needed a way to convert list to array. This helper function does it. It ensures
+not only preserving of the length but also that the same elements are on the same positions -
+see the second ~ensures~ on line ~3~:
+
+#+begin_example
+ 1  let list_to_array (l: L.list int) : array int =
+ 2    ensures { LL.length l = length result }
+ 3    ensures {
+ 4      (* preserving of elements *)
+ 5      forall k:int. 0 <= k < LL.length l ->
+ 6        Some result[k] = list_nth l k
+ 7    }
+ 8    let a = make (LL.length l) 0 in
+ 9    for i = 0 to LL.length l - 1 do
+10      invariant { 0 <= i <= LL.length l }
+11      invariant {
+12        forall k:int. 0 <= k < i ->
+13          Some a[k] = list_nth l k      (* check of history *)
+14      }
+15      match list_nth l i with
+16      | Some el -> a[i] <- el;
+17      | None    -> absurd
+18      end;
+19    done;
+20    a
+#+end_example
+
+Invariants are needed to say: "At every loop iteration, the current state must satisfy this
+formula, and this formula summarizes the relevant consequences of all previous iterations.", it
+is like setting of the induction hypothesis like:
+
+#+begin_example
+∀ k < i →
+    a[k] = l[k]
+#+end_example
+
+roughly, we can use why3 command's option =--print-theory=:
+
+#+begin_example
+   ...
+ 1   (forall a1:array int.
+ 2     a1.length = a.length ->
+ 3     (forall i:int.                   ⋱... our  for i = 0 to LL.length l - 1
+ 4       (0 <= i /\ i <= o2) /\         ⋰
+ 5       (0 <= i /\ i <= length1 l) /\                                    ⋱... invariants
+ 6       (forall k:int. 0 <= k /\ k < i -> Some a1[k] = list_nth l k) ->  ⋰
+ 7       (0 <= i /\ i < length1 l) /\
+ 8       (let o3 = list_nth l i in
+ 9        match o3 with
+10        | Some el -> mem el l
+11        | None -> false
+12        end ->
+   ...
+22           (0 <= (i + 1) /\ (i + 1) <= length1 l) &&
+23        (forall k:int.
+24          0 <= k /\ k < (i + 1) -> Some a2[k] = list_nth l k))
+   ...
+#+end_example
+
+Something like:
+
+#+begin_example
+    Assume invariant(i)
+            |
+            v
+    execute iteration
+            |
+            v
+  prove invariant(i+1)
+#+end_example
+
+This converts an unbounded history problem into a finite induction proof: "Every iteration I've
+performed so far correctly copied its element." It reminds the usual induction:
+
+#+begin_example
+Base:
+    I(S₀, 0)
+
+Step:
+    I(Sᵢ, i) ∧ transition(Sᵢ, Sᵢ₊₁)
+       ⇒ I(Sᵢ₊₁, i+1)
+
+Exit:
+    I(Sₙ, n) ∧ exit-condition
+       ⇒ postcondition
+#+end_example
+
+/where S is for "a state"/.
+
+** Fragment 6
+
+Another helper ghost (see ~predicate~) code:
+
+#+begin_example
+1   predicate list_elems_are_correct_index (l: L.list int) (n: int) =
+2   (* The predicate checks that all elements in the list `l` can be index bounded by `n`,
+3    * ie, 0 <= el < n. It is used in `list_elems_are_correct_index__append_singleton` lemma
+4    *)
+5     match l with
+6     | L.Nil      -> true
+7     | L.Cons x r -> 0 <= x < n /\ list_elems_are_correct_index r n
+8     end
+#+end_example
+
+It checks that all items in a list can be indexes of some sized object which size is ~n~, i.e.,
+they are bound by ~[0..n)~.
+
+#+begin_example
+ 1   (* This lemma is needed to prove the invariant:
+ 2    *
+ 3    *   invariant { list_elems_are_correct_index !res_ranges (length res_ps_arr) }
+ 4    *
+ 5    * in `approximate_by_rectangles`. This invariant tells that every item is `res_ranges`
+ 6    * is a index of items in `res_ps`/`res_ps_arr` (`res_ranges` is a list of indexes, so
+ 7    * no one item in `res_ranges` can violate the `res_ps` bounds - it can be useful in
+ 8    * the next function: `find_clusters_centers`). But to prove this invarint, we have
+ 9    * to hint Why3 with some lemma. Without it, we hit timeout/out of memory.
+10    *
+11    * It seems the timeout problem is connected with construction of a list and need to
+12    * check the invariant when the list is growing (?) - we add `i` to the list, and we
+13    * know that `i` is inside bounds, so Why3 has to check that adding only of `i` to a
+14    * list means that all items of that list are inside the same bounds. More detailed:
+15    * Z3/CVC4/... do not automatically know that `list_elems_lt` is preserved by `++` !
+16    *
+17    * This lemma proves it by induction. `requires` is A, `ensures` is B in A -> B.
+18    * `variant` is a termination measure (bcs the lemma is recursive).
+19    * The logic of the lemma is in its body (it is like FStar) - returning of () means
+20    * "true/fact!", and we prove the base of the induction for an empty list then
+21    * we state that for non-empty list we pass through it to the base case ("next step"?),
+22    * the proposition that we prove is B, ie:
+23    *
+24    *   ∀x: 0 <= x < n                             (any integer that is also valid index)
+25    *   list_elems_are_correct_index (l ++ [x]) n  (property is preserved after .. ++ [x])
+26    * 
+27    *)
+28   let rec lemma list_elems_are_correct_index__append_singleton (l: L.list int) (x n: int) =
+29   requires { list_elems_are_correct_index l n /\ 0 <= x < n }
+30   variant { LL.length l }
+31   ensures { list_elems_are_correct_index (l ++ L.Cons x L.Nil) n }
+32     match l with
+33     | L.Nil      -> ()
+34     | L.Cons _ r -> list_elems_are_correct_index__append_singleton r x n
+35     end
+#+end_example
+
+The idea of the lemma is that instead of asking the solver to discover that appending a *VALID*
+singleton preserves the property while reasoning about a growing list, the program can call the
+lemma and use its postcondition. Look:
+
+#+begin_example
+requires:                              
+    P(r) /\ Q
+
+ensures:
+    P(r ++ [x])
+
+  I n d u c t i o n :
+    
+P([])                  -- base
+P(y::r) -> P(r)        -- obtain ind. hypothesis (IH)
+IH                     -- recursively prove tail
+--------------
+P(y::r)
+#+end_example
+
+What does ~L.Nil -> ()~ mean in the lemma? It means:
+
+#+begin_quote
+1. There is no any PROGRAM operation to perform (it's ~let~ lemma)
+2. Just verify that the contract follows from the current logical context (i.e., preconditions,
+  postcondition)
+#+end_quote
+
+Lets simplify them:
+
+#+begin_example
+ 1   predicate P (l) (n) =
+ 2     match l with
+ 3     | Nil -> true
+ 4     | Cons x r -> 0 <= x < n /\ P r
+ 5     end
+ 6   
+ 7   let rec lemma foo (l) (x) (n) =
+ 8     requires { P l n /\ 0 <= x < n }
+ 9     variant { length l }
+10     ensures { P (l ++ [x]) n }
+11   
+12     match l with
+13     | Nil -> ()
+14     | Cons _ r -> foo r x n
+15     end
+#+end_example
+
+** Case 1: l = []
+
+Why3 enters ~| Nil -> ()~ - unit, so, NO RECURSIVE CALL: EXECUTE NOTHING, PRODUCE ~()~.
+
+*But Why3 still must verify the CONTRACT (pre/postconditions)*
+
+- Precondition ~P [] n /\ 0 <= x < n~.
+- Why3 automatically unfold ~P~, knowing its definition, from that definition it found that
+  when ~l~ is ~Nil~, the result is true: ~P Nil n -> true~, so now: ~true /\ 0 <= x < n~.
+- So, THIS IS THE PRECONDITION (!!!).
+- Postcondition is ~P (l ++ [x]) n~, currently ~l = []~, so the postcondition is ~P ([] ++ [x])
+  n~. Again, Why3 must still prove: PRE -> POST.
+- Why3 knows the definition of ~++~ (see the module ~Append~ in
+  ~/usr/share/why3/stdlib/list.mlw~). So, the result of ~[] + some_list -> some_list~ and
+  the postcondition becomes ~P [x] n~.
+- To prove it Why3 again goes to ~P~ definition and unfolds ~P [x]~: it is ~0 <= x < n /\ P []~.
+- ~P [] n~ is true, again. So, the postcondition is ~0 <= x < n /\ true~.
+- Now Why3 HAS COMPLETELY UNFOLDED POSTCONDITION TOO. They are:
+  PRE: ~true /\ 0 <= x < n~. POST: ~0 <= x < n /\ true~. Tautology, so PRE -> POST is proven!!!
+
+Why3 always must prove PRE -> POST, but sometimes also it should execute code, sometimes - no.
+
+** Case 2: l = [y]
+
+Now Why3 enters ~| Cons _ r -> foo r x n~ (~foo~ here is the recursive call of the lemma).
+~r = []~, cos ~l = y :: []~. Why3 walks into recursive call:
+
+- Precondition now is ~P [y] n /\ 0 <= x < n~.
+- Why3 unfold ~P [y] n~ again: ~0 <= y < n /\ P [] n~ (as we remember ~P [] n~ is true)
+- and so on... Recursive structure of the verification look as:
+
+#+begin_example
+foo [a,b,c] x n
+│
+├── requires: P([a,b,c],n) /\ 0 ≤ x < n
+│
+├── recursive call: foo [b,c] x n
+│   │
+│   ├── requires: P([b,c],n) /\ 0 ≤ x < n
+│   │
+│   ├── recursive call: foo [c] x n
+│   │   │
+│   │   ├── requires: P([c],n) /\ 0 ≤ x < n
+│   │   │
+│   │   ├── recursive call: foo [] x n         ⋱  now this is proven:
+│   │   │   │                                   :   P [] n /\ ≤ x < n
+│   │   │   ├── requires: P([],n) /\ 0 ≤ x < n  :   -----------------
+│   │   │   │                                   :   P [x] n
+│   │   │   └── ensures: P([x],n)              ⋰
+│   │   │
+│   │   └── ensures: P([c,x],n)
+│   │
+│   └── ensures: P([b,c,x],n)
+│
+└── ensures: P([a,b,c,x],n)
+
+
+and the top claim is proven:  P([a,b,c],n) /\ 0 ≤ x < n
+                              -------------------------
+                              P([a,b,c,x],n)
+#+end_example
+
+#+begin_quote
+The ensures of the recursive call is used to prove the ensures of the enclosing invocation.
+#+end_quote
+
+* Hoare triples and difference with traditional asserts
+
+https://en.wikipedia.org/wiki/Hoare_logic#Hoare_triple
+TODO
+
+* The difference with Rocq, LEAN - dark side
+
+TODO about timeouts, OOM
