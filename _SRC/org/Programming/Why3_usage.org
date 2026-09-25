@@ -16,6 +16,40 @@ mathematicians to state proving more formal, and more strict, "provable". But it
 
 The idea is that the same approach can be used for proving of some properties of software.
 
+* Why it matters in the epoch of AI
+
+People see that theorem provers become more and more popular. Why?
+
+1. They become more mature and better
+2. The cost of "error" becomes big (hackers, buggy code, etc)
+3. Their number is increasing
+4. "Buzz-word"
+5. AI effect
+
+What is "AI effect"? There is now a fairly substantial ecosystem where an AI proposes a
+mathematical statement/proof, and a theorem prover such as Lean acts as the trusted
+checker. There are also projects where the prover catches errors in the AI-generated/formalized
+result itself. Examples (however, more close is ProofNet-Verifided):
+
+- [[https://github.com/marcusm117/ProofNet-Verified][ProofNet-Verified]]: a benchmark where natural-language undergraduate mathematics
+  is translated into Lean
+- [[https://leandojo.org/leandojo][LeanDojo]] / [[https://github.com/lean-dojo/ReProver][ReProver]]: LLM proposes proofs, Lean verifies them
+- [[https://github.com/Kripner/openprover][OpenProver]]: workers generate mathematical ideas/proof steps, while verification is delegated
+  to Lean
+- [[https://github.com/facebookresearch/miniF2F][MiniF2F]]: math problem is proved by LLM then LEAN check it
+- [[https://paperswithlean.com/paper/2606.20068.html][Process-Verified RL]]: a newer direction, instead of merely asking: "Did the AI eventually
+  produce a correct proof?" the researchers use Lean to provide fine-grained feedback during
+  the proof process. LLM generates several steps, LEAN reject some of them
+
+So, the collaboration between theorem provers and AI/LLM today looks as:
+
+| Use                               | AI does                                    | Theorem prover does                                             |
+|-----------------------------------+--------------------------------------------+-----------------------------------------------------------------|
+|                                   |                                            |                                                                 |
+| Proof generation                  | Invents a proof                            | Checks it                                                       |
+| Proof correction                  | Proposes another proof after failure       | Identifies invalid steps                                        |
+| Result/formalization verification | Translates a human result into formal math | Determines whether the formal statement/proof is actually valid |
+  
 * Why3
 
 [[https://why3.org/][Why3]] is such a tool: you describe your "model" (of a program) then its properties then you
