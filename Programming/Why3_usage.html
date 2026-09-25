@@ -1,0 +1,2451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-09-25 Fri 19:41 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Using Why3 for software verification</title>
+<meta name="description" content="Introduction to Why3 for software verification" />
+<meta name="keywords" content="why3,whyml,theorem,proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Using Why3 for software verification</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org2209661">The idea</a></li>
+<li><a href="#org1ca1f29">Why it matters in the epoch of AI</a></li>
+<li><a href="#org830266f">Why Why3</a>
+<ul>
+<li><a href="#orgf2468a7">Why3 language</a></li>
+<li><a href="#org7c71cf5">Why3 features</a>
+<ul>
+<li><a href="#org384e22e">WhyML (language)</a></li>
+<li><a href="#org2149e3b">Logic, specification</a></li>
+<li><a href="#org7d612d1">Program verification</a></li>
+<li><a href="#org890ffbf">Supported SMT</a></li>
+<li><a href="#org1064c5d">Proof transformations</a></li>
+<li><a href="#org7b0dc76">Other features</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org79908ca">Other tools</a></li>
+<li><a href="#org17b1123">Comparison of tools for computer science</a>
+<ul>
+<li><a href="#org551a6d9">VST/Rocq and "low-level" programming</a></li>
+<li><a href="#orgdb37d41">F star and "low-level" programming</a></li>
+<li><a href="#org9d3a008">VST vs F*</a></li>
+<li><a href="#orgd9e9029">Use-cases from AI</a></li>
+<li><a href="#orgdcd03e3">Complexity, learning curve</a></li>
+</ul>
+</li>
+<li><a href="#org05a0c83">How much does this save you from bugs?</a></li>
+<li><a href="#org51f7bd5">Setup of Why3 on Linux</a>
+<ul>
+<li><a href="#orgb04cd8b">My makefile</a></li>
+</ul>
+</li>
+<li><a href="#org461a577">Why proving is "metaprogramming"</a></li>
+<li><a href="#org86a7aa5">Extraction</a></li>
+<li><a href="#org8f76b97">Usage scenarios</a></li>
+<li><a href="#org0bf759e">Program and logic: computational and logic code</a></li>
+<li><a href="#orgd8a2458">Solver, SMT, SAT...</a>
+<ul>
+<li><a href="#org73af3e2">SAT</a></li>
+<li><a href="#org2401ced">SMT</a></li>
+<li><a href="#org1c52751">How Why3 communicate with SMT</a></li>
+</ul>
+</li>
+<li><a href="#orgadd0171">Example</a>
+<ul>
+<li><a href="#org775af7d">Fragment 1: ADT</a></li>
+<li><a href="#org1ed4e4f">Fragment 2: pre/postcondition, invariant, variant</a></li>
+<li><a href="#org23f9fa1">Fragment 3: recursion and variant</a></li>
+<li><a href="#orgfc3e8d2">Fragment 4: function</a></li>
+<li><a href="#org473054a">Fragment 5: invariant "with history"</a></li>
+<li><a href="#org357cab8">Fragment 6: predicate, lemma with recursive code</a>
+<ul>
+<li><a href="#org965638e">Case 1: l = []</a></li>
+<li><a href="#org9a8fd41">Case 2: l = [y] and more</a></li>
+</ul>
+</li>
+<li><a href="#org95b3398">Fragment 7: axiom, bounds check</a></li>
+<li><a href="#orgd1b2b28">Fragment 8: complex contract, assert</a></li>
+<li><a href="#orgc126fc8">Fragment 9: complex bounds check</a></li>
+</ul>
+</li>
+<li><a href="#org0212e6f">Hoare triples and difference with traditional asserts</a></li>
+<li><a href="#orgbc71a65">The difference with Rocq, LEAN - dark side</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org2209661" class="outline-2">
+<h2 id="org2209661">The idea</h2>
+<div class="outline-text-2" id="text-org2209661">
+<p>
+Very briefly, because today everyone knows what it is. The idea is that in mathematics, logic,
+you prove theorems but the idea is that it can be done "automatically", well, not absolutely
+automatically but using a computer: see <a href="https://en.wikipedia.org/wiki/Automated_theorem_proving">Automated theorem proving</a>. And this allows to
+mathematicians to state proving more formal, and more strict, "provable". But it is for math.
+</p>
+
+<p>
+The idea is that the same approach can be used for proving of some properties of software.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ca1f29" class="outline-2">
+<h2 id="org1ca1f29">Why it matters in the epoch of AI</h2>
+<div class="outline-text-2" id="text-org1ca1f29">
+<p>
+People see that theorem provers become more and more popular. Why?
+</p>
+
+<ol class="org-ol">
+<li>They become more mature and better</li>
+<li>The cost of "error" becomes big (hackers, buggy code, etc)</li>
+<li>Their number is increasing</li>
+<li>"Buzz-word"</li>
+<li>AI effect</li>
+</ol>
+
+<p>
+What is "AI effect"? There is now a fairly substantial ecosystem where an AI proposes a
+mathematical statement/proof, and a theorem prover such as Lean acts as the trusted
+checker. There are also projects where the prover catches errors in the AI-generated/formalized
+result itself. Examples (however, more close is ProofNet-Verifided):
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/marcusm117/ProofNet-Verified">ProofNet-Verified</a>: a benchmark where natural-language undergraduate mathematics
+is translated into Lean</li>
+<li><a href="https://leandojo.org/leandojo">LeanDojo</a> / <a href="https://github.com/lean-dojo/ReProver">ReProver</a>: LLM proposes proofs, Lean verifies them</li>
+<li><a href="https://github.com/Kripner/openprover">OpenProver</a>: workers generate mathematical ideas/proof steps, while verification is delegated
+to Lean</li>
+<li><a href="https://github.com/facebookresearch/miniF2F">MiniF2F</a>: math problem is proved by LLM then LEAN check it</li>
+<li><a href="https://paperswithlean.com/paper/2606.20068.html">Process-Verified RL</a>: a newer direction, instead of merely asking: "Did the AI eventually
+produce a correct proof?" the researchers use Lean to provide fine-grained feedback during
+the proof process. LLM generates several steps, LEAN reject some of them</li>
+</ul>
+
+<p>
+So, the collaboration between theorem provers and AI/LLM today looks as:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Use</th>
+<th scope="col" class="org-left">AI does</th>
+<th scope="col" class="org-left">Theorem prover does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Proof generation</td>
+<td class="org-left">Invents a proof</td>
+<td class="org-left">Checks it</td>
+</tr>
+
+<tr>
+<td class="org-left">Proof correction</td>
+<td class="org-left">Proposes another proof after failure</td>
+<td class="org-left">Identifies invalid steps</td>
+</tr>
+
+<tr>
+<td class="org-left">Result/formalization verification</td>
+<td class="org-left">Translates a human result into formal math</td>
+<td class="org-left">Determines whether the formal statement/proof is actually valid</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+So, one of the scenario is:
+</p>
+
+<pre class="example" id="org1121091">
+             Human/AI
+                 |
+                 v
+       Natural-language result
+                 |
+                 v
+       .------------------.
+       |   LLM / Agent     ‖
+       | autoformalization ‖
+       `====================
+                |
+                v
+  Lean, Isabelle, Rocq, Metamath
+                |
+        .-------+--------.
+        |                |
+      VALID           INVALID
+        |                |
+        v                v
+   accept result    feedback to AI
+                         |
+                         `--&gt; revise
+</pre>
+</div>
+</div>
+<div id="outline-container-org830266f" class="outline-2">
+<h2 id="org830266f">Why Why3</h2>
+<div class="outline-text-2" id="text-org830266f">
+<p>
+<a href="https://why3.org/">Why3</a> is such a tool: you describe your "model" (of a program) then its properties then you
+prove them. If successfully then your software (different pieces of your code) is safe (as you
+described "safety" with those properties), else - you think about your code something, but it
+is something else.
+</p>
+
+<blockquote>
+<p>
+Why3 is a platform for deductive program verification. It provides a rich language for
+specification and programming, called WhyML, and relies on external theorem provers, both
+automated and interactive, to discharge verification conditions.
+</p>
+
+<p>
+-- <a href="https://why3.org/">https://why3.org/</a>
+</p>
+</blockquote>
+</div>
+<div id="outline-container-orgf2468a7" class="outline-3">
+<h3 id="orgf2468a7">Why3 language</h3>
+<div class="outline-text-3" id="text-orgf2468a7">
+<p>
+By default the input language is ML-based, called WhyML (.mlw extension). It's very beautiful
+language, but other languages are also supported:
+</p>
+
+<ul class="org-ul">
+<li>micro-C</li>
+<li>micro-Python (Python 3 subset)</li>
+<li>MLCFG</li>
+<li>Coma</li>
+</ul>
+
+<p>
+See <a href="https://why3.org/doc/input_formats.html">more about input languages</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-org7c71cf5" class="outline-3">
+<h3 id="org7c71cf5">Why3 features</h3>
+<div class="outline-text-3" id="text-org7c71cf5">
+<p>
+Why3 has a lot of features. Lets group them:
+</p>
+</div>
+<div id="outline-container-org384e22e" class="outline-4">
+<h4 id="org384e22e">WhyML (language)</h4>
+<div class="outline-text-4" id="text-org384e22e">
+<pre class="example" id="org45b3054">
+⬤ ML-style functions         ⬤ anonymous functions             
+⬤ algebraic data types       ⬤ recursion                       
+⬤ records                    ⬤ partial/non-terminating programs
+⬤ pattern matching           ⬤ ghost variables and ghost code  
+⬤ mutable variables          ⬤ abstract types                  
+⬤ mutable record fields      ⬤ program effects                 
+⬤ arrays                     ⬤ preconditions                   
+⬤ references                 ⬤ postconditions                  
+⬤ sequences                  ⬤ assertions                      
+⬤ exceptions                 ⬤ loop invariants                 
+⬤ loops                      ⬤ variants / termination measures 
+⬤ local functions
+</pre>
+</div>
+</div>
+<div id="outline-container-org2149e3b" class="outline-4">
+<h4 id="org2149e3b">Logic, specification</h4>
+<div class="outline-text-4" id="text-org2149e3b">
+<pre class="example" id="org2dfeb6c">
+⬤ propositions                      ⬤ maps                                           
+⬤ quantified formulas               ⬤ relations                                      
+⬤ logical functions                 ⬤ arrays                                         
+⬤ predicates                        ⬤ sequences                                      
+⬤ recursive logical definitions     ⬤ lists                                          
+⬤ inductive predicates              ⬤ finite structures                              
+⬤ algebraic data types              ⬤ integer and real arithmetic                    
+⬤ records                           ⬤ bit-vectors and floating-point related theories
+⬤ equality                          ⬤ axioms                                         
+⬤ arithmetic                        ⬤ lemmas                                         
+⬤ Boolean logic                     ⬤ goals                                          
+⬤ sets
+</pre>
+</div>
+</div>
+<div id="outline-container-org7d612d1" class="outline-4">
+<h4 id="org7d612d1">Program verification</h4>
+<div class="outline-text-4" id="text-org7d612d1">
+<pre class="example" id="org2a013c5">
+⬤ functional correctness                   ⬤ contracts                                                             
+⬤ memory/state reasoning                   ⬤ refinement                                                            
+⬤ array reasoning                          ⬤ data-structure invariants                                             
+⬤ mutable data structures                  ⬤ arithmetic properties                                                 
+⬤ loop invariants                          ⬤ quantified properties                                                 
+⬤ recursive-function verification          ⬤ exception safety/properties                                           
+⬤ termination proofs                       ⬤ floating-point verification                                           
+⬤ partial/non-terminating programs         ⬤ probabilistic-program-related
+⬤ inductive proofs                           developments through libraries/projects 
+⬤ concurrent/distributed verification
+  through extensions such as Why3-do
+</pre>
+
+<p>
+Pay attention: CONCURRENT, DISTRIBUTED VERIFICATION is also supported with Why3-do library (aka
+WhyDo) - see <a href="https://github.com/haslab/why3do/">its Github for examples</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-org890ffbf" class="outline-4">
+<h4 id="org890ffbf">Supported SMT</h4>
+<div class="outline-text-4" id="text-org890ffbf">
+<p>
+Alt-Ergo, Z3, CVC4/CVC5, E-prover, Vampire, Rocq (former Coq), Isabelle.
+</p>
+</div>
+</div>
+<div id="outline-container-org1064c5d" class="outline-4">
+<h4 id="org1064c5d">Proof transformations</h4>
+<div class="outline-text-4" id="text-org1064c5d">
+<pre class="example" id="org108544b">
+⬤ split conjunctions               ⬤ perform case analysis              
+⬤ split goals                      ⬤ transform array reasoning          
+⬤ introduce hypotheses             ⬤ remove unused hypotheses           
+⬤ eliminate definitions            ⬤ instantiate abstractions           
+⬤ simplify formulas                ⬤ manipulate verification conditions 
+⬤ specialize quantified formulas
+</pre>
+</div>
+</div>
+<div id="outline-container-org7b0dc76" class="outline-4">
+<h4 id="org7b0dc76">Other features</h4>
+<div class="outline-text-4" id="text-org7b0dc76">
+<p>
+Counterexamples, symbolic execution, extraction, interactive proof (Rocq, Isabelle/HOL, PVS),
+options for checking annotations during execution...
+</p>
+
+<p>
+Counterexamples show you a state where failure happens, it can print something like:
+</p>
+
+<pre class="example" id="orgfffc91a">
+x = ...
+i = ...
+my_array = ...
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org79908ca" class="outline-2">
+<h2 id="org79908ca">Other tools</h2>
+<div class="outline-text-2" id="text-org79908ca">
+<p>
+There are a lot of automatic (computer) provers, their features are different, they work in
+different ways, some of them are:
+</p>
+
+<ol class="org-ol">
+<li>for mathematics</li>
+<li>for mathematics and computer science (including software)</li>
+</ol>
+
+<p>
+My focus is 2nd:
+</p>
+
+<ol class="org-ol">
+<li><a href="https://why3.org/">Why3/WhyML</a></li>
+<li><a href="https://fstar-lang.org/">F*</a></li>
+<li><a href="https://dafny.org/">Dafny</a></li>
+</ol>
+
+
+<p>
+Mathematics oriented theorem provers surprisingly support software verification too:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://rocq-prover.org/">Rocq</a> (former Coq) - supports software verification amazing good</li>
+<li><a href="https://lean-lang.org">LEAN</a> - some ports from Rocq, still not completed and not mature</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org17b1123" class="outline-2">
+<h2 id="org17b1123">Comparison of tools for computer science</h2>
+<div class="outline-text-2" id="text-org17b1123">
+<p>
+Instead of big comparison, I will show only my impressions: <b>Why3</b> is good for verification of
+algorithms and existing software. It's syntax and semantic are simple mostly. Also it supports
+extraction. You can verify C/C++ programs with it, but it is not so low-level and it's more oriented
+on computer science, but again - it is possible sure but it is not its goal, purpose. Also it is
+used for verification of distributed architectures and algorithms.
+</p>
+
+<p>
+<b>F-star</b> is very close to Why3, the same <a href="https://www.inria.fr/en">National institute Inria</a> is involved, it is ML-based too,
+it supports the same proving features, but additionally it supports dependent types, effects are
+more obvious/explicit, refinement types are explicit (connected to a type, not to a contract), also
+it is better (maybe, not 100% sure) in code extraction, and more important - it supports LOW-LEVEL
+VERIFICATION: C, assembler.
+</p>
+
+<p>
+If to compare theorem provers in the context of LOW-LEVEL safe programming (think about OS kernels,
+bare-metal, low-level cryptography, assembler, chips firmware, etc) F* and VST/Rocq have serious
+low-level stories, while Why3 and Dafny are primarily deductive-verification frameworks/languages
+whose low-level support is more indirect. current F* has moved toward Pulse as its
+imperative/separation-logic language; the older Low* sublanguage has been removed from F* releases,
+although the Low* libraries/tooling remain relevant to existing projects.
+</p>
+
+<ul class="org-ul">
+<li>Existing C code: VST/Rocq is the most directly purpose-built of these.</li>
+<li>Writing new low-level C from scratch: F*/Pulse + KaRaMeL is extremely compelling.</li>
+<li>Handwritten assembly: F* + Vale is the standout here; VST can reason about CompCert's assembly
+semantics, but VST itself is fundamentally a C verification framework.</li>
+<li>Mostly ordinary imperative code with some low-level flavor: Dafny is much easier to get started
+with, and Vale can take it surprisingly far into assembly.</li>
+<li>SMT-heavy deductive verification, particularly if you want many automated provers: Why3 is
+excellent, but it is not the tool I'd reach for first for machine-level C/assembly.</li>
+</ul>
+
+<p>
+Why3 micro-C is mostly for teaching (it's tiny subset of C).
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">&#xa0;</th>
+<th scope="col" class="org-left">Why3</th>
+<th scope="col" class="org-left">F* / Pulse</th>
+<th scope="col" class="org-left">Dafny</th>
+<th scope="col" class="org-left">VST / Rocq</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Ordinary functional verification</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Existing C</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">New C-like low-level code</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Pointers / aliasing</td>
+<td class="org-left">★★--★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Separation logic</td>
+<td class="org-left">Limited</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">Limited</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Machine integers</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">C memory model</td>
+<td class="org-left">Limited</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">Limited</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Assembly</td>
+<td class="org-left">★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Compiler-correctness story</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Automation</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Interactive theorem proving</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Ease of learning</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★--★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Crypto / constant-</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">time low-level code</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="outline-container-org551a6d9" class="outline-3">
+<h3 id="org551a6d9">VST/Rocq and "low-level" programming</h3>
+<div class="outline-text-3" id="text-org551a6d9">
+<p>
+VST / Rocq is very mature and solid here - low-level C is it's home. It was used for verification of
+SHA-256, HMAC, mbedTLS HMAC-DRBG, TweetNaCl / Curve25519 cryptography, garbage collection, graph
+algorithms, concurrent messaging, an HTTP key-value server, differential-equation solvers, and
+Reed--Solomon coding, etc. Canonical VST case study is <a href="https://www.usenix.org/conference/usenixsecurity15/technical-sessions/presentation/beringer">verification of OpenSSL HMAC + SHA-256</a>. The
+work also connected the C-level proof to CompCert's verified compilation to assembly. The authors
+describe it as combining source-program correctness, compiler correctness, and
+cryptographic-security proofs without gaps at the specification interfaces. Additionally to
+cryptography VST is widely used in memory work verification, it supports:
+</p>
+
+<ul class="org-ul">
+<li>pointers</li>
+<li>aliasing</li>
+<li>ownership</li>
+<li>memory invariants</li>
+<li>low-level data structures</li>
+<li>allocators</li>
+<li>and so on...</li>
+</ul>
+
+<p>
+Also it is used for numerical scientific C, <a href="https://www.cs.princeton.edu/~appel/papers/">a lot of examples</a>, <a href="https://blog.poisson.chat/posts/2019-01-14-cpp19-from-c-to-itrees.html">network programming verification</a>
+</p>
+
+<p>
+See <a href="https://vst.cs.princeton.edu/">more about VST</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdb37d41" class="outline-3">
+<h3 id="orgdb37d41">F star and "low-level" programming</h3>
+<div class="outline-text-3" id="text-orgdb37d41">
+<p>
+F* has an unusually strong real-world systems/security track record, arguably more concentrated
+around cryptography, networking, and verified low-level code than VST's.
+</p>
+
+<p>
+The important distinction is that many of the projects below are part of the broader Project Everest
+ecosystem: F* is the specification/proof language, while tools such as KaRaMeL and Vale connect the
+proofs to C and assembly. Famous project where the code was verified and extracted is HACL*:
+</p>
+
+<p>
+HACL* is a collection of verified cryptographic primitives implemented in F*, with extraction to
+C. It includes algorithms such as:
+</p>
+
+<ul class="org-ul">
+<li>Curve25519</li>
+<li>Ed25519</li>
+<li>AES</li>
+<li>SHA-2</li>
+<li>ChaCha20</li>
+<li>Poly1305</li>
+<li>various hash/MAC constructions</li>
+</ul>
+
+<p>
+It was extracted to C and has been integrated into real software including Firefox, Linux, and
+WireGuard. Another project created with F* is EverCrypt:
+</p>
+
+<p>
+EverCrypt is a larger cryptographic provider built on the Everest verification technology. It
+combines verified implementations of cryptographic primitives with:
+</p>
+
+<ul class="org-ul">
+<li>algorithm agility,</li>
+<li>hardware acceleration,</li>
+<li>architecture-specific implementations,</li>
+<li>runtime selection,</li>
+<li><b>CONSTANT-TIME GUARANTEES!</b></li>
+</ul>
+
+<p>
+Another project: Vale (verified cryptographic assembly). Vale is designed specifically for verifying
+low-level assembly. It has been used to verify optimized cryptographic implementations, including
+assembly for:
+</p>
+
+<ul class="org-ul">
+<li>AES-GCM</li>
+<li>ChaCha20</li>
+<li>Poly1305</li>
+<li>Curve25519-related operations</li>
+<li>other cryptographic primitives</li>
+</ul>
+
+<p>
+Vale supports x86/x64 and ARM-family architectures, and its verification is integrated with F* and
+Dafny.
+</p>
+
+<p>
+Low*/Pulse was designed to give F* programs a C-like computational model:
+</p>
+
+<ul class="org-ul">
+<li>mutable buffers</li>
+<li>pointers</li>
+<li>arrays</li>
+<li>structs</li>
+<li>machine integers</li>
+<li>stack/heap memory</li>
+<li>explicit effects</li>
+<li>memory safety.</li>
+</ul>
+
+<p>
+KaRaMeL then translates verified Low* programs into C.
+</p>
+</div>
+</div>
+<div id="outline-container-org9d3a008" class="outline-3">
+<h3 id="org9d3a008">VST vs F*</h3>
+<div class="outline-text-3" id="text-org9d3a008">
+<p>
+VST scenario:
+</p>
+
+<pre class="example" id="orge9a03fa">
+   existing C
+       |
+       v
+VST separation logic
+       |
+       v
+     proof
+       |
+       v
+   CompCert
+       |
+       v
+  machine code
+</pre>
+
+<p>
+F* scenario:
+</p>
+
+<pre class="example" id="org98315c6">
+         specification
+               |
+               v
+               F*
+               |
+               v
+low-level verified implementation
+               |
+          .----+-----.
+          |          |
+          C         ASM
+          |          |
+        KaRaMeL    Vale
+</pre>
+
+<p>
+VST asks:
+</p>
+
+<blockquote>
+<p>
+"How can I prove this C program?"
+</p>
+</blockquote>
+
+<p>
+F* often asks:
+</p>
+
+<blockquote>
+<p>
+"How can I construct an implementation whose relationship to the specification is
+machine-checked, and then extract it to C or connect it to verified assembly?"
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-orgd9e9029" class="outline-3">
+<h3 id="orgd9e9029">Use-cases from AI</h3>
+<div class="outline-text-3" id="text-orgd9e9029">
+<blockquote>
+<p>
+For learning formal verification itself, I'd start with Dafny.
+</p>
+
+<p>
+For learning automated deductive verification, Dafny or Why3.
+</p>
+
+<p>
+For verified systems/security programming, F*.
+</p>
+
+<p>
+For deep C/pointer/separation-logic verification, VST/Rocq.
+</p>
+
+<p>
+And if your eventual goal is specifically C + handwritten x86-64/ARM assembly, I'd spend the
+learning effort on F + Vale* or VST/CompCert + Vale, rather than trying to make Dafny or Why3 do all
+of it.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-orgdcd03e3" class="outline-3">
+<h3 id="orgdcd03e3">Complexity, learning curve</h3>
+<div class="outline-text-3" id="text-orgdcd03e3">
+<p>
+Dafny - very simple. Why3 more complex but not too much. F* - yes, more complex even. Rocq/VST -
+absolute "hardcore", by AI they look as:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">What</th>
+<th scope="col" class="org-left">Dafny</th>
+<th scope="col" class="org-left">Why3</th>
+<th scope="col" class="org-left">F*</th>
+<th scope="col" class="org-left">VST / Rocq</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Initial learning</td>
+<td class="org-left">★</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">First useful proof</td>
+<td class="org-left">Very easy</td>
+<td class="org-left">Easy</td>
+<td class="org-left">Moderate</td>
+<td class="org-left">Hard</td>
+</tr>
+
+<tr>
+<td class="org-left">SMT automation</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★--★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Dependent types</td>
+<td class="org-left">-</td>
+<td class="org-left">-</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Separation logic</td>
+<td class="org-left">★</td>
+<td class="org-left">★★</td>
+<td class="org-left">★★★★--★★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">C/memory-model complexity</td>
+<td class="org-left">★</td>
+<td class="org-left">★★--★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Interactive proof complexity</td>
+<td class="org-left">★</td>
+<td class="org-left">★★--★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Large low-level proofs</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Debugging failed proofs</td>
+<td class="org-left">Easy--moderate</td>
+<td class="org-left">Moderate</td>
+<td class="org-left">Hard</td>
+<td class="org-left">Very hard</td>
+</tr>
+
+<tr>
+<td class="org-left">Conceptual ceiling</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★</td>
+<td class="org-left">★★★★★</td>
+<td class="org-left">★★★★★</td>
+</tr>
+
+<tr>
+<td class="org-left">Time to become productive</td>
+<td class="org-left">Days</td>
+<td class="org-left">Days--weeks</td>
+<td class="org-left">Weeks--months</td>
+<td class="org-left">Months</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-org05a0c83" class="outline-2">
+<h2 id="org05a0c83">How much does this save you from bugs?</h2>
+<div class="outline-text-2" id="text-org05a0c83">
+<p>
+After proof, your code may still contain errors. This is due to:
+</p>
+
+<ul class="org-ul">
+<li>you did not enumerate all important properties, you missed something</li>
+<li>there are "not logical" bugs, for example, error (additive, for example) is too large, ie,
+the software is not accurate enough in numerical calculation</li>
+<li>bugs happen outside of verified code - in the effectful world (API, network, libraries, OS...)</li>
+<li>serious performance problems</li>
+<li>policy related errors: bad UX, strange behavior on errors, weird understanding of the domain
+problems...</li>
+<li>bad design</li>
+<li>sometimes even proof can be not good enough (the probability of this is low: automatic
+verification checks the correctness of the proof)</li>
+</ul>
+
+<p>
+After proof usually you get:
+</p>
+
+<ul class="org-ul">
+<li>More correct code (or even significantly more correct, sometimes - code without bugs at all)</li>
+<li>You better understand your code and its corner cases, features, its pros and cons</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org51f7bd5" class="outline-2">
+<h2 id="org51f7bd5">Setup of Why3 on Linux</h2>
+<div class="outline-text-2" id="text-org51f7bd5">
+<p>
+Why3 can be installed from your distribution package manager. Also it comes with its default
+SMT solvers. Currently, it is CVC4, but it is not so good, and you can hit problems with
+it. So, I'd recommend to install Z3 SMT solver from the package manager and then to configure
+Why3 to "see" it:
+</p>
+
+<pre class="example" id="orga22f711">
+$ why3 config detect
+$ why3 config list-provers   # and you should see Z3 now in the list
+# After it use can use z3 during prooving woth "-P z3" option
+</pre>
+</div>
+<div id="outline-container-orgb04cd8b" class="outline-3">
+<h3 id="orgb04cd8b">My makefile</h3>
+<div class="outline-text-3" id="text-orgb04cd8b">
+<div class="org-src-container">
+<pre class="src src-makefile">set -o pipefail
+[ -z <span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span> ] &amp;&amp; { echo <span class="org-string">'Arg1: path to .mlw file'</span> ; exit 1; }
+[ <span class="org-string">"${</span><span class="org-string"><span class="org-variable-name">WHY3_SPLITVC</span></span><span class="org-string">+x}"</span> ] &amp;&amp; split_opt=<span class="org-string">'-a split_vc'</span>
+why3 prove -P ${<span class="org-variable-name">WHY3_PROVER</span>:-z3} -t ${<span class="org-variable-name">WHY3_TIMEOUT</span>:-10} <span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span> $split_opt $WHY3_OPTS | tee _<span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span>.proven
+echo <span class="org-string">'-----------------------------------------------------'</span>
+grep -P -B 2 <span class="org-string">'^Prover result is: (?!Valid)'</span> _<span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span>.proven | tee _<span class="org-string">"$</span><span class="org-string"><span class="org-constant">1</span></span><span class="org-string">"</span>.error
+[ $<span class="org-constant">?</span> -eq 0 ] &amp;&amp; { echo; echo <span class="org-string">'*** ERROR: NOT PROVEN! ***'</span>; exit 1; } || exit 0
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org461a577" class="outline-2">
+<h2 id="org461a577">Why proving is "metaprogramming"</h2>
+<div class="outline-text-2" id="text-org461a577">
+<p>
+There is such a term - <a href="https://en.wikipedia.org/wiki/Metaprogramming">metaprogramming</a> and logic "lives between liens of code" or on the top of
+it, not participating in computation but checking/verifying it: <b>it is a program about program</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org86a7aa5" class="outline-2">
+<h2 id="org86a7aa5">Extraction</h2>
+<div class="outline-text-2" id="text-org86a7aa5">
+<p>
+Why3 supports extraction too, see <a href="https://why3.org/doc/manpages.html#the-extract-command">this</a> and <a href="https://why3.org/doc/exec.html#sec-extract">this</a>. It can translate (correct term is EXTRACT
+though) your WhyML program to Ocaml, Java, C, CakeML.
+</p>
+</div>
+</div>
+<div id="outline-container-org8f76b97" class="outline-2">
+<h2 id="org8f76b97">Usage scenarios</h2>
+<div class="outline-text-2" id="text-org8f76b97">
+<p>
+Main are:
+</p>
+
+<ul class="org-ul">
+<li>proving of existing code</li>
+<li>proving of idea, algorithm including distributed one (<a href="https://github.com/haslab/why3do/tree/main/examples/paxos">PAXOS verified with WhyML</a>)</li>
+<li>extracting of verified code to be used in an existing project</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org0bf759e" class="outline-2">
+<h2 id="org0bf759e">Program and logic: computational and logic code</h2>
+<div class="outline-text-2" id="text-org0bf759e">
+<p>
+All WhyML code is split to 2 pies - WORLDS: a program (computational) "world" and logic
+"world". And... there are constructions living in both "worlds".
+</p>
+
+<ul class="org-ul">
+<li><b>Program/computational WhyML code</b> --- code that describes computation: functions, mutable
+state, references, loops, exceptions, I/O, etc. It is executed or compiled.</li>
+<li><b>Logical code</b> --- specifications and mathematical objects used to reason about the program:
+predicates, propositions, lemmas, axioms, pure functions, mathematical types, etc. It is not
+executed as program code; it is translated into proof obligations for automated/theorem
+provers.</li>
+</ul>
+
+<p>
+So, logical world (code) is metaprogramming. Computational (or program) world (code) is your
+program. Also it matters in extraction phase - logical code will not generate Ocaml, C output,
+in short.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd8a2458" class="outline-2">
+<h2 id="orgd8a2458">Solver, SMT, SAT...</h2>
+<div class="outline-text-2" id="text-orgd8a2458">
+<p>
+About SMT and SAT in <a href="https://en.wikipedia.org/wiki/Satisfiability_modulo_theories">Wikipedia</a>.
+</p>
+</div>
+<div id="outline-container-org73af3e2" class="outline-3">
+<h3 id="org73af3e2">SAT</h3>
+<div class="outline-text-3" id="text-org73af3e2">
+<p>
+SAT solves boolean "satisfiability" answering the question: "Can I assign true/false to these
+boolean variables so that the whole formula becomes true?", example:
+</p>
+
+<pre class="example" id="org78c1c2f">
+Input formula :            (A OR B) AND (NOT A OR C)
+
+A SAT solver might find :  A = false
+                           B = true
+                           C = false
+
+                           
+</pre>
+
+<p>
+It's kind of utility helper in the world of automatic logic. SAT works fundamentally with
+<code>true/false</code>, <code>AND, OR, NOT</code>... It is something like "constraint programming over boolean
+domain".
+</p>
+
+<blockquote>
+<p>
+A SAT solver doesn't inherently understand things like:
+</p>
+
+<p>
+x + 1 &gt; x
+</p>
+
+<p>
+because <code>x</code> there isn't a boolean variable.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-org2401ced" class="outline-3">
+<h3 id="org2401ced">SMT</h3>
+<div class="outline-text-3" id="text-org2401ced">
+<p>
+SMT means "Satisfiability Modulo Theories", it answers the question: "Is there an assignment
+that makes this formula true?", but SMT allows variables from particular mathematical theories.
+</p>
+
+<p>
+For example, integer arithmetic:
+</p>
+
+<pre class="example" id="org4c066db">
+Input :                   x: Int
+                          y: Int
+                          x &gt; 10
+                          y = x + 5
+                          y &lt; 20
+
+                          
+SMT solver might find :   x = 11
+                          y = 16
+</pre>
+
+<p>
+SMT works in domains:
+</p>
+
+<ul class="org-ul">
+<li>integers and real numbers</li>
+<li>arithmetic</li>
+<li>arrays</li>
+<li>bit-vectors</li>
+<li>equality</li>
+<li>uninterpreted functions</li>
+<li>sometimes strings (CVC 4 (strings), etc), floating point, etc.</li>
+</ul>
+
+<p>
+Modern SMT solvers combine: Boolean reasoning of SAT with its own standard Theory reasoning,
+i.e., SAT today is usually embedded part of SMT.
+</p>
+
+<p>
+Why3, Dafny, F*, etc, delegate "simple" work to SMT. Rocq, LEAN - do not (they can do all work
+by self, but they allow to use external solvers).
+</p>
+</div>
+</div>
+<div id="outline-container-org1c52751" class="outline-3">
+<h3 id="org1c52751">How Why3 communicate with SMT</h3>
+<div class="outline-text-3" id="text-org1c52751">
+<pre class="example" id="org4984c78">
+                .---------------------.
+                |       WhyML         ‖
+                |  program + specs    ‖
+                `======================
+                           |
+             verification  |              
+                           v
+                .---------------------.
+                |   Why3 VC Generator ‖
+                |       (VCgen)       ‖
+                `======================
+                           |
+                      Verification
+                    Conditions (VCs)
+                           |
+                           v
+                .---------------------.
+                |   Why3 Transform    ‖
+                |                     ‖
+                | simplify / split /  ‖
+                | instantiate / etc.  ‖
+                `======================
+                           |
+                SMT-LIB    |         
+               .-----------+-----------.
+               |           |           |
+               v           v           v
+            .-----.     .-----.     .------.
+  SMT       | Z3  ‖     |CVC5 ‖     | Alt- ‖
+solvers     |     ‖     |     ‖     | Ergo ‖
+            `======     `======     `=======
+               |           |           |
+               `-----------+-----------'
+                           |
+                       SAT, UNSAT
+                           |
+                           v
+                .---------------------.
+                |        Why3         ‖
+                |    proof result     ‖
+                `======================
+</pre>
+
+<p>
+The "route" of the input WhyML program;
+</p>
+
+<pre class="example" id="org2715f15">
+.----------[ WhyML ]-----------.
+|  let f (x: int) : int        ‖    Your WhyML code
+|   ensures { result &gt;= x } =  ‖   
+|  x + 1                       ‖   
+`===============================   
+               |                   Why3 generates VC
+               v                   (verification condition)
+ .----------[ VC ]-------------.   
+ |     ∀ x:int. x + 1 &gt;= x     ‖   
+ `==============================   Why3 translates it to the language
+               |                   understood by the selected prover
+               v                   (typically SMT-LIB)
+.---------[ Z3 QUERY ]----------.  
+| (declare-const x Int)         ‖  
+| (assert (not (&gt;= (+ x 1) x))) ‖  
+| (check-sat)                   ‖  
+`================================   Why3 gets output from SMT solver...
+</pre>
+
+<p>
+Why3 <b>is not a frontend to a SMT solver</b> - Why3 has its own intermediate logical language and
+transformation system. It can manipulate a proof goal before handing it to an automated prover:
+</p>
+
+<pre class="example" id="org205735b">
+             WhyML
+               |
+               v
+         .------------.   ....
+         |   VCgen    ‖       ⋱
+         `=============        :
+              VC               :
+               |               :
+               v               :
+         .------------.         ⋱  Why3
+         | Transform  ‖         ⋰  work
+         |            ‖        :
+         | split_goal ‖        :
+         | simplify   ‖        :
+         | induction  ‖        :
+         | specialize ‖        :
+         `=============   ....⋰
+               |
+      .--------+--------.
+      v                 v
+  SMT solver       Interactive
+  (Z3/CVC5/...)      prover
+</pre>
+
+<p>
+Also Why3 can combine provers:
+</p>
+
+<pre class="example" id="orga842ac2">
+         :
+        VC
+         |
+    .----+----.
+    v         v
+   Z3      Alt-Ergo
+    |         |
+    `----+----'
+         |
+         v
+       proved
+</pre>
+
+<p>
+Also Why3 records the resulting proof information so that the verification can be
+checked/replayed later.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgadd0171" class="outline-2">
+<h2 id="orgadd0171">Example</h2>
+<div class="outline-text-2" id="text-orgadd0171">
+<p>
+Before, I wrote this (<a href="./Packs_Search.html">Packs Search</a>) simple algorithm. It was written with memory exploitation
+which allows to visualize the algorithm's phases, steps - it could be written in other ways too
+but this way is more "visual". Visualization also is kind of "proving" of an algorithm, but it
+is not real logic-based proof. Let's fill this gap with Why3.
+</p>
+
+<p>
+I posted the WhyML proof code <a href="https://github.com/disco85/packs_verification/blob/main/Packs.mlw">here</a>. Let's walk through some fragments of the current state of
+the code and comments them.
+</p>
+</div>
+<div id="outline-container-org775af7d" class="outline-3">
+<h3 id="org775af7d">Fragment 1: ADT</h3>
+<div class="outline-text-3" id="text-org775af7d">
+<pre class="example" id="org38cc824">
+1   type num =
+2     | NaN
+3     | MinusInf
+4     | Fin int
+5     | PlusInf
+</pre>
+
+<p>
+Here we declare <a href="https://en.wikipedia.org/wiki/Algebraic_data_type">ADT</a> which models Not-a-Number, Minus Infinity, Finite integer (usual), Plus
+Infinity. We use it later, in the original Python code I used float numbers and Python support
+these special values internally.
+</p>
+</div>
+</div>
+<div id="outline-container-org1ed4e4f" class="outline-3">
+<h3 id="org1ed4e4f">Fragment 2: pre/postcondition, invariant, variant</h3>
+<div class="outline-text-3" id="text-org1ed4e4f">
+<pre class="example" id="org49854ed">
+ 1   let calc_diffs (ps: array int) (absolute: bool) : array int =
+ 2   ensures {
+ 3     (length ps = 0 -&gt; length result = 0) /\
+ 4     (length ps &gt; 0 -&gt; length result = length ps - 1)
+ 5   }
+ 6     let diffs_num = max ((length ps) - 1) 0 in
+ 7     let diffs = make diffs_num 0 in
+ 8     let i:ref int = ref 0 in
+ 9     if diffs_num = 0 then
+10       diffs
+11     else begin
+12       while !i &lt;&gt; length ps - 1 do
+13       invariant { 0 &lt;= !i &lt;= length ps - 1 }
+14       invariant { !i &lt;= length diffs }
+15       variant { length ps - 1 - !i }
+16         let diff = ps[!i + 1] - ps[!i] in
+17         let diff = if absolute then abs diff else diff in
+18         diffs[!i] &lt;- diff;
+19         incr i
+20       done;
+21       diffs
+22     end
+</pre>
+
+<p>
+First, we see on <code>1</code> the declaration of the function <code>calc_diffs</code> which has 2 arguments: an
+array of integers and a boolean, and it returns an array of integers. Also it has one
+postcondition on line <code>2</code> (see <code>ensures {..}</code>), it could have preconditions too...
+</p>
+
+<p>
+postcondition on <code>2</code> says: there are 2 statements - they are formed as <code>first AND second</code>
+("and" is <code>/\</code>):
+</p>
+
+<ol class="org-ol">
+<li><code>(length ps = 0 -&gt; length result = 0)</code>
+If the length of the argument <code>ps</code> is 0 then the result of the function will have a length 0 too</li>
+<li><code>(length ps &gt; 0 -&gt; length result = length ps - 1)</code>
+If the argument <code>ps</code> is not empty then the length of the result is lesser of <code>ps</code> by 1.</li>
+</ol>
+
+<p>
+Why3 will check the code of the function and will prove or refute such statements, you can do
+it by self:
+</p>
+
+<ol class="org-ol">
+<li>initially the loop variable <code>i</code> is 0</li>
+<li>it's bound is <code>length ps - 1</code> (on <code>12</code>)</li>
+</ol>
+
+<p>
+Why3 does it automatically, for you.
+</p>
+
+<p>
+<b>These properties (postconditions in the case) are important: you know what to expect from the
+function.</b>
+</p>
+
+<p>
+Also they will be used in proving of other pieces of the code, they are "a contract", and when
+it is called somewhere, Why3 can reason about its result.
+</p>
+
+<p>
+Types matter - they are also controlled by Why3 - if an expression violates the declared type,
+it is also reported as an error, obviously.
+</p>
+
+<p>
+Inside <code>while</code> loop we see <code>invariant</code> and <code>variant</code> expressions. "Invariant" describes
+something that does not change - it is checked too also this knowledge is remembered as a fact
+and can be used later for further proving. These 2 invariant expressions do state:
+</p>
+
+<ul class="org-ul">
+<li><code>invariant { 0 &lt;= !i &lt;= length ps - 1 }</code>
+we guarantee inside the loop that <code>i</code> is always in this diapason, i.e., <code>[0..length ps-1]</code></li>
+<li><code>invariant { !i &lt;= length diffs }</code>
+also we guarantee that <code>i</code> is always lesser or equal to the length of the array <code>diffs</code></li>
+</ul>
+
+<p>
+Invariants also can help proving of other claims - without them some claims will not be proven.
+</p>
+
+<p>
+Little note: <code>!</code> in the front of <code>i</code> is "dereferencing" like "*" in C - "take the content of
+the reference" - to be mutable we declared <code>i</code> as reference.
+</p>
+
+<p>
+OK, also we see "variant". The idea of a variant expression is more interesting: it guarantees
+that something is "decreasing" - it states "what" does it. Why do we need it? Usually it is
+needed in:
+</p>
+
+<ul class="org-ul">
+<li><code>while</code>-loop (in <code>for</code>-loop it is obvious, so it is redundant and syntactically denied)</li>
+<li>in recursive functions</li>
+</ul>
+
+<p>
+"Variants" state that something becomes smaller and smaller and this thing is known as
+something having "ZERO" - the smallest form, it cannot become "smaller" and it guarantees Why3
+that looping construction will complete (it is not forever-running, it will terminate) - most
+looping constructions are such ones. Sure, exceptions of this are supported (<code>diverges</code>
+keyword). OK, so here: <code>variant { length ps - 1 - !i }</code> we say that this "thing" (expression)
+becomes smaller and smaller, considering the length of <code>ps</code> is 3:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">!i</th>
+<th scope="col" class="org-right">3 - 1 - !i (ie, length ps - 1 - !i)</th>
+<th scope="col" class="org-left">treating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">2</td>
+<td class="org-left">search further...</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-left">search further...</td>
+</tr>
+
+<tr>
+<td class="org-right">2</td>
+<td class="org-right">0</td>
+<td class="org-left">0 = SMALLEST, STOP IS HERE!</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Theorem provers know: if we hit the smallest "thing" (and it checks the code sure, that it's
+true), then we reach the end of the looping. It means - no infinite loop here.
+</p>
+
+<p>
+<b>Variant expression just focus Why3 what "thing" to check for termination - the decrease of it
+is checked by Why3 itself</b>
+</p>
+
+<p>
+Such "things" can be integers, lists (reaching of <code>Nil</code> - the empty tail), etc.
+</p>
+
+<p>
+And <b>these "variants" and "invariants" give knowledge about looping constructions: what is true
+on every step/iteration, what does guarantee that the end of the loop or recursion.</b>
+</p>
+
+<p>
+Let's continue.
+</p>
+</div>
+</div>
+<div id="outline-container-org23f9fa1" class="outline-3">
+<h3 id="org23f9fa1">Fragment 3: recursion and variant</h3>
+<div class="outline-text-3" id="text-org23f9fa1">
+<pre class="example" id="org26917b3">
+ 1   let rec list_min (l: L.list int) : int =
+ 2   requires { l &lt;&gt; L.Nil }
+ 3   variant  { LL.length l }
+ 4     match l with
+ 5     | L.Nil -&gt; absurd
+ 6     | L.Cons x L.Nil -&gt; x
+ 7     | L.Cons x r -&gt;
+ 8         let m = list_min r in
+ 9         if x &lt; m then x else m
+10     end
+</pre>
+
+<p>
+New here is that it consumes list, not array. Also it is a "program" (i.e, computational)
+function (due to <code>let</code> keyword!). And it is recursive (<code>rec</code> keyword). It has <code>requires</code>
+expression which says that <code>list_min</code> is allowed to be called only with a non-empty list: Why3
+will check all places where it is called. Also it is a contract meaning: a function will
+guarantee (see <code>ensures</code>) if its requirements will be satisfied.
+</p>
+
+<p>
+And you see <code>variant</code> again focusing Why3 what should be checked for termination - it is the
+length of the list <code>l</code>, also we can write directly <code>variant { l }</code> - it is the same. It is our
+termination measure, because we call <code>list_min</code> recursively passing it the tail of the list
+<code>l</code>, which means that on every call <code>l</code> becomes smaller and smaller (we "chop" the list). Can
+we violate the requirement? No, because we stop on line <code>6</code> and return <code>x</code> without to dive
+deeper in a recursive call. Also we have pattern matching on <code>l</code> and it should have a branch
+for empty list - it is line <code>5</code>. What do we do there? We use <code>absurd</code> which means in the
+context of computational/program code - "check if it is really absurd code and it can never
+happen". Why3 will check it (in computational context). <b>If it is not - it will be reported as
+an error!</b>
+</p>
+</div>
+</div>
+<div id="outline-container-orgfc3e8d2" class="outline-3">
+<h3 id="orgfc3e8d2">Fragment 4: function</h3>
+<div class="outline-text-3" id="text-orgfc3e8d2">
+<p>
+This is helper-function, needed mostly in logic (so, I could make it ghost, I think):
+</p>
+
+<pre class="example" id="orge71d588">
+  let rec function list_nth (l: L.list int) (n: int): option int =
+  requires { 0 &lt;= n &lt; LL.length l }
+  ensures {
+    match result with
+    | Some el -&gt; LM.mem el l
+    | None    -&gt; false
+    end
+  }
+  variant { n }
+  match l with
+  | L.Cons x tl -&gt; if n = 0 then Some x else list_nth tl (n - 1)
+  | L.Nil -&gt; None
+  end
+</pre>
+
+<p>
+How to read it: input argument <code>n</code> must be in this range being passed to the function (it
+reminds <a href="https://en.wikipedia.org/wiki/Refinement_type">refinement types</a>) and cos it's a recursive function - it have a "measure of
+termination", i.e., <code>variant</code> expression in its contract: we recursively call ourselves (<code>rec</code>)
+with decreasing of <code>n</code>. More interesting is <code>ensures</code> part of the contract: it guarantees that
+the result exists if it is a member (see <code>mem</code>) of the list <code>l</code>. It sounds strange, but I used
+it to expose out the connection between "nth item" and "it is an item of list". It sounds
+strange but provers often need facts obvious to you but not for them.
+</p>
+</div>
+</div>
+<div id="outline-container-org473054a" class="outline-3">
+<h3 id="org473054a">Fragment 5: invariant "with history"</h3>
+<div class="outline-text-3" id="text-org473054a">
+<p>
+I checked Python program where lists have some duality: they are easy accessible by an index
+but at the same time they are like usual lists: you can append items to them, etc. So, I used
+arrays and lists in my WhyML - and I feel that it is not the best solution :)
+</p>
+
+<p>
+Anyway, so, I needed a way to convert list to array. This helper function does it. It ensures
+not only preserving of the length but also that the same elements are on the same positions -
+see the second <code>ensures</code> on line <code>3</code>:
+</p>
+
+<pre class="example" id="org3a308f5">
+ 1  let list_to_array (l: L.list int) : array int =
+ 2    ensures { LL.length l = length result }
+ 3    ensures {
+ 4      (* preserving of elements *)
+ 5      forall k:int. 0 &lt;= k &lt; LL.length l -&gt;
+ 6        Some result[k] = list_nth l k
+ 7    }
+ 8    let a = make (LL.length l) 0 in
+ 9    for i = 0 to LL.length l - 1 do
+10      invariant { 0 &lt;= i &lt;= LL.length l }
+11      invariant {
+12        forall k:int. 0 &lt;= k &lt; i -&gt;
+13          Some a[k] = list_nth l k      (* check of history *)
+14      }
+15      match list_nth l i with
+16      | Some el -&gt; a[i] &lt;- el;
+17      | None    -&gt; absurd
+18      end;
+19    done;
+20    a
+</pre>
+
+<p>
+Invariants are needed to say: "At every loop iteration, the current state must satisfy this
+formula, and this formula summarizes the relevant consequences of all previous iterations.", it
+is like setting of the induction hypothesis like:
+</p>
+
+<pre class="example" id="org91dd7e3">
+∀ k &lt; i →
+    a[k] = l[k]
+</pre>
+
+<p>
+roughly, we can use why3 command's option <code>--print-theory</code>:
+</p>
+
+<pre class="example" id="org663cabd">
+   ...
+ 1   (forall a1:array int.
+ 2     a1.length = a.length -&gt;
+ 3     (forall i:int.                   ⋱... our  for i = 0 to LL.length l - 1
+ 4       (0 &lt;= i /\ i &lt;= o2) /\         ⋰
+ 5       (0 &lt;= i /\ i &lt;= length1 l) /\                                    ⋱... invariants
+ 6       (forall k:int. 0 &lt;= k /\ k &lt; i -&gt; Some a1[k] = list_nth l k) -&gt;  ⋰
+ 7       (0 &lt;= i /\ i &lt; length1 l) /\
+ 8       (let o3 = list_nth l i in
+ 9        match o3 with
+10        | Some el -&gt; mem el l
+11        | None -&gt; false
+12        end -&gt;
+   ...
+22           (0 &lt;= (i + 1) /\ (i + 1) &lt;= length1 l) &amp;&amp;
+23        (forall k:int.
+24          0 &lt;= k /\ k &lt; (i + 1) -&gt; Some a2[k] = list_nth l k))
+   ...
+</pre>
+
+<p>
+Something like:
+</p>
+
+<pre class="example" id="orge77b68b">
+    Assume invariant(i)
+            |
+            v
+    execute iteration
+            |
+            v
+  prove invariant(i+1)
+</pre>
+
+<p>
+This converts an unbounded history problem into a finite induction proof: "Every iteration I've
+performed so far correctly copied its element." It reminds the usual induction:
+</p>
+
+<pre class="example" id="org53834fe">
+Base:
+    I(S₀, 0)
+
+Step:
+    I(Sᵢ, i) ∧ transition(Sᵢ, Sᵢ₊₁)
+       ⇒ I(Sᵢ₊₁, i+1)
+
+Exit:
+    I(Sₙ, n) ∧ exit-condition
+       ⇒ postcondition
+</pre>
+
+<p>
+<i>where S is for "a state"</i>.
+</p>
+</div>
+</div>
+<div id="outline-container-org357cab8" class="outline-3">
+<h3 id="org357cab8">Fragment 6: predicate, lemma with recursive code</h3>
+<div class="outline-text-3" id="text-org357cab8">
+<p>
+Another helper ghost (see <code>predicate</code>) code:
+</p>
+
+<pre class="example" id="org0ae876e">
+1   predicate list_elems_are_correct_index (l: L.list int) (n: int) =
+2   (* The predicate checks that all elements in the list `l` can be index bounded by `n`,
+3    * ie, 0 &lt;= el &lt; n. It is used in `list_elems_are_correct_index__append_singleton` lemma
+4    *)
+5     match l with
+6     | L.Nil      -&gt; true
+7     | L.Cons x r -&gt; 0 &lt;= x &lt; n /\ list_elems_are_correct_index r n
+8     end
+</pre>
+
+<p>
+It checks that all items in a list can be indexes of some sized object which size is <code>n</code>, i.e.,
+they are bound by <code>[0..n)</code>. Then - lemma, it is helper-theorem - something that will be proven
+and later used in other proofs.
+</p>
+
+<pre class="example" id="org22b6c79">
+ 1   (* This lemma is needed to prove the invariant:
+ 2    *
+ 3    *   invariant { list_elems_are_correct_index !res_ranges (length res_ps_arr) }
+ 4    *
+ 5    * in `approximate_by_rectangles`. This invariant tells that every item is `res_ranges`
+ 6    * is a index of items in `res_ps`/`res_ps_arr` (`res_ranges` is a list of indexes, so
+ 7    * no one item in `res_ranges` can violate the `res_ps` bounds - it can be useful in
+ 8    * the next function: `find_clusters_centers`). But to prove this invarint, we have
+ 9    * to hint Why3 with some lemma. Without it, we hit timeout/out of memory.
+10    *
+11    * It seems the timeout problem is connected with construction of a list and need to
+12    * check the invariant when the list is growing (?) - we add `i` to the list, and we
+13    * know that `i` is inside bounds, so Why3 has to check that adding only of `i` to a
+14    * list means that all items of that list are inside the same bounds. More detailed:
+15    * Z3/CVC4/... do not automatically know that `list_elems_lt` is preserved by `++` !
+16    *
+17    * This lemma proves it by induction. `requires` is A, `ensures` is B in A -&gt; B.
+18    * `variant` is a termination measure (bcs the lemma is recursive).
+19    * The logic of the lemma is in its body (it is like FStar) - returning of () means
+20    * "true/fact!", and we prove the base of the induction for an empty list then
+21    * we state that for non-empty list we pass through it to the base case ("next step"?),
+22    * the proposition that we prove is B, ie:
+23    *
+24    *   ∀x: 0 &lt;= x &lt; n                             (any integer that is also valid index)
+25    *   list_elems_are_correct_index (l ++ [x]) n  (property is preserved after .. ++ [x])
+26    * 
+27    *)
+28   let rec lemma list_elems_are_correct_index__append_singleton (l: L.list int) (x n: int) =
+29   requires { list_elems_are_correct_index l n /\ 0 &lt;= x &lt; n }
+30   variant { LL.length l }
+31   ensures { list_elems_are_correct_index (l ++ L.Cons x L.Nil) n }
+32     match l with
+33     | L.Nil      -&gt; ()
+34     | L.Cons _ r -&gt; list_elems_are_correct_index__append_singleton r x n
+35     end
+</pre>
+
+<p>
+The idea of the lemma is that instead of asking the solver to discover that appending a <b>VALID</b>
+singleton preserves the property while reasoning about a growing list, the program can call the
+lemma and use its postcondition. Look:
+</p>
+
+<pre class="example" id="org1aa7af4">
+requires:                              
+    P(r) /\ Q
+
+ensures:
+    P(r ++ [x])
+
+  I n d u c t i o n :
+    
+P([])                  -- base
+P(y::r) -&gt; P(r)        -- obtain ind. hypothesis (IH)
+IH                     -- recursively prove tail
+--------------
+P(y::r)
+</pre>
+
+<p>
+What does <code>L.Nil -&gt; ()</code> mean in the lemma? It means:
+</p>
+
+<blockquote>
+<ol class="org-ol">
+<li>There is no any PROGRAM operation to perform (it's <code>let</code> lemma)</li>
+<li>Just verify that the contract follows from the current logical context (i.e., preconditions,
+postcondition)</li>
+</ol>
+</blockquote>
+
+<p>
+Lets simplify them:
+</p>
+
+<pre class="example" id="org430c4be">
+ 1   predicate P (l) (n) =
+ 2     match l with
+ 3     | Nil -&gt; true
+ 4     | Cons x r -&gt; 0 &lt;= x &lt; n /\ P r
+ 5     end
+ 6   
+ 7   let rec lemma foo (l) (x) (n) =
+ 8     requires { P l n /\ 0 &lt;= x &lt; n }
+ 9     variant { length l }
+10     ensures { P (l ++ [x]) n }
+11   
+12     match l with
+13     | Nil -&gt; ()
+14     | Cons _ r -&gt; foo r x n
+15     end
+</pre>
+</div>
+<div id="outline-container-org965638e" class="outline-4">
+<h4 id="org965638e">Case 1: l = []</h4>
+<div class="outline-text-4" id="text-org965638e">
+<p>
+Why3 enters <code>| Nil -&gt; ()</code> - unit, so, NO RECURSIVE CALL: EXECUTE NOTHING, PRODUCE <code>()</code>.
+</p>
+
+<p>
+<b>But Why3 still must verify the CONTRACT (pre/postconditions)</b>
+</p>
+
+<ul class="org-ul">
+<li>Precondition <code>P [] n /\ 0 &lt;= x &lt; n</code>.</li>
+<li>Why3 automatically unfold <code>P</code>, knowing its definition, from that definition it found that
+when <code>l</code> is <code>Nil</code>, the result is true: <code>P Nil n -&gt; true</code>, so now: <code>true /\ 0 &lt;= x &lt; n</code>.</li>
+<li>So, THIS IS THE PRECONDITION (!!!).</li>
+<li>Postcondition is <code>P (l ++ [x]) n</code>, currently <code>l = []</code>, so the postcondition is <code>P ([] ++ [x])
+  n</code>. Again, Why3 must still prove: PRE -&gt; POST.</li>
+<li>Why3 knows the definition of <code>++</code> (see the module <code>Append</code> in
+<code>/usr/share/why3/stdlib/list.mlw</code>). So, the result of <code>[] + some_list -&gt; some_list</code> and
+the postcondition becomes <code>P [x] n</code>.</li>
+<li>To prove it Why3 again goes to <code>P</code> definition and unfolds <code>P [x]</code>: it is <code>0 &lt;= x &lt; n /\ P []</code>.</li>
+<li><code>P [] n</code> is true, again. So, the postcondition is <code>0 &lt;= x &lt; n /\ true</code>.</li>
+<li>Now Why3 HAS COMPLETELY UNFOLDED POSTCONDITION TOO. They are:
+PRE: <code>true /\ 0 &lt;= x &lt; n</code>. POST: <code>0 &lt;= x &lt; n /\ true</code>. Tautology, so PRE -&gt; POST is proven!!!</li>
+</ul>
+
+<p>
+Why3 always must prove PRE -&gt; POST, but sometimes also it should execute code, sometimes - no.
+</p>
+</div>
+</div>
+<div id="outline-container-org9a8fd41" class="outline-4">
+<h4 id="org9a8fd41">Case 2: l = [y] and more</h4>
+<div class="outline-text-4" id="text-org9a8fd41">
+<p>
+Now Why3 enters <code>| Cons _ r -&gt; foo r x n</code> (<code>foo</code> here is the recursive call of the lemma).
+<code>r = []</code>, cos <code>l = y :: []</code>. Why3 walks into recursive call:
+</p>
+
+<ul class="org-ul">
+<li>Precondition now is <code>P [y] n /\ 0 &lt;= x &lt; n</code>.</li>
+<li>Why3 unfold <code>P [y] n</code> again: <code>0 &lt;= y &lt; n /\ P [] n</code> (as we remember <code>P [] n</code> is true)</li>
+<li>and so on... Recursive structure of the verification look as:</li>
+</ul>
+
+<pre class="example" id="org88b33fa">
+foo [a,b,c] x n
+│
+├── requires: P([a,b,c],n) /\ 0 ≤ x &lt; n
+│
+├── recursive call: foo [b,c] x n
+│   │
+│   ├── requires: P([b,c],n) /\ 0 ≤ x &lt; n
+│   │
+│   ├── recursive call: foo [c] x n
+│   │   │
+│   │   ├── requires: P([c],n) /\ 0 ≤ x &lt; n
+│   │   │
+│   │   ├── recursive call: foo [] x n         ⋱  now this is proven:
+│   │   │   │                                   :   P [] n /\ ≤ x &lt; n
+│   │   │   ├── requires: P([],n) /\ 0 ≤ x &lt; n  :   -----------------
+│   │   │   │                                   :   P [x] n
+│   │   │   └── ensures: P([x],n)              ⋰
+│   │   │
+│   │   └── ensures: P([c,x],n)
+│   │
+│   └── ensures: P([b,c,x],n)
+│
+└── ensures: P([a,b,c,x],n)
+
+
+and the top claim is proven:  P([a,b,c],n) /\ 0 ≤ x &lt; n
+                              -------------------------
+                              P([a,b,c,x],n)
+</pre>
+
+<blockquote>
+<p>
+The ensures of the recursive call is used to prove the ensures of the enclosing invocation.
+</p>
+</blockquote>
+
+<p>
+<code>requires -&gt; recursive call -&gt; ensured new knowledge</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org95b3398" class="outline-3">
+<h3 id="org95b3398">Fragment 7: axiom, bounds check</h3>
+<div class="outline-text-3" id="text-org95b3398">
+<pre class="example" id="org516183a">
+ 1    (* This axiom is workaround for:
+ 2     *   let isovalue: int = isovalues_arr[ranges_arr[irange]] in
+ 3     * in `find_clusters_centers`, so Why3 be able to prove bounds violation, it has all info
+ 4     * for it but it cannot connect separate items (to connect list/array items bound by
+ 5     * `LL.length isovalues`, ie, `ranges/ranges_arr` values are 0..|isovalues|-1).
+ 6     *)
+ 7    
+ 8    axiom list_element_is_valid:
+ 9      forall l:L.list int, n k:int.
+10        list_elems_are_correct_index l n -&gt;
+11        0 &lt;= k &lt; LL.length l -&gt;
+12        match list_nth l k with
+13        | Some x -&gt; 0 &lt;= x &lt; n
+14        | None -&gt; false
+15        end
+</pre>
+
+<p>
+In short, if <code>list_elems_are_correct_index l n</code>, then it means that every item of <code>l</code> (indexed by
+<code>k ∈ 0..|l|</code>) is bounded too. I entered it as an axiom (it is just trusted, without to be provev),
+because I had problems with a proof of this obvious fact, yep. But this axiom helps to check bounds
+violations in <code>let isovalue: int = isovalues_arr[ranges_arr[irange]]...</code> later. Yes, Why3 performs
+bounds checking too.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd1b2b28" class="outline-3">
+<h3 id="orgd1b2b28">Fragment 8: complex contract, assert</h3>
+<div class="outline-text-3" id="text-orgd1b2b28">
+<pre class="example" id="orgc16ffc9">
+ 1   let approximate_by_rectangles (ps: array int)
+ 2                                 (tolerance: int) : (L.list int, L.list int) =
+ 3   requires { tolerance &gt; 0 }
+ 4   (* invariants and asserts help to prove `ensures`, else they fail with timeout *)
+ 5   ensures {
+ 6     length ps &gt; 0 -&gt;
+ 7       match result with
+ 8       | (a, b) -&gt; LL.length a &gt; 0 /\ LL.length b &gt; 0
+ 9       end
+10   }
+11   ensures {
+12     match result with
+13     | (a, b) -&gt; LL.length a &lt;= LL.length b
+14     end  
+15   }
+16   ensures {
+17     (* connects 1st,2nd items of the returning tuple: `a` is a list
+18        of indexes in `b` *)
+19     match result with
+20     | (a, b) -&gt; list_elems_are_correct_index a (LL.length b)
+21     end
+22   }
+23     let res_ps: ref (L.list int) = ref L.Nil in
+24     let res_ranges: ref (L.list int) = ref L.Nil in
+25     let slice: ref (L.list int) = ref L.Nil in
+26     for i = 0 to length ps - 1 do
+27     invariant { 0 &lt;= i &lt;= length ps }
+28     invariant { i &gt; 0 -&gt; LL.length !slice &gt; 0 }
+29     (* call of `list_to_array` in loop is horrible performance, but for proving - it
+30      * is not not a problem. It is needed due to duality of Python's list (it is
+31      * translation from Python) - it is indexable but also appendable/extendable *)
+32       let p = ps[i] in
+33       if LL.length !slice = 0 then
+34         slice := !slice ++ (L.Cons p L.Nil)
+35       else if new_rect_is_needed (list_to_array !slice) p tolerance then
+36         begin
+37           let slice_avg = calc_avg (list_to_array !slice) in
+38           res_ps := !res_ps ++ (make_list (LL.length !slice) slice_avg);
+39           slice := make_list 1 p
+40         end
+41       else
+42         slice := !slice ++ (L.Cons p L.Nil)
+43     done;
+44     if LL.length !slice &gt; 0 then
+45       begin
+46         let slice_avg = calc_avg (list_to_array !slice) in
+47         res_ps := !res_ps ++ (make_list (LL.length !slice) slice_avg)
+48       end;
+49     assert { LL.length !slice &gt; 0 -&gt; LL.length !res_ps &gt; 0 };
+50     let pr: ref (option int) = ref None in
+51     let res_ps_arr: array int = list_to_array !res_ps in
+52     assert { length res_ps_arr = LL.length !res_ps };
+53     for i = 0 to length res_ps_arr - 1 do
+54     invariant { 0 &lt;= i &lt;= length res_ps_arr }
+55     invariant { i &gt; 0 -&gt; LL.length !res_ranges &gt; 0 }
+56     invariant { LL.length !res_ranges &lt;= i }  (* this is needed to avoid timeout on 2nd
+57                                                * `ensures` of the function *)
+58     invariant { list_elems_are_correct_index !res_ranges (length res_ps_arr) }
+59       if i = 0 then
+60         res_ranges := !res_ranges ++ (L.Cons i L.Nil)
+61       else if not option_eq !pr (Some res_ps_arr[i]) then
+62         res_ranges := !res_ranges ++ (L.Cons i L.Nil);
+63       pr := Some res_ps_arr[i]
+64     done;
+65     assert { length ps &gt; 0 -&gt; (LL.length !res_ranges &gt; 0) /\ (LL.length !res_ps &gt; 0) };
+66     (!res_ranges, !res_ps)
+</pre>
+
+<p>
+This function contains interesting postconditions about resulting 2 lists (combined in a tuple):
+</p>
+
+<ul class="org-ul">
+<li>for non-empty input array, both result lists are not empty</li>
+<li>the second result list is never smaller than the first one</li>
+<li>the first list contains only indexes of the second list</li>
+</ul>
+
+<p>
+Also this fragment contains already known invariants (in <code>for</code>), pay attention, <code>for</code> does not use
+variants because it's naturally limited and asserts. Asserts must end with ";". Asserts:
+</p>
+
+<ul class="org-ul">
+<li>are proved</li>
+<li>are saved as facts in the logical context</li>
+<li>help to prove some other claims (as well as invariants help too)</li>
+<li>are kind of DOCUMENTATION about the code</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc126fc8" class="outline-3">
+<h3 id="orgc126fc8">Fragment 9: complex bounds check</h3>
+<div class="outline-text-3" id="text-orgc126fc8">
+<pre class="example" id="orgfcae1ab">
+  let find_clusters_centers
+    (ranges isovalues: L.list int) (ratio: int) (nesting: int): L.list (int, int) =
+  requires { LL.length ranges &lt;= LL.length isovalues }
+  requires { list_elems_are_correct_index ranges (LL.length isovalues) }
+  if LL.length ranges = 0 || LL.length isovalues = 0 then
+    L.Nil
+  else begin
+    let res: ref (L.list (int, int)) = ref L.Nil in
+    let max_irange: int = LL.length ranges - 1 in
+    let prev_isovalue: ref (option int) = ref None in
+    let ranges_arr: array int = list_to_array ranges in
+    let isovalues_arr: array int = list_to_array isovalues in
+    for irange = 0 to max_irange do
+      let isovalue: int = isovalues_arr[ranges_arr[irange]] in
+      let skip_common: ref bool = ref false in
+      let left: ref int = ref 0 in
+      let right: ref int = ref 0 in    
+      match !prev_isovalue with
+      | None                 -&gt; ()
+      | Some prev_isovalue_v -&gt;
+        if isovalue &gt; prev_isovalue_v &amp;&amp;
+           num_ge (calc_ratio isovalue prev_isovalue_v) (Fin ratio) then
+        begin
+          right := ranges_arr[irange];
+          left := ranges_arr[max (irange - 1) 0]
+        end
+        else if isovalue &lt; prev_isovalue_v &amp;&amp;
+                num_ge (calc_ratio prev_isovalue_v isovalue) (Fin ratio) then
+        begin
+          left := ranges_arr[irange];
+          right := ranges_arr[min (irange + 1) max_irange]
+        end
+        else
+        begin
+          prev_isovalue := Some isovalue;
+          skip_common := true
+        end;
+        if not !skip_common then
+        begin
+          if !right = !left then incr right;
+          left := !left + nesting;
+          right := !right + nesting;
+          if LL.length !res = 0 ||
+             not (option_tuple_eq (list_last !res) (Some (!left, !right))) then
+            res := !res ++ (L.Cons (!left, !right) L.Nil);
+        end
+      end;
+      prev_isovalue := Some isovalue
+    done;
+    !res
+  end
+</pre>
+
+<p>
+Why3 checks bounds violation in: <code>let isovalue: int = isovalues_arr[ranges_arr[irange]]</code>. But to do
+it, it needs help (that lemma <code>list_elems_are_correct_index__append_singleton</code> but mostly the
+axiom-workaround!): all indexes are checked! Also we added it to the precondition:
+</p>
+
+<pre class="example" id="org0639ba2">
+  requires { list_elems_are_correct_index ranges (LL.length isovalues) }
+</pre>
+
+<p>
+This is complex bounds check because it should check that all items in <code>ranges_arr</code> array do not
+violate <code>[0..|isovalues_arr|)</code>. Also Why3 checks that <code>irange</code> is in <code>0..|ranges_arr|</code>.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0212e6f" class="outline-2">
+<h2 id="org0212e6f">Hoare triples and difference with traditional asserts</h2>
+<div class="outline-text-2" id="text-org0212e6f">
+<p>
+<a href="https://en.wikipedia.org/wiki/Hoare_logic#Hoare_triple">https://en.wikipedia.org/wiki/Hoare_logic#Hoare_triple</a> :
+</p>
+
+<p>
+A Hoare triple is of the form <code>{P} C {Q}</code>, where <code>P</code> and <code>Q</code> are assertions and <code>C</code> is a
+command. <code>P</code> is named the precondition and <code>Q</code> the postcondition: when the precondition is met,
+executing the command establishes the postcondition.
+</p>
+
+<p>
+So, a program can be split to pieces with asserts:
+</p>
+
+<pre class="example" id="orga154c54">
+            code...
+            code...
+  /some state of the program\   P: assert(..)
+  \ treated as precondition /
+            code...             C
+            code...
+  /some state of the program\   Q: assert(..)
+  \ treated as postcondition/
+            . . .          
+</pre>
+
+<p>
+The difference is that usual asserts is C, Python, etc <b>are checked in runtime</b> while asserts in
+Why3 (and similar) are verified, without to run the program! BUT... Why3 support so called RAC:
+runtime assertion checking and Why3 has a lot of options for RAC. It allows to keep assertions at
+runtime too (in extracted code).
+</p>
+
+<p>
+OK, so, Python, C assertions live only in so called "instrumental build", and they are removed in
+release builds. But they should not be removed from the code, they are not only for verification in
+runtime, - they also are DOCUMENTATION, CONTRACTS for a programmer who can understand the behavior
+of the program better - they are like "monitors" guarantying that here, in this point the state is
+such one.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbc71a65" class="outline-2">
+<h2 id="orgbc71a65">The difference with Rocq, LEAN - dark side</h2>
+<div class="outline-text-2" id="text-orgbc71a65">
+<p>
+Sometimes verification fails with errors "timeout" and "out of memory".
+</p>
+
+<p>
+<b>IT IS TRUE FOR ALL THEOREM PROVERS</b>.
+</p>
+
+<p>
+"Out of memory" and timeout usually mean "the generated verification problem became too hard for the
+prover," not necessarily that the proposition is false or that Why3 is stuck executing your program.
+</p>
+
+<ul class="org-ul">
+<li>A timeout says: "I haven't finished."</li>
+<li>OOM says something closer to: "I generated/constructed too much state."</li>
+</ul>
+
+<p>
+And even 1, very small change of the WhyML code can lead to timeout or OOM. Their debugging in very
+difficult. 2 mathematically equivalent formulations can have radically different performance. A
+timeout does not mean "the theorem is difficult". Sometimes it can be even obvious to a human (see
+above my axiom-workaround).
+</p>
+
+<p>
+This is why Why3 verification often involves proof engineering:
+</p>
+
+<ul class="org-ul">
+<li>choose good invariants</li>
+<li>introduce lemmas</li>
+<li>control definitions</li>
+<li>split goals</li>
+<li>avoid unnecessary quantifiers</li>
+<li>provide intermediate facts</li>
+<li>choose appropriate triggers/provers</li>
+<li>sometimes explicitly instantiate lemmas</li>
+</ul>
+
+<p>
+Proof engineer not changing the mathematics; he/she changes <b>the shape of the problem</b> presented to
+the automated prover.
+</p>
+
+<p>
+The control of proving "route" in Rocq, LEAN is more "manual" (it can be automatic, but it can be
+very manual) and there OOM, timeouts happen too, but they allow more control to avoid them - if you
+know how to achieve it.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
