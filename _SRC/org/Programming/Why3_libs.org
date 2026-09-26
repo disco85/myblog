@@ -315,12 +315,151 @@ So, *transformation - is rewriting*. See the diagram:
                     SMT solver
                          |
                          v
-   Result: Valid / Invalid / Unknown / Timeout
+       Result: Valid/Invalid/Unknown/Timeout
                          |
                          v
         Why3 reports the result and records
               it in the proof session
 #+end_example
+
+* Custom libraries. Trust
+
+Let's put this into a separate file called ~MyListLemmas.mlw~:
+
+#+begin_example
+ 1   module MyListLemmas
+ 2   
+ 3     use int.Int
+ 4     use list.List
+ 5     use list.Length as LL
+ 6     use list.Nth
+ 7     use option.Option
+ 8   
+ 9     lemma nth_none_1:
+10        forall l: list 'a, i: int. i < 0 -> nth i l = None
+11   
+12     lemma nth_none_2:
+13        forall l : list 'a, i: int. i >= LL.length l -> nth i l = None
+14   
+15     lemma nth_none_3:
+16        forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= LL.length l
+17   end
+#+end_example
+
+then "import" it with ~use MyListLemmas.MyListLemmas~ and prove the ~Test2~ again:
+
+#+begin_example
+ 1   module Test2
+ 2   
+ 3     use int.Int
+ 4     use list.List
+ 5     use list.Length as LL
+ 6     use list.Nth
+ 7     use option.Option
+ 8     use MyListLemmas.MyListLemmas  (* <= ADDED USE ! *)
+ 9   
+10     goal bounded_nth:
+11       forall i: int, l: list 'a.
+12         0 <= i < LL.length l ->
+13         nth i l <> None
+14   
+15   end
+#+end_example
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 Test2.mlw
+File "Test2.mlw", line 12, character 4 to line 14, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.00s, 12337 steps).
+#+end_src
+
+Voila! Works. Now prove ~MyListLemma.mlw~ without transformations:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 MyListLemmas.mlw 
+File "MyListLemmas.mlw", line 10, characters 5-55:
+Goal nth_none_1.
+Prover result is: Timeout (5.00s, 7327706 steps).
+
+File "MyListLemmas.mlw", line 13, characters 5-67:
+Goal nth_none_2.
+Prover result is: Timeout (5.00s, 8989493 steps).
+
+File "MyListLemmas.mlw", line 16, characters 5-75:
+Goal nth_none_3.
+Prover result is: Timeout (5.00s, 7688072 steps).
+#+end_src
+
+Timeouts! It seems Why3 *TRUSTS IMPORTED SOURCES WITHOUT TO PROVE THEM!*.
+
+Look, let's create 2 files: ~Evil.mlw~ and ~Test3.mlw~:
+
+#+begin_example
+(* Evil.mlw *)
+module Evil
+  use int.Int
+  lemma completely_false:
+    false
+end
+
+(* Test3.mlw *)
+module Test3
+  use Evil.Evil
+  lemma test:
+    false
+end
+#+end_example
+
+Let's prove ~Test3.mlw~:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 Test3.mlw 
+File "Test3.mlw", line 4, characters 4-9:
+Goal test.
+Prover result is: Valid (0.00s, 4 steps).
+#+end_src
+
+Incredible!!! Our suggestion was right!
+
+If to comment out: ~(*use Evil.Evil*)~ line, then proving of ~Test3.mlw~ sure FAILS:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 Test3.mlw 
+File "Test3.mlw", line 4, characters 4-9:
+Goal test.
+Prover result is: Unknown (sat) (0.00s, 7 steps).
+#+end_src
+
+So, Why3 trusts included/used theories (~theory~ keyword was replaced by ~module~ in new
+versions):
+
+#+begin_example
+Why3 DOES NOT DO this on "use"                    Why3 DOES this
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                    ~~~~~~~~~~~~~~
+
+          "use XYZ"                                 "use XYZ"
+              |                                         |
+              v                                         v
+          find .mlw                                 find .mlw
+              |                                         |
+              v                                         v
+    p̶r̶o̶v̶e̶ ̶e̶v̶e̶r̶y̶ ̶l̶e̶m̶m̶a̶ ̶i̶n̶ ̶i̶t̶             l͟o͟a͟d͟ d͟e͟c͟l͟a͟r͟a͟t͟i͟o͟n͟s͟ o͟f͟ t͟h͟e͟ m͟o͟d͟u͟l͟e͟s͟
+              |                                         |
+              v                                         v
+ import the p̶r̶o̶v̶e̶d̶ results                 use them as trusted theories
+#+end_example
+
+*ACL2 Theorem Prover is different here: its books are "CERTIFIED" - must be signed after
+successful proving* - look more here about [[https://acl2.org/doc/index-seo.php?path=5213%2F162%2F42368%2F81&xkey=ACL2____CERTIFY-BOOK][Certified Books in ACL2]].
+
+So if the theory contains: ~lemma P: A~ then the importing theory can use P as a fact without
+generating/proving P's VC.
+
+* Transformations
+
+TODO
+
+--------------------------------------------------------
 
 
 TODO The session stores the transformations you performed on each verification condition, as well as the provers you ran.
