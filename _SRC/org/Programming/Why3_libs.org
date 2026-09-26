@@ -14,12 +14,12 @@ support more than one input language (usually theorem provers support only one),
 
 For Why3 1.8.x, the standard formats are:
 
-- WhyML — .mlw — the normal Why3 language for programs, specifications, lemmas, and goals.
-- micro-C — .c — a small C subset intended mainly for teaching.
-- micro-Python — .py — a small Python subset, also mainly for teaching.
-- MLCFG — .mlcfg — an extension of WhyML with unstructured/goto-style function bodies.
-- Coma — .coma — an intermediate verification language.
-- S-expressions — an internal/intermediate representation of Why3 syntax, when Why3 was built
+- WhyML - .mlw - the normal Why3 language for programs, specifications, lemmas, and goals.
+- micro-C - .c - a small C subset intended mainly for teaching.
+- micro-Python - .py - a small Python subset, also mainly for teaching.
+- MLCFG - .mlcfg - an extension of WhyML with unstructured/goto-style function bodies.
+- Coma - .coma - an intermediate verification language.
+- S-expressions - an internal/intermediate representation of Why3 syntax, when Why3 was built
   with S-expression support.
 - etc...
 
@@ -373,7 +373,7 @@ Goal bounded_nth.
 Prover result is: Valid (0.00s, 12337 steps).
 #+end_src
 
-Voila! Works. Now prove ~MyListLemma.mlw~ without transformations:
+Voila! Works. Now prove ~MyListLemmas.mlw~ without transformations:
 
 #+begin_src sh :eval no :exports both
 $ why3 prove -L . -P z3 MyListLemmas.mlw 
@@ -434,19 +434,20 @@ So, Why3 trusts included/used theories (~theory~ keyword was replaced by ~module
 versions):
 
 #+begin_example
-Why3 DOES NOT DO this on "use"                    Why3 DOES this
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                    ~~~~~~~~~~~~~~
+W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟N͟O͟T͟ ͟D͟O͟ ͟t͟h͟i͟s͟ ͟o͟n͟ ͟"͟u͟s͟e͟"͟                    W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟t͟h͟i͟s͟
 
+              ╳                                         ✔
+              
           "use XYZ"                                 "use XYZ"
               |                                         |
               v                                         v
           find .mlw                                 find .mlw
               |                                         |
               v                                         v
-    p̶r̶o̶v̶e̶ ̶e̶v̶e̶r̶y̶ ̶l̶e̶m̶m̶a̶ ̶i̶n̶ ̶i̶t̶             l͟o͟a͟d͟ d͟e͟c͟l͟a͟r͟a͟t͟i͟o͟n͟s͟ o͟f͟ t͟h͟e͟ m͟o͟d͟u͟l͟e͟s͟
+    prove every lemma in it             l͟o͟a͟d͟ d͟e͟c͟l͟a͟r͟a͟t͟i͟o͟n͟s͟ o͟f͟ t͟h͟e͟ m͟o͟d͟u͟l͟e͟s͟
               |                                         |
               v                                         v
- import the p̶r̶o̶v̶e̶d̶ results                 use them as trusted theories
+ import the proved results                 use them as trusted theories
 #+end_example
 
 *ACL2 Theorem Prover is different here: its books are "CERTIFIED" - must be signed after
@@ -455,11 +456,94 @@ successful proving* - look more here about [[https://acl2.org/doc/index-seo.php?
 So if the theory contains: ~lemma P: A~ then the importing theory can use P as a fact without
 generating/proving P's VC.
 
-* Transformations
+* Sessions
+
+As you see transformations are applied in CLI or in IDE, not in the source written in WhyML (in
+WhyML meta-program you can only add hints for transformations).
+
+If to open ~MyListLemmas.mlw~ in the IDE (yeah, Why3 has IDE! Run it ~why3 ide MyListLemmas.mlw~)
+then you will see something like (in the left panel):
+
+#+begin_example
+Status | Theories/Goals        | Time
+  ?      ▼ 🗁  MyListLemmas.mlw  
+  ?        ▼ 🗁  MyListLemmas    
+  ?          🗎 nth_none_1       
+  ?          🗎 nth_none_2       
+  ?          🗎 nth_none_3       
+#+end_example
+
+And you can try to prove them (all together with popup on the module "MyListLemmas" or
+individually, lemma by lemma) - just select the prover (CVC4, Z3, etc) - you will hit TIMEOUT!
+
+But if to apply transformation (menu "Tools/Transformations (e-r)/induction_ty_lex") on the
+whole module and then to call proving with the popup on the module (!) (even CVC4 works fine
+now), you will get the result immediately, see the new picture of proven goals:
+
+#+begin_example
+Status | Theories/Goals               | Time
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_1              
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.01 (steps: 4983)
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_2              
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.02 (steps: 5148)
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_3
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.02 (steps: 5322)
+#+end_example
+
+Now you can save it as /a session/ or /a ZIP file with a session/. Why3 will save 2 files
+actually - the menu "File/Save session and files":
+
+#+begin_example
+:
+├── MyListLemmas
+│   ├── why3session.xml
+│   └── why3shapes.gz
+├── MyListLemmas.mlw
+:
+#+end_example
+
+Files are:
+
+1. why3session.xml: session stores the transformations you performed on each verification
+   condition, as well as the provers you ran.
+2. why3shapes.gz: compressed database of proof shapes used by Why3’s proof-session replay.
+
+A proof shape is a compact representation of a proof attempt’s goal, used to recognize similar
+goals later. When replaying a session—often after the source or Why3 setup has changed—Why3 can
+use these shapes to help match old proof attempts to the corresponding new goals and decide
+what can be replayed:
+
+#+begin_example
+<saved Why3 session>
+  ├─ proof tree: transformations and prover calls
+  └─ why3shapes.gz: goal-shape data for matching/replay
+#+end_example
+
+OK, exit from the IDE where you proved the theory INTERACTIVELY. Now open it again:
+
+#+begin_src sh :eval no :exports both
+$ why3 ide MyListLemmas.mlw
+#+end_src
+
+Magic!!! You see the same picture - the picture of proven goals even with wasted time!!!
+
+** Use-cases of sessions
 
 TODO
 
 --------------------------------------------------------
 
 
-TODO The session stores the transformations you performed on each verification condition, as well as the provers you ran.
+TODO 
