@@ -1,0 +1,326 @@
+#+title: Why3, custom libraries, transformations
+#+description: How to write and use custom libraries
+#+keywords: Why3,libraries,theorem proving
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Why3 theorem proving
+#+date: <2026-09-26 Sat 11:57>
+
+* Why3 formats
+
+"Format" is an established term in Why3. It's an input file format. Language to be honest. Why3
+support more than one input language (usually theorem provers support only one), they are:
+
+For Why3 1.8.x, the standard formats are:
+
+- WhyML — .mlw — the normal Why3 language for programs, specifications, lemmas, and goals.
+- micro-C — .c — a small C subset intended mainly for teaching.
+- micro-Python — .py — a small Python subset, also mainly for teaching.
+- MLCFG — .mlcfg — an extension of WhyML with unstructured/goto-style function bodies.
+- Coma — .coma — an intermediate verification language.
+- S-expressions — an internal/intermediate representation of Why3 syntax, when Why3 was built
+  with S-expression support.
+- etc...
+
+You can list supported formats by YOUR installation of Why3 by the command:
+
+#+begin_example
+$ why3 show formats
+coma ["coma"]
+  Continuation Machine language
+
+dimacs ["cnf"]
+  Parser for dimacs format.
+
+equlin ["equlin"]
+  Generate random linear arithmetic problems. The first line gives the seed.
+  Each other line describes a goal and contains three numbers:
+    - the number of variables
+    - the number of equations
+    - the maximum absolute value of coefficients.
+
+micro-C ["c"]
+  micro-C format
+
+mlcfg ["mlcfg",
+"stdout"]
+  whyml extended with functions implemented by control-flow-graphs
+
+python ["py"]
+  mini-Python format
+
+sexp ["sexp"]
+  WhyML code in s-expressions format
+
+tptp ["p", "ax"]
+  TPTP format (CNF FOF FOFX TFF)
+
+whyml ["mlw", "why"]
+  WhyML programming and specification language
+#+end_example
+
+Read more about them in the [[https://why3.org/doc/input_formats.html][Documentation of Why3]].
+
+** WhyML - ML descendant
+
+.mlw format is a text file. The text inside it must follow special syntax, grammar. This
+grammar forms a language called WhyML. It is based on [[https://en.wikipedia.org/wiki/ML_(programming_language)][META LANGUAGE or ML]]. One of the
+descendants of ML is [[https://ocaml.org/][Ocaml]] (others: SML, [[https://cakeml.org/][CakeML]], [[https://ats-lang.sourceforge.net/][ATS - former Dependent ML]], [[https://fstar-lang.org/][F*]], [[https://fsharp.org/][F#]], [[https://reasonml.github.io/][Reason ML]],
+[[https://rescript-lang.org/][ReScript]], [[https://elm-lang.org/][Elm]], so on).
+
+Theorem provers written in Ocaml:
+
+- Why3
+- Rocq (ex. Coq)
+- F*
+- HOL Light
+- Matita
+- Zenon
+- Isabelle (not Ocaml, but SML)
+- Alt-Ergo (not prover, but SMT solver)
+- etc...
+
+* Standard libraries
+
+To use some library (with computational code or logical code), you should import it with:
+
+#+begin_example
+use Some_Library
+use Another_Library as AL
+#+end_example
+
+and to use symbols from them directly or prefixed (if you used ~... as prefix~). After
+installation, you can find Why3 libraries here: ~/usr/share/why3/stdlib~. There are .mlw
+libraries looking as:
+
+#+begin_example
+(** {1 Basic Algebra Theories} *)
+
+(** {2 Associativity} *)
+
+module Assoc
+
+  type t
+  function op t t : t
+  axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
+
+end
+
+(** {2 Commutativity} *)
+
+module Comm
+
+  type t
+  function op t t : t
+  axiom Comm : forall x y : t. op x y = op y x
+
+end
+...
+#+end_example
+
+You import it with ~use~ and its "theories" (old name for "module"-s) with their lemmas,
+axioms, functions, types, predicates, etc - are in your code, your code can be based on some
+lemma now.
+
+For example:
+
+#+begin_example
+ 1   module Test2
+ 2   
+ 3     use int.Int             (* for <, <=, etc *)
+ 4     use list.List           (* for list, Cons, Nil, etc *)
+ 5     use list.Length as LL   (* for list's length *)
+ 6     use list.Nth            (* for nth over lists *)
+ 7     use option.Option       (* for option, None, Some *)
+ 8   
+ 9     goal bounded_nth:
+10       forall i: int, l: list 'a.
+11         0 <= i < LL.length l ->
+12         nth i l <> None
+13   
+14   end
+#+end_example
+
+and if to try to prove this ~bounded_nth~ goal:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -P z3 Test2.mlw
+File "Test2.mlw", line 10, character 4 to line 12, character 21:
+Goal bounded_nth.
+Prover result is: Timeout (5.00s, 7412868 steps).
+#+end_src
+
+then we hit timeout. We need some lemma to prove this claim (that ~nth~ returns something,
+i.e., not ~None~ if the index is bounded by the length of the list). But if to add:
+
+#+begin_example
+...
+use list.NthLength
+...
+#+end_example
+
+then some important lemmas will come into our code, become available behind the scene and Why3
+will use them to prove the goal:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -P z3 Test2.mlw
+File "Test2.mlw", line 11, character 4 to line 13, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.01s, 12337 steps).
+#+end_src
+
+The library "came" from the module ~NthLength~ written in ~/usr/share/why3/stdlib/list.mlw~
+file. How does Why3 find it? If to call ~why3 config show~, you will see:
+
+#+begin_example
+...
+[main]
+default_editor = "xdg-open %f"
+loadpath = "/usr/share/why3/stdlib"
+magic = 14
+memlimit = 1000
+running_provers_max = 2
+timelimit = 5.000000
+...
+#+end_example
+
+this is the merge of default (embedded) settings and your home config which is
+=$HOME/.why3.conf=. Other directories used by why3:
+
+#+begin_src sh :eval no :exports both
+$ why3 --print-datadir
+/usr/share/why3
+
+$ why3 --print-libdir
+/usr/lib/x86_64-linux-gnu/ocaml/5.3.0/why3
+#+end_src
+
+You can add new directory for search (for libraries) using environment variable, config file or
+with CLI option ~-L <path>~.
+
+* Transformations
+
+We can avoid import of ~list.NthLength~ and to write them by hand in the top of our ~Test2~ module:
+
+#+begin_example
+1   lemma nth_none_1:
+2      forall l: list 'a, i: int. i < 0 -> nth i l = None
+3 
+4   lemma nth_none_2:
+5      forall l : list 'a, i: int. i >= LL.length l -> nth i l = None
+6 
+7   lemma nth_none_3:
+8      forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= LL.length l
+#+end_example
+
+Then to try to prove it with:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 Test2.mlw
+File "Test2.mlw", line 11, characters 5-55:
+Goal nth_none_1.
+Prover result is: Timeout (5.00s, 8394760 steps).
+
+File "Test2.mlw", line 14, characters 5-67:
+Goal nth_none_2.
+Prover result is: Timeout (5.00s, 9386120 steps).
+
+File "Test2.mlw", line 17, characters 5-75:
+Goal nth_none_3.
+Prover result is: Timeout (5.00s, 8412995 steps).
+
+File "Test2.mlw", line 20, character 4 to line 22, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.00s, 12337 steps).
+#+end_src
+
+Proving of them is naturally induction based. To force Why3 to use induction, we /apply transformation/:
+
+#+begin_src sh :eval no :exports both
+$ why3 prove -L . -P z3 --apply-transform induction_ty_lex Test2.mlw
+File Test2.mlw:
+Goal nth_none_1.
+Prover result is: Valid (0.01s, 9815 steps).
+
+File Test2.mlw:
+Goal nth_none_2.
+Prover result is: Valid (0.01s, 10099 steps).
+
+File Test2.mlw:
+Goal nth_none_3.
+Prover result is: Valid (0.01s, 11017 steps).
+
+File Test2.mlw:
+Goal bounded_nth.
+Prover result is: Valid (0.01s, 12067 steps).
+#+end_src
+
+Now everything is fine! No more timeouts. Why? Because we helped Why3 with a
+transformation. What is it?
+
+In Why3, a transformation is a program that takes a verification goal (or a collection of
+goals) and rewrites it into one or more new goals.  For example, transformations can:
+
+- Simplify a goal or remove redundant hypotheses.
+- Split a conjunction or a goal with multiple branches into separate goals.
+- Introduce definitions or unfold them.
+- Instantiate quantified formulas.
+- Eliminate certain constructs or encode them into simpler logic.
+- Prepare a goal for a particular prover, such as by changing its shape or encoding.
+
+#+begin_quote
+WhyML programs produce proof goals; Why3 transformations reshape those goals for proof.
+#+end_quote
+
+Why3 transformations are broadly similar to tactics: they take a proof goal and change it into
+subgoals that are easier to prove.  The distinction is mostly about how they’re used:
+
+A Why3 transformation is a named, reusable operation in Why3’s proof workflow (for example,
+splitting a goal or simplifying it).  A tactic often suggests an interactive proof command,
+possibly with a script or search procedure that applies several steps.
+
+Why3 transformations can be applied interactively in the IDE or passed in CLI. Some
+are simple goal rewrites; others perform more substantial encodings or preprocessing. So
+“tactic-like” is a good analogy, though not every transformation corresponds to a single tactic
+step.
+
+So, *transformation - is rewriting*. See the diagram:
+
+#+begin_example
+                   WhyML source
+                         |
+                         v
+           Why3 parses and type-checks
+                         |
+                         v
+           Verification conditions (tasks)
+                         |
+                         v
+            optional transformations           .---------.
+         split, simplify, inline, etc.     <---  H E R E |
+         (applied in the IDE or via CLI)       `---------'
+                         |
+                         v
+          Task sent to a selected prover
+                         |
+                         v
+           Why3 driver translates the task
+           into the prover's input language
+                         |
+                         v
+            SMT-LIB (for an SMT solver)
+                         |
+                         v
+                    SMT solver
+                         |
+                         v
+   Result: Valid / Invalid / Unknown / Timeout
+                         |
+                         v
+        Why3 reports the result and records
+              it in the proof session
+#+end_example
+
+
+TODO The session stores the transformations you performed on each verification condition, as well as the provers you ran.
