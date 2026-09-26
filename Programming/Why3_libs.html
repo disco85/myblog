@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-09-26 Sat 15:57 -->
+<!-- 2026-09-26 Sat 16:20 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Why3, custom libraries, transformations</title>
@@ -357,7 +357,7 @@ with S-expression support.</li>
 You can list supported formats by YOUR installation of Why3 by the command:
 </p>
 
-<pre class="example" id="org49b0bf9">
+<pre class="example" id="org68f1596">
 $ why3 show formats
 coma ["coma"]
   Continuation Machine language
@@ -431,7 +431,7 @@ Theorem provers written in Ocaml:
 To use some library (with computational code or logical code), you should import it with:
 </p>
 
-<pre class="example" id="org502fb6f">
+<pre class="example" id="org308c2ee">
 use Some_Library
 use Another_Library as AL
 </pre>
@@ -442,7 +442,7 @@ installation, you can find Why3 libraries here: <code>/usr/share/why3/stdlib</co
 libraries looking as:
 </p>
 
-<pre class="example" id="org220c839">
+<pre class="example" id="orgc491317">
 (** {1 Basic Algebra Theories} *)
 
 (** {2 Associativity} *)
@@ -477,7 +477,7 @@ lemma now.
 For example:
 </p>
 
-<pre class="example" id="orge3c3209">
+<pre class="example" id="org5e3f50a">
  1   module Test2
  2   
  3     use int.Int             (* for &lt;, &lt;=, etc *)
@@ -511,7 +511,7 @@ then we hit timeout. We need some lemma to prove this claim (that <code>nth</cod
 i.e., not <code>None</code> if the index is bounded by the length of the list). But if to add:
 </p>
 
-<pre class="example" id="org80597db">
+<pre class="example" id="org44383e9">
 ...
 use list.NthLength
 ...
@@ -535,7 +535,7 @@ The library "came" from the module <code>NthLength</code> written in <code>/usr/
 file. How does Why3 find it? If to call <code>why3 config show</code>, you will see:
 </p>
 
-<pre class="example" id="org4328cff">
+<pre class="example" id="org921c6b7">
 ...
 [main]
 default_editor = "xdg-open %f"
@@ -574,7 +574,7 @@ with CLI option <code>-L &lt;path&gt;</code>.
 We can avoid import of <code>list.NthLength</code> and to write them by hand in the top of our <code>Test2</code> module:
 </p>
 
-<pre class="example" id="org23494d0">
+<pre class="example" id="orgb00250e">
 1   lemma nth_none_1:
 2      forall l: list 'a, i: int. i &lt; 0 -&gt; nth i l = None
 3 
@@ -680,7 +680,7 @@ step.
 So, <b>transformation - is rewriting</b>. See the diagram:
 </p>
 
-<pre class="example" id="orgaa4fcc8">
+<pre class="example" id="orgd81d07c">
                    WhyML source
                          |
                          v
@@ -723,7 +723,7 @@ So, <b>transformation - is rewriting</b>. See the diagram:
 Let's put this into a separate file called <code>MyListLemmas.mlw</code>:
 </p>
 
-<pre class="example" id="org5c508a1">
+<pre class="example" id="org5541e4d">
  1   module MyListLemmas
  2   
  3     use int.Int
@@ -747,7 +747,7 @@ Let's put this into a separate file called <code>MyListLemmas.mlw</code>:
 then "import" it with <code>use MyListLemmas.MyListLemmas</code> and prove the <code>Test2</code> again:
 </p>
 
-<pre class="example" id="org485e652">
+<pre class="example" id="org16e7978">
  1   module Test2
  2   
  3     use int.Int
@@ -801,14 +801,14 @@ Timeouts! It seems Why3 <b>TRUSTS IMPORTED SOURCES WITHOUT TO PROVE THEM!</b>.
 Look, let's create 2 files: <code>Evil.mlw</code> and <code>Test3.mlw</code>:
 </p>
 
-<pre class="example" id="orgf7232b1">
+<pre class="example" id="org0669676">
 (* Evil.mlw *)
 module Evil
   use int.Int
   lemma completely_false:
     false
 end
-
+---------------------------
 (* Test3.mlw *)
 module Test3
   use Evil.Evil
@@ -850,7 +850,7 @@ So, Why3 trusts included/used theories (<code>theory</code> keyword was replaced
 versions):
 </p>
 
-<pre class="example" id="orgdbad113">
+<pre class="example" id="orgc1e19b3">
 W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟N͟O͟T͟ ͟D͟O͟ ͟t͟h͟i͟s͟ ͟o͟n͟ ͟"͟u͟s͟e͟"͟                    W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟t͟h͟i͟s͟
 
               ╳                                         ✔
@@ -891,7 +891,7 @@ If to open <code>MyListLemmas.mlw</code> in the IDE (yeah, Why3 has IDE! Run it 
 then you will see something like (in the left panel):
 </p>
 
-<pre class="example" id="org872dc49">
+<pre class="example" id="orgfc031bb">
 Status | Theories/Goals               | Time
   ?      ▼ 🗁  MyListLemmas.mlw  
   ?        ▼ 🗁  MyListLemmas    
@@ -911,7 +911,7 @@ whole module and then to call proving with the popup on the module (!) (even CVC
 now), you will get the result immediately, see the new picture of proven goals:
 </p>
 
-<pre class="example" id="org8c424c3">
+<pre class="example" id="org78d002e">
 Status | Theories/Goals               | Time
   ✔      ▼ 🗁  MyListLemmas.mlw         
   ✔        ▼ 🗁  MyListLemmas           
@@ -938,7 +938,7 @@ Now you can save it as <i>a session</i> or <i>a ZIP file with a session</i>. Why
 actually - the menu "File/Save session and files":
 </p>
 
-<pre class="example" id="orgfbc1eb2">
+<pre class="example" id="org955adc1">
 :
 ├── MyListLemmas
 │   ├── why3session.xml
@@ -975,7 +975,7 @@ shapes to help match old proof attempts to the corresponding new goals and decid
 replayed:
 </p>
 
-<pre class="example" id="org3fda9a4">
+<pre class="example" id="org4a132c3">
 &lt;saved Why3 session&gt;
           |
           +-- proof tree: transformations and prover calls
@@ -1088,7 +1088,7 @@ not something an SMT solver can simply rediscover (it is about integration of Is
 </tbody>
 </table>
 
-<pre class="example" id="orga9aab86">
+<pre class="example" id="org578f3c9">
         source
            +
         session
@@ -1109,7 +1109,7 @@ The session is what gives a persistent record of how Xyz.mlw itself was verified
 So for a project with a library hierarchy, a sensible discipline is:
 </p>
 
-<pre class="example" id="org07d867d">
+<pre class="example" id="orgba17b85">
 libraries/
      +-- Base.mlw
      +-- Base/
