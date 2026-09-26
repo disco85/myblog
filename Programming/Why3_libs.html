@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-09-26 Sat 15:55 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why3, custom libraries, transformations</title>
+<meta name="description" content="How to write and use custom libraries" />
+<meta name="keywords" content="Why3,libraries,theorem proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Why3, custom libraries, transformations</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orge7f0294">Why3 formats</a>
+<ul>
+<li><a href="#org6b9ee69">WhyML - ML descendant</a></li>
+</ul>
+</li>
+<li><a href="#org94a23c3">Standard libraries</a></li>
+<li><a href="#orgc52fd38">Transformations</a></li>
+<li><a href="#org9696d06">Custom libraries. Trust</a></li>
+<li><a href="#orgbafb98e">Sessions</a>
+<ul>
+<li><a href="#org541bc0c">Use-cases of sessions</a></li>
+<li><a href="#org94dec75">Mental model about sessions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge7f0294" class="outline-2">
+<h2 id="orge7f0294">Why3 formats</h2>
+<div class="outline-text-2" id="text-orge7f0294">
+<p>
+"Format" is an established term in Why3. It's an input file format. Language to be honest. Why3
+support more than one input language (usually theorem provers support only one), they are:
+</p>
+
+<p>
+For Why3 1.8.x, the standard formats are:
+</p>
+
+<ul class="org-ul">
+<li>WhyML - .mlw - the normal Why3 language for programs, specifications, lemmas, and goals.</li>
+<li>micro-C - .c - a small C subset intended mainly for teaching.</li>
+<li>micro-Python - .py - a small Python subset, also mainly for teaching.</li>
+<li>MLCFG - .mlcfg - an extension of WhyML with unstructured/goto-style function bodies.</li>
+<li>Coma - .coma - an intermediate verification language.</li>
+<li>S-expressions - an internal/intermediate representation of Why3 syntax, when Why3 was built
+with S-expression support.</li>
+<li>etc...</li>
+</ul>
+
+<p>
+You can list supported formats by YOUR installation of Why3 by the command:
+</p>
+
+<pre class="example" id="org7e1e44f">
+$ why3 show formats
+coma ["coma"]
+  Continuation Machine language
+
+dimacs ["cnf"]
+  Parser for dimacs format.
+
+equlin ["equlin"]
+  Generate random linear arithmetic problems. The first line gives the seed.
+  Each other line describes a goal and contains three numbers:
+    - the number of variables
+    - the number of equations
+    - the maximum absolute value of coefficients.
+
+micro-C ["c"]
+  micro-C format
+
+mlcfg ["mlcfg",
+"stdout"]
+  whyml extended with functions implemented by control-flow-graphs
+
+python ["py"]
+  mini-Python format
+
+sexp ["sexp"]
+  WhyML code in s-expressions format
+
+tptp ["p", "ax"]
+  TPTP format (CNF FOF FOFX TFF)
+
+whyml ["mlw", "why"]
+  WhyML programming and specification language
+</pre>
+
+<p>
+Read more about them in the <a href="https://why3.org/doc/input_formats.html">Documentation of Why3</a>.
+</p>
+</div>
+<div id="outline-container-org6b9ee69" class="outline-3">
+<h3 id="org6b9ee69">WhyML - ML descendant</h3>
+<div class="outline-text-3" id="text-org6b9ee69">
+<p>
+.mlw format is a text file. The text inside it must follow special syntax, grammar. This
+grammar forms a language called WhyML. It is based on <a href="https://en.wikipedia.org/wiki/ML_(programming_language)">META LANGUAGE or ML</a>. One of the
+descendants of ML is <a href="https://ocaml.org/">Ocaml</a> (others: SML, <a href="https://cakeml.org/">CakeML</a>, <a href="https://ats-lang.sourceforge.net/">ATS - former Dependent ML</a>, <a href="https://fstar-lang.org/">F*</a>, <a href="https://fsharp.org/">F#</a>, <a href="https://reasonml.github.io/">Reason ML</a>,
+<a href="https://rescript-lang.org/">ReScript</a>, <a href="https://elm-lang.org/">Elm</a>, so on).
+</p>
+
+<p>
+Theorem provers written in Ocaml:
+</p>
+
+<ul class="org-ul">
+<li>Why3</li>
+<li>Rocq (ex. Coq)</li>
+<li>F*</li>
+<li>HOL Light</li>
+<li>Matita</li>
+<li>Zenon</li>
+<li>Isabelle (not Ocaml, but SML)</li>
+<li>Alt-Ergo (not prover, but SMT solver)</li>
+<li>etc...</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org94a23c3" class="outline-2">
+<h2 id="org94a23c3">Standard libraries</h2>
+<div class="outline-text-2" id="text-org94a23c3">
+<p>
+To use some library (with computational code or logical code), you should import it with:
+</p>
+
+<pre class="example" id="org2cfacd4">
+use Some_Library
+use Another_Library as AL
+</pre>
+
+<p>
+and to use symbols from them directly or prefixed (if you used <code>... as prefix</code>). After
+installation, you can find Why3 libraries here: <code>/usr/share/why3/stdlib</code>. There are .mlw
+libraries looking as:
+</p>
+
+<pre class="example" id="orgec79902">
+(** {1 Basic Algebra Theories} *)
+
+(** {2 Associativity} *)
+
+module Assoc
+
+  type t
+  function op t t : t
+  axiom Assoc : forall x y z : t. op (op x y) z = op x (op y z)
+
+end
+
+(** {2 Commutativity} *)
+
+module Comm
+
+  type t
+  function op t t : t
+  axiom Comm : forall x y : t. op x y = op y x
+
+end
+...
+</pre>
+
+<p>
+You import it with <code>use</code> and its "theories" (old name for "module"-s) with their lemmas,
+axioms, functions, types, predicates, etc - are in your code, your code can be based on some
+lemma now.
+</p>
+
+<p>
+For example:
+</p>
+
+<pre class="example" id="orge64d883">
+ 1   module Test2
+ 2   
+ 3     use int.Int             (* for &lt;, &lt;=, etc *)
+ 4     use list.List           (* for list, Cons, Nil, etc *)
+ 5     use list.Length as LL   (* for list's length *)
+ 6     use list.Nth            (* for nth over lists *)
+ 7     use option.Option       (* for option, None, Some *)
+ 8   
+ 9     goal bounded_nth:
+10       forall i: int, l: list 'a.
+11         0 &lt;= i &lt; LL.length l -&gt;
+12         nth i l &lt;&gt; None
+13   
+14   end
+</pre>
+
+<p>
+and if to try to prove this <code>bounded_nth</code> goal:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -P z3 Test2.mlw
+File <span class="org-string">"Test2.mlw"</span>, line 10, character 4 to line 12, character 21:
+Goal bounded_nth.
+Prover result is: Timeout (5.00s, 7412868 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+then we hit timeout. We need some lemma to prove this claim (that <code>nth</code> returns something,
+i.e., not <code>None</code> if the index is bounded by the length of the list). But if to add:
+</p>
+
+<pre class="example" id="org34ae5b1">
+...
+use list.NthLength
+...
+</pre>
+
+<p>
+then some important lemmas will come into our code, become available behind the scene and Why3
+will use them to prove the goal:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -P z3 Test2.mlw
+File <span class="org-string">"Test2.mlw"</span>, line 11, character 4 to line 13, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.01s, 12337 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+The library "came" from the module <code>NthLength</code> written in <code>/usr/share/why3/stdlib/list.mlw</code>
+file. How does Why3 find it? If to call <code>why3 config show</code>, you will see:
+</p>
+
+<pre class="example" id="org2eaadc3">
+...
+[main]
+default_editor = "xdg-open %f"
+loadpath = "/usr/share/why3/stdlib"
+magic = 14
+memlimit = 1000
+running_provers_max = 2
+timelimit = 5.000000
+...
+</pre>
+
+<p>
+this is the merge of default (embedded) settings and your home config which is
+<code>$HOME/.why3.conf</code>. Other directories used by why3:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 --print-datadir
+/usr/share/why3
+
+$ why3 --print-libdir
+/usr/lib/x86_64-linux-gnu/ocaml/5.3.0/why3
+</pre>
+</div>
+
+<p>
+You can add new directory for search (for libraries) using environment variable, config file or
+with CLI option <code>-L &lt;path&gt;</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc52fd38" class="outline-2">
+<h2 id="orgc52fd38">Transformations</h2>
+<div class="outline-text-2" id="text-orgc52fd38">
+<p>
+We can avoid import of <code>list.NthLength</code> and to write them by hand in the top of our <code>Test2</code> module:
+</p>
+
+<pre class="example" id="org8998433">
+1   lemma nth_none_1:
+2      forall l: list 'a, i: int. i &lt; 0 -&gt; nth i l = None
+3 
+4   lemma nth_none_2:
+5      forall l : list 'a, i: int. i &gt;= LL.length l -&gt; nth i l = None
+6 
+7   lemma nth_none_3:
+8      forall l: list 'a, i: int. nth i l = None -&gt; i &lt; 0 \/ i &gt;= LL.length l
+</pre>
+
+<p>
+Then to try to prove it with:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 Test2.mlw
+File <span class="org-string">"Test2.mlw"</span>, line 11, characters 5-55:
+Goal nth_none_1.
+Prover result is: Timeout (5.00s, 8394760 steps)<span class="org-builtin">.</span>
+
+File <span class="org-string">"Test2.mlw"</span>, line 14, characters 5-67:
+Goal nth_none_2.
+Prover result is: Timeout (5.00s, 9386120 steps)<span class="org-builtin">.</span>
+
+File <span class="org-string">"Test2.mlw"</span>, line 17, characters 5-75:
+Goal nth_none_3.
+Prover result is: Timeout (5.00s, 8412995 steps)<span class="org-builtin">.</span>
+
+File <span class="org-string">"Test2.mlw"</span>, line 20, character 4 to line 22, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.00s, 12337 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+Proving of them is naturally induction based. To force Why3 to use induction, we <i>apply transformation</i>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 --apply-transform induction_ty_lex Test2.mlw
+File Test2.mlw:
+Goal nth_none_1.
+Prover result is: Valid (0.01s, 9815 steps)<span class="org-builtin">.</span>
+
+File Test2.mlw:
+Goal nth_none_2.
+Prover result is: Valid (0.01s, 10099 steps)<span class="org-builtin">.</span>
+
+File Test2.mlw:
+Goal nth_none_3.
+Prover result is: Valid (0.01s, 11017 steps)<span class="org-builtin">.</span>
+
+File Test2.mlw:
+Goal bounded_nth.
+Prover result is: Valid (0.01s, 12067 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+Now everything is fine! No more timeouts. Why? Because we helped Why3 with a
+transformation. What is it?
+</p>
+
+<p>
+In Why3, a transformation is a program that takes a verification goal (or a collection of
+goals) and rewrites it into one or more new goals.  For example, transformations can:
+</p>
+
+<ul class="org-ul">
+<li>Simplify a goal or remove redundant hypotheses.</li>
+<li>Split a conjunction or a goal with multiple branches into separate goals.</li>
+<li>Introduce definitions or unfold them.</li>
+<li>Instantiate quantified formulas.</li>
+<li>Eliminate certain constructs or encode them into simpler logic.</li>
+<li>Prepare a goal for a particular prover, such as by changing its shape or encoding.</li>
+</ul>
+
+<blockquote>
+<p>
+WhyML programs produce proof goals; Why3 transformations reshape those goals for proof.
+</p>
+</blockquote>
+
+<p>
+Why3 transformations are broadly similar to tactics: they take a proof goal and change it into
+subgoals that are easier to prove.  The distinction is mostly about how they’re used:
+</p>
+
+<p>
+A Why3 transformation is a named, reusable operation in Why3’s proof workflow (for example,
+splitting a goal or simplifying it).  A tactic often suggests an interactive proof command,
+possibly with a script or search procedure that applies several steps.
+</p>
+
+<p>
+Why3 transformations can be applied interactively in the IDE or passed in CLI. Some
+are simple goal rewrites; others perform more substantial encodings or preprocessing. So
+“tactic-like” is a good analogy, though not every transformation corresponds to a single tactic
+step.
+</p>
+
+<p>
+So, <b>transformation - is rewriting</b>. See the diagram:
+</p>
+
+<pre class="example" id="org99bc77b">
+                   WhyML source
+                         |
+                         v
+           Why3 parses and type-checks
+                         |
+                         v
+           Verification conditions (tasks)
+                         |
+                         v
+            optional transformations           .---------.
+         split, simplify, inline, etc.     &lt;---  H E R E |
+         (applied in the IDE or via CLI)       `---------'
+                         |
+                         v
+          Task sent to a selected prover
+                         |
+                         v
+           Why3 driver translates the task
+           into the prover's input language
+                         |
+                         v
+            SMT-LIB (for an SMT solver)
+                         |
+                         v
+                    SMT solver
+                         |
+                         v
+       Result: Valid/Invalid/Unknown/Timeout
+                         |
+                         v
+        Why3 reports the result and records
+              it in the proof session
+</pre>
+</div>
+</div>
+<div id="outline-container-org9696d06" class="outline-2">
+<h2 id="org9696d06">Custom libraries. Trust</h2>
+<div class="outline-text-2" id="text-org9696d06">
+<p>
+Let's put this into a separate file called <code>MyListLemmas.mlw</code>:
+</p>
+
+<pre class="example" id="orgaab9d8b">
+ 1   module MyListLemmas
+ 2   
+ 3     use int.Int
+ 4     use list.List
+ 5     use list.Length as LL
+ 6     use list.Nth
+ 7     use option.Option
+ 8   
+ 9     lemma nth_none_1:
+10        forall l: list 'a, i: int. i &lt; 0 -&gt; nth i l = None
+11   
+12     lemma nth_none_2:
+13        forall l : list 'a, i: int. i &gt;= LL.length l -&gt; nth i l = None
+14   
+15     lemma nth_none_3:
+16        forall l: list 'a, i: int. nth i l = None -&gt; i &lt; 0 \/ i &gt;= LL.length l
+17   end
+</pre>
+
+<p>
+then "import" it with <code>use MyListLemmas.MyListLemmas</code> and prove the <code>Test2</code> again:
+</p>
+
+<pre class="example" id="org644a742">
+ 1   module Test2
+ 2   
+ 3     use int.Int
+ 4     use list.List
+ 5     use list.Length as LL
+ 6     use list.Nth
+ 7     use option.Option
+ 8     use MyListLemmas.MyListLemmas  (* &lt;= ADDED USE ! *)
+ 9   
+10     goal bounded_nth:
+11       forall i: int, l: list 'a.
+12         0 &lt;= i &lt; LL.length l -&gt;
+13         nth i l &lt;&gt; None
+14   
+15   end
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 Test2.mlw
+File <span class="org-string">"Test2.mlw"</span>, line 12, character 4 to line 14, character 21:
+Goal bounded_nth.
+Prover result is: Valid (0.00s, 12337 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+Voila! Works. Now prove <code>MyListLemmas.mlw</code> without transformations:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 MyListLemmas.mlw 
+File <span class="org-string">"MyListLemmas.mlw"</span>, line 10, characters 5-55:
+Goal nth_none_1.
+Prover result is: Timeout (5.00s, 7327706 steps)<span class="org-builtin">.</span>
+
+File <span class="org-string">"MyListLemmas.mlw"</span>, line 13, characters 5-67:
+Goal nth_none_2.
+Prover result is: Timeout (5.00s, 8989493 steps)<span class="org-builtin">.</span>
+
+File <span class="org-string">"MyListLemmas.mlw"</span>, line 16, characters 5-75:
+Goal nth_none_3.
+Prover result is: Timeout (5.00s, 7688072 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+Timeouts! It seems Why3 <b>TRUSTS IMPORTED SOURCES WITHOUT TO PROVE THEM!</b>.
+</p>
+
+<p>
+Look, let's create 2 files: <code>Evil.mlw</code> and <code>Test3.mlw</code>:
+</p>
+
+<pre class="example" id="org0bac607">
+(* Evil.mlw *)
+module Evil
+  use int.Int
+  lemma completely_false:
+    false
+end
+
+(* Test3.mlw *)
+module Test3
+  use Evil.Evil
+  lemma test:
+    false
+end
+</pre>
+
+<p>
+Let's prove <code>Test3.mlw</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 Test3.mlw 
+File <span class="org-string">"Test3.mlw"</span>, line 4, characters 4-9:
+Goal test.
+Prover result is: Valid (0.00s, 4 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+Incredible!!! Our suggestion was right!
+</p>
+
+<p>
+If to comment out: <code>(*use Evil.Evil*)</code> line, then proving of <code>Test3.mlw</code> sure FAILS:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 prove -L . -P z3 Test3.mlw 
+File <span class="org-string">"Test3.mlw"</span>, line 4, characters 4-9:
+Goal test.
+Prover result is: Unknown (sat) (0.00s, 7 steps)<span class="org-builtin">.</span>
+</pre>
+</div>
+
+<p>
+So, Why3 trusts included/used theories (<code>theory</code> keyword was replaced by <code>module</code> in new
+versions):
+</p>
+
+<pre class="example" id="org4aa58b8">
+W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟N͟O͟T͟ ͟D͟O͟ ͟t͟h͟i͟s͟ ͟o͟n͟ ͟"͟u͟s͟e͟"͟                    W͟h͟y͟3͟ ͟D͟O͟E͟S͟ ͟t͟h͟i͟s͟
+
+              ╳                                         ✔
+              
+          "use XYZ"                                 "use XYZ"
+              |                                         |
+              v                                         v
+          find .mlw                                 find .mlw
+              |                                         |
+              v                                         v
+    prove every lemma in it             l͟o͟a͟d͟ d͟e͟c͟l͟a͟r͟a͟t͟i͟o͟n͟s͟ o͟f͟ t͟h͟e͟ m͟o͟d͟u͟l͟e͟s͟
+              |                                         |
+              v                                         v
+ import the proved results                 use them as trusted theories
+</pre>
+
+<p>
+<b>ACL2 Theorem Prover is different here: its books are "CERTIFIED" - must be signed after
+successful proving</b> - look more here about <a href="https://acl2.org/doc/index-seo.php?path=5213%2F162%2F42368%2F81&amp;xkey=ACL2____CERTIFY-BOOK">Certified Books in ACL2</a>.
+</p>
+
+<p>
+So if the theory contains: <code>lemma P: A</code> then the importing theory can use P as a fact without
+generating/proving P's VC.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbafb98e" class="outline-2">
+<h2 id="orgbafb98e">Sessions</h2>
+<div class="outline-text-2" id="text-orgbafb98e">
+<p>
+As you see transformations are applied in CLI or in IDE, not in the source written in WhyML (in
+WhyML meta-program you can only add hints for transformations).
+</p>
+
+<p>
+If to open <code>MyListLemmas.mlw</code> in the IDE (yeah, Why3 has IDE! Run it <code>why3 ide MyListLemmas.mlw</code>)
+then you will see something like (in the left panel):
+</p>
+
+<pre class="example" id="org162c940">
+Status | Theories/Goals               | Time
+  ?      ▼ 🗁  MyListLemmas.mlw  
+  ?        ▼ 🗁  MyListLemmas    
+  ?          🗎 nth_none_1       
+  ?          🗎 nth_none_2       
+  ?          🗎 nth_none_3       
+</pre>
+
+<p>
+And you can try to prove them (all together with popup on the module "MyListLemmas" or
+individually, lemma by lemma) - just select the prover (CVC4, Z3, etc) - you will hit TIMEOUT!
+</p>
+
+<p>
+But if to apply transformation (menu "Tools/Transformations (e-r)/induction<sub>ty</sub><sub>lex</sub>") on the
+whole module and then to call proving with the popup on the module (!) (even CVC4 works fine
+now), you will get the result immediately, see the new picture of proven goals:
+</p>
+
+<pre class="example" id="org6f98bf8">
+Status | Theories/Goals               | Time
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_1              
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.01 (steps: 4983)
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_2              
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.02 (steps: 5148)
+  ✔      ▼ 🗁  MyListLemmas.mlw         
+  ✔        ▼ 🗁  MyListLemmas           
+  ✔          🗎 nth_none_3
+  ✔          ▼ 🛠 induction_ty_lex      
+  ✔            ▼ 🗎 0                   
+  ✔                \ CVC4 1.8           0.02 (steps: 5322)
+</pre>
+
+<p>
+Now you can save it as <i>a session</i> or <i>a ZIP file with a session</i>. Why3 will save 2 files
+actually - the menu "File/Save session and files":
+</p>
+
+<pre class="example" id="org1830d19">
+:
+├── MyListLemmas
+│   ├── why3session.xml
+│   └── why3shapes.gz
+├── MyListLemmas.mlw
+:
+</pre>
+
+<p>
+Files are:
+</p>
+
+<ol class="org-ol">
+<li>why3session.xml: session stores the transformations you performed on each verification
+condition, as well as the provers you ran.</li>
+<li>why3shapes.gz: compressed database of proof shapes used by Why3’s proof-session replay.</li>
+</ol>
+
+<p>
+The shapes file contains checksums and shapes of goals. Why3 uses these when source programs
+change, so it can identify corresponding/unchanged goals and merge/reconcile proof-session
+information. 
+</p>
+
+<blockquote>
+<p>
+why3shapes.gz is not required to replay a proof session.
+</p>
+</blockquote>
+
+<p>
+When replaying a session - often after the source or Why3 setup has changed - Why3 can use these
+shapes to help match old proof attempts to the corresponding new goals and decide what can be
+replayed:
+</p>
+
+<pre class="example" id="org3512a72">
+&lt;saved Why3 session&gt;
+          |
+          +-- proof tree: transformations and prover calls
+          `-- why3shapes.gz: goal-shape data for matching/replay
+</pre>
+
+<p>
+OK, exit from the IDE where you proved the theory INTERACTIVELY. Now open it again:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">$ why3 ide MyListLemmas.mlw
+</pre>
+</div>
+
+<p>
+Magic!!! You see the same picture - the picture of proven goals even with wasted time:
+</p>
+
+<ul class="org-ul">
+<li>which transformations you chose</li>
+<li>which provers you tried</li>
+<li>which time limits you used</li>
+<li>which branches succeeded</li>
+<li>which branches failed...</li>
+</ul>
+</div>
+<div id="outline-container-org541bc0c" class="outline-3">
+<h3 id="org541bc0c">Use-cases of sessions</h3>
+<div class="outline-text-3" id="text-org541bc0c">
+<ol class="org-ol">
+<li>Don't redo interactive transformations</li>
+<li>Reopen an IDE project without losing your proof work</li>
+<li>Detect that a previously valid proof became obsolete:
+Why3 can detect modification of something reminded in the session, and
+<ul class="org-ul">
+<li>unchanged goals retain previous proofs</li>
+<li>modified goals cause previous proof attempts to become obsolete, and you can replay them.</li>
+</ul></li>
+<li>Why3 replay - <b>regression testing</b>: if we run <code>why3 replay MyLibrary</code> then Why3 reruns the stored
+proof attempts and compares the results with the session.</li>
+<li>Reusing proof work after changing the source: Why3 can preserve the existing proof of <code>foo</code>
+(unchanged) while creating a new VC for <code>bar</code> (changed!).  This is a major reason sessions
+are useful for real projects: you don't want every edit to throw away all your previous
+interactive proof work.</li>
+<li>Keep a particular prover configuration</li>
+<li>Preserve interactive proofs: this becomes especially important with interactive provers. For
+example, Why3 can interact with systems such as Coq and Isabelle. Their proof scripts are
+not something an SMT solver can simply rediscover (it is about integration of Isabelle, Rocq...)</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org94dec75" class="outline-3">
+<h3 id="org94dec75">Mental model about sessions</h3>
+<div class="outline-text-3" id="text-org94dec75">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Cases</th>
+<th scope="col" class="org-left">Session useful?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">simple Z3 proof</td>
+<td class="org-left">not really</td>
+</tr>
+
+<tr>
+<td class="org-left">Z3 + induction</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Z3 + several transformations</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">interactive Coq</td>
+<td class="org-left">YES, strongly</td>
+</tr>
+
+<tr>
+<td class="org-left">interactive Isabelle</td>
+<td class="org-left">YES, strongly</td>
+</tr>
+
+<tr>
+<td class="org-left">CI/regression</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">reopen IDE</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">track source changes</td>
+<td class="org-left">YES</td>
+</tr>
+</tbody>
+</table>
+
+<pre class="example" id="orgc822517">
+        source
+           +
+        session
+           |
+           v
+   continue working
+</pre>
+
+<p>
+It reminds IMAGE BASED PROGRAMMING (Smalltalk, Pharo, Common Lisp, etc).
+</p>
+
+<p>
+The session is what gives a persistent record of how Xyz.mlw itself was verified.
+</p>
+
+<p>
+So for a project with a library hierarchy, a sensible discipline is:
+</p>
+
+<pre class="example" id="orgeedf923">
+libraries/
+     +-- Base.mlw
+     +-- Base/
+     |   +-- why3session.xml
+     |
+     +-- Lists.mlw
+     +-- Lists/
+     |   +-- why3session.xml
+     |
+     `-- Algorithms.mlw
+         +-- ...
+
+         
+CI runs something like:
+
+   $ why3 replay Base
+   $ why3 replay Lists
+   $ why3 replay Algorithms
+
+before accepting the project.         
+</pre>
+
+<p>
+<code>why3 replay</code> is specifically intended for this kind of <b>regression checking</b>.
+</p>
+
+<p>
+<code>why3shapes.gz</code> is secondary: it is as Why3's bookkeeping for matching old proof information to
+goals after source changes, not as the proof itself.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

@@ -465,7 +465,7 @@ If to open ~MyListLemmas.mlw~ in the IDE (yeah, Why3 has IDE! Run it ~why3 ide M
 then you will see something like (in the left panel):
 
 #+begin_example
-Status | Theories/Goals        | Time
+Status | Theories/Goals               | Time
   ?      ▼ 🗁  MyListLemmas.mlw  
   ?        ▼ 🗁  MyListLemmas    
   ?          🗎 nth_none_1       
@@ -520,15 +520,23 @@ Files are:
    condition, as well as the provers you ran.
 2. why3shapes.gz: compressed database of proof shapes used by Why3’s proof-session replay.
 
-A proof shape is a compact representation of a proof attempt’s goal, used to recognize similar
-goals later. When replaying a session—often after the source or Why3 setup has changed—Why3 can
-use these shapes to help match old proof attempts to the corresponding new goals and decide
-what can be replayed:
+The shapes file contains checksums and shapes of goals. Why3 uses these when source programs
+change, so it can identify corresponding/unchanged goals and merge/reconcile proof-session
+information. 
+
+#+begin_quote
+why3shapes.gz is not required to replay a proof session.
+#+end_quote
+
+When replaying a session - often after the source or Why3 setup has changed - Why3 can use these
+shapes to help match old proof attempts to the corresponding new goals and decide what can be
+replayed:
 
 #+begin_example
 <saved Why3 session>
-  ├─ proof tree: transformations and prover calls
-  └─ why3shapes.gz: goal-shape data for matching/replay
+          |
+          +-- proof tree: transformations and prover calls
+          `-- why3shapes.gz: goal-shape data for matching/replay
 #+end_example
 
 OK, exit from the IDE where you proved the theory INTERACTIVELY. Now open it again:
@@ -537,13 +545,85 @@ OK, exit from the IDE where you proved the theory INTERACTIVELY. Now open it aga
 $ why3 ide MyListLemmas.mlw
 #+end_src
 
-Magic!!! You see the same picture - the picture of proven goals even with wasted time!!!
+Magic!!! You see the same picture - the picture of proven goals even with wasted time:
+
+- which transformations you chose
+- which provers you tried
+- which time limits you used
+- which branches succeeded
+- which branches failed...
 
 ** Use-cases of sessions
 
-TODO
+1. Don't redo interactive transformations
+2. Reopen an IDE project without losing your proof work
+3. Detect that a previously valid proof became obsolete:
+   Why3 can detect modification of something reminded in the session, and
+   - unchanged goals retain previous proofs
+   - modified goals cause previous proof attempts to become obsolete, and you can replay them.
+4. Why3 replay - *regression testing*: if we run ~why3 replay MyLibrary~ then Why3 reruns the stored
+   proof attempts and compares the results with the session.
+5. Reusing proof work after changing the source: Why3 can preserve the existing proof of ~foo~
+   (unchanged) while creating a new VC for ~bar~ (changed!).  This is a major reason sessions
+   are useful for real projects: you don't want every edit to throw away all your previous
+   interactive proof work.
+6. Keep a particular prover configuration
+7. Preserve interactive proofs: this becomes especially important with interactive provers. For
+   example, Why3 can interact with systems such as Coq and Isabelle. Their proof scripts are
+   not something an SMT solver can simply rediscover (it is about integration of Isabelle, Rocq...)
 
---------------------------------------------------------
+** Mental model about sessions
 
+| Cases                        | Session useful? |
+|------------------------------+-----------------|
+| simple Z3 proof              | not really      |
+| Z3 + induction               | YES             |
+| Z3 + several transformations | YES             |
+| interactive Coq              | YES, strongly   |
+| interactive Isabelle         | YES, strongly   |
+| CI/regression                | YES             |
+| reopen IDE                   | YES             |
+| track source changes         | YES             |
 
-TODO 
+#+begin_example
+        source
+           +
+        session
+           |
+           v
+   continue working
+#+end_example
+
+It reminds IMAGE BASED PROGRAMMING (Smalltalk, Pharo, Common Lisp, etc).
+
+The session is what gives a persistent record of how Xyz.mlw itself was verified.
+
+So for a project with a library hierarchy, a sensible discipline is:
+
+#+begin_example
+libraries/
+     +-- Base.mlw
+     +-- Base/
+     |   +-- why3session.xml
+     |
+     +-- Lists.mlw
+     +-- Lists/
+     |   +-- why3session.xml
+     |
+     `-- Algorithms.mlw
+         +-- ...
+
+         
+CI runs something like:
+
+   $ why3 replay Base
+   $ why3 replay Lists
+   $ why3 replay Algorithms
+
+before accepting the project.         
+#+end_example
+
+~why3 replay~ is specifically intended for this kind of *regression checking*.
+
+~why3shapes.gz~ is secondary: it is as Why3's bookkeeping for matching old proof information to
+goals after source changes, not as the proof itself.
