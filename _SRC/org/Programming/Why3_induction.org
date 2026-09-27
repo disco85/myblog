@@ -309,38 +309,44 @@ Prove ("ensures" of the lemma "sum_formula"):         :
         i=1      2                                    :  
                                                       :
 Why3 unfolds sum (from "sum" definition):             :
-                 ‥                                    :
-  n        n-1 ⋰  ⋱                                   :
-  ∑ i = n + ∑ i     `·····this····.             by this from
- i=1       i=1                    :                P(n-1)
-                n-1               :                   :
-and substitutes  ∑ i :            :                   :
-                i=1               :                   :
-                                  :                   :
-  n         (n-1)n                :                   :
-  ∑ i = n + ──────   <············:···················'
- i=1          2
+                                                      :
+                              then Why3               :
+         n        n-1 ⋰˙˙⋱   substitutes        by this from
+ P(n) ≡  ∑ i = n + ∑ i     `····this····.          P(n-1)   
+        i=1       i=1                   :          /  :   
+                                        :         /   :
+                                        :       SO    :
+                                        :     ASSUME  :
+         n         (n-1)n               :     P(n-1)  :
+ P(n) ≡  ∑ i = n + ──────   <···········:·············'
+        i=1          2
 
-So now the goal is effectively:
+Now the goal is effectively:
 
                  n     n(n+1)
-  by "ensures"   ∑ i = ──────                --  U(n)
+  by "ensures"   ∑ i = ──────                -- V(n)
                 i=1      2
                 
                  n         (n-1)n
-  by the body    ∑ i = n + ──────            --  V(n)
-                i=1          2
-
+                 ∑ i = n + ──────            -- P(n)
+                i=1          2                  assuming
+                                                P(n-1)
 and this last equation is sent to SMT.
 #+end_example
 
-This is sent to SMT - SMT can establish it very easy:
+This is sent to SMT - SMT can establish it very easy (numbers!):
 
 \begin{aligned}
 \forall n \in \mathbb{Z}, \frac{n(n+1)}{2} = \frac{n(n-1)}{2} + n
 \end{aligned}
 
-Integer domain - exactly for SMT.
+Again, to prove ~P(n)~, we assumed ~P(n-1)~ - this is /the induction step/
+and finally we came to some new formula. Then we sent to SMT request to
+prove ~V(n) or ensures {..}~ and this new formula. 
+
+Assuming that ~P(n-1)~ is true, we proved true of ~P(n)~, so we established
+~P(n-1) => P(n)~. Base case is for ~n = 0~ ("unit" - trivial). This is how
+Why3 presumably operated in this instance.
 
 *** IDE
 
