@@ -1,0 +1,158 @@
+#+title: Why3: induction
+#+description: Proving by induction in Why3
+#+keywords: Why3,theorem,proving
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Why3 Theorem Proving
+#+date: <2026-09-27 Sun 12:22>
+
+* Proving by induction
+
+There are different ways to prove something, in math one of them is proving by induction. Its
+idea is: prove that a statement is true for every natural number ~n~.
+
+- *Identify the cases.*
+  The theorem, lemma, or claim usually has many cases. We want to prove that the statement is true for all of them.
+- *Number the cases.* We describe the cases using a natural number ~n~.
+  For example, if the cases are ~2x, 4x, 6x, 8x, ...~ we can describe the ~n~-th case as ~2*n*x~.
+  So instead of proving infinitely many separate cases, we can talk about them using one number ~n~.
+- *Prove the base case.* We prove that the statement is true for the first case, usually ~n=0~
+  or ~n=1~ (but it can be any).
+- *Prove the induction step.* We prove a general rule:
+  *I͟f͟ t͟h͟e͟ s͟t͟a͟t͟e͟m͟e͟n͟t͟ i͟s͟ t͟r͟u͟e͟ f͟o͟r͟ s͟o͟m͟e͟ c͟a͟s͟e͟ n͟,͟ t͟h͟e͟n͟ i͟t͟ i͟s͟ a͟l͟s͟o͟ t͟r͟u͟e͟ f͟o͟r͟ t͟h͟e͟ n͟e͟x͟t͟ c͟a͟s͟e͟,͟ n͟+͟1͟. and
+  EVERY case has previous, next case, so it means ALL cases are true* ("next is true"
+  automatically means "ALL" after some zero, initial case)
+  The important word is some. We are not proving only that case ~n=5~ leads to case ~n=6~. We prove
+  the rule for every possible n: ~P(n) => P(n+1)~
+- *Put the two parts together.* We know the first case is true: ~P(1)~ and we know that every
+  true case leads to the next true case: ~P(n) => P(n+1)~. Therefore: ~P(1) => P(2) => P(3)...~
+- So: *every case is true.*:
+
+#+begin_example
+P(1) => P(2)
+P(2) => P(3)
+P(3) => P(4)
+...
+P(n) => P(n+1)
+#+end_example
+
+#+begin_quote
+PROVE THE FIRST CASE, THEN PROVE THAT EVERY CASE (IF IT IS TRUE) LEADS TO THE NEXT
+CASE. THEREFORE ALL CASES ARE TRUE.
+#+end_quote
+
+Again, we don't prove that ~P(n)~ is true, we prove that *IF* ~P(n)~ is true, then ~P(n+1)~ is
+true, but it does not prove that ~P(n)~ is true, maybe *IT IS NOT*. We prove only logical
+connection between them - "IF one true, the next (any) true too" . But... if among them we see
+at least one case true - then ALL are:
+
+#+begin_example
+          oh, true!
+             |
+            \v/ 
+   o -> o -> O -> o -> ... -> o -> o -> o
+     |      / \
+     |
+     `-- if the previous is true
+         then the next is true
+#+end_example
+
+but we select 0-th because it is more mathematically "regular".
+
+See [[https://en.wikipedia.org/wiki/Mathematical_induction][more in Wikipedia]].
+
+* Induction in Why3
+
+Lets prove this formula:
+
+\begin{aligned}
+P(n \in \mathbb{N}): 0 + 1 + 2 + \ldots + n = \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \text{(1)}
+\end{aligned}
+
+It is proven by induction as...
+
+/*Induction case*/ if want to prove that IF it is true for some ~n~ (some... hmmm, let's
+call it ~k~, i.e., when ~n = k~), then it is true for the next (i.e., ~k + 1~). What do we
+know? We know only that formula (1). We chose some PARTICULAR NUMBER among the series natural
+numbers, we designed it as ~k~. The formula (not proven yet!) is the same (1) but imagine the
+particular ~k~ instead of abstract ~n~. OK. The step is to prove that ~P(k+1)~ is true too -
+when ~P(k)~ is true: ~P(k) => P(k+1)~. How? Look:
+
+\begin{aligned}
+\text{For k :   } 0 + 1 + \ldots + k = \frac{k(k+1)}{2} \\
+\text{For the next, i.e., k + 1 is :   } 0 + 1 + \ldots + k + (k + 1) = ?
+\end{aligned}
+
+Well, ~?~ is our formula (1) plus this new addend - ~(k + 1)~:
+
+\begin{aligned}
+0 + 1 + \ldots + k + (k + 1) = \frac{k(k+1)}{2} + (k + 1)
+\end{aligned}
+
+After simplification this formula became:
+
+\begin{aligned}
+0 + 1 + \ldots + k + (k + 1) = \frac{(k+1)((k+1)+1)}{2}
+\end{aligned}
+
+If to rename ~(k + 1)~ as some... ~X~: $\frac{X(X+1)}{2}$, wow! We see again the formula (1) !
+What is our conclusion after this mathematical exercise? It is:
+
+#+begin_quote
+If formula (1) is true (we don't know: maybe it is not!), but if (1) is true, for some /k/ then
+it is true for /k+1/ too because IT IS THE SAME FORMULA AGAIN! So, we proved that if ~P(k)~ is
+true then ~P(k + 1)~ will be true too.
+#+end_quote
+
+/*Base case*/ ok, now lets select the "base" case - ~n=0~ (or 1, etc):
+   
+\begin{aligned}
+\text{Base case : }P(0) = \frac{0(0+1)}{2} = 0 \text{(2)}
+\end{aligned}
+
+#+begin_quote
+Conclusion: Since both the base case and the induction step have been proved as true, by
+mathematical induction the statement ~P(n)~ holds for every natural number ~n ≥ 0~ !
+#+end_quote
+
+Proven!
+
+See [[https://en.wikipedia.org/wiki/Mathematical_induction#Sum_of_consecutive_natural_numbers][more on Wikipedia]].
+
+** First attempt (unsuccessful)
+
+#+begin_example
+module MySum
+
+  use int.Int
+  use int.EuclideanDivision
+
+  let rec function sum (n: int) : int
+    variant { n }
+  =
+    if n <= 0 then 0
+    else n + sum (n - 1)
+
+  lemma sum_formula:
+    forall n: int. n >= 0 ->
+      sum n = div (n * (n + 1)) 2
+
+end
+#+end_example
+
+and if to try to prove it:
+
+#+begin_example
+$ why3 prove -Pz3 MySum1.mlw
+File MySum1.mlw:
+Goal sum'vc.
+Prover result is: Valid (0.00s, 299 steps).
+
+File "MySum1.mlw", line 26, character 4 to line 27, character 33:
+Goal sum_formula.
+Prover result is: Timeout (5.00s, 710885547 steps).
+#+end_example
+
+Ops!
+
