@@ -353,12 +353,81 @@ and finally we came to some new formula. Then we sent to SMT request to
 prove ~V(n) or ensures {..}~ and this new formula. 
 
 Assuming that ~P(n-1)~ is true, we proved true of ~P(n)~, so we established
-~P(n-1) => P(n)~. Base case is for ~n = 0~ ("unit" - trivial). This is how
-Why3 presumably operated in this instance.
+~P(n-1) => P(n)~. Base case is for ~n = 0~ ("unit" - trivial, even if it is
+implicit):
+
+#+begin_example
+...
+  if n = 0 then ()
+...
+#+end_example
+
+This is how Why3 presumably operated in this instance.
 
 ~P(n-1)~ came from recursion of the lemma - we "forced" Why3 to be based on
-~P(n-1)~ - so to become "inductive"! By the way, ~n + ...~ came from recursion
-of the ~sum~ definition.
+~P(n-1)~ - so to become "inductive"!
+
+By the way, ~n + ...~ came from recursion of the ~sum~ definition.
+
+#+begin_quote
+The combination of the recursive call and the decreasing variant is what makes the recursive
+lemma usable inductively.
+#+end_quote
+
+The question here is:
+
+*** Why does not Why3 prove P(n-1) case?
+
+When Why3 sees that some goal (a lemma in the case) is *recursive* and *it has a variant*
+(decreasing measure) it "think" in this way:
+
+I (Why3) sees:
+
+#+begin_example
+let rec lemma foo (n: int)         GOAL:       P(n)
+  ensures { P(n) }                 -----
+  variant { n }                    AVAILABLE:  P(n-1)
+=                                  ----------    :
+  if n = 0 then ()                               :
+  else foo (n-1)               From recursive call/SPECIFICATION
+#+end_example
+
+Why3 doesn't recursively open another proof obligation saying "now prove P(n-1)". *It uses the
+induction mechanism instead.*
+
+But if we write:
+
+#+begin_example
+let lemma bar (n: int)
+  ensures { P(n-1) }
+=
+  ...without recursive call supplying P(n-1), and no variant too
+#+end_example
+
+then the goal is plain ~P(n-1)~ from ~ensures {..}~. And Why3 in this case will prove ~P(n-1)~.
+When Why3 sees induction, it proves the base case, and then proves the connection/IMPLICATION
+between ~P(n) => P(n+1)~ - it is "smart" enough. To do it Why3 needs:
+
+- recursion
+- variant (decreasing measure)
+
+When Why3 sees something like: ~foo(smaller_argument)~ then what does the ensures clause of
+~foo~ give it? If it gives Why3: ~P(smaller_argument)~ then Why3 can use that as an induction
+hypothesis while proving the current invocation.
+
+#+begin_quote
+The ~variant~ answers a different question:
+
+    Why am I allowed to use the recursive call?
+
+Answer:
+
+    Because the recursive argument/measure is smaller.
+#+end_quote
+
+*Why3 proves ~P(n-1)~ when ~P(n-1)~ is the current verification goal; it ASSUMES/uses ~P(n-1)~
+when a valid recursive call to a lemma whose CONTRACT (~ensures {..}~) guarantees ~P(n-1)~ is
+available while proving P(n).*
 
 *** IDE
 
@@ -369,6 +438,9 @@ TODO
 
 TODO
 
+split_vc
+OR
+intros n + induction n
 ----------------------------TODO
 
 
@@ -753,3 +825,370 @@ div(n(n+1),2)
  That's why looking at the **full VC in the IDE** is so useful. It shows you exactly what Z3 is being asked to prove, rather than the simplified mathematical story we tell when explaining it.
 ----------------------------------------------------------
 TODO do it with inductive types!!!
+=====================================
+Yes — **Why3 is doing the same logical thing as mathematical induction**, but there is an important distinction between:
+
+ - **assuming** `P(n-1)` inside the induction step, and
+- **having established** `P(n-1)` as a theorem for the particular value `n-1`.
+
+ That distinction is the source of the confusion.
+
+ ### The key idea
+
+ When Why3 verifies your recursive lemma
+
+```
+let rec lemma sum_formula_aux (n: int)
+  requires { n >= 0 }
+  ensures { sum n = div (n * (n + 1)) 2 }
+  variant { n }
+=
+  if n = 0 then
+    ()
+  else
+    sum_formula_aux (n - 1)
+```
+
+ it is essentially proving the implication
+
+ $$
+P(n-1) \Longrightarrow P(n)
+$$
+
+ in the recursive branch.
+
+ It is **not** saying:
+
+ > "I know that `P(n-1)` is true because I have already independently proved it."
+
+ Instead, it says:
+
+ > "Suppose `P(n-1)` is true. Under that assumption, I can prove `P(n)`."
+
+ That is exactly the **induction step**.
+
+---
+
+ ## But then how can `P(n-1)` be used?
+
+ This is the crucial part.
+
+ Suppose we're proving:
+
+ $$
+\forall n\ge0,\ P(n)
+$$
+
+ Mathematical induction says:
+
+ 1. Prove `P(0)`.
+2. Prove\
+
+   $$
+   \forall n>0,\quad P(n-1)\Rightarrow P(n).
+   $$
+
+ Notice that step 2 **does not prove `P(n-1)`**.
+
+ It proves the conditional:
+
+ $$
+P(n-1)\Rightarrow P(n).
+$$
+
+ Then, **together with the fact that `P(0)` is true**, we can derive:
+
+ $$
+P(1)
+$$
+
+ because:
+
+ $$
+P(0)\Rightarrow P(1)
+$$
+
+ and we already have `P(0)`.
+
+ Then:
+
+ $$
+P(1)\Rightarrow P(2)
+$$
+
+ and now we already established `P(1)`, so we get `P(2)`.
+
+ And so on.
+
+ ### So is `P(n-1)` actually true?
+
+ **Yes, ultimately.**
+
+ But **not because the induction step assumes it**.
+
+ It becomes known to be true because the whole induction argument establishes the sequence:
+
+ $$
+P(0), P(1), P(2), P(3), \ldots
+$$
+
+ The induction hypothesis is a _temporary assumption_ used to prove the implication.
+
+---
+
+ # Now the important Why3 part
+
+ Your recursive call:
+
+```
+sum_formula_aux (n - 1)
+```
+
+ is where Why3's proof differs superficially from the way you might write induction on paper.
+
+ The recursive lemma has this contract:
+
+```
+requires { n >= 0 }
+
+ensures {
+  sum n = div (n * (n + 1)) 2
+}
+```
+
+ So when you call:
+
+```
+sum_formula_aux (n - 1)
+```
+
+ Why3 can use the **postcondition of the recursive call**:
+
+```
+sum (n - 1)
+=
+div ((n - 1) * n) 2
+```
+
+ That is exactly:
+
+ $$
+P(n-1).
+$$
+
+ But where does that fact come from?
+
+ **From the recursive call itself.**
+
+ And why is Why3 allowed to trust the recursive call?
+
+ Because Why3 is verifying the recursive function using **induction on the variant**:
+
+```
+variant { n }
+```
+
+ The recursive call has a smaller argument:
+
+ $$
+n-1 < n
+$$
+
+ when `n > 0`.
+
+ So Why3's termination/induction mechanism says, essentially:
+
+ > To prove the lemma for `n`, I may use the lemma's specification for a smaller value `n-1`.
+
+ That is the induction hypothesis.
+
+---
+
+ # Think of it this way
+
+ Imagine Why3 is proving your lemma for some arbitrary `n > 0`.
+
+ It has:
+
+```
+Goal:
+
+sum(n) = div(n*(n+1), 2)
+```
+
+ The recursive call gives it:
+
+```
+IH:
+
+sum(n-1) = div((n-1)*n, 2)
+```
+
+ Now unfold `sum(n)`:
+
+```
+sum(n) = n + sum(n-1)
+```
+
+ So the goal becomes essentially:
+
+```
+n + sum(n-1)
+    =
+div(n*(n+1), 2)
+```
+
+ Then Why3 substitutes the induction hypothesis:
+
+```
+n + div((n-1)*n, 2)
+    =
+div(n*(n+1), 2)
+```
+
+ and the arithmetic solver proves that.
+
+ So the logical structure is:
+
+```
+             assume P(n-1)
+                  │
+                  ▼
+          prove P(n)
+```
+
+ The recursive call is the mechanism that supplies `P(n-1)` **under the induction hypothesis**.
+
+---
+
+ # And what about `n = 0`?
+
+ This is the base case:
+
+```
+if n = 0 then
+  ()
+```
+
+ Why does `()` prove the postcondition?
+
+ Because in this branch Why3 knows:
+
+```
+n = 0
+```
+
+ and therefore the postcondition
+
+```
+sum 0 = div (0 * (0 + 1)) 2
+```
+
+ reduces to:
+
+```
+0 = 0
+```
+
+ So the base case establishes:
+
+ $$
+P(0).
+$$
+
+---
+
+ # The subtle but extremely important distinction
+
+ You asked:
+
+ > "You told me P(n-1) is not proven but it is assumption (as it was true, but without proving). IS it true?"
+
+ The most precise answer is:
+
+ ### During the induction step:
+
+ `P(n-1)` is **assumed**, not independently proved.
+
+ ### In the complete induction argument:
+
+ `P(n-1)` is **justified by the induction principle**, ultimately because the base case and all previous induction steps establish it.
+
+ So don't think:
+
+ > "Why3 assumes a possibly false statement and therefore magically proves the theorem."
+
+ Think:
+
+ > "Why3 proves that if the theorem holds for a smaller argument, then it holds for this argument. The recursive structure plus the base case makes that implication an induction proof."
+
+---
+
+ ## A concrete example: `n = 3`
+
+ Imagine we want:
+
+ $$
+P(3).
+$$
+
+ The induction step says:
+
+ $$
+P(2)\Rightarrow P(3).
+$$
+
+ We don't prove `P(2)` _inside the proof of `P(3)`_. We use it.
+
+ But where did `P(2)` come from?
+
+ From the previous induction step:
+
+ $$
+P(1)\Rightarrow P(2)
+$$
+
+ and `P(1)` came from:
+
+ $$
+P(0)\Rightarrow P(1)
+$$
+
+ and `P(0)` came from the base case.
+
+ So:
+
+```
+P(0)                         ← base case
+ │
+ ▼
+P(1)                         ← induction step
+ │
+ ▼
+P(2)                         ← induction step
+ │
+ ▼
+P(3)                         ← induction step
+```
+
+ Why3 compresses this whole potentially infinite-looking chain into the **recursive induction principle**.
+
+---
+
+ ## One more important correction to the phrase "it is not proven again"
+
+ When I previously said:
+
+ > "`P(n-1)` is not proven again."
+
+ A more precise wording would be:
+
+ > **`P(n-1)` is not proved as a separate obligation inside the proof of `P(n)`; it is supplied as the induction hypothesis.**
+
+ That doesn't mean `P(n-1)` is ultimately unproven.
+
+ It means **the current induction step is not responsible for establishing it**.
+
+ This is exactly how ordinary mathematical induction works.
+
+ Your intuition here is correct: **Why3's recursive lemma is implementing the same fundamental induction idea.**
