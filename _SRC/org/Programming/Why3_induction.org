@@ -67,7 +67,7 @@ See [[https://en.wikipedia.org/wiki/Mathematical_induction][more in Wikipedia]].
 Lets prove this formula:
 
 \begin{aligned}
-P(n \in \mathbb{N}): 0 + 1 + 2 + \ldots + n = \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \text{(1)}
+P(n \in \mathbb{N}): 0 + 1 + 2 + \ldots + n = \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \text{ , formula (1)}
 \end{aligned}
 
 It is proven by induction as...
@@ -108,7 +108,7 @@ true then ~P(k + 1)~ will be true too.
 /*Base case*/ ok, now lets select the "base" case - ~n=0~ (or 1, etc):
    
 \begin{aligned}
-\text{Base case : }P(0) = \frac{0(0+1)}{2} = 0 \text{(2)}
+\text{Base case : }P(0) = \frac{0(0+1)}{2} = 0
 \end{aligned}
 
 #+begin_quote
@@ -116,24 +116,27 @@ Conclusion: Since both the base case and the induction step have been proved as 
 mathematical induction the statement ~P(n)~ holds for every natural number ~n ≥ 0~ !
 #+end_quote
 
-Proven!
+Proven! This is the method, approach of math. induction - an example of its usage.
 
 See [[https://en.wikipedia.org/wiki/Mathematical_induction#Sum_of_consecutive_natural_numbers][more on Wikipedia]].
 
 ** First attempt (unsuccessful)
 
+Lets repeat this approach in Why3:
+
 #+begin_example
 module MySum
 
-  use int.Int
-  use int.EuclideanDivision
+  use int.Int                  (* for ints and operation *)
+  use int.EuclideanDivision    (* for div operation *)
 
   let rec function sum (n: int) : int
+    requires { n>=0 }
     variant { n }
   =
-    if n <= 0 then 0
+    if n = 0 then 0
     else n + sum (n - 1)
-
+  
   lemma sum_formula:
     forall n: int. n >= 0 ->
       sum n = div (n * (n + 1)) 2
@@ -156,3 +159,578 @@ Prover result is: Timeout (5.00s, 710885547 steps).
 
 Ops!
 
+In math we had a sum equals to... In Why3 we should express the sum in some way, we did it
+using a recursive function (we a termination/DECREASING measure ~n~) and a kind of "refinement
+type" (actually just a contract ~n>=0~):
+
+| mathematics        | Why3                      |
+|--------------------+---------------------------|
+| $\sum_{i=1}^{n} i$ | ~let rec function sum~... |
+| $\frac{n(n+1)}{2}$ | ~lemma sum_formula~...    |
+
+So, the sum is expressed through a recursion, OK, but the result (right hand side) of the
+formula ... Why3 cannot prove it by default!
+
+** Lemma with a body
+
+We wrote:
+
+#+begin_example
+module MySum
+
+  use int.Int
+  use int.EuclideanDivision
+
+  let rec function sum (n: int) : int
+    requires { n>=0 }
+    variant { n }
+  =
+    if n = 0 then 0
+    else n + sum (n - 1)
+
+  let rec lemma sum_formula (n: int)
+    requires { n >= 0 }
+    ensures { sum n = div (n * (n + 1)) 2 }
+    variant { n }
+  =
+    if n = 0 then
+      ()
+    else
+      sum_formula (n - 1)
+
+end
+#+end_example
+
+And the proving now:
+
+#+begin_example
+$ why3 prove -Pz3 MySum1.mlw
+File MySum1.mlw:
+Goal sum'vc.
+Prover result is: Valid (0.00s, 431 steps).
+
+File MySum1.mlw:
+Goal sum_formula'vc.
+Prover result is: Valid (0.00s, 6485 steps).
+#+end_example
+
+How does it prove the formula (1) by induction?!
+
+First, the "lemma" is our theorem, our formula (1). Second, it has "a contract": precondition,
+postcondition and an argument ~n~:
+
+#+begin_example
+  requires { U(n) }       \_____  U(n) -> V(n): Assuming U(n), prove V(n).
+  ensures { V(n) }        /
+#+end_example
+
+~U~ is ~n ≥ 0~. And the ~V~ is exactly $\frac{n(n+1)}{2}$ ! But... our lemma is not only
+proposition-based, it has a body. And the body is this:
+
+#+begin_example
+    if n = 0 then
+      ()
+    else
+      sum_formula (n - 1)
+#+end_example
+
+So, the base case is ~n=0~ - the lemma-with-a-body returns ~()~, i.e., a unit which means
+"proven!", then - the induction step: else - follow recursion. By the way, this can be
+rewritten lesser explicit and shorter, it is the same:
+
+#+begin_example
+    if n > 0 then
+      sum_formula (n - 1)
+#+end_example
+
+What does Why3 do with all these? Using induction it has to check that ~P(n) => P(n+1)~ and to
+find the base case. Our lemma is:
+
+\begin{aligned}
+P(n) \equiv \sum_{i=1}^{n} i = \frac{n*(n+1)}{2}
+\end{aligned}
+
+~P(n-1)~ is, then:
+
+\begin{aligned}
+P(n - 1) \equiv \sum_{i=1}^{n - 1} i = \frac{(n-1)*n}{2}
+\end{aligned}
+
+Two different propositions. We can assume ~P(n - 1) = sum(n - 1)~ as true - it will be our
+/induction hypothesis/. Our goal is ~P(n)~ which is $\sum_{i=1}^{n} i = \frac{n*(n+1)}{2}$ (the
+postcondition of our lemma is).
+
+From the recursive definition of the sum (~function sum~) Why3 knows that:
+
+\begin{aligned}
+n > 0, \sum_{i=1}^{n} i = n + \sum_{i=1}^{n - 1} i  \text{, the recursive call}
+\end{aligned}
+
+and Why3 use it in our goal ~P(n)~, replacing ~sum(n)~ by ~n + sum(n - 1)~:
+
+\begin{aligned}
+n + \sum_{i=1}^{n - 1} i = \frac{n*(n + 1)}{2}
+\end{aligned}
+
+Why3 uses the ~sum(n - 1)~ from the induction hypothesis and:
+
+\begin{aligned}
+n + \frac{(n - 1)*n}{2} = \frac{n*(n + 1)}{2}
+\end{aligned}
+
+This is passed to SMT solver and it easy solves it in a numerical domain.
+
+Conceptually, the induction step is ~P(n - 1) => P(n)~, but Why3 doesn't necessarily hand Z3
+one giant formula literally written in this way. Instead, Why3 creates a /verification
+condition/ (VC) with ~P(n - 1)~ as an assumption $P(n-1) \vdash P(n)$ which means:
+
+#+begin_quote
+Assuming ~P(n - 1)~ as true, prove ~P(n)~
+#+end_quote
+
+Bigger picture:
+
+#+begin_example
+Assume:
+  n >= 0
+  n > 0
+
+Induction hypothesis (from the lemma "sum_formula",
+                      substituting "n" by "n-1"):
+                      
+          n-1    (n-1)n
+  P(n-1) = ∑ i = ──────   ····························.
+          i=1      2                                  :
+                                                      :
+Prove ("ensures" of the lemma "sum_formula"):         :
+                                                      :
+         n     n(n+1)                                 :
+  P(n) = ∑ i = ──────                                 :
+        i=1      2                                 P(n-1)
+                                                      :
+Why3 unfolds sum (from "sum" definition):             :
+                                                      :
+  n        n-1                                        :
+  ∑ i = n + ∑ i      ·············.                   :
+ i=1       i=1                    :                   :
+                                  :                   :
+and substitutes sum(n-1):         :                   :
+                                  :                   :
+  n         (n-1)n                :                   :
+  ∑ i = n + ──────   <············:···················'
+ i=1          2
+
+So now the goal is effectively:
+
+                 n     n(n+1)
+  by "ensures"   ∑ i = ──────                --  U(n)
+                i=1      2
+                
+                 n         (n-1)n
+  by the body    ∑ i = n + ──────            --  V(n)
+                i=1          2
+
+and this last equation is sent to SMT.
+#+end_example
+
+This is sent to SMT - SMT can establish it very easy:
+
+\begin{aligned}
+\forall n \in \mathbb{Z}, \frac{n(n+1)}{2} = \frac{n(n-1)}{2} + n
+\end{aligned}
+
+Integer domain - exactly for SMT.
+
+*** IDE
+
+If to open it in the IDE with ~why3 ide <your-file>~ then you can see:
+TODO
+
+** Proving using transformations
+
+TODO
+
+----------------------------TODO
+
+
+In IDE:
+
+constant n : int
+
+Init : 0 < n
+
+Hrec :
+  forall n1:int.
+    n1 < n ->
+    n1 >= 0 ->
+    sum n1 = div (n1 * (n1 + 1)) 2
+
+Goal:
+  n >= 0 ->
+  sum n = div (n * (n + 1)) 2
+
+  Then the proof still needs to use:
+
+Hrec (n - 1)
+
+and sum'def.
+
+Once those are instantiated/unfolded, the arithmetic goal becomes essentially:
+
+n + div ((n - 1) * n) 2
+=
+div (n * (n + 1)) 2
+That is the kind of formula Z3 ultimately receives.
+
+"Use the induction hypothesis at n-1."
+"Unfold sum."
+"Use the definition."
+"Reduce the remaining obligation."
+Z3 is doing the automatic logical/arithmetic reasoning on the resulting VC.
+
+So when we say:
+
+    "Z3 proves the induction step"
+
+that's slightly imprecise.
+
+A better description is:
+Why3 generates the induction-step verification condition; Z3 automatically proves that verification condition.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  You're very close, but there's one crucial distinction:
+
+ > **`n + div((n-1)n, 2) = div(n(n+1), 2)` is NOT `P(n-1)`.**
+
+ It is the **induction step after using `P(n-1)`**.
+
+ Let's name the propositions. This makes everything much clearer.
+
+ ## 1\. Define `P(n)`
+
+ Your theorem is:
+
+ $$
+P(n) \equiv
+sum(n)=div(n(n+1),2)
+$$
+
+ So:
+
+ $$
+P(n-1)
+$$
+
+ means:
+
+ $$
+sum(n-1)
+=
+div((n-1)n,2)
+$$
+
+ And:
+
+ $$
+P(n)
+$$
+
+ means:
+
+ $$
+sum(n)
+=
+div(n(n+1),2)
+$$
+
+ These are two different propositions.
+
+---
+
+ ## 2. What does the induction hypothesis say?
+
+ Why3 gives us:
+
+```
+H:
+sum(n-1) = div((n-1)n, 2)
+```
+
+ That is **`P(n-1)`**.
+
+ We are allowed to assume it.
+
+ We are NOT trying to prove it again.
+
+---
+
+ ## 3\. What is our actual goal?
+
+ Our goal is:
+
+```
+sum(n) = div(n(n+1), 2)
+```
+
+ That's **`P(n)`**.
+
+ Now use the definition of `sum`.
+
+ Because `n > 0`:
+
+```
+sum(n) = n + sum(n-1)
+```
+
+ So our goal:
+
+```
+sum(n) = div(n(n+1),2)
+```
+
+ becomes:
+
+```
+n + sum(n-1) = div(n(n+1),2)
+```
+
+ Now use the induction hypothesis:
+
+```
+sum(n-1) = div((n-1)n,2)
+```
+
+ Substitute that into the goal:
+
+```
+n + div((n-1)n,2)
+    =
+div(n(n+1),2)
+```
+
+ **That is the formula you asked about.**
+
+ So that formula is **not `P(n-1)`**.
+
+ It is what's left to prove **after we have already used `P(n-1)`**.
+
+---
+
+ # 4. Think of substitution
+
+ Here's a simpler analogy.
+
+ <Suppose:
+
+```
+H:
+x = 10
+```
+
+ and your goal is:
+
+```
+x + 5 = 15
+```
+
+ You don't prove `x = 10` again.
+
+ You use `H` to replace `x`:
+
+```
+10 + 5 = 15
+```
+
+ and then prove that.
+
+ Exactly the same thing happens here.
+
+ We have:
+
+```
+H:
+sum(n-1) = div((n-1)n,2)
+```
+
+ Goal:
+
+```
+sum(n) = div(n(n+1),2)
+```
+
+ Unfold `sum(n)`:
+
+```
+n + sum(n-1) = div(n(n+1),2)
+```
+
+ Use `H`:
+
+```
+n + div((n-1)n,2) = div(n(n+1),2)
+```
+
+ Then Z3 proves **that arithmetic equality**.
+
+---
+
+ # 5\. Where is the implication `P(n-1) → P(n)`?
+
+ This is the really important part.
+
+ Conceptually, the induction step is:
+
+ $$
+P(n-1) \Rightarrow P(n)
+$$
+
+ Why3 doesn't necessarily hand Z3 one giant formula literally written as:
+
+```
+P(n-1) -> P(n)
+```
+
+ Instead, Why3 creates a **verification condition with `P(n-1)` as an assumption**.
+
+ In logical notation, it is equivalent to:
+
+ $$
+P(n-1) \vdash P(n)
+$$
+
+ which means:
+
+ > Assuming `P(n-1)`, prove `P(n)`.
+
+ And in classical logic:
+
+ $$
+P(n-1) \vdash P(n)
+$$
+
+ is equivalent to:
+
+ $$
+P(n-1) \rightarrow P(n)
+$$
+
+ So the implication is there — it's just represented in the VC as a **hypothesis/context plus a
+ goal**, rather than necessarily as an explicit `→`.
+
+ Your IDE showed exactly that:
+
+```
+Hrec : forall n1:int.
+       n1 < n ->
+       n1 >= 0 ->
+       sum n1 = div (...) 2
+
+Goal:
+       n >= 0 ->
+       sum n = div (...) 2
+```
+
+ Once the relevant hypotheses are introduced, conceptually you get:
+
+```
+ASSUME:
+
+P(n-1)
+
+PROVE:
+
+P(n)
+```
+
+ That's the induction implication.
+
+---
+
+ # 6\. And there are actually TWO different proofs happening
+
+ This is probably the source of the confusion.
+
+ ### Proof A — induction hypothesis
+
+ Why3 establishes/provides:
+
+```
+P(n-1)
+```
+
+ as an **assumption**.
+
+ It does not ask Z3 to prove it again at this point.
+
+ ### Proof B — induction step
+
+ Z3 proves:
+
+```
+P(n-1) → P(n)
+```
+
+ but operationally it gets this as:
+
+```
+Assume P(n-1)
+Prove P(n)
+```
+
+ After unfolding and substitution, the remaining arithmetic is:
+
+```
+n + div((n-1)n,2)
+=
+div(n(n+1),2)
+```
+
+ So:
+
+```
+                 P(n-1)
+                    │
+                    │ assumption
+                    ▼
+             ┌──────────────┐
+             │   Why3 VC    │
+             │              │
+             │ prove P(n)   │
+             └──────┬───────┘
+                    │
+          unfold sum(n)
+                    │
+                    ▼
+       n + sum(n-1) = RHS
+                    │
+           use P(n-1)
+                    │
+                    ▼
+       n + div((n-1)n,2) = RHS
+                    │
+                    ▼
+                   Z3
+                    │
+                    ▼
+                  TRUE
+```
+
+ That's the whole induction step.
+
+---
+
+ ## And one final subtlety
+
+ When I previously said:
+
+ > "Z3 proves `n + div(...) = div(...)`"
+
+ that's shorthand.
+
+ More precisely, **Why3 gives Z3 a VC containing the relevant assumptions**, including the induction hypothesis and facts about `n`.
+
+ So Z3 isn't proving that equality for arbitrary integers with no assumptions. It's proving it **under the assumptions generated by Why3**.
+
+ That's why looking at the **full VC in the IDE** is so useful. It shows you exactly what Z3 is being asked to prove, rather than the simplified mathematical story we tell when explaining it.
+----------------------------------------------------------
+TODO do it with inductive types!!!
