@@ -325,13 +325,21 @@ Now the goal is effectively:
 
                  n     n(n+1)
   by "ensures"   ∑ i = ──────                -- V(n)
-                i=1      2
+                i=1      2                      or precond.
                 
-                 n         (n-1)n
-                 ∑ i = n + ──────            -- P(n)
+  by unfolds     n         (n-1)n
+  and subst.     ∑ i = n + ──────            -- P(n)
                 i=1          2                  assuming
                                                 P(n-1)
-and this last equation is sent to SMT.
+
+So, to prove P(n), ie, whole lemma - that V(n) = transform result,
+we send this to SMT:
+
+   n(n+1)  ?      (n-1)n                   easy proves
+   ──────  =  n + ──────   ···> SMT ···>  that they are
+     2              2                      really equal
+
+QED: assuming P(n-1), we proved P(n).
 #+end_example
 
 This is sent to SMT - SMT can establish it very easy (numbers!):
@@ -347,6 +355,10 @@ prove ~V(n) or ensures {..}~ and this new formula.
 Assuming that ~P(n-1)~ is true, we proved true of ~P(n)~, so we established
 ~P(n-1) => P(n)~. Base case is for ~n = 0~ ("unit" - trivial). This is how
 Why3 presumably operated in this instance.
+
+~P(n-1)~ came from recursion of the lemma - we "forced" Why3 to be based on
+~P(n-1)~ - so to become "inductive"! By the way, ~n + ...~ came from recursion
+of the ~sum~ definition.
 
 *** IDE
 
