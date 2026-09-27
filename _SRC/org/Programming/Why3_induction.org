@@ -247,20 +247,20 @@ What does Why3 do with all these? Using induction it has to check that ~P(n) => 
 find the base case. Our lemma is:
 
 \begin{aligned}
-P(n) \equiv \sum_{i=1}^{n} i = \frac{n*(n+1)}{2}
+P(n) \equiv \sum_{i=1}^{n} i = \frac{n(n+1)}{2}
 \end{aligned}
 
 ~P(n-1)~ is, then:
 
 \begin{aligned}
-P(n - 1) \equiv \sum_{i=1}^{n - 1} i = \frac{(n-1)*n}{2}
+P(n - 1) \equiv \sum_{i=1}^{n - 1} i = \frac{(n-1)n}{2}
 \end{aligned}
 
 Two different propositions. We can assume ~P(n - 1) = sum(n - 1)~ as true - it will be our
-/induction hypothesis/. Our goal is ~P(n)~ which is $\sum_{i=1}^{n} i = \frac{n*(n+1)}{2}$ (the
+/induction hypothesis/. Our goal is ~P(n)~ which is $\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$ (the
 postcondition of our lemma is).
 
-From the recursive definition of the sum (~function sum~) Why3 knows that:
+From the recursive definition of the sum (~let rec function sum~) Why3 knows that:
 
 \begin{aligned}
 n > 0, \sum_{i=1}^{n} i = n + \sum_{i=1}^{n - 1} i  \text{, the recursive call}
@@ -269,13 +269,13 @@ n > 0, \sum_{i=1}^{n} i = n + \sum_{i=1}^{n - 1} i  \text{, the recursive call}
 and Why3 use it in our goal ~P(n)~, replacing ~sum(n)~ by ~n + sum(n - 1)~:
 
 \begin{aligned}
-n + \sum_{i=1}^{n - 1} i = \frac{n*(n + 1)}{2}
+n + \sum_{i=1}^{n - 1} i = \frac{n(n + 1)}{2}
 \end{aligned}
 
 Why3 uses the ~sum(n - 1)~ from the induction hypothesis and:
 
 \begin{aligned}
-n + \frac{(n - 1)*n}{2} = \frac{n*(n + 1)}{2}
+n + \frac{(n - 1)n}{2} = \frac{n(n + 1)}{2}
 \end{aligned}
 
 This is passed to SMT solver and it easy solves it in a numerical domain.
