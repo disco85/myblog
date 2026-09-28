@@ -485,7 +485,13 @@ Simple example: ~split_vc~ splits a verification condition into separate goals, 
 decomposing a top-level conjunction in the goal.  For example, a goal ~P /\ Q~ becomes 2 goals, ~P~
 and ~Q~. This *lets Why3 send each obligation to SMT prover separately*. It *does not prove them*;
 it *restructures the proof task*. I.e., ~split_vc~ is a transformation: it takes a verification
-condition and produces separate proof goals, rather than proving them itself.
+condition and produces separate proof goals, rather than proving them itself. If you think that
+it looks as an "optimization" then yes - it affects the performance of the proving and if you has hit
+timeout or similar, then sometimes ~split_vc~ can help.
+
+Usually you use transformations exactly for this: you cannot prove some goal, using transformations
+you solve this problem. Well, sometimes you need rewriting of WhyML too... anyway, this is the idea
+of "transformations".
 
 You can see all supported transformations by the simple command:
 
