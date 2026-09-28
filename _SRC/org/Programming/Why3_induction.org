@@ -489,14 +489,14 @@ end
 Here ~sum_def n s~ is read as "~s~ is the sum of the first ~n~ numbers.", So,
 
 #+begin_example
-constructor/case|             TRUE IS THAT...
+constructor/case|                      TRUE IS THAT...
 ----------------+----------------------------------------------------------------
-    Zero        |              sum_def 0 0
-                |
-                |       "sum of first 0 nums is 0"
-----------------|----------------------------------------------------------------
-    More        | forall n s: int.  sum_def n s   ->   sum_def (n + 1) (s + n + 1)
-                |
+     Zero       |                       sum_def 0 0
+                |                             ↓
+                |                "sum of first 0 nums is 0"
+----------------+----------------------------------------------------------------
+     More       | forall n s: int.  sum_def n s   ->   sum_def (n + 1) (s + n + 1)
+                |        ↓               ↓        ↓                  ↓
                 |    "For any       "if s is    "then"    "s + (n + 1) is the sum
                 |    integers        the sum                   for n + 1"
                 |      n, s"       for n nums"
@@ -526,7 +526,7 @@ Then the lemma. It says:
 
 #+begin_example
 forall n s: int.       sum_def n s       ->       2 * s = n * (n + 1)
-
+      ↓                     ↓            ↓                ↓
                                                                  n(n+1)
   "for any         "if s is the sum    "then"   "sum is equal to ------ "
 n,s integers"       of first n nums"                                2
