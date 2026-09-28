@@ -493,14 +493,16 @@ constructor/case|             TRUE IS THAT...
 ----------------+----------------------------------------------------------------
     Zero        |              sum_def 0 0
                 |
-                |       "sum of first 0 nums in 0"
+                |       "sum of first 0 nums is 0"
 ----------------|----------------------------------------------------------------
     More        | forall n s: int.  sum_def n s   ->   sum_def (n + 1) (s + n + 1)
                 |
                 |    "For any       "if s is    "then"    "s + (n + 1) is the sum
-                |    integers       the sum                    for n + 1"
-                |      n, s"         for n"
+                |    integers        the sum                   for n + 1"
+                |      n, s"       for n nums"
 #+end_example
+
+Yes, literally it is read for ~Zero~: "IT IS TRUE THAT SUM OF FIRST 0 NUMBERS IS 0".
 
 It is a recursive definition of the sum, expressed as an inductive predicate.
 
@@ -531,6 +533,56 @@ n,s integers"       of first n nums"                                2
 #+end_example
 
 And to avoid games with ~div~, we just multiplied both side by 2 (so, you see ~2 * s = ...~). 
+
+*** What is "inductive" ?
+
+Why3 supports "predicate" - something returning true or false. The construction using the keyword
+~inductive~ means "define this predicate by rules" (~sum_def~). It has 2 arguments:
+
+#+begin_example
+sum_def : int -> int -> Prop
+#+end_example
+
+and when it is used as ~sum_def 3 6~ then it is a PROPOSITION, saying "6 is the sum associated with
+3."
+
+And because it is an inductive predicate, you don't define it with a Boolean expression such as
+~predicate sum_def (n,s:int) = ...~. Instead, you define *RULES FOR CONSTRUCTING PROOFS OF
+IT*. Yes, the CONSTRUCTORS ARE RULES FOR PROVING THE PREDICATE:
+
+#+begin_example
+                            sum_def n s
+   ───────────              ─────────────────────
+   sum_def 0 0              sum_def (n+1) (s+n+1)
+
+#+end_example
+
+#+begin_quote
+If you already have a proof that ~sum_def n s~, you are allowed to construct a proof that
+~sum_def (n+1) (s+n+1)~.
+#+end_quote
+
+this is your *induction step*:
+
+#+begin_quote
+THE WORD I͟N͟D͟U͟C͟T͟I͟V͟E͟ MEANS THAT *THE PREDICATE IS DEFINED BY HOW ITS PROOFS CAN BE CONSTRUCTED FROM EARLIER PROOFS*.
+#+end_quote
+
+#+begin_example
+        Zero
+sum_def 0 0
+      ↓ More
+sum_def 1 1
+      ↓ More
+sum_def 2 3
+      ↓ More
+sum_def 3 6
+      ↓ More
+sum_def 4 10
+#+end_example
+
+And the surprise part is that if to try to prove it with Why3, then it will... timeout! And it can
+be overcome with the help of transformations.
 
 TODO
 
