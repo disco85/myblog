@@ -462,50 +462,307 @@ TODO
 split_vc
 OR
 intros n + induction n
-----------------------------TODO
 
 
-In IDE:
+** Proving using inductive predicate and transformations
 
+#+begin_example
+module MySum2
+  use int.Int
+
+  inductive sum_def int int =
+    | Zero:
+        sum_def 0 0
+    | More:
+        forall n s: int.
+          sum_def n s ->
+          sum_def (n + 1) (s + n + 1)
+
+  lemma sum_formula:
+    forall n s: int.
+      sum_def n s ->
+      2 * s = n * (n + 1)
+
+end
+#+end_example
+
+Here ~sum_def n s~ is read as "~s~ is the sum of the first ~n~ numbers.", So,
+
+#+begin_example
+constructor/case|             TRUE IS THAT...
+----------------+----------------------------------------------------------------
+    Zero        |              sum_def 0 0
+                |
+                |       "sum of first 0 nums in 0"
+----------------|----------------------------------------------------------------
+    More        | forall n s: int.  sum_def n s   ->   sum_def (n + 1) (s + n + 1)
+                |
+                |    "For any       "if s is    "then"    "s + (n + 1) is the sum
+                |    integers       the sum                    for n + 1"
+                |      n, s"         for n"
+#+end_example
+
+It is a recursive definition of the sum, expressed as an inductive predicate.
+
+*Why does ~sum_def~ have 2 arguments?* Imagine:
+
+#+begin_example
+inductive sum_def int =
+  | Zero: sum_def 0
+  | More:
+      forall n:int.
+        sum_def n ->
+        sum_def (n+1)
+#+end_example
+
+Then ~sum_def n~ would only tell us: /"~n~ is reachable from zero."/ *It would not tell us what the
+sum is.* For example, all we know is: ~sum_def 3~ *BUT WHERE IS 6 - THE SUM VALUE?*
+
+It reminds Prolog's predicate...
+
+Then the lemma. It says:
+
+#+begin_example
+forall n s: int.       sum_def n s       ->       2 * s = n * (n + 1)
+
+                                                                 n(n+1)
+  "for any         "if s is the sum    "then"   "sum is equal to ------ "
+n,s integers"       of first n nums"                                2
+#+end_example
+
+And to avoid games with ~div~, we just multiplied both side by 2 (so, you see ~2 * s = ...~). 
+
+TODO
+
+
+
+
+--------------------------------------
+Chat about MySum2 - inductive types + transformations:
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Yes! **Now we have the exact answer.** Your `why3 show transformations` output plus the official Why3 example make the issue clear.
+
+ The thing you need is exactly:
+
+```
+induction_arg_pr H with_gen n,s
+```
+
+ The `with_gen` part is the important piece.
+
+ Why3 1.8.x added this optional argument specifically to control which variables are generalized during induction. The Why3 examples themselves use the syntax `induction_arg_pr H with_gen x,y`.  Why3+1
+
+ ## Why your previous induction was bad
+
+ You currently have:
+
+```
 constant n : int
+constant s : int
 
-Init : 0 < n
+H1 : sum_def n s
 
-Hrec :
-  forall n1:int.
-    n1 < n ->
-    n1 >= 0 ->
-    sum n1 = div (n1 * (n1 + 1)) 2
+H :
+  ((s + n) + 1) = s ->
+  (n + 1) = n ->
+  ...
+```
+
+ Why3 has kept the **outer** `n` and `s` fixed while constructing the induction hypothesis. Consequently, the induction hypothesis says, roughly:
+
+ > "If the new values happen to equal the old values, then the formula holds."
+
+ That's useless.
+
+ What we want is to say:
+
+ > "For **any** `n` and `s`, if `sum_def n s`, then the formula holds."
+
+ So we need to **generalize `n` and `s`** during the induction.
+
+ ## Do this
+
+ Starting with:
+
+```
+lemma sum_formula:
+  forall n s: int.
+    sum_def n s ->
+    2 * s = n * (n + 1)
+```
+
+ ### 1\. `introduce_premises`
+
+ Run:
+
+```
+introduce_premises
+```
+
+ You get roughly:
+
+```
+constant n : int
+constant s : int
+H1 : sum_def n s
 
 Goal:
-  n >= 0 ->
-  sum n = div (n * (n + 1)) 2
+  2 * s = n * (n + 1)
+```
 
-  Then the proof still needs to use:
+ ### 2\. Induct on `H1`, generalizing `n,s`
 
-Hrec (n - 1)
+ Run:
 
-and sum'def.
+```
+induction_arg_pr H1 with_gen n,s
+```
 
-Once those are instantiated/unfolded, the arithmetic goal becomes essentially:
+ **This is the important command.**
 
-n + div ((n - 1) * n) 2
-=
-div (n * (n + 1)) 2
-That is the kind of formula Z3 ultimately receives.
+ Now Why3 should generate the induction hypothesis in the useful form.
 
-"Use the induction hypothesis at n-1."
-"Unfold sum."
-"Use the definition."
-"Reduce the remaining obligation."
-Z3 is doing the automatic logical/arithmetic reasoning on the resulting VC.
+ You should get a base case roughly like:
 
-So when we say:
+```
+s = 0
+n = 0
 
-    "Z3 proves the induction step"
+Goal:
+2 * s = n * (n + 1)
+```
 
-that's slightly imprecise.
+ which Z3 can solve.
 
-A better description is:
-Why3 generates the induction-step verification condition; Z3 automatically proves that verification condition.
+ And the `More` case should be roughly:
 
+```
+n : int
+s : int
+
+H1 : sum_def n s
+
+H :
+  2 * s = n * (n + 1)
+
+Goal:
+  2 * (s + n + 1) =
+    (n + 1) * ((n + 1) + 1)
+```
+
+ **That `H` is exactly the induction hypothesis we wanted.**
+
+ Then Z3 should be able to prove the arithmetic.
+
+---
+
+ ## Why `with_gen n,s` fixes it
+
+ Think about the mathematical induction you're trying to express.
+
+ You want to prove:
+
+ $$
+\forall n,s,\quad
+sum\_def(n,s)\rightarrow P(n,s)
+$$
+
+ where
+
+ $$
+P(n,s)\equiv 2s=n(n+1).
+$$
+
+ The induction principle needs to be:
+
+ ### Zero
+
+ $$
+P(0,0)
+$$
+
+ ### More
+
+ $$
+\boxed{P(n,s)\Rightarrow P(n+1,s+n+1)}
+$$
+
+ The crucial part is that the $n,s$ in $P(n,s)$ are **arbitrary**.
+
+ That's what `with_gen n,s` tells Why3:
+
+ > Don't freeze the current `n` and `s`; generalize them so that the induction hypothesis can apply to the predecessor's `n1,s1`.
+
+ This is precisely the purpose of the `with_gen` option.  Why3
+
+---
+
+ ## So your whole proof should be
+
+ Your source remains simply:
+
+```
+module MySum2
+
+  use int.Int
+  use int.EuclideanDivision
+
+  inductive sum_def int int =
+    | Zero:
+        sum_def 0 0
+
+    | More:
+        forall n1:int, s1:int.
+          sum_def n1 s1 ->
+          sum_def (n1 + 1) ((s1 + n1) + 1)
+
+  lemma sum_formula:
+    forall n s: int.
+      sum_def n s ->
+      2 * s = n * (n + 1)
+
+end
+```
+
+ Then in the IDE:
+
+```
+sum_formula
+    ↓
+introduce_premises
+    ↓
+induction_arg_pr H1 with_gen n,s
+    ↓
+  ┌─────────────┐
+  │ Zero        │ ──→ Z3
+  └─────────────┘
+
+  ┌─────────────┐
+  │ More        │
+  │             │
+  │ IH:         │
+  │ 2*s=n(n+1)  │
+  │             │
+  │ Goal:       │
+  │ 2(s+n+1)    │
+  │ =(n+1)(n+2) │
+  └─────────────┘
+          ↓
+         Z3
+```
+
+ And this is a **much better educational representation** of mathematical induction than the earlier attempt.
+
+ You're literally telling Why3:
+
+ > "Take this inductively defined object, and prove my property by induction over its construction."
+
+ The `sum_def` constructors are your mathematical induction rules, and `induction_arg_pr ... with_gen n,s` tells Why3 what the induction hypothesis should quantify over.
+
+ Also, your choice to use
+
+ $$
+2s=n(n+1)
+$$
+
+ rather than immediately involving `div` is good here: it leaves the induction step as ordinary integer arithmetic.
