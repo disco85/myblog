@@ -457,6 +457,72 @@ TODO
 
 ** Proving using transformations
 
+What are transformations in Why3?
+
+A transformation rewrites a proof goal into one or more new goals, usually in a predictable,
+logic-level way. In Why3, a transformation might introduce an implication’s premises as hypotheses,
+split a conjunction, or simplify a formula. It generally doesn’t construct a proof by itself; it
+changes the task that a prover must solve.
+
+Why3 transformations are typically reusable goal-to-goal operations, often used to prepare
+verification conditions for automated provers.
+
+"Reusable" means that you can save them in a session file if you applied them interactively in IDE
+(as commands: IDE has an edit box for typing of "commands"). Also you can pass them as options in
+command line as ~--apply-transform~ - one by one.
+
+A transformation can resemble a simple "tactic": for instance, Why3’s introduce_premises is similar
+in effect to introducing assumptions in Rocq or LEAN. But tactics are a broader mechanism and can
+include search, branching, and proof construction.
+
+Transformations are best thought of as goal transformations; tactics are proof-state programs. The
+boundary isn’t absolute—some tactics merely transform goals, and some systems expose transformations
+through tactic-like interfaces.
+
+Transformation is REWRITING of your initial WhyML happening "in the memory".
+
+Simple example: ~split_vc~ splits a verification condition into separate goals, typically by
+decomposing a top-level conjunction in the goal.  For example, a goal ~P /\ Q~ becomes 2 goals, ~P~
+and ~Q~. This *lets Why3 send each obligation to SMT prover separately*. It *does not prove them*;
+it *restructures the proof task*. I.e., ~split_vc~ is a transformation: it takes a verification
+condition and produces separate proof goals, rather than proving them itself.
+
+You can see all supported transformations by the simple command:
+
+#+begin_example
+$ why3 show transformations
+abstract_quantifiers
+  Abstract quantifiers in the axioms of the context and the goals.
+
+abstract_unknown_lsymbols
+  Abstract applications of non-built-in symbols with constants. Used by the
+  Gappa pretty-printer.
+
+apply
+  type: prsymbol -> ?with -> list term -> list task
+  apply <prop> [with] <term list> applies premise <prop> to the goal and uses
+  the list of terms to instantiate the variables that are not found.
+
+assert
+  type: formula -> ?as -> string -> list task
+  assert <term> [name] makes an assertion with a hypothesis 'name: term'.
+
+case
+  type: formula -> ?as -> string -> list task
+  case <term> [name] generates hypothesis 'name: term' in a first goal and
+  'name: ~ term' in a second one.
+...
+#+end_example
+
+For example, Why3 1.8.0 has 128 transformations. They are available as an interactive command in
+IDE and as menu items in IDE: "Tools/Transformations".
+
+#+begin_quote
+Transformations cannot be written in WhyML program - to be "called"/applied from there. But you
+can "hint" then from WhyML program (with arguments).
+#+end_quote
+
+
 TODO
 
 split_vc
@@ -526,7 +592,7 @@ Then the lemma. It says:
 
 #+begin_example
 forall n s: int.       sum_def n s       ->       2 * s = n * (n + 1)
-      ↓                     ↓            ↓                ↓
+       ↓                    ↓            ↓                ↓
                                                                  n(n+1)
   "for any         "if s is the sum    "then"   "sum is equal to ------ "
 n,s integers"       of first n nums"                                2
@@ -584,6 +650,7 @@ sum_def 4 10
 And the surprise part is that if to try to prove it with Why3, then it will... timeout! And it can
 be overcome with the help of transformations.
 
+
 TODO
 
 
@@ -592,7 +659,9 @@ TODO
 --------------------------------------
 Chat about MySum2 - inductive types + transformations:
                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Yes! **Now we have the exact answer.** Your `why3 show transformations` output plus the official Why3 example make the issue clear.
+                    
+Yes! **Now we have the exact answer.** Your `why3 show transformations` output plus the official
+Why3 example make the issue clear.
 
  The thing you need is exactly:
 
@@ -602,7 +671,9 @@ induction_arg_pr H with_gen n,s
 
  The `with_gen` part is the important piece.
 
- Why3 1.8.x added this optional argument specifically to control which variables are generalized during induction. The Why3 examples themselves use the syntax `induction_arg_pr H with_gen x,y`.  Why3+1
+ Why3 1.8.x added this optional argument specifically to control which variables are generalized
+ during induction. The Why3 examples themselves use the syntax `induction_arg_pr H with_gen x,y`.
+ Why3+1
 
  ## Why your previous induction was bad
 
@@ -620,7 +691,8 @@ H :
   ...
 ```
 
- Why3 has kept the **outer** `n` and `s` fixed while constructing the induction hypothesis. Consequently, the induction hypothesis says, roughly:
+ Why3 has kept the **outer** `n` and `s` fixed while constructing the induction
+ hypothesis. Consequently, the induction hypothesis says, roughly:
 
  > "If the new values happen to equal the old values, then the formula holds."
 
@@ -743,7 +815,8 @@ $$
 
  That's what `with_gen n,s` tells Why3:
 
- > Don't freeze the current `n` and `s`; generalize them so that the induction hypothesis can apply to the predecessor's `n1,s1`.
+ > Don't freeze the current `n` and `s`; generalize them so that the induction hypothesis can apply
+ to the predecessor's `n1,s1`.
 
  This is precisely the purpose of the `with_gen` option.  Why3
 
