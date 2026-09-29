@@ -656,6 +656,141 @@ sum_def 4 10
 And the surprise part is that if to try to prove it with Why3, then it will... timeout! And it can
 be overcome with the help of transformations.
 
+*** Applying transformation
+
+We can do it in CLI with this command applying transformation ~induction_pr~:
+
+#+begin_example
+$ why3 prove -Pz3 MySum2.mlw --apply-transform 'induction_pr'
+File MySum2.mlw:
+Goal sum_formula.
+Prover result is: Valid (0.00s, 80 steps).
+
+File "MySum2.mlw", line 11, character 8 to line 13, character 37:
+Goal sum_formula.
+Prover result is: Valid (0.01s, 1763 steps).
+#+end_example
+
+If to open it in IDE: ~why3 ide MyList2.mlw~ and to apply the same transformation
+~induction_pr~ from the menu, then you will see new "subgoals" labeled by "0" and "1" in the
+left panel ("tree"). If to put the cursor on the "0" and to open in the right panel the tab
+"Task", then you will see there:
+
+#+begin_example
+--------------------------- Local Context ---------------------------
+
+inductive sum_def int int =
+  | Zero : sum_def 0 0
+  | More : forall n:int, s:int. sum_def n s -> sum_def (n + 1) ((s + n) + 1)
+
+------------------------------- Goal --------------------------------
+
+goal sum_formula :
+  forall n:int, s:int. s = 0 -> n = 0 -> (2 * s) = (n * (n + 1))
+#+end_example
+
+The "0" subgoal is proving of our lemma ~sum_formula~ for ~Zero~ constructor only. It can be
+read as "assuming ~sum_def 0 0~, prove ~sum_formula~". But ~sum_def 0 0~ means ~s~ (sum) is 0,
+and ~n~ (numbers) is 0 too, and Why3 writes exactly this:
+
+#+begin_example
+          ASSUMING THIS...            PROVE          THIS
+forall n:int, s:int. s = 0 -> n = 0    ->    (2 * s) = (n * (n + 1))
+#+end_example
+
+/~s = 0 -> n = 0~ is read as "Assuming that if s=0 and if n=0..."/
+
+If - on "1", then the content of "Task" tab will be:
+
+#+begin_example
+--------------------------- Local Context ---------------------------
+
+inductive sum_def int int =
+  | Zero : sum_def 0 0
+  | More : forall n:int, s:int. sum_def n s -> sum_def (n + 1) ((s + n) + 1)
+
+------------------------------- Goal --------------------------------
+
+goal sum_formula :
+  forall n:int, s:int.
+   sum_def n s /\
+   (forall n1:int, s1:int. s1 = s -> n1 = n -> (2 * s1) = (n1 * (n1 + 1))) ->
+   (forall n1:int, s1:int.
+     s1 = ((s + n) + 1) -> n1 = (n + 1) -> (2 * s1) = (n1 * (n1 + 1)))
+#+end_example
+
+It is the next sub-goal for proving (of ~sum_formula~ lemma). Well, the second sub-goal is for
+~More~ obviously (though it is not written somewhere). This long goal consists actually of 3
+parts - they are induction step written in ~More~ constructor:
+
+1. ~sum_def n s~
+2. ~(forall n1:int, s1:int. s1 = s -> n1 = n -> (2 * s1) = (n1 * (n1 + 1))) -> ...~
+3. ~(forall n1:int, s1:int.
+     s1 = ((s + n) + 1) -> n1 = (n + 1) -> (2 * s1) = (n1 * (n1 + 1)))~
+
+1st is read as "assuming that the predecessor is a valid ~sum_def n s~..."
+
+2nd is read as "we introduce the INDUCTION HYPOTHESIS IH: ~2 * s = n * (n + 1)~". Why3 writes
+it in the "Task" tab as ~(2 * s1) = (n1 * (n1 + 1))) -> ...~ with quantified variables (more on
+them later). Can be read also: "Induction hypothesis: the formula is true for the predecessor
+~n,s~."
+
+3rd represents the property for the result of the ~More~ constructor ~sum_def (n + 1) (s + n +
+1)~ - this. This is so called the "INDUCTION STEP" - the lemma should be true on the next step
+too - ~P(n+1)~.
+
+Now, why does ~induction_pr~ introduce ~n1~ and ~s1~? It generalizes the variables, forming
+always:
+
+#+begin_example
+(for any X,Y,Z: phrase-1...) -> (for any T,U,V: phrase-2...) -> ...
+#+end_example
+
+it does it always, even if variables the same. If they are the same, they are "fixed" with:
+
+#+begin_example
+   for i in ...      →    forall i
+     for i1 in ...   →      forall i1.
+       if i1:        →        i1 = i ->
+         ...         →          ...
+#+end_example
+
+Or in more human readable form:
+
+#+begin_example
+--------BASE--------
+
+n = 0
+s = 0
+
+Prove:
+    2*s = n*(n+1)
+
+    
+---INDUCTION-CASE---
+
+Assume:
+    sum_def n s
+
+Induction hypothesis:
+    2*s = n*(n+1)
+
+Prove:
+    2*(s+n+1) = (n+1)*(n+2)
+#+end_example
+
+SMT can proves the last easy (assuming ~P(1)~ - what ~2*s~ is, from the "BASE" case):
+
+#+begin_example
+2*(s+n+1)
+= 2*s + 2*n + 2
+= n*(n+1) + 2*n + 2       [IH]
+= n² + 3*n + 2
+= (n+1)*(n+2)
+#+end_example
+
+*** Why did the transformation help?
+
 
 TODO
 
