@@ -791,6 +791,43 @@ SMT can proves the last easy (assuming ~P(1)~ - what ~2*s~ is, from the "BASE" c
 
 *** Why did the transformation help?
 
+Without ~induction_pr~ Z3 got:
+
+#+begin_example
+we know  : sum_def 0 0
+     and : sum_def n s -> sum_def (n+1) (s+n+1)
+lemma is : sum_def n s -> 2*s = n*(n+1)
+#+end_example
+
+and Z3 has to discover the RELATIONSHIP between your recursive/inductive definition ~sum_def~ and
+the lemma ~sum_formula~. Being different numerical, boolean domains constrained. It is not easy
+for SMT usually and it hits timeout:
+
+#+begin_quote
+Z3 is very good at arithmetic and first-order SMT reasoning, but it isn't automatically
+performing the structural induction that a human mathematician sees immediately.
+#+end_quote
+
+It will discover it for long WITHOUT FINDING THE INDUCTION ARGUMENT.
+
+But with ~induction_pr~, Why3 performs the induction BEFORE Z3 sees the problem and it
+transforms:
+
+#+begin_example
+       f r o m                   t o  -  g o o d   f o r   Z 3
+
+∀ n s.                        →   BASE:  P(0, 0)
+sum_def n s -> P(n,s)         →   STEP:  P(n,s) -> P(n+1,s+n+1)
+
+𝘸𝘩𝘦𝘳𝘦 𝘗(𝘯,𝘴) ≡ 2*𝘴 = 𝘯*(𝘯+1)
+
+                                              ↓ ↓ ↓
+
+                               n=0, s=0         2s = n(n+1)
+                               ───────────  ,   ─────────────────────
+                               2s = n(n+1)      2(s+n+1) = (n+1)(n+2)
+#+end_example
+
 
 TODO
 
