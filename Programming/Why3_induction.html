@@ -1,0 +1,1877 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-09-30 Wed 20:48 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why3: induction</title>
+<meta name="description" content="Proving by induction in Why3" />
+<meta name="keywords" content="Why3,theorem,proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Why3: induction</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org52a39ab">Proving by induction</a></li>
+<li><a href="#org4c1b30b">Induction in Why3</a>
+<ul>
+<li><a href="#org8ba8f7d">First attempt (unsuccessful)</a></li>
+<li><a href="#orgab9d3e8">Lemma with a body</a>
+<ul>
+<li><a href="#orgeb1f53e">Why does not Why3 prove P(n-1) case?</a></li>
+</ul>
+</li>
+<li><a href="#orgf52f455">Transformations</a>
+<ul>
+<li><a href="#org35a363b">Weak (ordinary) induction</a></li>
+<li><a href="#orgf16efe8">Strong induction</a></li>
+</ul>
+</li>
+<li><a href="#orga0ca0df">Inductive predicate and transformations</a>
+<ul>
+<li><a href="#org9393273">What is "inductive" ?</a></li>
+<li><a href="#org0b538cb">Applying transformation</a></li>
+<li><a href="#org5ab71df">Why did the transformation help?</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org550bcc7">What is sent to SMT?</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org52a39ab" class="outline-2">
+<h2 id="org52a39ab">Proving by induction</h2>
+<div class="outline-text-2" id="text-org52a39ab">
+<p>
+There are different ways to prove something, in math one of them is proving by induction. Its
+idea is: prove that a statement is true for every natural number <code>n</code>.
+</p>
+
+<ul class="org-ul">
+<li><b>Identify the cases.</b>
+The theorem, lemma, or claim usually has many cases. We want to prove that the statement is true for all of them.</li>
+<li><b>Number the cases.</b> We describe the cases using a natural number <code>n</code>.
+For example, if the cases are <code>2x, 4x, 6x, 8x, ...</code> we can describe the <code>n</code>-th case as <code>2*n*x</code>.
+So instead of proving infinitely many separate cases, we can talk about them using one number <code>n</code>.</li>
+<li><b>Prove the base case.</b> We prove that the statement is true for the first case, usually <code>n=0</code>
+or <code>n=1</code> (it can be any <code>n</code> but it must be the first one).</li>
+<li><b>Prove the induction step.</b> We prove a general rule:
+<b>I͟f͟ t͟h͟e͟ s͟t͟a͟t͟e͟m͟e͟n͟t͟ i͟s͟ t͟r͟u͟e͟ f͟o͟r͟ s͟o͟m͟e͟ c͟a͟s͟e͟ n͟,͟ t͟h͟e͟n͟ i͟t͟ i͟s͟ a͟l͟s͟o͟ t͟r͟u͟e͟ f͟o͟r͟ t͟h͟e͟ n͟e͟x͟t͟ c͟a͟s͟e͟,͟ n͟+͟1͟. And
+EVERY case has previous, next case, so it means ALL cases are true AFTER THE FIRST</b> ("next is true"
+automatically means "ALL" after some zero, initial case)
+The important word is some. We are not proving some case <code>n=5</code> leading to case <code>n=6</code>. We prove
+the rule for every possible <code>n</code>: <code>P(n) =&gt; P(n+1)</code></li>
+<li><b>Put the two parts together.</b> We know the first case is true (let's say the first is <code>n=1</code>):
+<code>P(1)</code> and we know that every true case leads to the next true case: <code>P(n) =&gt; P(n+1)</code>. Therefore:
+<code>P(1) =&gt; P(2) =&gt; P(3)...</code></li>
+<li>So: <b>every case AFTER THE BASE CASE is true.</b>:</li>
+</ul>
+
+<pre class="example" id="org5e3e1ad">
+P(1) =&gt; P(2)
+P(2) =&gt; P(3)
+P(3) =&gt; P(4)
+...
+P(n) =&gt; P(n+1)
+</pre>
+
+<blockquote>
+<p>
+PROVE THE FIRST CASE, THEN PROVE THAT EVERY CASE (IF IT IS TRUE) LEADS TO THE NEXT
+CASE. THEREFORE ALL CASES AFTER THE BASE - ARE TRUE.
+</p>
+</blockquote>
+
+<p>
+Again, we don't prove that <code>P(n)</code> is true, we prove that <b>IF</b> <code>P(n)</code> is true, then <code>P(n+1)</code> is
+true, but it does not prove that <code>P(n)</code> is true, maybe <b>IT IS NOT</b>. We prove only logical
+connection between them - "IF one true, the next (any) true too" . But... if among them we see
+at least one case true - then ALL are:
+</p>
+
+<pre class="example" id="org2b98263">
+          oh, true!
+             |
+            \v/ 
+   ? -&gt; ? -&gt; O -&gt; o -&gt; ... -&gt; o -&gt; o -&gt; o
+            /|\   |
+             |    |
+            base  `-- if the previous is true
+            case      then the next is true
+</pre>
+
+<p>
+What about cases BEFORE the first/BASE case? We don't know, maybe they are true, maybe no - look at
+the implication logical function:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">U</th>
+<th scope="col" class="org-right">V</th>
+<th scope="col" class="org-right">U =&gt; V</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+and lets think that the base case is <code>V</code> and the previous one, unknown (?) - is <code>U</code>. If <code>V=1</code> then
+<code>U</code> can be <code>0</code> and the implication (<code>=&gt;</code> or <code>-&gt;</code>) will be true too. It means that if we proved
+<code>P(n) =&gt; P(n+1)</code> and if the base case if true (<code>1</code>), then there is only one case for the next
+case - when both are true. But for the previous it is not true: <code>0 =&gt; 1</code> is true and if the base is
+this <code>1</code> then the previous could be <code>0</code>. So, the math. induction is based on the idea of the NEXT
+cases only:
+</p>
+
+<blockquote>
+<p>
+Mathematical induction is fundamentally about propagating truth from a starting point toward the
+next cases: <code>P(base-case) =&gt; P(base-case + 1) =&gt; P(base-case + 2) =&gt; ...</code>
+</p>
+</blockquote>
+
+<p>
+See <a href="https://en.wikipedia.org/wiki/Mathematical_induction">more in Wikipedia</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-org4c1b30b" class="outline-2">
+<h2 id="org4c1b30b">Induction in Why3</h2>
+<div class="outline-text-2" id="text-org4c1b30b">
+<p>
+Lets prove this formula:
+</p>
+
+\begin{aligned}
+P(n \in \mathbb{N}): 0 + 1 + 2 + \ldots + n = \sum_{i=1}^{n} i = \frac{n(n+1)}{2} \text{ , formula (1)}
+\end{aligned}
+
+<p>
+It is proven by induction as...
+</p>
+
+<p>
+<i><b>Induction case</b></i> if want to prove that IF it is true for some <code>n</code> (some... hmmm, let's
+call it <code>k</code>, i.e., when <code>n = k</code>), then it is true for the next (i.e., <code>k + 1</code>). What do we
+know? We know only that formula (1). We chose some PARTICULAR NUMBER among the series natural
+numbers, we designed it as <code>k</code>. The formula (not proven yet!) is the same (1) but imagine the
+particular <code>k</code> instead of abstract <code>n</code>. OK. The step is to prove that <code>P(k+1)</code> is true too -
+when <code>P(k)</code> is true: <code>P(k) =&gt; P(k+1)</code>. How? Look:
+</p>
+
+\begin{aligned}
+0 + 1 + \ldots + k = \frac{k(k+1)}{2} \text{ , for k} \\
+0 + 1 + \ldots + k + (k + 1) = ? \text{ , for k + 1}
+\end{aligned}
+
+<p>
+Well, <code>?</code> is our formula (1) plus this new addend - <code>(k + 1)</code>:
+</p>
+
+\begin{aligned}
+0 + 1 + \ldots + k + (k + 1) = \frac{k(k+1)}{2} + (k + 1)
+\end{aligned}
+
+<p>
+After simplification this formula became:
+</p>
+
+\begin{aligned}
+0 + 1 + \ldots + k + (k + 1) = \frac{(k+1)((k+1)+1)}{2}
+\end{aligned}
+
+<p>
+If to rename <code>(k + 1)</code> as some... <code>X</code>: \(\frac{X(X+1)}{2}\), wow! We see again the formula (1) !
+What is our conclusion after this mathematical exercise? It is:
+</p>
+
+<blockquote>
+<p>
+If formula (1) is true (we don't know: maybe it is not!), but if (1) is true, for some <i>k</i> then
+it is true for <i>k+1</i> too because IT IS THE SAME FORMULA AGAIN! So, we proved that if <code>P(k)</code> is
+true then <code>P(k + 1)</code> will be true too.
+</p>
+</blockquote>
+
+<p>
+<i><b>Base case</b></i> ok, now lets select the "base" case - <code>n=0</code> (or 1, etc):
+</p>
+
+\begin{aligned}
+\text{Base case : }P(0) = \frac{0(0+1)}{2} = 0
+\end{aligned}
+
+<blockquote>
+<p>
+Conclusion: Since both the base case and the induction step have been proved as true, by
+mathematical induction the statement <code>P(n)</code> holds for every natural number <code>n ≥ 0</code> !
+</p>
+</blockquote>
+
+<p>
+Proven! This is the method, approach of math. induction - an example of its usage.
+</p>
+
+<p>
+See <a href="https://en.wikipedia.org/wiki/Mathematical_induction#Sum_of_consecutive_natural_numbers">more on Wikipedia</a>.
+</p>
+</div>
+<div id="outline-container-org8ba8f7d" class="outline-3">
+<h3 id="org8ba8f7d">First attempt (unsuccessful)</h3>
+<div class="outline-text-3" id="text-org8ba8f7d">
+<p>
+Lets repeat this approach in Why3:
+</p>
+
+<pre class="example" id="org2c562b6">
+module MySum
+
+  use int.Int                  (* for ints and operation *)
+  use int.EuclideanDivision    (* for div operation *)
+
+  let rec function sum (n: int) : int
+    requires { n&gt;=0 }
+    variant { n }
+  =
+    if n = 0 then 0
+    else n + sum (n - 1)
+  
+  lemma sum_formula:
+    forall n: int. n &gt;= 0 -&gt;
+      sum n = div (n * (n + 1)) 2
+
+end
+</pre>
+
+<p>
+and if to try to prove it:
+</p>
+
+<pre class="example" id="org6835425">
+$ why3 prove -Pz3 MySum1.mlw
+File MySum1.mlw:
+Goal sum'vc.
+Prover result is: Valid (0.00s, 299 steps).
+
+File "MySum1.mlw", line 26, character 4 to line 27, character 33:
+Goal sum_formula.
+Prover result is: Timeout (5.00s, 710885547 steps).
+</pre>
+
+<p>
+Ops!
+</p>
+
+<p>
+In math we had a sum equals to... In Why3 we should express the sum in some way, we did it
+using a recursive function (we a termination/DECREASING measure <code>n</code>) and a kind of "refinement
+type" (actually just a contract <code>n&gt;=0</code>):
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">mathematics</th>
+<th scope="col" class="org-left">Why3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">\(\sum_{i=1}^{n} i\)</td>
+<td class="org-left"><code>let rec function sum</code>...</td>
+</tr>
+
+<tr>
+<td class="org-left">\(\frac{n(n+1)}{2}\)</td>
+<td class="org-left"><code>lemma sum_formula</code>...</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+So, the sum is expressed through a recursion, OK, but the result (right hand side) of the
+formula ... Why3 cannot prove it by default!
+</p>
+</div>
+</div>
+<div id="outline-container-orgab9d3e8" class="outline-3">
+<h3 id="orgab9d3e8">Lemma with a body</h3>
+<div class="outline-text-3" id="text-orgab9d3e8">
+<p>
+We wrote:
+</p>
+
+<pre class="example" id="org68c4061">
+module MySum
+
+  use int.Int
+  use int.EuclideanDivision
+
+  let rec function sum (n: int) : int
+    requires { n&gt;=0 }
+    variant { n }
+  =
+    if n = 0 then 0
+    else n + sum (n - 1)
+
+  let rec lemma sum_formula (n: int)
+    requires { n &gt;= 0 }
+    ensures { sum n = div (n * (n + 1)) 2 }
+    variant { n }
+  =
+    if n = 0 then
+      ()
+    else
+      sum_formula (n - 1)
+
+end
+</pre>
+
+<p>
+And the proving now:
+</p>
+
+<pre class="example" id="org804db0f">
+$ why3 prove -Pz3 MySum1.mlw
+File MySum1.mlw:
+Goal sum'vc.
+Prover result is: Valid (0.00s, 431 steps).
+
+File MySum1.mlw:
+Goal sum_formula'vc.
+Prover result is: Valid (0.00s, 6485 steps).
+</pre>
+
+<p>
+How does it prove the formula (1) by induction?!
+</p>
+
+<p>
+First, the "lemma" is our theorem, our formula (1). Second, it has "a contract": precondition,
+postcondition and an argument <code>n</code>:
+</p>
+
+<pre class="example" id="org36cd0f9">
+  requires { U(n) }       \_____  U(n) -&gt; V(n): Assuming U(n), prove V(n).
+  ensures { V(n) }        /
+</pre>
+
+<p>
+<code>U</code> is <code>n ≥ 0</code>. And the <code>V</code> is exactly \(\frac{n(n+1)}{2}\) ! But... our lemma is not only
+proposition-based, it has a body. And the body is this:
+</p>
+
+<pre class="example" id="orgf1fd404">
+    if n = 0 then
+      ()
+    else
+      sum_formula (n - 1)
+</pre>
+
+<p>
+So, the base case is <code>n=0</code> - the lemma-with-a-body returns <code>()</code>, i.e., a unit which means
+"proven!", then - the induction step: else - follow recursion. By the way, this can be
+rewritten lesser explicit and shorter, it is the same:
+</p>
+
+<pre class="example" id="org34e7a56">
+    if n &gt; 0 then
+      sum_formula (n - 1)
+</pre>
+
+<p>
+What does Why3 do with all these? Using induction it has to check that <code>P(n) =&gt; P(n+1)</code> and to
+find the base case. Our lemma is:
+</p>
+
+\begin{aligned}
+P(n) \equiv \sum_{i=1}^{n} i = \frac{n(n+1)}{2}
+\end{aligned}
+
+<p>
+<code>P(n-1)</code> is, then:
+</p>
+
+\begin{aligned}
+P(n - 1) \equiv \sum_{i=1}^{n - 1} i = \frac{(n-1)n}{2}
+\end{aligned}
+
+<p>
+Two different propositions. We can assume \(P(n - 1) = \sum_{i=1}^{n - 1} i\) as true - it will be our
+<i>induction hypothesis</i>. Our goal is <code>P(n)</code> which is \(\sum_{i=1}^{n} i = \frac{n(n+1)}{2}\) (the
+postcondition of our lemma is).
+</p>
+
+<p>
+From the recursive definition of the sum (<code>let rec function sum</code>) Why3 knows that when <code>n &gt; 0</code>:
+</p>
+
+\begin{aligned}
+\sum_{i=1}^{n} i = n + \sum_{i=1}^{n - 1} i
+\end{aligned}
+
+<p>
+and Why3 use it in our goal <code>P(n)</code>, replacing \(\sum_{i=1}^{n} i\) by \(n + \sum_{i=1}^{n - 1} i\) :
+</p>
+
+\begin{aligned}
+n + \sum_{i=1}^{n - 1} i = \frac{n(n + 1)}{2}
+\end{aligned}
+
+<p>
+Why3 uses the \(\sum_{i=1}^{n - 1} i\) from the induction hypothesis and:
+</p>
+
+\begin{aligned}
+n + \frac{(n - 1)n}{2} = \frac{n(n + 1)}{2}
+\end{aligned}
+
+<p>
+This is passed to SMT solver and it easy proves it (<code>n</code> is in a numerical domain - a task as for SMT).
+</p>
+
+<p>
+Conceptually, the induction step is <code>P(n - 1) =&gt; P(n)</code>, but Why3 doesn't necessarily hand Z3
+one giant formula literally written in this way. Instead, Why3 creates a <i>verification
+condition</i> (VC) with <code>P(n - 1)</code> as an assumption \(P(n-1) \vdash P(n)\) which means:
+</p>
+
+<blockquote>
+<p>
+Assuming <code>P(n - 1)</code> as true, prove <code>P(n)</code>
+</p>
+</blockquote>
+
+<p>
+Bigger picture:
+</p>
+
+<pre class="example" id="orge035b18">
+Assume:
+  n &gt;= 0
+  n &gt; 0
+
+Induction hypothesis (from the lemma "sum_formula",
+                      substituting "n" by "n-1"):
+                      
+          n-1    (n-1)n
+ P(n-1) ≡  ∑ i = ──────   ····························.
+          i=1      2                                  :
+                                                      :
+Prove ("ensures" of the lemma "sum_formula"):         :
+                                                      :
+         n     n(n+1)                                 :
+ P(n) ≡  ∑ i = ──────                                 :     
+        i=1      2                                    :  
+                                                      :
+Why3 unfolds sum (from "sum" definition):             :
+                                                      :
+                              then Why3               :
+         n        n-1 ⋰˙˙⋱   substitutes        by this from
+ P(n) ≡  ∑ i = n + ∑ i     `····this····.          P(n-1)   
+        i=1       i=1                   :          /  :   
+                                        :         /   :
+                                        :       SO    :
+                                        :     ASSUME  :
+         n         (n-1)n               :     P(n-1)  :
+ P(n) ≡  ∑ i = n + ──────   &lt;···········:·············'
+        i=1          2
+
+Now the goal is effectively:
+
+                 n     n(n+1)
+  by "ensures"   ∑ i = ──────                -- V(n)
+                i=1      2                      or precond.
+                
+  by unfolds     n         (n-1)n
+  and subst.     ∑ i = n + ──────            -- P(n)
+                i=1          2                  assuming
+                                                P(n-1)
+
+So, to prove P(n), ie, whole lemma - that V(n) = transform result,
+we send this to SMT:
+
+   n(n+1)  ?      (n-1)n                   easy proves
+   ──────  =  n + ──────   ···&gt; SMT ···&gt;  that they are
+     2              2                      really equal
+
+QED: assuming P(n-1), we proved P(n).
+</pre>
+
+<p>
+This is sent to SMT - SMT can establish it very easy (numbers!):
+</p>
+
+\begin{aligned}
+\forall n \in \mathbb{Z}, \frac{n(n+1)}{2} = \frac{n(n-1)}{2} + n
+\end{aligned}
+
+<p>
+Again, to prove <code>P(n)</code>, we assumed <code>P(n-1)</code> - this is <i>the induction step</i>
+and finally we came to some new formula. Then we sent to SMT request to
+prove <code>V(n) or ensures {..}</code> and this new formula. 
+</p>
+
+<p>
+Assuming that <code>P(n-1)</code> is true, we proved true of <code>P(n)</code>, so we established
+<code>P(n-1) =&gt; P(n)</code>. Base case is for <code>n = 0</code> ("unit" - trivial, even if it is
+implicit):
+</p>
+
+<pre class="example" id="org0bc0ed3">
+...
+  if n = 0 then ()
+...
+</pre>
+
+<p>
+This is how Why3 presumably operated in this instance.
+</p>
+
+<p>
+<code>P(n-1)</code> came from recursion of the lemma - we "forced" Why3 to be based on
+<code>P(n-1)</code> - so to become "inductive"!
+</p>
+
+<p>
+By the way, <code>n + ...</code> came from recursion of the <code>sum</code> definition.
+</p>
+
+<blockquote>
+<p>
+The combination of the recursive call and the decreasing variant is what makes the recursive
+lemma usable inductively.
+</p>
+</blockquote>
+
+<p>
+The question here is:
+</p>
+</div>
+<div id="outline-container-orgeb1f53e" class="outline-4">
+<h4 id="orgeb1f53e">Why does not Why3 prove P(n-1) case?</h4>
+<div class="outline-text-4" id="text-orgeb1f53e">
+<p>
+When Why3 sees that some goal (a lemma in the case) is <b>recursive</b> and <b>it has a variant</b>
+(decreasing measure) it "think" in this way:
+</p>
+
+<p>
+I (Why3) sees:
+</p>
+
+<pre class="example" id="org946767e">
+let rec lemma foo (n: int)         GOAL:       P(n)
+  ensures { P(n) }                 -----
+  variant { n }                    AVAILABLE:  P(n-1)
+=                                  ----------    :
+  if n = 0 then ()                               :
+  else foo (n-1)               From recursive call/SPECIFICATION
+</pre>
+
+<p>
+Why3 doesn't recursively open another proof obligation saying "now prove P(n-1)". <b>It uses the
+induction mechanism instead.</b>
+</p>
+
+<p>
+But if we write:
+</p>
+
+<pre class="example" id="orge19cd23">
+let lemma bar (n: int)
+  ensures { P(n-1) }
+=
+  ...without recursive call supplying P(n-1), and no variant too
+</pre>
+
+<p>
+then the goal is plain <code>P(n-1)</code> from <code>ensures {..}</code>. And Why3 in this case will prove <code>P(n-1)</code>.
+When Why3 sees induction, it proves the base case, and then proves the connection/IMPLICATION
+between <code>P(n) =&gt; P(n+1)</code> - it is "smart" enough. To do it Why3 needs:
+</p>
+
+<ul class="org-ul">
+<li>recursion</li>
+<li>variant (decreasing measure)</li>
+</ul>
+
+<p>
+When Why3 sees something like: <code>foo(smaller_argument)</code> then what does the ensures clause of
+<code>foo</code> give it? If it gives Why3: <code>P(smaller_argument)</code> then Why3 can use that as an induction
+hypothesis while proving the current invocation.
+</p>
+
+<blockquote>
+<p>
+The <code>variant</code> answers a different question:
+</p>
+
+<p>
+Why am I allowed to use the recursive call?
+</p>
+
+<p>
+Answer:
+</p>
+
+<p>
+Because the recursive argument/measure is smaller.
+</p>
+</blockquote>
+
+<p>
+<b>Why3 proves <code>P(n-1)</code> when <code>P(n-1)</code> is the current verification goal; it ASSUMES/uses <code>P(n-1)</code>
+when a valid recursive call to a lemma whose CONTRACT (<code>ensures {..}</code>) guarantees <code>P(n-1)</code> is
+available while proving P(n).</b>
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf52f455" class="outline-3">
+<h3 id="orgf52f455">Transformations</h3>
+<div class="outline-text-3" id="text-orgf52f455">
+<p>
+What are transformations in Why3?
+</p>
+
+<p>
+A transformation rewrites a proof goal into one or more new goals, usually in a predictable,
+logic-level way. In Why3, a transformation might introduce an implication’s premises as hypotheses,
+split a conjunction, or simplify a formula. It generally doesn’t construct a proof by itself; it
+changes the task that a prover must solve.
+</p>
+
+<p>
+Why3 transformations are typically reusable goal-to-goal operations, often used to prepare
+verification conditions for automated provers.
+</p>
+
+<p>
+"Reusable" means that you can save them in a session file if you applied them interactively in IDE
+(as commands: IDE has an edit box for typing of "commands"). Also you can pass them as options in
+command line as <code>--apply-transform</code> - one by one.
+</p>
+
+<p>
+A transformation can resemble a simple "tactic": for instance, Why3’s introduce<sub>premises</sub> is similar
+in effect to introducing assumptions in Rocq or LEAN. But tactics are a broader mechanism and can
+include search, branching, and proof construction.
+</p>
+
+<p>
+Transformations are best thought of as goal transformations; tactics are proof-state programs. The
+boundary isn’t absolute---some tactics merely transform goals, and some systems expose transformations
+through tactic-like interfaces.
+</p>
+
+<p>
+Transformation is REWRITING of the initial WhyML happening "in the memory".
+</p>
+
+<p>
+Simple example: <code>split_vc</code> splits a verification condition into separate goals, typically by
+decomposing a top-level conjunction in the goal.  For example, a goal <code>P /\ Q</code> becomes 2 goals, <code>P</code>
+and <code>Q</code>. This <b>lets Why3 send each obligation to SMT prover separately</b>. It <b>does not prove them</b>;
+it <b>restructures the proof task</b>. I.e., <code>split_vc</code> is a transformation: it takes a verification
+condition and produces separate proof goals, rather than proving them itself. If you think that
+it looks as an "optimization" then yes - it affects the performance of the proving and if you has hit
+timeout or similar, then sometimes <code>split_vc</code> can help.
+</p>
+
+<p>
+Usually you use transformations exactly for this: you cannot prove some goal, using transformations
+you solve this problem. Well, sometimes you need rewriting of WhyML too... anyway, this is the idea
+of "transformations".
+</p>
+
+<p>
+You can see all supported transformations by the simple command:
+</p>
+
+<pre class="example" id="org96fba97">
+$ why3 show transformations
+abstract_quantifiers
+  Abstract quantifiers in the axioms of the context and the goals.
+
+abstract_unknown_lsymbols
+  Abstract applications of non-built-in symbols with constants. Used by the
+  Gappa pretty-printer.
+
+apply
+  type: prsymbol -&gt; ?with -&gt; list term -&gt; list task
+  apply &lt;prop&gt; [with] &lt;term list&gt; applies premise &lt;prop&gt; to the goal and uses
+  the list of terms to instantiate the variables that are not found.
+
+assert
+  type: formula -&gt; ?as -&gt; string -&gt; list task
+  assert &lt;term&gt; [name] makes an assertion with a hypothesis 'name: term'.
+
+case
+  type: formula -&gt; ?as -&gt; string -&gt; list task
+  case &lt;term&gt; [name] generates hypothesis 'name: term' in a first goal and
+  'name: ~ term' in a second one.
+...
+</pre>
+
+<p>
+For example, Why3 1.8.0 has 128 transformations. They are available as an interactive command in
+IDE and as menu items in IDE: "Tools/Transformations".
+</p>
+
+<blockquote>
+<p>
+Transformations cannot be written in WhyML program - to be "called"/applied from there. But you
+can "hint" then from WhyML program (with arguments).
+</p>
+</blockquote>
+
+<p>
+Now lets return to the initial WhyML:
+</p>
+
+<pre class="example" id="org9f80025">
+module MySum
+
+  use int.Int                  (* for ints and operation *)
+  use int.EuclideanDivision    (* for div operation *)
+
+  let rec function sum (n: int) : int
+    requires { n&gt;=0 }
+    variant { n }
+  =
+    if n = 0 then 0
+    else n + sum (n - 1)
+  
+  lemma sum_formula:
+    forall n: int. n &gt;= 0 -&gt;
+      sum n = div (n * (n + 1)) 2
+
+end
+</pre>
+
+<p>
+And let's open it in IDE with <code>why3 ide MySum1.mlw</code>. We have an edit box for entering of
+commands, put the cursor on <code>sum_formula</code> in the left tree. And enter in the command box
+<code>intros n</code>. It will create there new sub-goals. Put the cursor on the last one "0" and enter
+the next command: <code>introduce_premises</code>. New sub-goal, and a new command: <code>induction n</code>.
+Put the cursor for example, on the <code>induction n</code> sub-goal and call the SMT proving with the
+menu "Tools/Provers/CVC4". You show see green checks in the tree. Now put the cursor on the
+<code>sum'vc</code> and call the prover again - everything is green now and the tree looks like:
+</p>
+
+<pre class="example" id="orgc896457">
+Status | Theories/Goals                         | Time
+  ✔      ▼ 🗁  MySum1.mlw         
+  ✔        ▼ 🗁  MySum
+  ✔          ▼ 🗎 sum'vc [VC for sum]
+  ✔              \ CVC4 1.8                       0.01 (steps: 246)
+  ✔          ▼ 🗎 sum_formula
+  ✔            ▼ 🛠 intros n
+  ✔              ▼ 🗎 0
+  ✔                ▼ 🛠 introduce_premises
+  ✔                  ▼ 🗎 0
+  ✔                    ▼ 🛠 induction n
+  ✔                      ▼ 🗎 0 [base case]
+  ✔                          \ CVC4 1.8           0.02 (steps: 3597)
+  ✔                      ▼ 🗎 1 [recursive case]
+  ✔                          \ CVC4 1.8           0.02 (steps: 4821)
+</pre>
+
+<p>
+Entered commands are transformations. Now, save the session (menu "File/Save session"). And
+exit. Put the session directory (<code>./MySum1/</code>) to Git control (all its files). And you can
+re-check it from the command line with this command line in the console:
+</p>
+
+<pre class="example" id="orgc311248">
+$ why3 replay -q MySum1
+ 2/2 (replay OK)
+</pre>
+
+<p>
+For unchanged goals, existing proofs remain attached. For goals affected by the source
+modification, the existing proof attempts become obsolete. This is explicitly how Why3 is
+designed to work.
+</p>
+
+<p>
+If the modification changes the actual proof structure, we may need to edit the
+transformation tree - for example, change, add, remove transformations - just as we did
+originally, in the IDE.
+</p>
+
+<p>
+Why3 specifically provides the replay valid obsolete proofs operation for this situation.
+</p>
+
+<p>
+By the way, another scenario is to use just 2 transformations - they also work fine:
+</p>
+
+<ol class="org-ol">
+<li><code>intros n</code></li>
+<li><code>induction n</code></li>
+</ol>
+
+<p>
+Lets explore little what we are seeing in the IDE.
+</p>
+
+
+<p>
+▒▒▒▒▒▒▒▒▒▒ Cursor on <b><code>sum_formula</code></b> - the "Task" tab is:
+</p>
+
+<pre class="example" id="orgfbf0607">
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n:int.
+ 7     n &gt;= 0 -&gt; (if n = 0 then sum n = 0 else sum n = (n + sum (n - 1)))
+ 8  
+ 9  ------------------------------- Goal --------------------------------
+10  
+11  goal sum_formula : forall n:int. n &gt;= 0 -&gt; sum n = div (n * (n + 1)) 2
+</pre>
+
+<p>
+Our initial WhyML.
+</p>
+
+
+<p>
+▒▒▒▒▒▒▒▒▒▒ Cursor on <b><code>intros n</code> / 0</b> - the "Task" tab is:
+</p>
+
+<pre class="example" id="orgb8aaef2">
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 &gt;= 0 -&gt; (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  ------------------------------- Goal --------------------------------
+12  
+13  goal sum_formula : n &gt;= 0 -&gt; sum n = div (n * (n + 1)) 2
+</pre>
+
+<p>
+<code>intros n</code> introduced (extracted) <code>n</code> constant (line 9) in the <i>logical context</i> (in the top
+level) - it was applied on <code>sum_formula</code> so <code>forall n</code> was removed as redundant now - now <code>n</code>
+is on the top level. Also, to avoid names clashing, in <code>sum'def</code> the variable <code>n</code> was renamed
+to <code>n1</code> (line 6).
+</p>
+
+
+<p>
+▒▒▒▒▒▒▒▒▒▒ Cursor on <b><code>induction n</code> / 0 [base case]</b> - the "Task" tab is:
+</p>
+
+<pre class="example" id="org0ace4f7">
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 &gt;= 0 -&gt; (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  Init : n &lt;= 0
+12  
+13  ------------------------------- Goal --------------------------------
+14  
+15  goal sum_formula : n &gt;= 0 -&gt; sum n = div (n * (n + 1)) 2
+</pre>
+
+<p>
+Base case. <code>Init</code> is simply the name Why3 gives to the <i>induction-range assumption</i>.
+</p>
+
+<p>
+It is not an assumption from the original .mlw source, and it is not something that changed
+between the 2 cases. Rather, each branch gets a <b>different generated assumption</b>.
+</p>
+
+<p>
+▒▒▒▒▒▒▒▒▒▒  Cursor on <b><code>induction n</code> / 1 [recursive case]</b> - the "Task" tab is:
+</p>
+
+<pre class="example" id="orgd1e7f06">
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 &gt;= 0 -&gt; (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  Init : 0 &lt; n
+12  
+13  Hrec : forall n1:int. n1 &lt; n -&gt; n1 &gt;= 0 -&gt; sum n1 = div (n1 * (n1 + 1)) 2
+14  
+15  ------------------------------- Goal --------------------------------
+16  
+17  goal sum_formula : n &gt;= 0 -&gt; sum n = div (n * (n + 1)) 2
+</pre>
+
+<p>
+<code>Hrec</code> was added (line 13) - it is <i>the STRONG induction hypothesis</i>:
+</p>
+
+<pre class="example" id="orgb0ffb61">
+                                  I N D U C T I O N   H Y P O T H E S I S:
+                                          
+                                                  n     n(n+1)
+                                           P(n) ≡ ∑ i = ──────
+Hrec :                                           i=1      2
+  forall n1:int.
+    n1 &lt; n -&gt;                       ⟷     ∀n, n &lt; n1 /\ n ≥ 0  ⟹  P(n).
+    n1 &gt;= 0 -&gt;
+    sum n1 = div (n1 * (n1 + 1)) 2        For every nonnegative integer
+                                          smaller than n, the theorem
+                                          is already known.
+</pre>
+
+
+<p>
+Conceptually:
+</p>
+
+<pre class="example" id="orgf66ac92">
+             P(n)
+               │
+        induction on n
+          /         \
+     n &lt;= 0          n &gt; 0
+       │               │
+     Base          Recursive
+</pre>
+</div>
+<div id="outline-container-org35a363b" class="outline-4">
+<h4 id="org35a363b">Weak (ordinary) induction</h4>
+<div class="outline-text-4" id="text-org35a363b">
+<p>
+In ordinary induction, the recursive step gives you only the immediately preceding case:
+<code>P(n−1) ⟹ P(n)</code>, i.e., "if <code>P</code> holds in the previous case, then in the current, it holds too."
+In Why3 it could look as:
+</p>
+
+<pre class="example" id="orge373b4f">
+Hrec : P(n - 1)           if const n=4: P(3) ◀ known
+                                        P(4)   ?
+● I know the theorem for exactly n-1
+</pre>
+</div>
+</div>
+<div id="outline-container-orgf16efe8" class="outline-4">
+<h4 id="orgf16efe8">Strong induction</h4>
+<div class="outline-text-4" id="text-orgf16efe8">
+<pre class="example" id="org1fb93fc">
+Hrec :                    if const n=4: P(0) ◀ known
+  forall n1:int.                        P(1) ◀ known
+    n1 &lt; n -&gt;                           P(2) ◀ known
+    n1 &gt;= 0 -&gt;                          P(3) ◀ known
+    P(n1)                               P(4)   ?
+
+● I know the theorem for every nonnegative integer smaller than n
+
+                           I.e.,
+
+                  ● ordinary induction:
+
+                          P(n-1)
+
+                  ● strong induction:
+
+              P(0) /\ P(1) /\ ... /\ P(n-1)                           
+</pre>
+
+<blockquote>
+<p>
+For many proofs, strong induction isn't actually more powerful in terms of what can ultimately
+be proved.
+</p>
+</blockquote>
+
+<p>
+Why did STRONG induction appear? This is how the transformation <code>induction...</code> works:
+</p>
+
+<pre class="example" id="org144875c">
+$ why3 show transformations | grep -A 2 induction
+induction
+  type: term -&gt; ?from -&gt; term -&gt; env -&gt; list task
+  induction &lt;term1&gt; [from] &lt;term2&gt; performs a strong induction on the integer
+  &lt;term1&gt; starting from the integer &lt;term2&gt;. &lt;term2&gt; is optional and defaults
+  to 0.
+--
+...
+</pre>
+
+<p>
+The mental model is:
+</p>
+
+<pre class="example" id="org21d6150">
+Transformation "induction n":
+
+        "induction n"
+             │
+             ├── base:     n &lt;= 0
+             │
+             └── recursive: 0 &lt; n
+                            +
+                            ∀ n1 &lt; n, P(n1)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga0ca0df" class="outline-3">
+<h3 id="orga0ca0df">Inductive predicate and transformations</h3>
+<div class="outline-text-3" id="text-orga0ca0df">
+<pre class="example" id="orgda36fd1">
+module MySum2
+  use int.Int
+
+  inductive sum_def int int =
+    | Zero:
+        sum_def 0 0
+    | More:
+        forall n s: int.
+          sum_def n s -&gt;
+          sum_def (n + 1) (s + n + 1)
+
+  lemma sum_formula:
+    forall n s: int.
+      sum_def n s -&gt;
+      2 * s = n * (n + 1)
+
+end
+</pre>
+
+<p>
+Here <code>sum_def n s</code> is read as "<code>s</code> is the sum of the first <code>n</code> numbers.", So,
+</p>
+
+<pre class="example" id="orga1ccfea">
+constructor/case|                      TRUE IS THAT...
+----------------+----------------------------------------------------------------
+     Zero       |                       sum_def 0 0
+                |                             ↓
+                |                "sum of first 0 nums is 0"
+----------------+----------------------------------------------------------------
+     More       | forall n s: int.  sum_def n s   -&gt;   sum_def (n + 1) (s + n + 1)
+                |        ↓               ↓        ↓                  ↓
+                |    "For any       "if s is    "then"    "s + (n + 1) is the sum
+                |    integers        the sum                   for n + 1"
+                |      n, s"       for n nums"
+</pre>
+
+<p>
+Yes, literally it is read for <code>Zero</code>: "IT IS TRUE THAT SUM OF FIRST 0 NUMBERS IS 0".
+</p>
+
+<p>
+It is a recursive definition of the sum, expressed as an inductive predicate.
+</p>
+
+<p>
+<b>Why does <code>sum_def</code> have 2 arguments?</b> Imagine:
+</p>
+
+<pre class="example" id="org8a7d424">
+inductive sum_def int =
+  | Zero: sum_def 0
+  | More:
+      forall n:int.
+        sum_def n -&gt;
+        sum_def (n+1)
+</pre>
+
+<p>
+Then <code>sum_def n</code> would only tell us: <i>"<code>n</code> is reachable from zero."</i> <b>It would not tell us what the
+sum is.</b> For example, all we know is: <code>sum_def 3</code> <b>BUT WHERE IS 6 - THE SUM VALUE?</b>
+</p>
+
+<p>
+It reminds Prolog's predicate...
+</p>
+
+<p>
+Then the lemma. It says:
+</p>
+
+<pre class="example" id="orgd279a14">
+forall n s: int.       sum_def n s       -&gt;       2 * s = n * (n + 1)
+       ↓                    ↓            ↓                ↓
+                                                                 n(n+1)
+  "for any         "if s is the sum    "then"   "sum is equal to ------ "
+n,s integers"       of first n nums"                                2
+</pre>
+
+<p>
+And to avoid games with <code>div</code>, we just multiplied both side by 2 (so, you see <code>2 * s = ...</code>). 
+</p>
+</div>
+<div id="outline-container-org9393273" class="outline-4">
+<h4 id="org9393273">What is "inductive" ?</h4>
+<div class="outline-text-4" id="text-org9393273">
+<p>
+Why3 supports "predicate" - something returning true or false. The construction using the keyword
+<code>inductive</code> means "define this predicate by rules" (<code>sum_def</code>). It has 2 arguments:
+</p>
+
+<pre class="example" id="orgfc527cb">
+sum_def : int -&gt; int -&gt; Prop
+</pre>
+
+<p>
+and when it is used as <code>sum_def 3 6</code> then it is a PROPOSITION, saying "6 is the sum associated with
+3."
+</p>
+
+<p>
+And because it is an inductive predicate, you don't define it with a Boolean expression such as
+<code>predicate sum_def (n,s:int) = ...</code>. Instead, you define <b>RULES FOR CONSTRUCTING PROOFS OF
+IT</b>. Yes, the CONSTRUCTORS ARE RULES FOR PROVING THE PREDICATE:
+</p>
+
+<pre class="example" id="org10e069c">
+                                 sum_def n s
+   ───────────              ─────────────────────
+   sum_def 0 0              sum_def (n+1) (s+n+1)
+
+</pre>
+
+<blockquote>
+<p>
+If you already have a proof that <code>sum_def n s</code>, you are allowed to construct a proof that
+<code>sum_def (n+1) (s+n+1)</code>.
+</p>
+</blockquote>
+
+<p>
+this is the <b>induction step</b>:
+</p>
+
+<blockquote>
+<p>
+THE WORD I͟N͟D͟U͟C͟T͟I͟V͟E͟ MEANS THAT <b>THE PREDICATE IS DEFINED BY HOW ITS PROOFS CAN BE CONSTRUCTED FROM EARLIER PROOFS</b>.
+</p>
+</blockquote>
+
+<pre class="example" id="orgc7af13f">
+        Zero
+sum_def 0 0
+      ↓ More
+sum_def 1 1
+      ↓ More
+sum_def 2 3
+      ↓ More
+sum_def 3 6
+      ↓ More
+sum_def 4 10
+</pre>
+
+<p>
+And the surprise part is that if to try to prove it with Why3, then it will... timeout! And it can
+be overcome with the help of transformations.
+</p>
+</div>
+</div>
+<div id="outline-container-org0b538cb" class="outline-4">
+<h4 id="org0b538cb">Applying transformation</h4>
+<div class="outline-text-4" id="text-org0b538cb">
+<p>
+We can do it in CLI with this command applying transformation <code>induction_pr</code>:
+</p>
+
+<pre class="example" id="org898c4e0">
+$ why3 prove -Pz3 MySum2.mlw --apply-transform 'induction_pr'
+File MySum2.mlw:
+Goal sum_formula.
+Prover result is: Valid (0.00s, 80 steps).
+
+File "MySum2.mlw", line 11, character 8 to line 13, character 37:
+Goal sum_formula.
+Prover result is: Valid (0.01s, 1763 steps).
+</pre>
+
+<p>
+If to open it in IDE: <code>why3 ide MyList2.mlw</code> and to apply the same transformation
+<code>induction_pr</code> from the menu, then you will see new "sub-goals" labeled by "0" and "1" in the
+left panel ("tree"). If to put the cursor on the "0" and to open in the right panel the tab
+"Task", then you will see there:
+</p>
+
+<pre class="example" id="org7ee85e9">
+--------------------------- Local Context ---------------------------
+
+inductive sum_def int int =
+  | Zero : sum_def 0 0
+  | More : forall n:int, s:int. sum_def n s -&gt; sum_def (n + 1) ((s + n) + 1)
+
+------------------------------- Goal --------------------------------
+
+goal sum_formula :
+  forall n:int, s:int. s = 0 -&gt; n = 0 -&gt; (2 * s) = (n * (n + 1))
+</pre>
+
+<p>
+The "0" sub-goal is proving of our lemma <code>sum_formula</code> for <code>Zero</code> constructor only. It can be
+read as "assuming <code>sum_def 0 0</code>, prove <code>sum_formula</code>". But <code>sum_def 0 0</code> means <code>s</code> (sum) is 0,
+and <code>n</code> (numbers) is 0 too, and Why3 writes exactly this:
+</p>
+
+<pre class="example" id="org315c080">
+          ASSUMING THIS...            PROVE          THIS
+forall n:int, s:int. s = 0 -&gt; n = 0    -&gt;    (2 * s) = (n * (n + 1))
+</pre>
+
+<p>
+<i><code>s = 0 -&gt; n = 0</code> is read as "Assuming that if s=0 and if n=0..."</i>
+</p>
+
+<p>
+If - on "1", then the content of "Task" tab will be:
+</p>
+
+<pre class="example" id="org030921c">
+--------------------------- Local Context ---------------------------
+
+inductive sum_def int int =
+  | Zero : sum_def 0 0
+  | More : forall n:int, s:int. sum_def n s -&gt; sum_def (n + 1) ((s + n) + 1)
+
+------------------------------- Goal --------------------------------
+
+goal sum_formula :
+  forall n:int, s:int.
+   sum_def n s /\
+   (forall n1:int, s1:int. s1 = s -&gt; n1 = n -&gt; (2 * s1) = (n1 * (n1 + 1))) -&gt;
+   (forall n1:int, s1:int.
+     s1 = ((s + n) + 1) -&gt; n1 = (n + 1) -&gt; (2 * s1) = (n1 * (n1 + 1)))
+</pre>
+
+<p>
+It is the next sub-goal for proving (of <code>sum_formula</code> lemma). Well, the second sub-goal is for
+<code>More</code> obviously (though it is not written somewhere). This long goal consists actually of 3
+parts - they are induction step written in <code>More</code> constructor:
+</p>
+
+<ol class="org-ol">
+<li><code>sum_def n s</code></li>
+<li><code>(forall n1:int, s1:int. s1 = s -&gt; n1 = n -&gt; (2 * s1) = (n1 * (n1 + 1))) -&gt; ...</code></li>
+<li><code>(forall n1:int, s1:int.
+     s1 = ((s + n) + 1) -&gt; n1 = (n + 1) -&gt; (2 * s1) = (n1 * (n1 + 1)))</code></li>
+</ol>
+
+<p>
+1st is read as "assuming that the predecessor is a valid <code>sum_def n s</code>..."
+</p>
+
+<p>
+2nd is read as "we introduce the INDUCTION HYPOTHESIS IH: <code>2 * s = n * (n + 1)</code>". Why3 writes
+it in the "Task" tab as <code>(2 * s1) = (n1 * (n1 + 1))) -&gt; ...</code> with quantified variables (more on
+them later). Can be read also: "Induction hypothesis: the formula is true for the predecessor
+<code>n,s</code>."
+</p>
+
+<p>
+3rd represents the property for the result of the <code>More</code> constructor <code>sum_def (n + 1) (s + n +
+1)</code> - this. This is so called the "INDUCTION STEP" - the lemma should be true on the next step
+too - <code>P(n+1)</code>.
+</p>
+
+<p>
+Now, why does <code>induction_pr</code> introduce <code>n1</code> and <code>s1</code>? It generalizes the variables, forming
+always:
+</p>
+
+<pre class="example" id="orgfb14aaa">
+(for any X,Y,Z: phrase-1...) -&gt; (for any T,U,V: phrase-2...) -&gt; ...
+</pre>
+
+<p>
+it does it always, even if variables the same. If they are the same, they are "fixed" with
+top-scope value (<code>forall i1, but i1 = i</code>):
+</p>
+
+<pre class="example" id="orge80fcfe">
+   for i in ...      →    forall i
+     for i1 in ...   →      forall i1.
+       if i1:        →        i1 = i -&gt;
+         ...         →          ...
+</pre>
+
+<p>
+Or in more human readable form:
+</p>
+
+<pre class="example" id="orga3af585">
+--------BASE--------
+
+n = 0
+s = 0
+
+Prove:
+    2*s = n*(n+1)
+
+    
+---INDUCTION-CASE---
+
+Assume:
+    sum_def n s
+
+Induction hypothesis:
+    2*s = n*(n+1)
+
+Prove:
+    2*(s+n+1) = (n+1)*(n+2)
+</pre>
+
+<p>
+SMT can proves the last easy (assuming <code>P(1)</code> - what <code>2*s</code> is, from the "BASE" case):
+</p>
+
+<pre class="example" id="orgb482dcc">
+2*(s+n+1)
+= 2*s + 2*n + 2
+= n*(n+1) + 2*n + 2       [IH]
+= n² + 3*n + 2
+= (n+1)*(n+2)
+</pre>
+</div>
+</div>
+<div id="outline-container-org5ab71df" class="outline-4">
+<h4 id="org5ab71df">Why did the transformation help?</h4>
+<div class="outline-text-4" id="text-org5ab71df">
+<p>
+Without <code>induction_pr</code> Z3 got:
+</p>
+
+<pre class="example" id="orgcc124a7">
+ we know : sum_def 0 0
+     and : sum_def n s -&gt; sum_def (n+1) (s+n+1)
+lemma is : sum_def n s -&gt; 2*s = n*(n+1)
+</pre>
+
+<p>
+and Z3 has to discover the RELATIONSHIP between our recursive/inductive definition <code>sum_def</code> and
+the lemma <code>sum_formula</code>. Being different numerical, boolean domains constrained. It is not easy
+for SMT usually and it hits timeout:
+</p>
+
+<blockquote>
+<p>
+Z3 is very good at arithmetic and first-order SMT reasoning, but it isn't automatically
+performing the structural induction that a human mathematician sees immediately.
+</p>
+</blockquote>
+
+<p>
+It will discover it for long WITHOUT FINDING THE INDUCTION ARGUMENT.
+</p>
+
+<p>
+But with <code>induction_pr</code>, Why3 performs the induction BEFORE Z3 sees the problem and it
+transforms:
+</p>
+
+<pre class="example" id="org4199642">
+       f r o m                    t o  -  Z 3  (n o w   O K)
+
+∀ n s.                     →      BASE:  P(0, 0)
+sum_def n s -&gt; P(n,s)      →      STEP:  P(n,s) -&gt; P(n+1,s+n+1)
+
+𝘸𝘩𝘦𝘳𝘦 𝘗(𝘯,𝘴) ≡ 2*𝘴 = 𝘯*(𝘯+1)
+                                           ↓ ↓ ↓
+                                              
+
+                                 n=0, s=0            2s = n(n+1)
+                               ───────────  ,   ─────────────────────
+                               2s = n(n+1)      2(s+n+1) = (n+1)(n+2)
+
+                                        (𝘫𝘶𝘴𝘵 𝘢𝘳𝘪𝘵𝘩𝘮𝘦𝘵𝘪𝘤)
+</pre>
+
+<p>
+Why3 transformations is a kind of proof-problem preprocessing, rewriting, it helped Why3 to
+recognize INDUCTION STRUCTURE and to reduce it to "arithmetic" - good for SMT.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org550bcc7" class="outline-2">
+<h2 id="org550bcc7">What is sent to SMT?</h2>
+<div class="outline-text-2" id="text-org550bcc7">
+<p>
+Actually, you can watch what Why3 sends to SMT solver using its <code>-o &lt;DIRECTORY&gt;</code> option, for
+example:
+</p>
+
+<pre class="example" id="orgccf7666">
+$ why3 prove -Pz3 MySum2.mlw -o .
+</pre>
+
+<p>
+It saves in the <code>&lt;DIRECTORY&gt;</code> files sent to SMT. During my different experiments, I got 2
+files:
+</p>
+
+<pre class="example" id="org0f16217">
+                ----- File MySum2-MySum2-sum_formula.smt2 -----
+
+;;; generated by SMT-LIB2 driver
+;;; SMT-LIB2 driver: bit-vectors, common part
+;;; generated by SMT-LIB strings
+;;; SMT-LIB2: integer arithmetic
+;; Goal "sum_formula"
+;; File "MySum2.mlw", line 20, characters 6-17
+(assert
+  (not
+  (forall ((n Int) (s Int))
+    (=&gt; (= s 0) (=&gt; (= n 0) (= (* 2 s) (* n (+ n 1))))))))
+
+(check-sat)
+
+                ----- File MySum2-MySum2-sum_formula1.smt2 -----
+
+;;; generated by SMT-LIB2 driver
+;;; SMT-LIB2 driver: bit-vectors, common part
+;;; generated by SMT-LIB strings
+;;; SMT-LIB2: integer arithmetic
+;; "sum_def"
+(declare-fun sum_def (Int
+  Int) Bool)
+
+;; "Zero"
+(assert (sum_def 0 0))
+
+;; "More"
+(assert
+  (forall ((n Int) (s Int))
+    (=&gt; (sum_def n s) (sum_def (+ n 1) (+ (+ s n) 1)))))
+
+;; "sum_def_inversion"
+(assert
+  (forall ((z Int) (z1 Int))
+    (=&gt;
+      (sum_def z z1)
+      (or
+        (and (= z 0) (= z1 0))
+        (exists ((n Int) (s Int))
+          (and (sum_def n s) (and (= z (+ n 1)) (= z1 (+ (+ s n) 1)))))))))
+
+;; Goal "sum_formula"
+;; File "MySum2.mlw", line 20, characters 6-17
+(assert
+  (not
+  (forall ((n Int) (s Int))
+    (=&gt;
+      (and
+        (sum_def n s)
+        (forall ((n1 Int) (s1 Int))
+          (=&gt; (= s1 s) (=&gt; (= n1 n) (= (* 2 s1) (* n1 (+ n1 1)))))))
+      (forall ((n1 Int) (s1 Int))
+        (=&gt;
+          (= s1 (+ (+ s n) 1))
+          (=&gt; (= n1 (+ n 1)) (= (* 2 s1) (* n1 (+ n1 1))))))))))
+
+(check-sat)                
+</pre>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>

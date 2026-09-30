@@ -101,8 +101,8 @@ particular ~k~ instead of abstract ~n~. OK. The step is to prove that ~P(k+1)~ i
 when ~P(k)~ is true: ~P(k) => P(k+1)~. How? Look:
 
 \begin{aligned}
-\text{For k :   } 0 + 1 + \ldots + k = \frac{k(k+1)}{2} \\
-\text{For the next, i.e., k + 1 is :   } 0 + 1 + \ldots + k + (k + 1) = ?
+0 + 1 + \ldots + k = \frac{k(k+1)}{2} \text{ , for k} \\
+0 + 1 + \ldots + k + (k + 1) = ? \text{ , for k + 1}
 \end{aligned}
 
 Well, ~?~ is our formula (1) plus this new addend - ~(k + 1)~:
@@ -450,11 +450,6 @@ Answer:
 when a valid recursive call to a lemma whose CONTRACT (~ensures {..}~) guarantees ~P(n-1)~ is
 available while proving P(n).*
 
-*** IDE
-
-If to open it in the IDE with ~why3 ide <mlw-file>~ then you can see:
-TODO
-
 ** Transformations
 
 What are transformations in Why3?
@@ -590,18 +585,203 @@ modification, the existing proof attempts become obsolete. This is explicitly ho
 designed to work.
 
 If the modification changes the actual proof structure, we may need to edit the
-transformation tree — for example, change, add, remove transformations — just as we did
+transformation tree - for example, change, add, remove transformations - just as we did
 originally, in the IDE.
 
 Why3 specifically provides the replay valid obsolete proofs operation for this situation.
 
+By the way, another scenario is to use just 2 transformations - they also work fine:
 
-TODO
+1. ~intros n~
+2. ~induction n~
 
-split_vc
-OR
-intros n + induction n
+Lets explore little what we are seeing in the IDE.
 
+
+▒▒▒▒▒▒▒▒▒▒ Cursor on *~sum_formula~* - the "Task" tab is:
+
+#+begin_example
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n:int.
+ 7     n >= 0 -> (if n = 0 then sum n = 0 else sum n = (n + sum (n - 1)))
+ 8  
+ 9  ------------------------------- Goal --------------------------------
+10  
+11  goal sum_formula : forall n:int. n >= 0 -> sum n = div (n * (n + 1)) 2
+#+end_example
+
+Our initial WhyML.
+
+
+▒▒▒▒▒▒▒▒▒▒ Cursor on *~intros n~ / 0* - the "Task" tab is:
+
+#+begin_example
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 >= 0 -> (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  ------------------------------- Goal --------------------------------
+12  
+13  goal sum_formula : n >= 0 -> sum n = div (n * (n + 1)) 2
+#+end_example
+
+~intros n~ introduced (extracted) ~n~ constant (line 9) in the /logical context/ (in the top
+level) - it was applied on ~sum_formula~ so ~forall n~ was removed as redundant now - now ~n~
+is on the top level. Also, to avoid names clashing, in ~sum'def~ the variable ~n~ was renamed
+to ~n1~ (line 6).
+
+
+▒▒▒▒▒▒▒▒▒▒ Cursor on *~induction n~ / 0 [base case]* - the "Task" tab is:
+
+#+begin_example
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 >= 0 -> (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  Init : n <= 0
+12  
+13  ------------------------------- Goal --------------------------------
+14  
+15  goal sum_formula : n >= 0 -> sum n = div (n * (n + 1)) 2
+#+end_example
+
+Base case. ~Init~ is simply the name Why3 gives to the /induction-range assumption/.
+
+It is not an assumption from the original .mlw source, and it is not something that changed
+between the 2 cases. Rather, each branch gets a *different generated assumption*.
+
+▒▒▒▒▒▒▒▒▒▒  Cursor on *~induction n~ / 1 [recursive case]* - the "Task" tab is:
+
+#+begin_example
+ 1  --------------------------- Local Context ---------------------------
+ 2  
+ 3  function sum int : int
+ 4  
+ 5  sum'def :
+ 6    forall n1:int.
+ 7     n1 >= 0 -> (if n1 = 0 then sum n1 = 0 else sum n1 = (n1 + sum (n1 - 1)))
+ 8  
+ 9  constant n : int
+10  
+11  Init : 0 < n
+12  
+13  Hrec : forall n1:int. n1 < n -> n1 >= 0 -> sum n1 = div (n1 * (n1 + 1)) 2
+14  
+15  ------------------------------- Goal --------------------------------
+16  
+17  goal sum_formula : n >= 0 -> sum n = div (n * (n + 1)) 2
+#+end_example
+
+~Hrec~ was added (line 13) - it is /the STRONG induction hypothesis/:
+
+#+begin_example
+                                  I N D U C T I O N   H Y P O T H E S I S:
+                                          
+                                                  n     n(n+1)
+                                           P(n) ≡ ∑ i = ──────
+Hrec :                                           i=1      2
+  forall n1:int.
+    n1 < n ->                       ⟷     ∀n, n < n1 /\ n ≥ 0  ⟹  P(n).
+    n1 >= 0 ->
+    sum n1 = div (n1 * (n1 + 1)) 2        For every nonnegative integer
+                                          smaller than n, the theorem
+                                          is already known.
+#+end_example
+
+
+Conceptually:
+
+#+begin_example
+             P(n)
+               │
+        induction on n
+          /         \
+     n <= 0          n > 0
+       │               │
+     Base          Recursive
+#+end_example
+
+*** Weak (ordinary) induction
+
+In ordinary induction, the recursive step gives you only the immediately preceding case:
+~P(n−1) ⟹ P(n)~, i.e., "if ~P~ holds in the previous case, then in the current, it holds too."
+In Why3 it could look as:
+
+#+begin_example
+Hrec : P(n - 1)           if const n=4: P(3) ◀ known
+                                        P(4)   ?
+● I know the theorem for exactly n-1
+#+end_example
+
+*** Strong induction
+
+#+begin_example
+Hrec :                    if const n=4: P(0) ◀ known
+  forall n1:int.                        P(1) ◀ known
+    n1 < n ->                           P(2) ◀ known
+    n1 >= 0 ->                          P(3) ◀ known
+    P(n1)                               P(4)   ?
+
+● I know the theorem for every nonnegative integer smaller than n
+
+                           I.e.,
+
+                  ● ordinary induction:
+
+                          P(n-1)
+
+                  ● strong induction:
+
+              P(0) /\ P(1) /\ ... /\ P(n-1)                           
+#+end_example
+
+#+begin_quote
+For many proofs, strong induction isn't actually more powerful in terms of what can ultimately
+be proved.
+#+end_quote
+
+Why did STRONG induction appear? This is how the transformation ~induction...~ works:
+
+#+begin_example
+$ why3 show transformations | grep -A 2 induction
+induction
+  type: term -> ?from -> term -> env -> list task
+  induction <term1> [from] <term2> performs a strong induction on the integer
+  <term1> starting from the integer <term2>. <term2> is optional and defaults
+  to 0.
+--
+...
+#+end_example
+
+The mental model is:
+
+#+begin_example
+Transformation "induction n":
+
+        "induction n"
+             │
+             ├── base:     n <= 0
+             │
+             └── recursive: 0 < n
+                            +
+                            ∀ n1 < n, P(n1)
+#+end_example
 
 ** Inductive predicate and transformations
 
@@ -901,244 +1081,77 @@ sum_def n s -> P(n,s)      →      STEP:  P(n,s) -> P(n+1,s+n+1)
 Why3 transformations is a kind of proof-problem preprocessing, rewriting, it helped Why3 to
 recognize INDUCTION STRUCTURE and to reduce it to "arithmetic" - good for SMT.
 
+* What is sent to SMT?
+
+Actually, you can watch what Why3 sends to SMT solver using its ~-o <DIRECTORY>~ option, for
+example:
+
+#+begin_example
+$ why3 prove -Pz3 MySum2.mlw -o .
+#+end_example
+
+It saves in the ~<DIRECTORY>~ files sent to SMT. During my different experiments, I got 2
+files:
+
+#+begin_example
+                ----- File MySum2-MySum2-sum_formula.smt2 -----
+
+;;; generated by SMT-LIB2 driver
+;;; SMT-LIB2 driver: bit-vectors, common part
+;;; generated by SMT-LIB strings
+;;; SMT-LIB2: integer arithmetic
+;; Goal "sum_formula"
+;; File "MySum2.mlw", line 20, characters 6-17
+(assert
+  (not
+  (forall ((n Int) (s Int))
+    (=> (= s 0) (=> (= n 0) (= (* 2 s) (* n (+ n 1))))))))
+
+(check-sat)
+
+                ----- File MySum2-MySum2-sum_formula1.smt2 -----
+
+;;; generated by SMT-LIB2 driver
+;;; SMT-LIB2 driver: bit-vectors, common part
+;;; generated by SMT-LIB strings
+;;; SMT-LIB2: integer arithmetic
+;; "sum_def"
+(declare-fun sum_def (Int
+  Int) Bool)
+
+;; "Zero"
+(assert (sum_def 0 0))
+
+;; "More"
+(assert
+  (forall ((n Int) (s Int))
+    (=> (sum_def n s) (sum_def (+ n 1) (+ (+ s n) 1)))))
+
+;; "sum_def_inversion"
+(assert
+  (forall ((z Int) (z1 Int))
+    (=>
+      (sum_def z z1)
+      (or
+        (and (= z 0) (= z1 0))
+        (exists ((n Int) (s Int))
+          (and (sum_def n s) (and (= z (+ n 1)) (= z1 (+ (+ s n) 1)))))))))
+
+;; Goal "sum_formula"
+;; File "MySum2.mlw", line 20, characters 6-17
+(assert
+  (not
+  (forall ((n Int) (s Int))
+    (=>
+      (and
+        (sum_def n s)
+        (forall ((n1 Int) (s1 Int))
+          (=> (= s1 s) (=> (= n1 n) (= (* 2 s1) (* n1 (+ n1 1)))))))
+      (forall ((n1 Int) (s1 Int))
+        (=>
+          (= s1 (+ (+ s n) 1))
+          (=> (= n1 (+ n 1)) (= (* 2 s1) (* n1 (+ n1 1))))))))))
+
+(check-sat)                
+#+end_example
 
-
-
-
--------------------------------------------------------------------------
-
---------------------------------------
-Chat about MySum2 - inductive types + transformations:
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    
-Yes! **Now we have the exact answer.** Your `why3 show transformations` output plus the official
-Why3 example make the issue clear.
-
- The thing you need is exactly:
-
-```
-induction_arg_pr H with_gen n,s
-```
-
- The `with_gen` part is the important piece.
-
- Why3 1.8.x added this optional argument specifically to control which variables are generalized
- during induction. The Why3 examples themselves use the syntax `induction_arg_pr H with_gen x,y`.
- Why3+1
-
- ## Why your previous induction was bad
-
- You currently have:
-
-```
-constant n : int
-constant s : int
-
-H1 : sum_def n s
-
-H :
-  ((s + n) + 1) = s ->
-  (n + 1) = n ->
-  ...
-```
-
- Why3 has kept the **outer** `n` and `s` fixed while constructing the induction
- hypothesis. Consequently, the induction hypothesis says, roughly:
-
- > "If the new values happen to equal the old values, then the formula holds."
-
- That's useless.
-
- What we want is to say:
-
- > "For **any** `n` and `s`, if `sum_def n s`, then the formula holds."
-
- So we need to **generalize `n` and `s`** during the induction.
-
- ## Do this
-
- Starting with:
-
-```
-lemma sum_formula:
-  forall n s: int.
-    sum_def n s ->
-    2 * s = n * (n + 1)
-```
-
- ### 1\. `introduce_premises`
-
- Run:
-
-```
-introduce_premises
-```
-
- You get roughly:
-
-```
-constant n : int
-constant s : int
-H1 : sum_def n s
-
-Goal:
-  2 * s = n * (n + 1)
-```
-
- ### 2\. Induct on `H1`, generalizing `n,s`
-
- Run:
-
-```
-induction_arg_pr H1 with_gen n,s
-```
-
- **This is the important command.**
-
- Now Why3 should generate the induction hypothesis in the useful form.
-
- You should get a base case roughly like:
-
-```
-s = 0
-n = 0
-
-Goal:
-2 * s = n * (n + 1)
-```
-
- which Z3 can solve.
-
- And the `More` case should be roughly:
-
-```
-n : int
-s : int
-
-H1 : sum_def n s
-
-H :
-  2 * s = n * (n + 1)
-
-Goal:
-  2 * (s + n + 1) =
-    (n + 1) * ((n + 1) + 1)
-```
-
- **That `H` is exactly the induction hypothesis we wanted.**
-
- Then Z3 should be able to prove the arithmetic.
-
----
-
- ## Why `with_gen n,s` fixes it
-
- Think about the mathematical induction you're trying to express.
-
- You want to prove:
-
- $$
-\forall n,s,\quad
-sum\_def(n,s)\rightarrow P(n,s)
-$$
-
- where
-
- $$
-P(n,s)\equiv 2s=n(n+1).
-$$
-
- The induction principle needs to be:
-
- ### Zero
-
- $$
-P(0,0)
-$$
-
- ### More
-
- $$
-\boxed{P(n,s)\Rightarrow P(n+1,s+n+1)}
-$$
-
- The crucial part is that the $n,s$ in $P(n,s)$ are **arbitrary**.
-
- That's what `with_gen n,s` tells Why3:
-
- > Don't freeze the current `n` and `s`; generalize them so that the induction hypothesis can apply
- to the predecessor's `n1,s1`.
-
- This is precisely the purpose of the `with_gen` option.  Why3
-
----
-
- ## So your whole proof should be
-
- Your source remains simply:
-
-```
-module MySum2
-
-  use int.Int
-  use int.EuclideanDivision
-
-  inductive sum_def int int =
-    | Zero:
-        sum_def 0 0
-
-    | More:
-        forall n1:int, s1:int.
-          sum_def n1 s1 ->
-          sum_def (n1 + 1) ((s1 + n1) + 1)
-
-  lemma sum_formula:
-    forall n s: int.
-      sum_def n s ->
-      2 * s = n * (n + 1)
-
-end
-```
-
- Then in the IDE:
-
-```
-sum_formula
-    ↓
-introduce_premises
-    ↓
-induction_arg_pr H1 with_gen n,s
-    ↓
-  ┌─────────────┐
-  │ Zero        │ ──→ Z3
-  └─────────────┘
-
-  ┌─────────────┐
-  │ More        │
-  │             │
-  │ IH:         │
-  │ 2*s=n(n+1)  │
-  │             │
-  │ Goal:       │
-  │ 2(s+n+1)    │
-  │ =(n+1)(n+2) │
-  └─────────────┘
-          ↓
-         Z3
-```
-
- And this is a **much better educational representation** of mathematical induction than the earlier attempt.
-
- You're literally telling Why3:
-
- > "Take this inductively defined object, and prove my property by induction over its construction."
-
- The `sum_def` constructors are your mathematical induction rules, and `induction_arg_pr ... with_gen n,s` tells Why3 what the induction hypothesis should quantify over.
-
- Also, your choice to use
-
- $$
-2s=n(n+1)
-$$
-
- rather than immediately involving `div` is good here: it leaves the induction step as ordinary integer arithmetic.
