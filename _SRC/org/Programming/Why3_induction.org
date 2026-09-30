@@ -452,10 +452,10 @@ available while proving P(n).*
 
 *** IDE
 
-If to open it in the IDE with ~why3 ide <your-file>~ then you can see:
+If to open it in the IDE with ~why3 ide <mlw-file>~ then you can see:
 TODO
 
-** Proving using transformations
+** Transformations
 
 What are transformations in Why3?
 
@@ -479,7 +479,7 @@ Transformations are best thought of as goal transformations; tactics are proof-s
 boundary isn’t absolute—some tactics merely transform goals, and some systems expose transformations
 through tactic-like interfaces.
 
-Transformation is REWRITING of your initial WhyML happening "in the memory".
+Transformation is REWRITING of the initial WhyML happening "in the memory".
 
 Simple example: ~split_vc~ splits a verification condition into separate goals, typically by
 decomposing a top-level conjunction in the goal.  For example, a goal ~P /\ Q~ becomes 2 goals, ~P~
@@ -528,6 +528,73 @@ Transformations cannot be written in WhyML program - to be "called"/applied from
 can "hint" then from WhyML program (with arguments).
 #+end_quote
 
+Now lets return to the initial WhyML:
+
+#+begin_example
+module MySum
+
+  use int.Int                  (* for ints and operation *)
+  use int.EuclideanDivision    (* for div operation *)
+
+  let rec function sum (n: int) : int
+    requires { n>=0 }
+    variant { n }
+  =
+    if n = 0 then 0
+    else n + sum (n - 1)
+  
+  lemma sum_formula:
+    forall n: int. n >= 0 ->
+      sum n = div (n * (n + 1)) 2
+
+end
+#+end_example
+
+And let's open it in IDE with ~why3 ide MySum1.mlw~. We have an edit box for entering of
+commands, put the cursor on ~sum_formula~ in the left tree. And enter in the command box
+~intros n~. It will create there new sub-goals. Put the cursor on the last one "0" and enter
+the next command: ~introduce_premises~. New sub-goal, and a new command: ~induction n~.
+Put the cursor for example, on the ~induction n~ sub-goal and call the SMT proving with the
+menu "Tools/Provers/CVC4". You show see green checks in the tree. Now put the cursor on the
+~sum'vc~ and call the prover again - everything is green now and the tree looks like:
+
+#+begin_example
+Status | Theories/Goals                         | Time
+  ✔      ▼ 🗁  MySum1.mlw         
+  ✔        ▼ 🗁  MySum
+  ✔          ▼ 🗎 sum'vc [VC for sum]
+  ✔              \ CVC4 1.8                       0.01 (steps: 246)
+  ✔          ▼ 🗎 sum_formula
+  ✔            ▼ 🛠 intros n
+  ✔              ▼ 🗎 0
+  ✔                ▼ 🛠 introduce_premises
+  ✔                  ▼ 🗎 0
+  ✔                    ▼ 🛠 induction n
+  ✔                      ▼ 🗎 0 [base case]
+  ✔                          \ CVC4 1.8           0.02 (steps: 3597)
+  ✔                      ▼ 🗎 1 [recursive case]
+  ✔                          \ CVC4 1.8           0.02 (steps: 4821)
+#+end_example
+
+Entered commands are transformations. Now, save the session (menu "File/Save session"). And
+exit. Put the session directory (~./MySum1/~) to Git control (all its files). And you can
+re-check it from the command line with this command line in the console:
+
+#+begin_example
+$ why3 replay -q MySum1
+ 2/2 (replay OK)
+#+end_example
+
+For unchanged goals, existing proofs remain attached. For goals affected by the source
+modification, the existing proof attempts become obsolete. This is explicitly how Why3 is
+designed to work.
+
+If the modification changes the actual proof structure, we may need to edit the
+transformation tree — for example, change, add, remove transformations — just as we did
+originally, in the IDE.
+
+Why3 specifically provides the replay valid obsolete proofs operation for this situation.
+
 
 TODO
 
@@ -536,7 +603,7 @@ OR
 intros n + induction n
 
 
-** Proving using inductive predicate and transformations
+** Inductive predicate and transformations
 
 #+begin_example
 module MySum2
@@ -623,7 +690,7 @@ And because it is an inductive predicate, you don't define it with a Boolean exp
 IT*. Yes, the CONSTRUCTORS ARE RULES FOR PROVING THE PREDICATE:
 
 #+begin_example
-                            sum_def n s
+                                 sum_def n s
    ───────────              ─────────────────────
    sum_def 0 0              sum_def (n+1) (s+n+1)
 
@@ -634,7 +701,7 @@ If you already have a proof that ~sum_def n s~, you are allowed to construct a p
 ~sum_def (n+1) (s+n+1)~.
 #+end_quote
 
-this is your *induction step*:
+this is the *induction step*:
 
 #+begin_quote
 THE WORD I͟N͟D͟U͟C͟T͟I͟V͟E͟ MEANS THAT *THE PREDICATE IS DEFINED BY HOW ITS PROOFS CAN BE CONSTRUCTED FROM EARLIER PROOFS*.
@@ -672,7 +739,7 @@ Prover result is: Valid (0.01s, 1763 steps).
 #+end_example
 
 If to open it in IDE: ~why3 ide MyList2.mlw~ and to apply the same transformation
-~induction_pr~ from the menu, then you will see new "subgoals" labeled by "0" and "1" in the
+~induction_pr~ from the menu, then you will see new "sub-goals" labeled by "0" and "1" in the
 left panel ("tree"). If to put the cursor on the "0" and to open in the right panel the tab
 "Task", then you will see there:
 
@@ -689,7 +756,7 @@ goal sum_formula :
   forall n:int, s:int. s = 0 -> n = 0 -> (2 * s) = (n * (n + 1))
 #+end_example
 
-The "0" subgoal is proving of our lemma ~sum_formula~ for ~Zero~ constructor only. It can be
+The "0" sub-goal is proving of our lemma ~sum_formula~ for ~Zero~ constructor only. It can be
 read as "assuming ~sum_def 0 0~, prove ~sum_formula~". But ~sum_def 0 0~ means ~s~ (sum) is 0,
 and ~n~ (numbers) is 0 too, and Why3 writes exactly this:
 
@@ -746,7 +813,8 @@ always:
 (for any X,Y,Z: phrase-1...) -> (for any T,U,V: phrase-2...) -> ...
 #+end_example
 
-it does it always, even if variables the same. If they are the same, they are "fixed" with:
+it does it always, even if variables the same. If they are the same, they are "fixed" with
+top-scope value (~forall i1, but i1 = i~):
 
 #+begin_example
    for i in ...      →    forall i
@@ -794,12 +862,12 @@ SMT can proves the last easy (assuming ~P(1)~ - what ~2*s~ is, from the "BASE" c
 Without ~induction_pr~ Z3 got:
 
 #+begin_example
-we know  : sum_def 0 0
+ we know : sum_def 0 0
      and : sum_def n s -> sum_def (n+1) (s+n+1)
 lemma is : sum_def n s -> 2*s = n*(n+1)
 #+end_example
 
-and Z3 has to discover the RELATIONSHIP between your recursive/inductive definition ~sum_def~ and
+and Z3 has to discover the RELATIONSHIP between our recursive/inductive definition ~sum_def~ and
 the lemma ~sum_formula~. Being different numerical, boolean domains constrained. It is not easy
 for SMT usually and it hits timeout:
 
@@ -814,16 +882,16 @@ But with ~induction_pr~, Why3 performs the induction BEFORE Z3 sees the problem 
 transforms:
 
 #+begin_example
-       f r o m                   t o  -  g o o d   f o r   Z 3
+       f r o m                    t o  -  Z 3  (n o w   O K)
 
-∀ n s.                        →   BASE:  P(0, 0)
-sum_def n s -> P(n,s)         →   STEP:  P(n,s) -> P(n+1,s+n+1)
+∀ n s.                     →      BASE:  P(0, 0)
+sum_def n s -> P(n,s)      →      STEP:  P(n,s) -> P(n+1,s+n+1)
 
 𝘸𝘩𝘦𝘳𝘦 𝘗(𝘯,𝘴) ≡ 2*𝘴 = 𝘯*(𝘯+1)
+                                           ↓ ↓ ↓
+                                              
 
-                                              ↓ ↓ ↓
-
-                               n=0, s=0         2s = n(n+1)
+                                 n=0, s=0            2s = n(n+1)
                                ───────────  ,   ─────────────────────
                                2s = n(n+1)      2(s+n+1) = (n+1)(n+2)
 
