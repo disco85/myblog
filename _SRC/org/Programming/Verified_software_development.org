@@ -53,7 +53,9 @@ opposite: *the code can be very low level: assembler, C with manual control of a
 resources but safe enough bcs it was verified at "COMPILE" TIME and it was qualified as
 correct*.
 
-I will try to classify them all in the context of /software development/.
+I will try to classify them all in the context of /software development/ using AI, so
+maybe tables are not fully completed - check always the documentation of PA - they often
+add new features.
 
 * Supported languages
 
@@ -79,7 +81,7 @@ Notes on the table:
 | Isabelle/HOL        | Proof assistant                             | Isabelle/HOL                            | SML, OCaml, Haskell, Scala                                                | Higher-order logic                              | Isabelle code generator                     | Direct for executable HOL definitions: logical definitions are translated to executable code             |
 | Agda                | Proof assistant, dependently typed language | Agda                                    | Haskell, JavaScript                                                       | Dependent type theory                           | Compiler backends                           | Direct computational compilation; irrelevant fields, arguments can be erased                             |
 | F*                  | Proof-oriented programming language         | F*                                      | OCaml, F#; C/Rust via Pulse + KaRaMeL; assembly via Vale                  | Dependent, refinement types, SMT, effect system | Extraction, code generation                 | Strong: verified F* programs can be extracted; low-level paths provide additional verification machinery |
-| Why3                | Deductive verification platform             | WhyML, MicroPython, MicroC, MLCFG, Coma | OCaml, C                                                                  | Hoare logic, SMT-backed deductive verification  | Why3 extract                                | Strong: WhyML program is verified and then extracted; C has a restricted supported subset                |
+| Why3                | Deductive verification platform             | WhyML, MicroPython, MicroC, MLCFG, Coma | OCaml, C, Java                                                            | Hoare logic, SMT-backed deductive verification  | Why3 extract                                | Strong: WhyML program is verified and then extracted; C has a restricted supported subset                |
 | Dafny               | Verification language                       | Dafny                                   | C#, Java, JavaScript, Go, Python, Rust, C++                               | SMT-based contracts, invariants, termination    | Source-to-source compiler                   | Strong but different from classical extraction: verified Dafny program is translated to target source    |
 | ACL2                | Theorem prover, programming environment     | ACL2, Common Lisp                       | C, Java                                                                   | First-order logic, executable Lisp              | ATC, ATJ                                    | Very strong: ATC is explicitly proof-generating C code generation                                        |
 | Viper               | Verification infrastructure                 | Viper intermediate language             | Primarily verification IR rather than a general-purpose extraction target | Permission-based separation logic               | Verification-oriented translation           | Not primarily an extraction system                                                                       |
@@ -94,6 +96,9 @@ Notes on the table:
 | Minlog              | Proof assistant                             | Minlog language                         | Scheme                                                                    | Constructive type theory                        | Program extraction                          | Direct: realizers, computational content extracted from constructive proofs                              |
 | Isabelle/UTP etc.   | Proof framework                             | Isabelle theories                       | SML, OCaml, Haskell, Scala when definitions are executable                | HOL, object logics                              | Isabelle code generator                     | Depends on the object logic and executable definitions                                                   |
 
+PA extracting the largest number of languages: Dafny, Why3, F*, Isabelle... Dafny is
+especially unusual because it has a large number of source-language backends.
+
 * Which PA system can eventually give me code in language X?
 
 | Target      | Systems                                                                                                           |
@@ -101,7 +106,7 @@ Notes on the table:
 | C           | F* + Pulse + KaRaMeL, Why3, ACL2/ATC, Stainless/GenC, Dafny (limited/rudimentary backend), Vale-related workflows |
 | C++         | Dafny                                                                                                             |
 | C#          | Dafny                                                                                                             |
-| Java        | Dafny, ACL2/ATJ                                                                                                   |
+| Java        | Dafny, Why3, ACL2/ATJ                                                                                             |
 | JavaScript  | Dafny, Agda                                                                                                       |
 | Python      | Dafny                                                                                                             |
 | Go          | Dafny                                                                                                             |
@@ -115,716 +120,192 @@ Notes on the table:
 | WebAssembly | F* ecosystem + low-level toolchains                                                                               |
 | Assembly    | Vale + F* ecosystem                                                                                               |
 
- - Classical extraction systems
+So, the most popular languages for extraction are Ocaml and C.
+
+* Classical extraction systems
+
+Use-case: "I prove a theorem, define a constructive algorithm, and the system removes the proof-only
+material and gives me executable source code." - then the particularly relevant systems are:
+
+| System       | Classical extraction?                            | Main targets                                        |
+|--------------+--------------------------------------------------+-----------------------------------------------------|
+| Rocq (Coq)   | YES                                              | OCaml, Haskell, Scheme                              |
+| Agda         | YES-ish, compilation of computational content    | Haskell, JavaScript                                 |
+| Minlog       | YES                                              | Scheme                                              |
+| NuPRL        | YES                                              | Historically Lisp-oriented computational extraction |
+| Isabelle/HOL | Code generation rather than Coq-style extraction | SML, OCaml, Haskell, Scala                          |
+| Lean         | Compilation rather than classical extraction     | Native executable via compiler or C backend         |
+| F*           | Extraction, code generation                      | OCaml, F#, C, Rust through ecosystem                |
+| Why3         | Program extraction                               | OCaml, C                                            |
+
+Rocq is particularly clear-cut: its extraction mechanism explicitly supports OCaml, Haskell and Scheme.
+
+Why3 is similarly explicit: the command =why3 extract= generates OCaml, and its C driver
+can generate C for a supported subset of WhyML.
+
+** Verified output vs verified source
+
+| Level | Meaning                                              | Examples                                       |
+|-------+------------------------------------------------------+------------------------------------------------|
+| L0    | No executable-code generation                        | Viper-like verification infrastructure         |
+| L1    | Compile verified source normally                     | Verus, SPARK, Liquid Haskell                   |
+| L2    | Generate executable source from verified definitions | Dafny, Stainless, Isabelle, Why3               |
+| L3    | Proof, program extraction                            | Rocq, Minlog, constructive type-theory systems |
+| L4    | Proof-producing low-level generation                 | ACL2, ATC, parts of F* with KaRaMeL/Vale       |
+
+* Specific runtime
+
+The key distinction is between **standalone generated code** and code that depends on a
+**language-specific runtime/library**. Also, "no special runtime" does not necessarily
+mean "zero dependencies": e.g. generated C may use the C standard library or a small
+support library.
+
+| System              | Typical target                 | Special runtime required?                                   | Generated code usable independently? | Notes                                                                                                                                                                    |
+|---------------------+--------------------------------+-------------------------------------------------------------+--------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Rocq / Coq**      | OCaml, Haskell, Scheme         | - Usually **no Rocq runtime**                               | **Yes**                              | Extracted program is ordinary target-language code. It may depend on ordinary target libraries.                                                                          |
+| **Lean 4**          | C / native                     | + **Lean runtime** generally required                       | **No, not completely**               | Lean's generated native code relies on Lean's runtime support for things such as memory management and runtime representations.                                          |
+| **Isabelle/HOL**    | SML, OCaml, Haskell, Scala     | - Generally **no Isabelle runtime**                         | **Yes**                              | Generated code is intended to be executable independently of Isabelle; target-language libraries/runtime still apply.                                                    |
+| **Agda**            | Haskell, JavaScript            | + **Target-language/runtime libraries**                     | **Mostly yes**                       | Haskell output runs under GHC/Haskell runtime; JS output needs the normal JS environment and any generated support. No Agda theorem-prover runtime is normally required. |
+| **F\***             | OCaml, F#, C, Rust             | - **Depends on backend**                                    | **Often yes**                        | OCaml/F# can be ordinary target programs; C/Rust extraction can use generated/support libraries, depending on the F\*/KaRaMeL setup.                                     |
+| **Why3**            | OCaml, C                       | - Usually **no Why3 runtime**                               | **Yes**                              | One of the cleaner cases: extraction produces normal OCaml/C code. External libraries can of course be required.                                                         |
+| **Dafny**           | C#, Java, JS, Go, Python, etc. | + **Yes, commonly**                                         | **Usually no**                       | Generated programs use Dafny runtime/support libraries for Dafny types and operations. This is one of the clearest examples of runtime-dependent generation.             |
+| **ACL2 / ATC**      | C                              | - Small/support runtime may be needed depending on features | **Largely yes**                      | ATC is specifically designed to generate C; generated code can be very close to conventional standalone C.                                                               |
+| **ACL2 / ATJ**      | Java                           | ± ACL2-specific support may be required                     | **Not always**                       | Depends on which ACL2 constructs/features are translated.                                                                                                                |
+| **Stainless**       | Scala, C                       | ± Backend/runtime support depends on generated features     | **Often yes**                        | Generated Scala is normal Scala; GenC can require Stainless support/runtime for some constructs.                                                                         |
+| **Verus**           | Rust                           | - **No Verus runtime**                                      | **Yes**                              | `spec`/`proof`/ghost material is erased; executable Rust is compiled normally. This is a particularly clean model.                                                       |
+| **SPARK**           | Ada                            | - **No SPARK runtime in the conceptual sense**              | **Yes**                              | SPARK is a subset/methodology over Ada. Verified Ada is compiled using normal Ada toolchains/runtime as appropriate.                                                     |
+| **Liquid Haskell**  | Haskell                        | - **No Liquid Haskell runtime**                             | **Yes**                              | Refinements disappear; resulting program is ordinary Haskell.                                                                                                            |
+| **Vale**            | Assembly                       | - **No Vale runtime for the generated assembly itself**     | **Yes**                              | Designed specifically for low-level code; generated/verified routines can be incorporated into normal systems.                                                           |
+| **K Framework**     | Depends on backend             | ± **Usually backend-specific**                              | **Depends**                          | K is primarily semantics/execution/verification infrastructure rather than a simple extraction pipeline.                                                                 |
+| **Event-B / Rodin** | Various                        | ± **Depends on code-generation toolchain**                  | **Depends**                          | Refinement/code-generation approach rather than classical proof extraction.                                                                                              |
+| **B Method**        | Ada, C, etc.                   | ± **Depends on toolchain**                                  | **Usually yes**                      | Generated implementation can become ordinary target-language code.                                                                                                       |
+| **PVS**             | Various                        | - **Not primarily an extraction system**                    | **Depends**                          | Code generation is not its central use case.                                                                                                                             |
+| **HOL4**            | SML                            | - **No HOL runtime normally required**                      | **Yes**                              | Generated SML can be compiled/executed as ordinary SML.                                                                                                                  |
+| **Minlog**          | Scheme                         | - **No Minlog runtime in the classical model**              | **Yes**                              | Constructive proof → extracted Scheme program.                                                                                                                           |
+| **NuPRL**           | Lisp-oriented                  | ± Historically implementation-dependent                     | **Depends**                          | More of a historical/academic example of computational extraction.                                                                                                       |
+
+Also they can be grouped in this sense as:
+
+| Category                                      | Systems                                                 | What you get                                                                                       |
+|-----------------------------------------------+---------------------------------------------------------+----------------------------------------------------------------------------------------------------|
+| A. Truly independent extraction               | Rocq, Why3, Isabelle, Minlog, HOL4                      | Ordinary target-language source; no theorem-prover runtime is fundamentally part of the executable |
+| B. Normal language compilation, proofs erased | Verus, SPARK, Liquid Haskell, Vale                      | The executable is essentially an ordinary Rust/Ada/Haskell/assembly program                        |
+| C. Generated code + project/runtime support   | Dafny, Lean, some F_/Stainless configurations, ACL2/ATJ | Generated source is usable, but some language/runtime support is normally carried along            |
+| D. Backend/toolchain dependent                | K, Event-B, B, PVS                                      | Whether the final artifact is standalone depends substantially on the particular backend/toolchain |
+
+** The interesting cases
+
+*** 1. Dafny
+
+This is the model you're probably thinking about:
+
+#+begin_example
+       Dafny source
+            |
+     <verification> ----> Z3, ...
+            |
+      Dafny compiler
+            |
+   .--------+--------.
+   |        |        |           Dafny runtime
+  C#      Java     Python ...          |
+   |        |        |                 |
+   `--------+--------'                 |
+            |                          |
+            +--------------------------'
+            |
+            v
+        executable
+#+end_example
+
+That's an important distinction if your objective is **"I want to give the generated
+source to somebody who doesn't have Dafny installed."**
+
+They generally don't need the Dafny compiler, but they may need the **Dafny runtime/support package**.
 
- If the specific thing you mean by "extraction" is:
+*** 2. Rocq (Coq)
 
- #+begin\_quote\
- I prove a theorem / define a constructive algorithm, and the system removes the proof-only material and gives me executable source code.\
- #+end\_quote
+Rocq is much closer to what I'd call classical _extraction_:
 
- then the particularly relevant systems are:
-
- | System         | Classical extraction?                            | Main targets                                        |
- |----------------+--------------------------------------------------+-----------------------------------------------------|
- | Rocq/Coq       | YES                                              | OCaml, Haskell, Scheme                              |
- | Agda           | YES-ish / compilation of computational content   | Haskell, JavaScript                                 |
- | Minlog         | YES                                              | Scheme                                              |
- | NuPRL          | YES                                              | Historically Lisp-oriented computational extraction |
- | Isabelle/HOL   | Code generation rather than Coq-style extraction | SML, OCaml, Haskell, Scala                          |
- | Lean           | Compilation rather than classical extraction     | Native executable via compiler/C backend            |
- | F*             | Extraction/code generation                       | OCaml, F#, C/Rust through ecosystem                 |
- | Why3           | Program extraction                               | OCaml, C                                            |
+#+begin_example
+         Gallina
+            |
+         theorem
+            |
+        extraction
+            |
+    +-------+-------+
+    |       |       |
+    v       v       v
+ OCaml   Haskell   Scheme
+    |       |       |
+    v       v       v
+<compile w/o dependencies>
+#+end_example
 
- Rocq is particularly clear-cut: its extraction mechanism explicitly supports OCaml, Haskell and Scheme.  Rocq
-
- Why3 is similarly explicit: =why3 extract= generates OCaml, and its C driver can generate C for a supported subset of WhyML.  Why3+1
-
- - Verification-language systems
-
- There is another important family where the program is already written in something close to a conventional programming language:
-
- | System      | You write          | You execute                              |
- |-------------+--------------------+------------------------------------------|
- | _Dafny_     | Dafny              | Generated C#/Java/JS/Python/Go/Rust/etc. |
- | _Verus_     | Rust               | Rust                                     |
- | _SPARK_     | Ada                | Ada                                      |
- | _Stainless_ | Scala              | Scala or generated C                     |
- | _F_\*       | F\*                | OCaml/F#/C/Rust depending on backend     |
- | _Vale_      | Low-level language | Assembly                                 |
-
- Dafny is especially unusual because it has a large number of source-language backends. Current Dafny documentation lists C#, Java, JavaScript, Python, Go and Rust support, with C++ described as rudimentary/limited.  Dafny+1
+The resulting OCaml, for example, doesn't conceptually need Coq/Rocq to execute. The
+theorem prover is **not part of the runtime architecture**.
 
- Verus takes a different approach: executable code is already Rust, while =spec= and =proof= code are ghost code and are removed before compilation.  Verus Lang+1
+That is a major advantage if your goal is deployment.
 
- ATC is particularly notable because it is explicitly described as a _proof-generating C code generator_, while ATJ translates ACL2 functions to Java.  ACL2+1
+*** 3. Why3
 
- - Important distinction: verified output vs verified source
+Why3 is another particularly interesting one:
 
- For comparing these systems, I would use four categories rather than one "extraction" column:
-
- | Level | Meaning                                              | Examples                                       | \ |
- |-------+------------------------------------------------------+------------------------------------------------+---|
- | _L0_  | No executable-code generation                        | Viper-like verification infrastructure         | \ |
- | _L1_  | Compile verified source normally                     | Verus, SPARK, Liquid Haskell                   | \ |
- | _L2_  | Generate executable source from verified definitions | Dafny, Stainless, Isabelle, Why3               | \ |
- | _L3_  | Proof/program extraction                             | Rocq, Minlog, constructive type-theory systems | \ |
- | _L4_  | Proof-producing low-level generation                 | ACL2/ATC, parts of F\*/KaRaMeL/Vale            |   |
-
- This classification is more informative than simply listing target languages.
-
- For example:
-
- #+begin\_example\
- Dafny -\> C#\
- Dafny -\> Python\
- Dafny -\> Go\
- Dafny -\> Java\
- #+end\_example
-
- does _not_ mean that Dafny is doing Coq-style proof-term extraction into those languages. It means the Dafny compiler translates the verified Dafny program into target-language source. Dafny's own documentation describes its compiler as translating a Dafny program into a target source language.  Dafny
-
- By contrast:
-
- #+begin\_example\
- Coq/Rocq theorem + computational content\
- |\
- v\
- extraction\
- |\
- v\
- OCaml\
- #+end\_example
-
- is the classical "program extraction from proofs/specifications" model.  Rocq Prover Documentation
-
- - My practical shortlist
-
- If the goal is specifically _"I want to formally prove an algorithm and obtain executable code"_:
-
- | Goal                                               | Systems worth looking at                    |
- |----------------------------------------------------+---------------------------------------------|
- | Dependent types + mathematical proofs + extraction | _Rocq, Agda, Lean_                          |
- | Verified functional programs                       | _Rocq, Isabelle/HOL, F_\*                   |
- | Verified C                                         | _F_/KaRaMeL, Why3, ACL2/ATC, Stainless/GenC |
- | Verified Rust                                      | _Verus, F_/Pulse + KaRaMeL\*                |
- | Verified Ada / safety-critical                     | _SPARK_                                     |
- | Verify ordinary-ish multi-language programs        | _Dafny_                                     |
- | Verified Scala                                     | _Stainless_                                 |
- | Verified low-level / crypto code                   | _Vale, F_/Pulse\*                           |
- | Constructive proof → executable program            | _Rocq, Agda, Minlog_                        |
-
- - Sources
-
- - Rocq extraction: https://rocq-prover.org/doc/master/refman/addendum/extraction.html
-- Isabelle code generation: https://isabelle.in.tum.de/website-Isabelle2020/dist/library/Doc/Codegen/Introduction.html
-- Agda compilers: https://agda.readthedocs.io/en/latest/tools/compilers.html
-- Dafny compilation: https://dafny.org/latest/Installation
-- Why3 extraction: https://why3.org/doc/manpages.html
-- F\*: https://github.com/FStarLang/FStar
-- ACL2 ATC: https://acl2.org/doc/index-seo.php?xkey=C\_\_\_\_ATC
-- ACL2 ATJ: https://acl2.org/doc/index-seo.php?xkey=JAVA\_\_\_\_ATJ
-- Verus: https://verus-lang.github.io/verus/guide/modes.html
-- Stainless: https://github.com/epfl-lara/stainless
-
- - Bottom line
-
- The most important distinction is:
-
- #+begin\_example\
- FORMAL SPECIFICATION\
- |\
- +----------+----------+\
- | |\
- theorem prover verified program\
- | |\
- proof terms executable code\
- | |\
- extraction compilation /\
- | code generation\
- v v\
- OCaml/Haskell/etc. C/Rust/Java/etc.\
- #+end\_example
-
- So if you are specifically researching _"proof assistant -\> extracted implementation language"_, I would put _Rocq, Isabelle, Agda, Lean, F_, Why3 and Minlog\* at the center of the comparison.
-
- If you instead mean _"write a production program, prove it, and compile it to C/Rust/etc."_, then _Dafny, F_, Verus, SPARK, Why3, Stainless, ACL2/ATC and Vale\* become much more relevant.\
- :::
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-----------------------------------------------------------------------------------------------------------------------
-
-Depending on a special runtime library
-
-
-Yes. The key distinction is between **standalone generated code** and code that depends on a **language-specific runtime/library**. Also, “no special runtime” does not necessarily mean “zero dependencies”: e.g. generated C may use the C standard library or a small support library.
-
- | System              | Typical target                 | Special runtime required?                                 | Generated code usable independently? | Notes                                                                                                                                                                    |
- | ---                 | ---                            | ---                                                       | ---                                  | ---                                                                                                                                                                      |
- | **Rocq / Coq**      | OCaml, Haskell, Scheme         | Usually **no Rocq runtime**                               | **Yes**                              | Extracted program is ordinary target-language code. It may depend on ordinary target libraries.                                                                          |
- | **Lean 4**          | C / native                     | **Lean runtime** generally required                       | **No, not completely**               | Lean's generated native code relies on Lean's runtime support for things such as memory management and runtime representations.                                          |
- | **Isabelle/HOL**    | SML, OCaml, Haskell, Scala     | Generally **no Isabelle runtime**                         | **Yes**                              | Generated code is intended to be executable independently of Isabelle; target-language libraries/runtime still apply.                                                    |
- | **Agda**            | Haskell, JavaScript            | **Target-language/runtime libraries**                     | **Mostly yes**                       | Haskell output runs under GHC/Haskell runtime; JS output needs the normal JS environment and any generated support. No Agda theorem-prover runtime is normally required. |
- | **F\***             | OCaml, F#, C, Rust             | **Depends on backend**                                    | **Often yes**                        | OCaml/F# can be ordinary target programs; C/Rust extraction can use generated/support libraries, depending on the F\*/KaRaMeL setup.                                     |
- | **Why3**            | OCaml, C                       | Usually **no Why3 runtime**                               | **Yes**                              | One of the cleaner cases: extraction produces normal OCaml/C code. External libraries can of course be required.                                                         |
- | **Dafny**           | C#, Java, JS, Go, Python, etc. | **Yes, commonly**                                         | **Usually no**                       | Generated programs use Dafny runtime/support libraries for Dafny types and operations. This is one of the clearest examples of runtime-dependent generation.             |
- | **ACL2 / ATC**      | C                              | Small/support runtime may be needed depending on features | **Largely yes**                      | ATC is specifically designed to generate C; generated code can be very close to conventional standalone C.                                                               |
- | **ACL2 / ATJ**      | Java                           | ACL2-specific support may be required                     | **Not always**                       | Depends on which ACL2 constructs/features are translated.                                                                                                                |
- | **Stainless**       | Scala, C                       | Backend/runtime support depends on generated features     | **Often yes**                        | Generated Scala is normal Scala; GenC can require Stainless support/runtime for some constructs.                                                                         |
- | **Verus**           | Rust                           | **No Verus runtime**                                      | **Yes**                              | `spec`/`proof`/ghost material is erased; executable Rust is compiled normally. This is a particularly clean model.                                                       |
- | **SPARK**           | Ada                            | **No SPARK runtime in the conceptual sense**              | **Yes**                              | SPARK is a subset/methodology over Ada. Verified Ada is compiled using normal Ada toolchains/runtime as appropriate.                                                     |
- | **Liquid Haskell**  | Haskell                        | **No Liquid Haskell runtime**                             | **Yes**                              | Refinements disappear; resulting program is ordinary Haskell.                                                                                                            |
- | **Vale**            | Assembly                       | **No Vale runtime for the generated assembly itself**     | **Yes**                              | Designed specifically for low-level code; generated/verified routines can be incorporated into normal systems.                                                           |
- | **Viper**           | —                              | N/A                                                       | **No**                               | Primarily a verification intermediate language, not a general executable-code generator.                                                                                 |
- | **K Framework**     | Depends on backend             | **Usually backend-specific**                              | **Depends**                          | K is primarily semantics/execution/verification infrastructure rather than a simple extraction pipeline.                                                                 |
- | **Event-B / Rodin** | Various                        | **Depends on code-generation toolchain**                  | **Depends**                          | Refinement/code-generation approach rather than classical proof extraction.                                                                                              |
- | **B Method**        | Ada, C, etc.                   | **Depends on toolchain**                                  | **Usually yes**                      | Generated implementation can become ordinary target-language code.                                                                                                       |
- | **PVS**             | Various                        | **Not primarily an extraction system**                    | **Depends**                          | Code generation is not its central use case.                                                                                                                             |
- | **HOL4**            | SML                            | **No HOL runtime normally required**                      | **Yes**                              | Generated SML can be compiled/executed as ordinary SML.                                                                                                                  |
- | **Minlog**          | Scheme                         | **No Minlog runtime in the classical model**              | **Yes**                              | Constructive proof → extracted Scheme program.                                                                                                                           |
- | **NuPRL**           | Lisp-oriented                  | Historically implementation-dependent                     | **Depends**                          | More of a historical/academic example of computational extraction.                                                                                                       |
-
-## A more useful classification
-
- I'd actually divide them into **four categories**:
-
- | Category                                          | Systems                                                      | What you get                                                                                       |
- | ---                                               | ---                                                          | ---                                                                                                |
- | **A. Truly independent extraction**               | **Rocq, Why3, Isabelle, Minlog, HOL4**                       | Ordinary target-language source; no theorem-prover runtime is fundamentally part of the executable |
- | **B. Normal language compilation, proofs erased** | **Verus, SPARK, Liquid Haskell, Vale**                       | The executable is essentially an ordinary Rust/Ada/Haskell/assembly program                        |
- | **C. Generated code + project/runtime support**   | __Dafny, Lean, some F_/Stainless configurations, ACL2/ATJ_\* | Generated source is usable, but some language/runtime support is normally carried along            |
- | **D. Backend/toolchain dependent**                | **K, Event-B, B, PVS**                                       | Whether the final artifact is standalone depends substantially on the particular backend/toolchain |
-
-### The interesting cases
-
- #### 1\. Dafny
-
- This is the model you're probably thinking about:
-
-```
-              Dafny source
-                   |
-             verification
-                   |
-             Dafny compiler
-                   |
-          +--------+--------+
-          |        |        |
-        C#       Java     Python ...
-          |        |        |
-          +--------+--------+
-                   |
-             Dafny runtime
-             / libraries
-```
-
- The generated C#/Java/Python isn't simply "pure target-language code" in the sense of a hand-written implementation. Dafny's compiler emits calls/types that are supported by Dafny's runtime libraries.
-
- So:
-
-```
-Dafny program
-     ↓
-verified
-     ↓
-generated C#
-     ↓
-Dafny runtime/library
-     ↓
-application
-```
-
- That's an important distinction if your objective is **"I want to give the generated source to somebody who doesn't have Dafny installed."**
-
- They generally don't need the _Dafny compiler_, but they may need the **Dafny runtime/support package**.
-
----
-
- #### 2\. Rocq / Coq
-
- Rocq is much closer to what I'd call classical _extraction_:
-
-```
-        Gallina
-           |
-        theorem
-           |
-       extraction
-           |
-     +-----+-----+
-     |     |     |
-   OCaml Haskell Scheme
-```
-
- The resulting OCaml, for example, doesn't conceptually need Coq/Rocq to execute.
-
- You can do:
-
-```
-Coq/Rocq
-   |
-   | extraction
-   v
-foo.ml
-   |
-   | ordinary OCaml compiler
-   v
-foo
-```
-
- The theorem prover is **not part of the runtime architecture**.
-
- That is a major advantage if your goal is deployment.
-
----
-
- #### 3\. Why3
-
- Why3 is another particularly interesting one:
-
-```
+#+begin_example
               WhyML
                 |
        +--------+--------+
        |                 |
-   verification       extraction
+  verification       extraction
        |                 |
-    SMT provers      +----+----+
-                     |         |
-                   OCaml       C
-```
+  SMT solvers       +----+----+
+                    |    |    |
+                 OCaml   C   Java
+#+end_example
 
- The verification infrastructure is not needed to execute the resulting program.
+The verification infrastructure is not needed to execute the resulting program. That makes
+it quite attractive for the: *"Prove it here, deploy it somewhere completely unrelated."* model.
 
- That makes it quite attractive for the:
+*** 4. Verus
 
- > _"Prove it here, deploy it somewhere completely unrelated."_
+Verus is perhaps even cleaner conceptually, because executable code is **already Rust**:
 
- model.
-
----
-
- #### 4\. Verus
-
- Verus is perhaps even cleaner conceptually, because executable code is **already Rust**:
-
-```
+#+begin_example
 fn verified_algorithm(...) -> ... {
     ...
 }
-```
 
- alongside:
+----- alongside -----
 
-```
 spec fn ...
 proof fn ...
-```
+#+end_example
 
- The specification/proof portions are ghost material.
+The specification/proof portions are ghost material.
 
- Conceptually:
+Conceptually:
 
-```
-             Rust + proofs
+#+begin_example
+              Rust + proofs
                    |
-              Verus verifier
+             Verus verifier
                    |
                    v
-             erase ghost code
+            erase ghost code
                    |
                    v
               ordinary Rust
                    |
-                rustc
+                 rustc
                    |
                    v
              native binary
-```
-
- There is **no Verus runtime** that your deployed program needs.
-
- That's a very different architecture from Dafny.
-
----
-
- ## Runtime dependency vs. verification dependency
-
- There's an even more important distinction:
-
- | Question                                                           | Example                  |
- | ---                                                                | ---                      |
- | Does the generated program need the **proof assistant**?           | Almost always **no**     |
- | Does it need the **compiler**?                                     | To build it, usually yes |
- | Does it need the **target language runtime**?                      | Often yes                |
- | Does it need a **special runtime from the verification language**? | Depends                  |
- | Does it need **generated support libraries**?                      | Depends                  |
- | Does it need the **SMT solver** at execution time?                 | Normally **no**          |
- | Does it need the **proofs** at execution time?                     | Normally **no**          |
-
-This is important because **Dafny does not need Z3 at runtime**, for example. Z3 is used during verification. The runtime dependency is a separate issue.
-
- So:
-
-```
-             Dafny source
-                  |
-          +-------+-------+
-          |               |
-       verifier        compiler
-          |               |
-         Z3          target source
-                          |
-                     Dafny runtime
-                          |
-                       program
-```
-
- whereas something like classical Coq extraction is closer to:
-
-```
-             Coq/Rocq
-                |
-          theorem proving
-                |
-           extraction
-                |
-                v
-          target source
-                |
-           target compiler
-                |
-                v
-             program
-```
-
- No theorem prover is involved in execution.
-
- ## If "zero special runtime" is your main criterion
-
- I'd put these near the top of the list:
-
- 1. **Rocq/Coq → OCaml/Haskell**
-2. **Why3 → OCaml/C**
-3. **Isabelle/HOL → SML/OCaml/Haskell/Scala**
-4. **Minlog → Scheme**
-5. **HOL4 → SML**
-6. **Verus → Rust**
-7. **SPARK → Ada**
-8. **Liquid Haskell → Haskell**
-9. **Vale → assembly**
-
- And I'd treat these differently:
-
- - **Dafny** → generated code normally carries Dafny runtime/support dependencies.
-- **Lean** → generated native programs depend on Lean runtime infrastructure.
-- **F\*** → very dependent on which backend/toolchain you choose; it can get extremely close to standalone C/Rust.
-- **Stainless** → similarly backend-dependent.
-
- So, if your actual research question is **"Which proof system lets me prove something once and then ship a completely self-contained C/Rust/OCaml implementation, with no special VM/runtime?"**, that's a narrower and quite interesting comparison. In that case, I would make a second table specifically for **C, Rust, OCaml, and Haskell**, including _runtime dependency, garbage collector dependency, standard-library dependency, generated-code quality, and whether the proof is preserved through the compilation/extraction boundary_.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-#+TITLE: Verified Code Generation: C, Rust, OCaml and Haskell
-#+OPTIONS: toc:2
-
-What "standalone" means here
-
-I use these definitions:
-
-| Term                         | Meaning                                                                                                                                         |
-|------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
-| No verifier runtime          | The deployed program does not need Dafny/Lean/Rocq/Why3/etc. installed or running                                                               |
-| No special runtime           | No runtime specifically belonging to the verification language is required                                                                      |
-| Native target runtime        | Normal runtime of the target language/compiler may still be needed                                                                              |
-| Self-contained native        | The generated artifact can ultimately be compiled/linked into a normal native executable without a verification-language runtime                |
-| Proof erased                 | Proof/specification code does not execute in the deployed program                                                                               |
-| Proof-preserving compilation | There is a formally established relationship between the source proof and the generated machine code; merely verifying the source is not enough |
-
-The distinction is important.
-
-For example:
-
-#+begin_example
-Dafny -> C# -> .NET
 #+end_example
 
-does not need Dafny at execution time, but it does need the .NET runtime.
+There is **no Verus runtime** that the deployed program needs. That's a very different architecture from Dafny.
 
-Likewise:
-
-#+begin_example
-Coq -> OCaml -> native executable
-#+end_example
-
-does not need Coq at execution time, but the executable is still produced using the OCaml toolchain and may use the OCaml runtime/GC.
-
-C as target
-
-| System           | C generation                                         | Special verifier runtime                                | C runtime / support                                   | GC?                            | Can deploy as ordinary C?            | Comments                                                                             |
-|------------------+------------------------------------------------------+---------------------------------------------------------+-------------------------------------------------------+--------------------------------+--------------------------------------+--------------------------------------------------------------------------------------|
-| F / KaRaMeL      | YES                                                  | Usually no                                              | Some generated/support libraries depending on program | Usually no for C output        | YES                                  | One of the strongest choices for verified C                                          |
-| Why3             | YES                                                  | No                                                      | Standard C library + generated support where needed   | No                             | YES                                  | WhyML is verified; supported WhyML subset can be extracted to C                      |
-| ACL2 / ATC       | YES                                                  | No                                                      | C support / standard library as required              | No                             | YES                                  | ATC is explicitly designed as proof-producing C code generation                      |
-| Stainless / GenC | YES                                                  | Usually no, but support depends on generated constructs | GenC support may be needed                            | Usually No                     | Mostly                               | Worth examining on a per-program basis                                               |
-| Dafny            | C++ / limited C support rather than primary C target | Yes / support libraries                                 | Dafny support                                         | Depends on target              | Not the cleanest route               | Dafny is much more naturally used with its mainstream backends                       |
-| Lean             | Internal C backend                                   | Lean runtime                                            | Lean runtime                                          | Yes/managed runtime mechanisms | No, not in the minimal-runtime sense | C is an implementation target for Lean's compiler rather than classical C extraction |
-| Rocq / Coq       | Not normally direct C extraction                     | N/A                                                     | N/A                                                   | N/A                            | N/A                                  | Usually extract to OCaml/Haskell/Scheme instead                                      |
-| Isabelle/HOL     | Not standard direct C target                         | N/A                                                     | N/A                                                   | N/A                            | N/A                                  | Normally use SML/OCaml/Haskell/Scala                                                 |
-| Verus            | No                                                   | N/A                                                     | N/A                                                   | N/A                            | N/A                                  | Verus targets Rust                                                                   |
-| SPARK            | Ada rather than C                                    | N/A                                                     | Ada runtime                                           | Usually no tracing GC          | Not directly                         | Can interface with C, but C is not the primary verified output                       |
-
-Best candidates for "verified C"
-
-For the specific goal:
-
-#+begin_example
-formal proof
-|
-v
-verified implementation
-|
-v
-ordinary C
-|
-v
-normal C compiler
-|
-v
-native executable
-#+end_example
-
-the systems most worth investigating are:
-
-#+begin_example
-F* + KaRaMeL
-Why3
-ACL2 + ATC
-Stainless + GenC
-#+end_example
-
-F* / KaRaMeL is particularly interesting for systems/security/cryptographic code because the toolchain is designed to move from high-level verified code toward low-level C while preserving substantial verification structure.
-
-Rust as target
-
-| System              | Rust generation                      | Special verifier runtime      | Rust runtime                       | GC                     | Deployable as normal Rust? | Comments                                                                               |
-|---------------------+--------------------------------------+-------------------------------+------------------------------------+------------------------+----------------------------+----------------------------------------------------------------------------------------|
-| Verus               | Native Rust source                   | No                            | Normal Rust environment only       | No tracing GC          | YES                        | Excellent fit: executable code is Rust; proof/spec code is ghost                       |
-| F / Pulse + KaRaMeL | YES, depending on workflow           | Usually no                    | Rust/C support libraries may apply | Generally No           | YES                        | Strong low-level verification story                                                    |
-| Dafny               | Rust backend                         | Dafny support may be required | Rust runtime/support as generated  | No tracing GC normally | Mostly                     | Generated Rust is not conceptually the same as handwritten Rust                        |
-| Lean                | No conventional Rust backend         | N/A                           | N/A                                | N/A                    | N/A                        | Not a normal Lean target                                                               |
-| Rocq / Coq          | No mainstream native Rust extraction | N/A                           | N/A                                | N/A                    | N/A                        | Rust extraction projects exist, but not equivalent to its mature OCaml extraction path |
-| Why3                | No standard Rust extraction          | N/A                           | N/A                                | N/A                    | N/A                        | Rust is not its normal executable target                                               |
-| Isabelle/HOL        | No standard Rust backend             | N/A                           | N/A                                | N/A                    | N/A                        | Normally SML/OCaml/Haskell/Scala                                                       |
-| SPARK               | No                                   | N/A                           | N/A                                | N/A                    | N/A                        | Ada ecosystem                                                                          |
-
-Best candidate: Verus
-
-For:
-
-#+begin_example
-verified algorithm
-|
-v
-Rust
-|
-+-- spec
-+-- proof
-+-- executable code
-|
-v
-erase ghost
-|
-v
-ordinary Rust
-|
-rustc
-|
-v
-native executable
-#+end_example
-
-Verus is unusually attractive.
-
-The important architectural feature is that the executable program is already Rust. Verification annotations and proof functions are ghost/specification material and are erased.
-
-That means you don't have:
-
-#+begin_example
-Verifier language
-|
-v
-translator
-|
-v
-Rust + special runtime
-#+end_example
-
-Instead, conceptually:
-
-#+begin_example
-Rust + formal specifications
-|
-verification
-|
-ghost erasure
-|
-v
-ordinary Rust
-#+end_example
-
-This is a major difference from Dafny.
-
-OCaml as target
-
-| System       | OCaml generation            | Special verifier runtime | OCaml runtime        | GC  | Deployable independently of prover? | Comments                                        |
-|--------------+-----------------------------+--------------------------+----------------------+-----+-------------------------------------+-------------------------------------------------|
-| Rocq / Coq   | YES                         | No                       | Normal OCaml runtime | Yes | YES                                 | One of the canonical extraction pipelines       |
-| Isabelle/HOL | YES                         | No                       | Normal OCaml runtime | Yes | YES                                 | Isabelle code generator                         |
-| Why3         | YES                         | No                       | Normal OCaml runtime | Yes | YES                                 | Very direct extraction                          |
-| F            | YES                         | Usually No               | Normal OCaml runtime | Yes | YES                                 | F* has an OCaml backend                         |
-| Lean         | Not its normal OCaml target | N/A                      | N/A                  | N/A | N/A                                 | Lean uses its own compiler/runtime architecture |
-| Agda         | Not normally direct OCaml   | N/A                      | N/A                  | N/A | N/A                                 | Haskell is the normal backend                   |
-| Dafny        | No mainstream OCaml backend | N/A                      | N/A                  | N/A | N/A                                 | Not a target                                    |
-| HOL4         | No normal OCaml output      | N/A                      | N/A                  | N/A | N/A                                 | SML is the natural target                       |
-
-OCaml has an interesting property
-
-OCaml extraction is often an excellent compromise:
-
-#+begin_example
-Rocq / Isabelle / Why3 / F*
-|
-v
-OCaml
-|
-v
-ocamlopt
-|
-v
-native executable
-#+end_example
-
-There is no theorem prover in the deployed architecture.
-
-However:
-
-#+begin_example
-"No verifier runtime"
-!=
-"no runtime at all"
-#+end_example
-
-OCaml's normal execution model includes its runtime/garbage collector. That's completely different from a Dafny runtime: it is the normal implementation infrastructure of the target language.
-
-Haskell as target
-
-| System         | Haskell generation             | Special verifier runtime | Haskell runtime     | GC  | Deployable independently of prover? | Comments                                                             |
-|----------------+--------------------------------+--------------------------+---------------------+-----+-------------------------------------+----------------------------------------------------------------------|
-| Rocq / Coq     | YES                            | No                       | GHC runtime         | Yes | YES                                 | Classical extraction target                                          |
-| Isabelle/HOL   | YES                            | No                       | GHC/Haskell runtime | Yes | YES                                 | Isabelle code generator                                              |
-| Agda           | YES                            | No Agda runtime          | GHC/Haskell runtime | Yes | YES                                 | One of Agda's primary compilation routes                             |
-| Liquid Haskell | YES                            | No                       | GHC/Haskell runtime | Yes | YES                                 | Verification happens on Haskell; resulting program is normal Haskell |
-| Lean           | No standard Haskell target     | N/A                      | N/A                 | N/A | N/A                                 | Not a normal Lean backend                                            |
-| Why3           | No standard Haskell extraction | N/A                      | N/A                 | N/A | N/A                                 | OCaml is the normal functional target                                |
-| Dafny          | No                             | N/A                      | N/A                 | N/A | N/A                                 | Not a Dafny target                                                   |
-
-The "runtime ladder"
-
-This is perhaps the most useful way to compare the systems.
-
-#+begin_example
-LEVEL 0
-No runtime at all
-|
-| practically impossible for useful high-level programs
-v
-
-LEVEL 1
-Normal target-language runtime only
-
-Rocq -> OCaml
-Why3 -> OCaml
-Isabelle -> OCaml
-Rocq -> Haskell
-Agda -> Haskell
-Verus -> Rust
-
-    |
-    v
-
-
-LEVEL 2
-Normal target runtime + generated support libraries
-
-F* -> C
-F* -> Rust
-Stainless -> C
-ACL2 -> C
-
-    |
-    v
-
-
-LEVEL 3
-Target runtime + verification-language runtime
-
-Dafny -> C#/Java/etc.
-Lean -> native
-
-    |
-    v
-
-
-LEVEL 4
-VM / specialized execution environment
-
-systems whose executable artifact fundamentally targets
-a custom VM or specialized runtime
-
-
-#+end_example
-
-Garbage collection
+* Garbage collection
 
 If your concern is not merely "special verifier runtime" but also "I want predictable systems code with no GC", the classification changes substantially.
 
