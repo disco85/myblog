@@ -55,7 +55,14 @@ correct*.
 
 I will try to classify them all in the context of /software development/ using AI, so
 maybe tables are not fully completed - check always the documentation of PA - they often
-add new features.
+add new features - example, I just checked the backend for Rocq (Coq) called [[https://certicoq.org/]["CertiCoq"]]
+and voila - it supports extraction to C subset (Clight) and... WebAssembly:
+
+#+begin_quote
+CertiRocq (formerly CertiCoq) is a compiler for Gallina, the specification language of the
+Rocq Prover. CertiRocq targets WebAssembly and Clight, a subset of the C language that can
+be compiled with any C compiler, including the CompCert verified compiler.
+#+end_quote
 
 * Supported languages
 
@@ -155,34 +162,34 @@ can generate C for a supported subset of WhyML.
 
 * Specific runtime
 
-The key distinction is between **standalone generated code** and code that depends on a
-**language-specific runtime/library**. Also, "no special runtime" does not necessarily
+The key distinction is between *standalone generated code* and code that depends on a
+*language-specific runtime/library*. Also, "no special runtime" does not necessarily
 mean "zero dependencies": e.g. generated C may use the C standard library or a small
 support library.
 
-| System              | Typical target                 | Special runtime required?                                   | Generated code usable independently? | Notes                                                                                                                                                                    |
-|---------------------+--------------------------------+-------------------------------------------------------------+--------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rocq / Coq**      | OCaml, Haskell, Scheme         | - Usually **no Rocq runtime**                               | **Yes**                              | Extracted program is ordinary target-language code. It may depend on ordinary target libraries.                                                                          |
-| **Lean 4**          | C / native                     | + **Lean runtime** generally required                       | **No, not completely**               | Lean's generated native code relies on Lean's runtime support for things such as memory management and runtime representations.                                          |
-| **Isabelle/HOL**    | SML, OCaml, Haskell, Scala     | - Generally **no Isabelle runtime**                         | **Yes**                              | Generated code is intended to be executable independently of Isabelle; target-language libraries/runtime still apply.                                                    |
-| **Agda**            | Haskell, JavaScript            | + **Target-language/runtime libraries**                     | **Mostly yes**                       | Haskell output runs under GHC/Haskell runtime; JS output needs the normal JS environment and any generated support. No Agda theorem-prover runtime is normally required. |
-| **F***              | OCaml, F#, C, Rust             | - **Depends on backend**                                    | **Often yes**                        | OCaml/F# can be ordinary target programs; C/Rust extraction can use generated/support libraries, depending on the F\*/KaRaMeL setup.                                     |
-| **Why3**            | OCaml, C                       | - Usually **no Why3 runtime**                               | **Yes**                              | One of the cleaner cases: extraction produces normal OCaml/C code. External libraries can of course be required.                                                         |
-| **Dafny**           | C#, Java, JS, Go, Python, etc. | + **Yes, commonly**                                         | **Usually no**                       | Generated programs use Dafny runtime/support libraries for Dafny types and operations. This is one of the clearest examples of runtime-dependent generation.             |
-| **ACL2 / ATC**      | C                              | - Small/support runtime may be needed depending on features | **Largely yes**                      | ATC is specifically designed to generate C; generated code can be very close to conventional standalone C.                                                               |
-| **ACL2 / ATJ**      | Java                           | ± ACL2-specific support may be required                     | **Not always**                       | Depends on which ACL2 constructs/features are translated.                                                                                                                |
-| **Stainless**       | Scala, C                       | ± Backend/runtime support depends on generated features     | **Often yes**                        | Generated Scala is normal Scala; GenC can require Stainless support/runtime for some constructs.                                                                         |
-| **Verus**           | Rust                           | - **No Verus runtime**                                      | **Yes**                              | `spec`/`proof`/ghost material is erased; executable Rust is compiled normally. This is a particularly clean model.                                                       |
-| **SPARK**           | Ada                            | - **No SPARK runtime in the conceptual sense**              | **Yes**                              | SPARK is a subset/methodology over Ada. Verified Ada is compiled using normal Ada toolchains/runtime as appropriate.                                                     |
-| **Liquid Haskell**  | Haskell                        | - **No Liquid Haskell runtime**                             | **Yes**                              | Refinements disappear; resulting program is ordinary Haskell.                                                                                                            |
-| **Vale**            | Assembly                       | - **No Vale runtime for the generated assembly itself**     | **Yes**                              | Designed specifically for low-level code; generated/verified routines can be incorporated into normal systems.                                                           |
-| **K Framework**     | Depends on backend             | ± **Usually backend-specific**                              | **Depends**                          | K is primarily semantics/execution/verification infrastructure rather than a simple extraction pipeline.                                                                 |
-| **Event-B / Rodin** | Various                        | ± **Depends on code-generation toolchain**                  | **Depends**                          | Refinement/code-generation approach rather than classical proof extraction.                                                                                              |
-| **B Method**        | Ada, C, etc.                   | ± **Depends on toolchain**                                  | **Usually yes**                      | Generated implementation can become ordinary target-language code.                                                                                                       |
-| **PVS**             | Various                        | - **Not primarily an extraction system**                    | **Depends**                          | Code generation is not its central use case.                                                                                                                             |
-| **HOL4**            | SML                            | - **No HOL runtime normally required**                      | **Yes**                              | Generated SML can be compiled/executed as ordinary SML.                                                                                                                  |
-| **Minlog**          | Scheme                         | - **No Minlog runtime in the classical model**              | **Yes**                              | Constructive proof → extracted Scheme program.                                                                                                                           |
-| **NuPRL**           | Lisp-oriented                  | ± Historically implementation-dependent                     | **Depends**                          | More of a historical/academic example of computational extraction.                                                                                                       |
+| System           | Typical target                 | Special runtime required?                                   | Generated code usable independently? | Notes                                                                                                                                                                    |
+|------------------+--------------------------------+-------------------------------------------------------------+--------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| *Rocq/Coq*       | OCaml, Haskell, Scheme         | - Usually *no Rocq runtime*                                 | *Yes*                                | Extracted program is ordinary target-language code. It may depend on ordinary target libraries.                                                                          |
+| *Lean 4*         | C/native                       | + *Lean runtime* generally required                         | *No, not completely*                 | Lean's generated native code relies on Lean's runtime support for things such as memory management and runtime representations.                                          |
+| *Isabelle/HOL*   | SML, OCaml, Haskell, Scala     | - Generally *no Isabelle runtime*                           | *Yes*                                | Generated code is intended to be executable independently of Isabelle; target-language libraries/runtime still apply.                                                    |
+| *Agda*           | Haskell, JavaScript            | + *Target-language/runtime libraries*                       | *Mostly yes*                         | Haskell output runs under GHC/Haskell runtime; JS output needs the normal JS environment and any generated support. No Agda theorem-prover runtime is normally required. |
+| *F**             | OCaml, F#, C, Rust             | - *Depends on backend*                                      | *Often yes*                          | OCaml/F# can be ordinary target programs; C/Rust extraction can use generated/support libraries, depending on the F\*/KaRaMeL setup.                                     |
+| *Why3*           | OCaml, C                       | - Usually *no Why3 runtime*                                 | *Yes*                                | One of the cleaner cases: extraction produces normal OCaml/C code. External libraries can of course be required.                                                         |
+| *Dafny*          | C#, Java, JS, Go, Python, etc. | + *Yes, commonly*                                           | *Usually no*                         | Generated programs use Dafny runtime/support libraries for Dafny types and operations. This is one of the clearest examples of runtime-dependent generation.             |
+| *ACL2/ATC*       | C                              | - Small/support runtime may be needed depending on features | *Largely yes*                        | ATC is specifically designed to generate C; generated code can be very close to conventional standalone C.                                                               |
+| *ACL2/ATJ*       | Java                           | ± ACL2-specific support may be required                     | *Not always*                         | Depends on which ACL2 constructs/features are translated.                                                                                                                |
+| *Stainless*      | Scala, C                       | ± Backend/runtime support depends on generated features     | *Often yes*                          | Generated Scala is normal Scala; GenC can require Stainless support/runtime for some constructs.                                                                         |
+| *Verus*          | Rust                           | - *No Verus runtime*                                        | *Yes*                                | `spec`/`proof`/ghost material is erased; executable Rust is compiled normally. This is a particularly clean model.                                                       |
+| *SPARK*          | Ada                            | - *No SPARK runtime in the conceptual sense*                | *Yes*                                | SPARK is a subset/methodology over Ada. Verified Ada is compiled using normal Ada toolchains/runtime as appropriate.                                                     |
+| *Liquid Haskell* | Haskell                        | - *No Liquid Haskell runtime*                               | *Yes*                                | Refinements disappear; resulting program is ordinary Haskell.                                                                                                            |
+| *Vale*           | Assembly                       | - *No Vale runtime for the generated assembly itself*       | *Yes*                                | Designed specifically for low-level code; generated/verified routines can be incorporated into normal systems.                                                           |
+| *K Framework*    | Depends on backend             | ± *Usually backend-specific*                                | *Depends*                            | K is primarily semantics/execution/verification infrastructure rather than a simple extraction pipeline.                                                                 |
+| *Event-B/Rodin*  | Various                        | ± *Depends on code-generation toolchain*                    | *Depends*                            | Refinement/code-generation approach rather than classical proof extraction.                                                                                              |
+| *B Method*       | Ada, C, etc.                   | ± *Depends on toolchain*                                    | *Usually yes*                        | Generated implementation can become ordinary target-language code.                                                                                                       |
+| *PVS*            | Various                        | - *Not primarily an extraction system*                      | *Depends*                            | Code generation is not its central use case.                                                                                                                             |
+| *HOL4*           | SML                            | - *No HOL runtime normally required*                        | *Yes*                                | Generated SML can be compiled/executed as ordinary SML.                                                                                                                  |
+| *Minlog*         | Scheme                         | - *No Minlog runtime in the classical model*                | *Yes*                                | Constructive proof → extracted Scheme program.                                                                                                                           |
+| *NuPRL*          | Lisp-oriented                  | ± Historically implementation-dependent                     | *Depends*                            | More of a historical/academic example of computational extraction.                                                                                                       |
 
 Also they can be grouped in this sense as:
 
@@ -195,7 +202,7 @@ Also they can be grouped in this sense as:
 
 ** The interesting cases
 
-*** 1. Dafny
+*** Dafny
 
 This is the model you're probably thinking about:
 
@@ -218,12 +225,12 @@ This is the model you're probably thinking about:
         executable
 #+end_example
 
-That's an important distinction if your objective is **"I want to give the generated
-source to somebody who doesn't have Dafny installed."**
+That's an important distinction if your objective is *"I want to give the generated
+source to somebody who doesn't have Dafny installed."*
 
-They generally don't need the Dafny compiler, but they may need the **Dafny runtime/support package**.
+They generally don't need the Dafny compiler, but they may need the *Dafny runtime/support package*.
 
-*** 2. Rocq (Coq)
+*** Rocq (Coq)
 
 Rocq is much closer to what I'd call classical _extraction_:
 
@@ -244,11 +251,11 @@ Rocq is much closer to what I'd call classical _extraction_:
 #+end_example
 
 The resulting OCaml, for example, doesn't conceptually need Coq/Rocq to execute. The
-theorem prover is **not part of the runtime architecture**.
+theorem prover is *not part of the runtime architecture*.
 
 That is a major advantage if your goal is deployment.
 
-*** 3. Why3
+*** Why3
 
 Why3 is another particularly interesting one:
 
@@ -267,9 +274,9 @@ Why3 is another particularly interesting one:
 The verification infrastructure is not needed to execute the resulting program. That makes
 it quite attractive for the: *"Prove it here, deploy it somewhere completely unrelated."* model.
 
-*** 4. Verus
+*** Verus
 
-Verus is perhaps even cleaner conceptually, because executable code is **already Rust**:
+Verus is perhaps even cleaner conceptually, because executable code is *already Rust*:
 
 #+begin_example
 fn verified_algorithm(...) -> ... {
@@ -303,13 +310,13 @@ Conceptually:
     native binary
 #+end_example
 
-There is **no Verus runtime** that the deployed program needs. That's a very different architecture from Dafny.
+There is *no Verus runtime* that the deployed program needs. That's a very different architecture from Dafny.
 
 * Garbage collection
 
 If your concern is not merely "special verifier runtime" but also "I want predictable systems code with no GC", the classification changes substantially.
 
-| System / target   | Typical GC?                        | Suitable for GC-free systems code?                           |
+| System/target     | Typical GC?                        | Suitable for GC-free systems code?                           |
 |-------------------+------------------------------------+--------------------------------------------------------------|
 | F* -> C           | No tracing GC required by C itself | YES                                                          |
 | Why3 -> C         | No                                 | YES                                                          |
@@ -317,7 +324,7 @@ If your concern is not merely "special verifier runtime" but also "I want predic
 | Verus -> Rust     | No tracing GC                      | YES                                                          |
 | Vale -> assembly  | No                                 | YES                                                          |
 | SPARK -> Ada      | No tracing GC normally             | YES                                                          |
-| Rocq -> OCaml     | Yes                                | Usually no for hard real-time / GC-free requirements         |
+| Rocq -> OCaml     | Yes                                | Usually no for hard real-time/GC-free requirements           |
 | Isabelle -> OCaml | Yes                                | Usually no                                                   |
 | F* -> OCaml       | Yes                                | Usually no                                                   |
 | Rocq -> Haskell   | Yes                                | Usually no                                                   |
@@ -325,7 +332,7 @@ If your concern is not merely "special verifier runtime" but also "I want predic
 | Liquid Haskell    | Yes                                | Usually no                                                   |
 | Dafny -> C#       | Yes (.NET GC)                      | Usually no                                                   |
 | Dafny -> Java     | Yes (JVM GC)                       | Usually no                                                   |
-| Dafny -> Python   | Yes / managed memory               | No for this requirement                                      |
+| Dafny -> Python   | Yes/managed memory                 | No for this requirement                                      |
 | Lean native       | Runtime-managed                    | Depends heavily on application, but not equivalent to bare C |
 
 Important distinction - 4 different questions:
@@ -370,10 +377,10 @@ Also distinct "GC added by PA" and "GC pre-existing in the target language", e.g
       executable        executable
 #+end_example
 
-So, for Why3 -> OCaml you naturally get OCaml's GC, bcs you cannot remove the OCaml's GC
+So, for ~Why3 -> OCaml~ you naturally get OCaml's GC, bcs you cannot remove the OCaml's GC
 from OCaml. But for extraction of C - you don't get any GC from Why3.
 
-* F* / Low* / KaRaMeL
+** F* (Low*, KaRaMeL)
 
 F* is one of the most interesting systems for this particular question.
 
@@ -386,24 +393,26 @@ Low* is explicitly designed to model C-like low-level computation. Its libraries
 - C memory
 - system-level C functionality
 
-and KaRaMeL erases proofs before generating C.  GitHub
+and KaRaMeL erases proofs before generating C (comparing to Why3 which can keep runtime
+asserts, if you need such ones).
 
 Conceptually:
 
 #+begin_example
-F* / Low*
+F*/Low*
     |
-    | proofs
-    | specifications
+    | proofs specifications
+    |
     v
 verification
     |
     | erase proofs
+    |
     v
 Low-level implementation
     |
     v
-C
+    C
     |
     +--> stack
     |
@@ -423,12 +432,12 @@ high-level functional language
              C
              |
              v
-       generated GC runtime
+    generated GC runtime
 #+end_example
 
-Low* is specifically trying to model the C memory behavior rather than hide it behind a tracing collector.  GitHub
+Low* is specifically trying *to model the C memory behavior rather than hide it behind a tracing collector*.
 
-However, F* as a *whole* should not be labeled "no GC":
+However, F* as a *whole* should not be labeled "no GC" bcs:
 
 #+begin_example
 F*
@@ -442,123 +451,47 @@ F*
  +--> other backends      -> depends
 #+end_example
 
-So F* gets a:
+So F* can be treated as "backend-dependent" classification.
 
-#+begin_example
-"backend-dependent"
-#+end_example
+** Dafny
 
-classification.
-
-* Dafny
-
-Dafny is almost the opposite example.
-
-Suppose:
-
-#+begin_example
-Dafny
-  |
-  v
-C++
-#+end_example
-
-It does *not* follow that you get "normal manual-memory C++".
-
-Dafny has its own runtime/support infrastructure, and generated C++ can depend on that infrastructure.
+Dafny is almost the opposite example. Supposing ~Dafny -> C++~ it does *not* follow that
+you get "normal manual-memory C++". Dafny has its own runtime, support infrastructure, and
+generated C++ can depend on that infrastructure.
 
 Therefore:
 
 #+begin_example
-Dafny
- |
- v
-C++
- |
- +--> Dafny runtime
- |      |
- |      +--> runtime representations
- |      +--> collections
- |      +--> memory management
- |
- v
+  Dafny
+   |
+   v
+  C++
+   |
+   +--> Dafny runtime
+   |      |
+   |      +--> runtime representations
+   |      |
+   |      +--> collections
+   |      |
+   |      +--> memory management
+   |
+   v
 program
 #+end_example
 
-The generated C++ can therefore effectively have managed-memory semantics even though C++ itself has no mandatory tracing GC.
+The generated C++ can therefore effectively have managed-memory semantics even though C++
+itself has no mandatory tracing GC.
 
-This is exactly the phenomenon you were asking about.
+** Isabelle/HOL
 
-So:
-
-#+begin_example
-C++ target
-+
-Dafny runtime
-=
-potentially GC/managed-memory behavior
-#+end_example
-
-* Verus
-
-Verus is almost the opposite architectural model.
-
-Verus verifies Rust and then removes ghost code before ordinary Rust compilation. Its documented pipeline says that specification/proof code is erased and the remaining code goes through normal rustc/LLVM compilation.  GitHub
-
-#+begin_example
-Rust
- |
- +-- executable code
- |
- +-- spec code
- |
- +-- proof code
- |
- v
-Verus
- |
- | erase ghost
- v
-Rust
- |
- v
-rustc
- |
- v
-native executable
-#+end_example
-
-Rust does not have a tracing GC as part of its normal execution model.
-
-Therefore:
-
-#+begin_example
-Verus
-  |
-  +--> no Verus runtime
-  |
-  +--> no tracing GC
-  |
-  +--> ownership / borrowing
-  |
-  v
-normal Rust binary
-#+end_example
-
-A programmer could of course implement a garbage collector *in Rust*. Verus does not prohibit that.
-
-But that would be **application-level code**, not a hidden requirement of Verus.
-
-* Isabelle/HOL
-
-Isabelle's code generator produces SML, OCaml, Haskell and Scala.  Proofcraft+1
+Isabelle's code generator produces SML, OCaml, Haskell and Scala.
 
 Therefore the memory-management story is inherited largely from the target:
 
 #+begin_example
 Isabelle/HOL
  |
- +--> SML      -> SML runtime / GC
+ +--> SML      -> SML runtime/GC
  |
  +--> OCaml    -> OCaml GC
  |
@@ -567,11 +500,10 @@ Isabelle/HOL
  +--> Scala    -> JVM GC
 #+end_example
 
-So Isabelle doesn't need an "Isabelle GC".
+So Isabelle doesn't need an its own "Isabelle GC", but the generated program is certainly
+not necessarily GC-free.
 
-But the generated program is certainly not necessarily GC-free.
-
-* Agda
+** Agda
 
 Agda is similar:
 
@@ -583,195 +515,67 @@ Agda
  +--> JavaScript  -> JS engine GC
 #+end_example
 
-Again:
-
-#+begin_example
-No Agda runtime
-        !=
-No garbage collector
-#+end_example
-
-* Lean
+** Lean
 
 Lean is different.
 
-Lean's executable model includes a runtime system, and its compiler targets native code through its compilation infrastructure.
+Lean's executable model includes a runtime system, and its compiler targets native code
+through its compilation infrastructure.
 
-Therefore I would not put Lean into the same category as:
-
-#+begin_example
-Why3 -> C
-```
-
- or:
-
- #+begin\_example\
- Verus -\> Rust
-
-```
-
-where the output is naturally viewed as ordinary target-language code with the verifier's proof layer erased.
-
-A more accurate model is:
+A more accurate model for Lean is:
 
 #+begin_example
-Lean
- |
- v
+    Lean
+     |
+     v
 Lean compiler
- |
- v
+     |
+     v
 native code
- |
- +--> Lean runtime
-        |
-        +--> runtime representations
-        +--> memory management
-        +--> GC/runtime machinery
+     |
+     +--> Lean runtime
+              |
+              +--> runtime representations
+              |
+              +--> memory management
+              |
+              +--> GC/runtime machinery
 #+end_example
 
-* ACL2 / ATC
+** ACL2/ATC
 
-ACL2's ATC is interesting because it generates C and is explicitly designed as a proof-generating C code generator.
+ACL2's ATC is interesting because it generates C and is explicitly designed as a
+proof-generating C code generator.
 
 The conceptual model is:
 
 #+begin_example
-ACL2
- |
- | proof
- v
-ATC
- |
- v
-C
- |
- v
+       ACL2
+        |
+        | proof
+        |
+        v
+       ATC
+        |
+        v
+        C
+        |
+        v
 ordinary C compiler
 #+end_example
 
-ATC is much closer to:
+ATC is much closer to: "generate C that follows the proved semantics" than to: "generate C
+plus a large managed-language runtime".
 
-#+begin_example
-"generate C that follows the proved semantics"
-#+end_example
+So GC is *not normally intrinsic* for ACL2.
 
-than to:
+Of course, nothing prevents the generated C program from linking against a GC library if
+the application requires one.
 
-#+begin_example
-"generate C plus a large managed-language runtime"
-#+end_example
+** Vale
 
-So GC is **not normally intrinsic**.
-
-Of course, nothing prevents the generated C program from linking against a GC library if the application requires one.
-
-* Stainless
-
-Stainless is more complicated.
-
-Its Scala side naturally inherits Scala/JVM memory management:
-
-#+begin_example
-Stainless
- |
- v
-Scala
- |
- v
-JVM
- |
- v
-GC
-#+end_example
-
-But GenC changes the picture:
-
-#+begin_example
-Stainless
- |
- v
-GenC
- |
- v
-C
- |
- +--> generated/support runtime
- |
- +--> allocator
- |
- +--> potentially explicit memory
-#+end_example
-
-Therefore I would classify Stainless/C as:
-
-#+begin_example
-backend-dependent
-#+end_example
-
-rather than simply "GC" or "no GC".
-
-* SPARK
-
-SPARK is Ada-based.
-
-The normal SPARK model is much closer to:
-
-#+begin_example
-SPARK
- |
- v
-Ada
- |
- +--> stack/static allocation
- +--> controlled heap allocation
- |
- v
-native code
-#+end_example
-
-It does not require a tracing GC as part of the SPARK execution model.
-
-This makes SPARK particularly relevant for safety-critical systems.
-
-However, "Ada has no GC" should not be interpreted as a theorem about every possible Ada runtime. A particular Ada environment could theoretically provide additional managed facilities.
-
-* Liquid Haskell
-
-Liquid Haskell verifies Haskell rather than translating a separate language into C/Rust.
-
-#+begin_example
-Haskell + refinements
-        |
-        v
-Liquid Haskell
-        |
-    refinements
-      erased
-        |
-        v
-      Haskell
-        |
-        v
-       GHC
-        |
-        v
-      GC/runtime
-#+end_example
-
-So:
-
-#+begin_example
-No Liquid Haskell runtime
-        +
-Haskell GC
-#+end_example
-
-is the right characterization.
-
-* Vale
-
-Vale operates at a much lower level.
+Vale operates at a much lower level - [[https://github.com/project-everest/vale][Vale]] is a DSL/toolchain for verified ASSEMBLY (ARM,
+x86?) for F* and Dafny, see [[https://www.microsoft.com/en-us/research/project/project-everest-verified-secure-implementations-https-ecosystem/tools/][more]]. The project today does not look as too alive though.
 
 Its generated/verified code can be incorporated into systems software without a mandatory tracing GC.
 
@@ -779,7 +583,7 @@ But, just as with C or assembly generally:
 
 #+begin_example
 "no mandatory GC"
-        !=
+       !=
 "GC impossible"
 #+end_example
 
@@ -787,293 +591,140 @@ You can implement a GC in assembly.
 
 The relevant question is whether the *Vale-generated code requires one*. Normally, no.
 
-* Viper
+** HOL4
 
-Viper is different enough that I wouldn't put it in the same extraction table.
+HOL4 can generate SML, so its extracted code uses GC of SML (not specially generated by HOL4).
 
-It is primarily a verification infrastructure/intermediate language.
+** A better overall classification
 
-#+begin_example
-Viper
- |
- v
-verification
- |
- v
-verified source program
-```
+| Category                                        | Systems                                                                                                                                 | GC status                                             |
+|-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------|
+| GC-free by design for the main low-level target | Verus → Rust, F*/Low* → C, Why3 → C, SPARK → Ada, Vale → assembly                                                                       | No tracing GC required by the normal architecture     |
+| Generated target inherits a GC                  | Rocq → OCaml, Rocq → Haskell, Isabelle → OCaml/Haskell/SML/Scala, Agda → Haskell, Liquid Haskell → Haskell, HOL4 → SML, Minlog → Scheme | GC normally present                                   |
+| Special runtime/managed execution model         | Dafny, Lean                                                                                                                             | GC/managed memory can be part of runtime architecture |
+| Backend-dependent                               | F*, Stainless, ACL2, B/Event-B, K, PVS                                                                                                  | Must inspect particular backend                       |
+| Not primarily executable-code generators        | Viper, some PVS/K workflows                                                                                                             | GC question is not directly applicable                |
+| Can deliberately verify a GC itself             | Rocq/CertiCoq ecosystem, verified-GC projects                                                                                           | GC can itself be a formally verified component        |
 
- rather than:
-
- #+begin\_example\
- Viper\
- |\
- v\
- standalone executable\
- #+end\_example
-
- So:
-
- #+begin\_example\
- GC question: N/A\
- #+end\_example
-
- for Viper itself.
-
- - K Framework
-
- K is also fundamentally different.
-
- K is primarily a framework for defining executable semantics and reasoning about programs.
-
- Its runtime/execution architecture depends on the selected backend.
-
- Therefore:
-
- #+begin\_example\
- K\
- |\
- +--\> backend A -\> memory model A\
- |\
- +--\> backend B -\> memory model B\
- |\
- +--\> backend C -\> memory model C\
- #+end\_example
-
- There isn't one universal "K generated program uses/no GC" answer.
-
- - B / Event-B / Rodin
-
- These are refinement-oriented approaches.
-
- The memory model depends heavily on the implementation language and code generator.
-
- For example:
-
- #+begin\_example\
- formal model\
- |\
- v\
- refinement\
- |\
- v\
- Ada/C/etc.\
- |\
- v\
- target runtime
-
-```
-
-Therefore GC is generally:
-
-#+begin_example
-toolchain-dependent
-#+end_example
-
-* PVS
-
-PVS is primarily a specification/theorem-proving environment rather than a modern "verified program -> standalone C/Rust" pipeline.
-
-Consequently, I would not use PVS as an example when comparing GC-free generated systems code.
-
-Its executable/code-generation story depends heavily on the particular application.
-
-* HOL4
-
-HOL4 can generate SML.
-
-Therefore:
-
-#+begin_example
-HOL4
- |
- v
-SML
- |
- v
-SML runtime
- |
- v
-GC
-#+end_example
-
-There is no reason to introduce a HOL-specific GC into the generated application.
-
-The GC is simply part of the SML implementation.
-
-* Minlog
-
-Minlog is particularly interesting for constructive extraction:
-
-#+begin_example
-constructive proof
-       |
-       v
-realizer
-       |
-       v
-Scheme
-       |
-       v
-Scheme runtime
-       |
-       v
-GC
-#+end_example
-
-So again, the proof system itself doesn't necessarily impose a GC, but the target environment may.
-
-* A better overall classification
-
-For your particular question, I would classify the systems like this:
-
-| Category                                          | Systems                                                                                                                                   | GC status                                             |
-|---------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------|
-| *GC-free by design for the main low-level target* | *Verus → Rust, F*/Low* → C, Why3 → C, SPARK → Ada, Vale → assembly*                                                                       | No tracing GC required by the normal architecture     |
-| *Generated target inherits a GC*                  | *Rocq → OCaml, Rocq → Haskell, Isabelle → OCaml/Haskell/SML/Scala, Agda → Haskell, Liquid Haskell → Haskell, HOL4 → SML, Minlog → Scheme* | GC normally present                                   |
-| *Special runtime / managed execution model*       | *Dafny, Lean*                                                                                                                             | GC/managed memory can be part of runtime architecture |
-| *Backend-dependent*                               | *F*, Stainless, ACL2, B/Event-B, K, PVS                                                                                                   | Must inspect particular backend                       |
-| *Not primarily executable-code generators*        | Viper, some PVS/K workflows                                                                                                               | GC question is not directly applicable                |
-| *Can deliberately verify a GC itself*             | *Rocq/CertiCoq ecosystem, verified-GC projects*                                                                                           | GC can itself be a formally verified component        |
-
-* The really interesting distinction
-
-There are actually **three independent axes**:
+There are actually *3 independent axes*:
 
 #+begin_example
                        GENERATED PROGRAM
                               |
              +----------------+----------------+
              |                                 |
-          managed                         explicit
-             |                             memory
+          managed                          explicit
+             |                               memory
              |                                 |
        +-----+-----+                    +------+------+
        |           |                    |             |
-      GC         RC/other             malloc       ownership
-       |                                /free        /regions
+      GC       RC/other              malloc,       ownership,
+       |                              free         regions
        |
        v
-  runtime support
+runtime support
 #+end_example
 
 So "GC or no GC" is not the whole story.
 
-For systems programming, I would use this richer classification:
+For systems programming, this it a richer classification:
 
-| Memory model            | Examples                                                       | Main characteristic                                          |
-|-------------------------+----------------------------------------------------------------+--------------------------------------------------------------|
-| *Tracing GC*            | Dafny managed targets, Lean runtime, OCaml, Haskell, JVM/Scala | Automatic object reclamation                                 |
-| *Reference counting*    | Possible in generated/runtime code                             | Deterministic reclamation but reference cycles need handling |
-| *Ownership / borrowing* | Verus/Rust                                                     | Compile-time resource management                             |
-| *Manual allocation*     | Low*/C, Why3/C, ordinary C                                     | Programmer/program proof controls allocation/deallocation    |
-| *Regions / arenas*      | Low-level verified systems, some functional implementations    | Lifetime is controlled by region                             |
-| *Stack/static*          | SPARK, Low* portions                                           | No general heap required                                     |
-| *Hybrid*                | F*, Stainless, custom runtimes                                 | Different types/data structures can use different strategies |
-| *Verified GC*           | CertiCoq/verified-GC research                                  | GC exists, but its behavior can itself be formally verified  |
+| Memory model        | Examples                                                       | Main characteristic                                          |
+|---------------------+----------------------------------------------------------------+--------------------------------------------------------------|
+| Tracing GC          | Dafny managed targets, Lean runtime, OCaml, Haskell, JVM/Scala | Automatic object reclamation                                 |
+| Reference counting  | Possible in generated/runtime code                             | Deterministic reclamation but reference cycles need handling |
+| Ownership/borrowing | Verus/Rust                                                     | Compile-time resource management                             |
+| Manual allocation   | Low*/C, Why3/C, ordinary C                                     | Programmer/program proof controls allocation/deallocation    |
+| Regions/arenas      | Low-level verified systems, some functional implementations    | Lifetime is controlled by region                             |
+| Stack/static        | SPARK, Low* portions                                           | No general heap required                                     |
+| Hybrid              | F*, Stainless, custom runtimes                                 | Different types/data structures can use different strategies |
+| Verified GC         | CertiCoq/verified-GC research                                  | GC exists, but its behavior can itself be formally verified  |
 
-* The surprising case: C + verified GC
+** The surprising case: C + verified GC
 
 This is why the CertiCoq ecosystem is particularly interesting.
 
-You can have:
+It is possible to have:
 
 #+begin_example
-                    Rocq
-                      |
-                 proof/program
-                      |
-                  CertiCoq
-                      |
-                      v
-                 generated C
-                      |
-             +--------+--------+
-             |                 |
-       application       verified GC
-             |                 |
-             +--------+--------+
-                      |
-                      v
-                 machine code
+               Rocq
+                 |
+           proof/program
+                 |
+             CertiCoq
+                 |
+                 v
+             generated C
+                 |
+        +--------+--------+
+        |                 |
+   application        verified GC
+        |                 |
+        +--------+--------+
+                 |
+                 v
+           machine code
 #+end_example
 
 So there is nothing contradictory about:
 
 #+begin_example
-"C code"
-+
+      "C code"
+         +
 "garbage collection"
-+
+         +
 "formally verified"
 #+end_example
 
 C doesn't prohibit GC; it simply doesn't provide one as part of the language.
 
-* The most useful comparison for your original question
+Reduce the enormous table:
 
-If the actual goal is:
+| System                        | Target                     | GC mandatory?               | Special runtime mandatory?      | Explicit memory possible? | Ownership/regions possible? | Particularly suitable for systems code              |
+|-------------------------------+----------------------------+-----------------------------+---------------------------------+---------------------------+-----------------------------+-----------------------------------------------------|
+| F*/Low*                       | C                          | NO                          | NO in the Low/C model           | YES                       | YES/modeled regions         | YES                                                 |
+| Why3                          | C                          | NO                          | NO                              | YES                       | Limited/model-dependent     | YES                                                 |
+| ACL2/ATC                      | C                          | NO normally                 | NO normally                     | YES                       | C-style                     | YES                                                 |
+| Verus                         | Rust                       | NO                          | NO                              | Controlled by Rust        | YES                         | YES                                                 |
+| SPARK                         | Ada                        | NO normally                 | NO                              | YES                       | YES                         | YES                                                 |
+| Vale                          | Assembly                   | NO                          | NO                              | YES                       | Explicit low-level          | YES                                                 |
+| Dafny                         | C++/other                  | Potentially/runtime-managed | YES support runtime             | Abstracted by runtime     | Not primary model           | Depends                                             |
+| Rocq/CertiCoq                 | C                          | Can be YES                  | Runtime/support may be required | YES                       | Possible                    | YES, especially research/verified-runtime scenarios |
+| F -> OCaml                    | OCaml                      | YES                         | NO F runtime necessarily        | Abstracted                | Not the Low model           | Less suitable for GC-free systems code              |
+| Rocq -> OCaml                 | OCaml                      | YES                         | NO Coq runtime                  | Abstracted                | Not normally the goal       | Excellent verified functional code                  |
+| Why3 -> OCaml                 | OCaml                      | YES                         | NO Why3 runtime                 | Abstracted                | Not normally the goal       | Excellent verified functional code                  |
+| Isabelle -> OCaml/Haskell/SML | Managed functional targets | YES                         | NO Isabelle runtime             | Abstracted                | Not normally the goal       | Excellent verified functional code                  |
+| Agda -> Haskell               | Haskell                    | YES                         | NO Agda runtime                 | Abstracted                | Not normally the goal       | Excellent dependent functional code                 |
 
-#+begin_quote
-I want a prover that can generate low-level C/Rust code, and I want to know exactly what happens to memory management.
-#+end_quote
+** Bottom line
 
-then I would reduce the enormous table to this:
-
-| System                          | Target                     | GC mandatory?                   | Special runtime mandatory?      | Explicit memory possible? | Ownership/regions possible? | Particularly suitable for systems code                |
-|---------------------------------+----------------------------+---------------------------------+---------------------------------+---------------------------+-----------------------------+-------------------------------------------------------|
-| *F* / Low*                      | C                          | *NO*                            | *NO* in the Low*/C model        | *YES*                     | *YES* / modeled regions     | *YES*                                                 |
-| *Why3*                          | C                          | *NO*                            | *NO*                            | *YES*                     | Limited / model-dependent   | *YES*                                                 |
-| *ACL2 / ATC*                    | C                          | *NO* normally                   | *NO* normally                   | *YES*                     | C-style                     | *YES*                                                 |
-| *Verus*                         | Rust                       | *NO*                            | *NO*                            | Controlled by Rust        | *YES*                       | *YES*                                                 |
-| *SPARK*                         | Ada                        | *NO* normally                   | *NO*                            | *YES*                     | *YES*                       | *YES*                                                 |
-| *Vale*                          | Assembly                   | *NO*                            | *NO*                            | *YES*                     | Explicit low-level          | *YES*                                                 |
-| *Dafny*                         | C++ / other                | *Potentially / runtime-managed* | *YES* support runtime           | Abstracted by runtime     | Not primary model           | Depends                                               |
-| *Rocq / CertiCoq*               | C                          | *Can be YES*                    | Runtime/support may be required | *YES*                     | Possible                    | *YES*, especially research/verified-runtime scenarios |
-| *F* -> OCaml                    | OCaml                      | *YES*                           | *NO F* runtime necessarily      | Abstracted                | Not the Low* model          | Less suitable for GC-free systems code                |
-| *Rocq* -> OCaml                 | OCaml                      | *YES*                           | *NO Coq runtime*                | Abstracted                | Not normally the goal       | Excellent verified functional code                    |
-| *Why3* -> OCaml                 | OCaml                      | *YES*                           | *NO Why3 runtime*               | Abstracted                | Not normally the goal       | Excellent verified functional code                    |
-| *Isabelle* -> OCaml/Haskell/SML | Managed functional targets | *YES*                           | *NO Isabelle runtime*           | Abstracted                | Not normally the goal       | Excellent verified functional code                    |
-| *Agda* -> Haskell               | Haskell                    | *YES*                           | *NO Agda runtime*               | Abstracted                | Not normally the goal       | Excellent dependent functional code                   |
-
-* Bottom line
-
-So, **yes: there absolutely are provers/formal-verification systems where the generated language is C/C++ but the resulting program can still have a garbage collector.**
+So, *yes: there absolutely are provers/formal-verification systems where the generated
+language is C/C++ but the resulting program can still have a garbage collector.*
 
 The cleanest conceptual distinction is:
 
 #+begin_example
-                  C / C++
+                   C/C++
                      |
           +----------+----------+
           |                     |
        GC-based             GC-free
           |                     |
-    runtime/collector       malloc/free
+   runtime/collector       malloc/free
           |                 ownership
-          |                 regions
-          |                 arenas
+          |                  regions
+          |                  arenas
           |                     |
-    CertiCoq-style          Low*/KaRaMeL
-    / Dafny-style           Why3/C
+   CertiCoq-style         Low*/KaRaMeL
+   / Dafny-style             Why3/C
                             ACL2/ATC
 #+end_example
 
-And for the systems we've discussed, **Why3 deserves a particularly explicit “NO mandatory GC for C extraction” entry**. Its current documentation describes correct-by-construction OCaml extraction, while its recent release history documents C extraction; the C path should be considered separately from its OCaml path.  Why3+1
+#+begin_quote
+CertiRocq-generated code normally relies on a CertiRocq runtime, and that runtime includes
+a generational garbage collector.
 
-Likewise, **Low*/KaRaMeL is deliberately on the GC-free/manual-memory side**: its documentation explicitly models C stack/heap allocation and C memory, with proofs erased before C generation.  GitHub
+See: [[https://github-wiki-see.page/m/CertiRocq/certirocq/wiki/Memory-Model-and-Garbage-Collection]["Memory Model and Garbage Collection - CertiRocq"]]
 
-And **Verus is on the ownership side**: after verification, ghost/specification code is erased and ordinary Rust compilation takes over.  GitHub
-
-So if your ultimate target is something like **kernel/embedded/cryptographic code where you want *no GC, no VM, no special runtime, and ideally a conventional C/Rust binary***, the systems I'd investigate most closely are **F*/Low* + KaRaMeL, Why3/C, Verus/Rust, SPARK/Ada, ACL2/ATC, and Vale**. The functional extraction systems such as **Rocq/Coq, Isabelle and Agda** are excellent for a different point in the design space: they can eliminate the prover from deployment, but their normal functional-language targets themselves commonly use GC.  Proofcraft+1
-
-:::
-```
-
-
-
-
-
-
-
-
+And: [[https://www.researchgate.net/publication/336454132_Certifying_graph-manipulating_C_programs_via_localizations_within_data_structures]["Certifying graph-manipulating C programs via localizations within data structures"]]
+#+end_quote

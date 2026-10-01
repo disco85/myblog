@@ -1,0 +1,2222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-01 Thu 22:58 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verified software development in proof assistants</title>
+<meta name="description" content="Extraction, compilation from a proof assistant" />
+<meta name="keywords" content="software,development,theorem,proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Verified software development in proof assistants</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org148c583">Use cases of proof assistants</a></li>
+<li><a href="#orgad89774">Supported languages</a></li>
+<li><a href="#orgce17d51">Which PA system can eventually give me code in language X?</a></li>
+<li><a href="#org04efa7a">Classical extraction systems</a>
+<ul>
+<li><a href="#orgf486ed2">Verified output vs verified source</a></li>
+</ul>
+</li>
+<li><a href="#orgdb65e31">Specific runtime</a>
+<ul>
+<li><a href="#org04f7f74">The interesting cases</a>
+<ul>
+<li><a href="#orgb2cc0dc">Dafny</a></li>
+<li><a href="#org1fb8e19">Rocq (Coq)</a></li>
+<li><a href="#orgc25ba8d">Why3</a></li>
+<li><a href="#orgf0cc84d">Verus</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgbfb0b5a">Garbage collection</a>
+<ul>
+<li><a href="#org21765a0">F* (Low*, KaRaMeL)</a></li>
+<li><a href="#org195ec38">Dafny</a></li>
+<li><a href="#org4df3cde">Isabelle/HOL</a></li>
+<li><a href="#org32a0780">Agda</a></li>
+<li><a href="#orgf7edc38">Lean</a></li>
+<li><a href="#org53d53c3">ACL2/ATC</a></li>
+<li><a href="#org9d1c355">Vale</a></li>
+<li><a href="#org5a1604e">HOL4</a></li>
+<li><a href="#org12ca30d">A better overall classification</a></li>
+<li><a href="#org0f9f398">The surprising case: C + verified GC</a></li>
+<li><a href="#orgba53391">Bottom line</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org148c583" class="outline-2">
+<h2 id="org148c583">Use cases of proof assistants</h2>
+<div class="outline-text-2" id="text-org148c583">
+<p>
+All use cases can be grouped to:
+</p>
+
+<ol class="org-ol">
+<li>formalizing mathematics, mathematical foundations, physics, economics, etc</li>
+<li>verification of algorithms, models, specifications, software, hardware, certification, etc</li>
+<li>control of AI results, improvement of AI results, etc</li>
+<li>software development, hardware development, etc</li>
+</ol>
+
+<p>
+4-th - software development is in the focus of this article. It is not just proving,
+verifying of some properties of some theories, models, algorithms, etc - IT IS CREATION OF
+SOFTWARE. Yes, theorem provers, proof assistants (lets call them PA) can be used
+to... WRITE SOFTWARE... and they are already used today -
+</p>
+
+<p>
+you can start with <a href="https://www.youtube.com/watch?v=c5LOYzZx-0c">"The Best New Programming Language is a Proof Assistant"</a>.
+</p>
+
+<p>
+How does it happen? Mostly - via compilation and extraction:
+</p>
+
+<pre class="example" id="org3f434e8">
+                  special language
+ (sometimes allows traditional programming language)
+                         |
+                         v
+                  proof assistant
+                developing software
+                         |
+           .-------------+-------------.
+           |                           |
+           v                           v
+      compilation                  extraction
+          to                           to
+      executable                some programming
+                                    language
+</pre>
+
+<p>
+Some of PA support compilation, some - extraction, some - both. Some of them can execute
+the PA code directly (eg, Why3), some of them understand more than 1 input language,
+including traditional programming languages (Why3 is such PA!).
+</p>
+
+<p>
+The ultimate idea is that you get very safe, verified software which is safe not bcs it
+uses runtime mechanisms like automatic memory control, garbage collectors, resource
+managers existing in high level languages like Java, Python, etc, and working in runtime,
+opposite: <b>the code can be very low level: assembler, C with manual control of all
+resources but safe enough bcs it was verified at "COMPILE" TIME and it was qualified as
+correct</b>.
+</p>
+
+<p>
+I will try to classify them all in the context of <i>software development</i> using AI, so
+maybe tables are not fully completed - check always the documentation of PA - they often
+add new features - example, I just checked the backend for Rocq (Coq) called <a href="https://certicoq.org/">"CertiCoq"</a>
+and voila - it supports extraction to C subset (Clight) and... WebAssembly:
+</p>
+
+<blockquote>
+<p>
+CertiRocq (formerly CertiCoq) is a compiler for Gallina, the specification language of the
+Rocq Prover. CertiRocq targets WebAssembly and Clight, a subset of the C language that can
+be compiled with any C compiler, including the CompCert verified compiler.
+</p>
+</blockquote>
+</div>
+</div>
+<div id="outline-container-orgad89774" class="outline-2">
+<h2 id="orgad89774">Supported languages</h2>
+<div class="outline-text-2" id="text-orgad89774">
+<p>
+Notes on the table:
+</p>
+
+<ul class="org-ul">
+<li>Proof assistant: primarily an interactive theorem prover, dependent type theory,
+higher-order logic system.</li>
+<li>Verification language: primarily a programming language in which specifications and
+proofs are attached to executable programs.</li>
+<li>Extraction: computational content is extracted from verified definitions, proofs,
+normally erasing logical, ghost material.</li>
+<li>Code generation: verified, executable definitions are translated to another programming
+language.</li>
+<li>Compilation: the system compiles its own language to executable code, rather than
+necessarily producing a human-oriented target-language program.</li>
+<li>Proof, executable connection: how directly the generated executable implementation is
+connected to the object that was formally verified.</li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">System</th>
+<th scope="col" class="org-left">Category</th>
+<th scope="col" class="org-left">Source programming language</th>
+<th scope="col" class="org-left">Target extracted language(s)</th>
+<th scope="col" class="org-left">Verification style</th>
+<th scope="col" class="org-left">Extraction, generation mechanism</th>
+<th scope="col" class="org-left">Proof, executable connection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Rocq (Coq)</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">Gallina</td>
+<td class="org-left">OCaml, Haskell, Scheme, JSON</td>
+<td class="org-left">CIC, dependent type theory</td>
+<td class="org-left">Program extraction</td>
+<td class="org-left">Direct extraction: computational content of Gallina terms, proofs is extracted; proofs can be erased</td>
+</tr>
+
+<tr>
+<td class="org-left">Lean 4</td>
+<td class="org-left">Proof assistant + programming language</td>
+<td class="org-left">Lean</td>
+<td class="org-left">C, then native executable</td>
+<td class="org-left">Dependent type theory</td>
+<td class="org-left">Compiler, code generation</td>
+<td class="org-left">Direct: Lean executable definitions are compiled; proof, specification material can be erased</td>
+</tr>
+
+<tr>
+<td class="org-left">Isabelle/HOL</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">Isabelle/HOL</td>
+<td class="org-left">SML, OCaml, Haskell, Scala</td>
+<td class="org-left">Higher-order logic</td>
+<td class="org-left">Isabelle code generator</td>
+<td class="org-left">Direct for executable HOL definitions: logical definitions are translated to executable code</td>
+</tr>
+
+<tr>
+<td class="org-left">Agda</td>
+<td class="org-left">Proof assistant, dependently typed language</td>
+<td class="org-left">Agda</td>
+<td class="org-left">Haskell, JavaScript</td>
+<td class="org-left">Dependent type theory</td>
+<td class="org-left">Compiler backends</td>
+<td class="org-left">Direct computational compilation; irrelevant fields, arguments can be erased</td>
+</tr>
+
+<tr>
+<td class="org-left">F*</td>
+<td class="org-left">Proof-oriented programming language</td>
+<td class="org-left">F*</td>
+<td class="org-left">OCaml, F#; C/Rust via Pulse + KaRaMeL; assembly via Vale</td>
+<td class="org-left">Dependent, refinement types, SMT, effect system</td>
+<td class="org-left">Extraction, code generation</td>
+<td class="org-left">Strong: verified F* programs can be extracted; low-level paths provide additional verification machinery</td>
+</tr>
+
+<tr>
+<td class="org-left">Why3</td>
+<td class="org-left">Deductive verification platform</td>
+<td class="org-left">WhyML, MicroPython, MicroC, MLCFG, Coma</td>
+<td class="org-left">OCaml, C, Java</td>
+<td class="org-left">Hoare logic, SMT-backed deductive verification</td>
+<td class="org-left">Why3 extract</td>
+<td class="org-left">Strong: WhyML program is verified and then extracted; C has a restricted supported subset</td>
+</tr>
+
+<tr>
+<td class="org-left">Dafny</td>
+<td class="org-left">Verification language</td>
+<td class="org-left">Dafny</td>
+<td class="org-left">C#, Java, JavaScript, Go, Python, Rust, C++</td>
+<td class="org-left">SMT-based contracts, invariants, termination</td>
+<td class="org-left">Source-to-source compiler</td>
+<td class="org-left">Strong but different from classical extraction: verified Dafny program is translated to target source</td>
+</tr>
+
+<tr>
+<td class="org-left">ACL2</td>
+<td class="org-left">Theorem prover, programming environment</td>
+<td class="org-left">ACL2, Common Lisp</td>
+<td class="org-left">C, Java</td>
+<td class="org-left">First-order logic, executable Lisp</td>
+<td class="org-left">ATC, ATJ</td>
+<td class="org-left">Very strong: ATC is explicitly proof-generating C code generation</td>
+</tr>
+
+<tr>
+<td class="org-left">Viper</td>
+<td class="org-left">Verification infrastructure</td>
+<td class="org-left">Viper intermediate language</td>
+<td class="org-left">Primarily verification IR rather than a general-purpose extraction target</td>
+<td class="org-left">Permission-based separation logic</td>
+<td class="org-left">Verification-oriented translation</td>
+<td class="org-left">Not primarily an extraction system</td>
+</tr>
+
+<tr>
+<td class="org-left">Vale</td>
+<td class="org-left">Verification language, framework</td>
+<td class="org-left">Vale</td>
+<td class="org-left">Assembly, low-level code</td>
+<td class="org-left">SMT-backed low-level verification</td>
+<td class="org-left">Verified assembly generation</td>
+<td class="org-left">Very strong: designed for verified low-level cryptographic, security code</td>
+</tr>
+
+<tr>
+<td class="org-left">K Framework</td>
+<td class="org-left">Semantics, verification framework</td>
+<td class="org-left">K definitions</td>
+<td class="org-left">Depends on backend; LLVM, JVM, JavaScript ecosystems</td>
+<td class="org-left">Reachability logic, executable semantics</td>
+<td class="org-left">Semantics-driven code generation, execution</td>
+<td class="org-left">Varies: primarily semantics and verification rather than classical extraction</td>
+</tr>
+
+<tr>
+<td class="org-left">Event-B, Rodin</td>
+<td class="org-left">Formal method</td>
+<td class="org-left">Event-B</td>
+<td class="org-left">Usually manually implemented code</td>
+<td class="org-left">Set theory, refinement</td>
+<td class="org-left">Refinement, code-generation extensions</td>
+<td class="org-left">Indirect: formal model is refined toward implementation</td>
+</tr>
+
+<tr>
+<td class="org-left">B Method, Atelier B</td>
+<td class="org-left">Formal method</td>
+<td class="org-left">B, Event-B family</td>
+<td class="org-left">Ada, C, etc. depending on toolchain</td>
+<td class="org-left">Set theory, refinement, proof obligations</td>
+<td class="org-left">Refinement + code generation</td>
+<td class="org-left">Strong refinement connection, but not classical proof-term extraction</td>
+</tr>
+
+<tr>
+<td class="org-left">PVS</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">PVS specification language</td>
+<td class="org-left">Lisp, generated executable forms</td>
+<td class="org-left">Higher-order logic, dependent types</td>
+<td class="org-left">Code generation, evaluation</td>
+<td class="org-left">Limited compared with Rocq: primarily a specification, proof environment</td>
+</tr>
+
+<tr>
+<td class="org-left">HOL4</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">Standard ML + HOL</td>
+<td class="org-left">SML</td>
+<td class="org-left">Higher-order logic</td>
+<td class="org-left">Code generation, evaluation</td>
+<td class="org-left">Direct for executable HOL definitions</td>
+</tr>
+
+<tr>
+<td class="org-left">HOL Light</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">OCaml + HOL</td>
+<td class="org-left">OCaml-oriented execution</td>
+<td class="org-left">Higher-order logic</td>
+<td class="org-left">Evaluation, derived executable definitions</td>
+<td class="org-left">More proof, evaluation oriented than multi-target extraction</td>
+</tr>
+
+<tr>
+<td class="org-left">NuPRL</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">Computational type theory</td>
+<td class="org-left">Lisp, extracted computational content historically</td>
+<td class="org-left">Constructive type theory</td>
+<td class="org-left">Program extraction</td>
+<td class="org-left">Direct computational interpretation</td>
+</tr>
+
+<tr>
+<td class="org-left">Minlog</td>
+<td class="org-left">Proof assistant</td>
+<td class="org-left">Minlog language</td>
+<td class="org-left">Scheme</td>
+<td class="org-left">Constructive type theory</td>
+<td class="org-left">Program extraction</td>
+<td class="org-left">Direct: realizers, computational content extracted from constructive proofs</td>
+</tr>
+
+<tr>
+<td class="org-left">Isabelle/UTP etc.</td>
+<td class="org-left">Proof framework</td>
+<td class="org-left">Isabelle theories</td>
+<td class="org-left">SML, OCaml, Haskell, Scala when definitions are executable</td>
+<td class="org-left">HOL, object logics</td>
+<td class="org-left">Isabelle code generator</td>
+<td class="org-left">Depends on the object logic and executable definitions</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+PA extracting the largest number of languages: Dafny, Why3, F*, Isabelle... Dafny is
+especially unusual because it has a large number of source-language backends.
+</p>
+</div>
+</div>
+<div id="outline-container-orgce17d51" class="outline-2">
+<h2 id="orgce17d51">Which PA system can eventually give me code in language X?</h2>
+<div class="outline-text-2" id="text-orgce17d51">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Target</th>
+<th scope="col" class="org-left">Systems</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">C</td>
+<td class="org-left">F* + Pulse + KaRaMeL, Why3, ACL2/ATC, Stainless/GenC, Dafny (limited/rudimentary backend), Vale-related workflows</td>
+</tr>
+
+<tr>
+<td class="org-left">C++</td>
+<td class="org-left">Dafny</td>
+</tr>
+
+<tr>
+<td class="org-left">C#</td>
+<td class="org-left">Dafny</td>
+</tr>
+
+<tr>
+<td class="org-left">Java</td>
+<td class="org-left">Dafny, Why3, ACL2/ATJ</td>
+</tr>
+
+<tr>
+<td class="org-left">JavaScript</td>
+<td class="org-left">Dafny, Agda</td>
+</tr>
+
+<tr>
+<td class="org-left">Python</td>
+<td class="org-left">Dafny</td>
+</tr>
+
+<tr>
+<td class="org-left">Go</td>
+<td class="org-left">Dafny</td>
+</tr>
+
+<tr>
+<td class="org-left">Rust</td>
+<td class="org-left">F* + Pulse + KaRaMeL, Dafny, Verus (native Rust)</td>
+</tr>
+
+<tr>
+<td class="org-left">OCaml</td>
+<td class="org-left">Rocq, Isabelle, F*, Why3</td>
+</tr>
+
+<tr>
+<td class="org-left">Haskell</td>
+<td class="org-left">Rocq, Isabelle, Agda</td>
+</tr>
+
+<tr>
+<td class="org-left">Scheme</td>
+<td class="org-left">Rocq, Minlog</td>
+</tr>
+
+<tr>
+<td class="org-left">SML</td>
+<td class="org-left">Isabelle, HOL4</td>
+</tr>
+
+<tr>
+<td class="org-left">Scala</td>
+<td class="org-left">Isabelle</td>
+</tr>
+
+<tr>
+<td class="org-left">F#</td>
+<td class="org-left">F*</td>
+</tr>
+
+<tr>
+<td class="org-left">WebAssembly</td>
+<td class="org-left">F* ecosystem + low-level toolchains</td>
+</tr>
+
+<tr>
+<td class="org-left">Assembly</td>
+<td class="org-left">Vale + F* ecosystem</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+So, the most popular languages for extraction are Ocaml and C.
+</p>
+</div>
+</div>
+<div id="outline-container-org04efa7a" class="outline-2">
+<h2 id="org04efa7a">Classical extraction systems</h2>
+<div class="outline-text-2" id="text-org04efa7a">
+<p>
+Use-case: "I prove a theorem, define a constructive algorithm, and the system removes the proof-only
+material and gives me executable source code." - then the particularly relevant systems are:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">System</th>
+<th scope="col" class="org-left">Classical extraction?</th>
+<th scope="col" class="org-left">Main targets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Rocq (Coq)</td>
+<td class="org-left">YES</td>
+<td class="org-left">OCaml, Haskell, Scheme</td>
+</tr>
+
+<tr>
+<td class="org-left">Agda</td>
+<td class="org-left">YES-ish, compilation of computational content</td>
+<td class="org-left">Haskell, JavaScript</td>
+</tr>
+
+<tr>
+<td class="org-left">Minlog</td>
+<td class="org-left">YES</td>
+<td class="org-left">Scheme</td>
+</tr>
+
+<tr>
+<td class="org-left">NuPRL</td>
+<td class="org-left">YES</td>
+<td class="org-left">Historically Lisp-oriented computational extraction</td>
+</tr>
+
+<tr>
+<td class="org-left">Isabelle/HOL</td>
+<td class="org-left">Code generation rather than Coq-style extraction</td>
+<td class="org-left">SML, OCaml, Haskell, Scala</td>
+</tr>
+
+<tr>
+<td class="org-left">Lean</td>
+<td class="org-left">Compilation rather than classical extraction</td>
+<td class="org-left">Native executable via compiler or C backend</td>
+</tr>
+
+<tr>
+<td class="org-left">F*</td>
+<td class="org-left">Extraction, code generation</td>
+<td class="org-left">OCaml, F#, C, Rust through ecosystem</td>
+</tr>
+
+<tr>
+<td class="org-left">Why3</td>
+<td class="org-left">Program extraction</td>
+<td class="org-left">OCaml, C</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Rocq is particularly clear-cut: its extraction mechanism explicitly supports OCaml, Haskell and Scheme.
+</p>
+
+<p>
+Why3 is similarly explicit: the command <code>why3 extract</code> generates OCaml, and its C driver
+can generate C for a supported subset of WhyML.
+</p>
+</div>
+<div id="outline-container-orgf486ed2" class="outline-3">
+<h3 id="orgf486ed2">Verified output vs verified source</h3>
+<div class="outline-text-3" id="text-orgf486ed2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Level</th>
+<th scope="col" class="org-left">Meaning</th>
+<th scope="col" class="org-left">Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">L0</td>
+<td class="org-left">No executable-code generation</td>
+<td class="org-left">Viper-like verification infrastructure</td>
+</tr>
+
+<tr>
+<td class="org-left">L1</td>
+<td class="org-left">Compile verified source normally</td>
+<td class="org-left">Verus, SPARK, Liquid Haskell</td>
+</tr>
+
+<tr>
+<td class="org-left">L2</td>
+<td class="org-left">Generate executable source from verified definitions</td>
+<td class="org-left">Dafny, Stainless, Isabelle, Why3</td>
+</tr>
+
+<tr>
+<td class="org-left">L3</td>
+<td class="org-left">Proof, program extraction</td>
+<td class="org-left">Rocq, Minlog, constructive type-theory systems</td>
+</tr>
+
+<tr>
+<td class="org-left">L4</td>
+<td class="org-left">Proof-producing low-level generation</td>
+<td class="org-left">ACL2, ATC, parts of F* with KaRaMeL/Vale</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-orgdb65e31" class="outline-2">
+<h2 id="orgdb65e31">Specific runtime</h2>
+<div class="outline-text-2" id="text-orgdb65e31">
+<p>
+The key distinction is between <b>standalone generated code</b> and code that depends on a
+<b>language-specific runtime/library</b>. Also, "no special runtime" does not necessarily
+mean "zero dependencies": e.g. generated C may use the C standard library or a small
+support library.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">System</th>
+<th scope="col" class="org-left">Typical target</th>
+<th scope="col" class="org-left">Special runtime required?</th>
+<th scope="col" class="org-left">Generated code usable independently?</th>
+<th scope="col" class="org-left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><b>Rocq/Coq</b></td>
+<td class="org-left">OCaml, Haskell, Scheme</td>
+<td class="org-left">- Usually <b>no Rocq runtime</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Extracted program is ordinary target-language code. It may depend on ordinary target libraries.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Lean 4</b></td>
+<td class="org-left">C/native</td>
+<td class="org-left">+ <b>Lean runtime</b> generally required</td>
+<td class="org-left"><b>No, not completely</b></td>
+<td class="org-left">Lean's generated native code relies on Lean's runtime support for things such as memory management and runtime representations.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Isabelle/HOL</b></td>
+<td class="org-left">SML, OCaml, Haskell, Scala</td>
+<td class="org-left">- Generally <b>no Isabelle runtime</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Generated code is intended to be executable independently of Isabelle; target-language libraries/runtime still apply.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Agda</b></td>
+<td class="org-left">Haskell, JavaScript</td>
+<td class="org-left">+ <b>Target-language/runtime libraries</b></td>
+<td class="org-left"><b>Mostly yes</b></td>
+<td class="org-left">Haskell output runs under GHC/Haskell runtime; JS output needs the normal JS environment and any generated support. No Agda theorem-prover runtime is normally required.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>F*</b></td>
+<td class="org-left">OCaml, F#, C, Rust</td>
+<td class="org-left">- <b>Depends on backend</b></td>
+<td class="org-left"><b>Often yes</b></td>
+<td class="org-left">OCaml/F# can be ordinary target programs; C/Rust extraction can use generated/support libraries, depending on the F\*/KaRaMeL setup.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Why3</b></td>
+<td class="org-left">OCaml, C</td>
+<td class="org-left">- Usually <b>no Why3 runtime</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">One of the cleaner cases: extraction produces normal OCaml/C code. External libraries can of course be required.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Dafny</b></td>
+<td class="org-left">C#, Java, JS, Go, Python, etc.</td>
+<td class="org-left">+ <b>Yes, commonly</b></td>
+<td class="org-left"><b>Usually no</b></td>
+<td class="org-left">Generated programs use Dafny runtime/support libraries for Dafny types and operations. This is one of the clearest examples of runtime-dependent generation.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>ACL2/ATC</b></td>
+<td class="org-left">C</td>
+<td class="org-left">- Small/support runtime may be needed depending on features</td>
+<td class="org-left"><b>Largely yes</b></td>
+<td class="org-left">ATC is specifically designed to generate C; generated code can be very close to conventional standalone C.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>ACL2/ATJ</b></td>
+<td class="org-left">Java</td>
+<td class="org-left">± ACL2-specific support may be required</td>
+<td class="org-left"><b>Not always</b></td>
+<td class="org-left">Depends on which ACL2 constructs/features are translated.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Stainless</b></td>
+<td class="org-left">Scala, C</td>
+<td class="org-left">± Backend/runtime support depends on generated features</td>
+<td class="org-left"><b>Often yes</b></td>
+<td class="org-left">Generated Scala is normal Scala; GenC can require Stainless support/runtime for some constructs.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Verus</b></td>
+<td class="org-left">Rust</td>
+<td class="org-left">- <b>No Verus runtime</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">`spec`/`proof`/ghost material is erased; executable Rust is compiled normally. This is a particularly clean model.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>SPARK</b></td>
+<td class="org-left">Ada</td>
+<td class="org-left">- <b>No SPARK runtime in the conceptual sense</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">SPARK is a subset/methodology over Ada. Verified Ada is compiled using normal Ada toolchains/runtime as appropriate.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Liquid Haskell</b></td>
+<td class="org-left">Haskell</td>
+<td class="org-left">- <b>No Liquid Haskell runtime</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Refinements disappear; resulting program is ordinary Haskell.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Vale</b></td>
+<td class="org-left">Assembly</td>
+<td class="org-left">- <b>No Vale runtime for the generated assembly itself</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Designed specifically for low-level code; generated/verified routines can be incorporated into normal systems.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>K Framework</b></td>
+<td class="org-left">Depends on backend</td>
+<td class="org-left">± <b>Usually backend-specific</b></td>
+<td class="org-left"><b>Depends</b></td>
+<td class="org-left">K is primarily semantics/execution/verification infrastructure rather than a simple extraction pipeline.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Event-B/Rodin</b></td>
+<td class="org-left">Various</td>
+<td class="org-left">± <b>Depends on code-generation toolchain</b></td>
+<td class="org-left"><b>Depends</b></td>
+<td class="org-left">Refinement/code-generation approach rather than classical proof extraction.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>B Method</b></td>
+<td class="org-left">Ada, C, etc.</td>
+<td class="org-left">± <b>Depends on toolchain</b></td>
+<td class="org-left"><b>Usually yes</b></td>
+<td class="org-left">Generated implementation can become ordinary target-language code.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>PVS</b></td>
+<td class="org-left">Various</td>
+<td class="org-left">- <b>Not primarily an extraction system</b></td>
+<td class="org-left"><b>Depends</b></td>
+<td class="org-left">Code generation is not its central use case.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>HOL4</b></td>
+<td class="org-left">SML</td>
+<td class="org-left">- <b>No HOL runtime normally required</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Generated SML can be compiled/executed as ordinary SML.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>Minlog</b></td>
+<td class="org-left">Scheme</td>
+<td class="org-left">- <b>No Minlog runtime in the classical model</b></td>
+<td class="org-left"><b>Yes</b></td>
+<td class="org-left">Constructive proof → extracted Scheme program.</td>
+</tr>
+
+<tr>
+<td class="org-left"><b>NuPRL</b></td>
+<td class="org-left">Lisp-oriented</td>
+<td class="org-left">± Historically implementation-dependent</td>
+<td class="org-left"><b>Depends</b></td>
+<td class="org-left">More of a historical/academic example of computational extraction.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Also they can be grouped in this sense as:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Category</th>
+<th scope="col" class="org-left">Systems</th>
+<th scope="col" class="org-left">What you get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">A. Truly independent extraction</td>
+<td class="org-left">Rocq, Why3, Isabelle, Minlog, HOL4</td>
+<td class="org-left">Ordinary target-language source; no theorem-prover runtime is fundamentally part of the executable</td>
+</tr>
+
+<tr>
+<td class="org-left">B. Normal language compilation, proofs erased</td>
+<td class="org-left">Verus, SPARK, Liquid Haskell, Vale</td>
+<td class="org-left">The executable is essentially an ordinary Rust/Ada/Haskell/assembly program</td>
+</tr>
+
+<tr>
+<td class="org-left">C. Generated code + project/runtime support</td>
+<td class="org-left">Dafny, Lean, some F_/Stainless configurations, ACL2/ATJ</td>
+<td class="org-left">Generated source is usable, but some language/runtime support is normally carried along</td>
+</tr>
+
+<tr>
+<td class="org-left">D. Backend/toolchain dependent</td>
+<td class="org-left">K, Event-B, B, PVS</td>
+<td class="org-left">Whether the final artifact is standalone depends substantially on the particular backend/toolchain</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="outline-container-org04f7f74" class="outline-3">
+<h3 id="org04f7f74">The interesting cases</h3>
+<div class="outline-text-3" id="text-org04f7f74">
+</div>
+<div id="outline-container-orgb2cc0dc" class="outline-4">
+<h4 id="orgb2cc0dc">Dafny</h4>
+<div class="outline-text-4" id="text-orgb2cc0dc">
+<p>
+This is the model you're probably thinking about:
+</p>
+
+<pre class="example" id="org53643bd">
+       Dafny source
+            |
+     &lt;verification&gt; ----&gt; Z3, ...
+            |
+      Dafny compiler
+            |
+   .--------+--------.
+   |        |        |           Dafny runtime
+  C#      Java     Python ...          |
+   |        |        |                 |
+   `--------+--------'                 |
+            |                          |
+            +--------------------------'
+            |
+            v
+        executable
+</pre>
+
+<p>
+That's an important distinction if your objective is <b>"I want to give the generated
+source to somebody who doesn't have Dafny installed."</b>
+</p>
+
+<p>
+They generally don't need the Dafny compiler, but they may need the <b>Dafny runtime/support package</b>.
+</p>
+</div>
+</div>
+<div id="outline-container-org1fb8e19" class="outline-4">
+<h4 id="org1fb8e19">Rocq (Coq)</h4>
+<div class="outline-text-4" id="text-org1fb8e19">
+<p>
+Rocq is much closer to what I'd call classical <span class="underline">extraction</span>:
+</p>
+
+<pre class="example" id="org65f87c4">
+         Gallina
+            |
+    &lt;theorems proving&gt;
+            |
+       &lt;extraction&gt;
+            |
+    +-------+-------+
+    |       |       |
+    v       v       v
+ OCaml   Haskell   Scheme
+    |       |       |
+    v       v       v
+&lt;compile w/o dependencies&gt;
+</pre>
+
+<p>
+The resulting OCaml, for example, doesn't conceptually need Coq/Rocq to execute. The
+theorem prover is <b>not part of the runtime architecture</b>.
+</p>
+
+<p>
+That is a major advantage if your goal is deployment.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc25ba8d" class="outline-4">
+<h4 id="orgc25ba8d">Why3</h4>
+<div class="outline-text-4" id="text-orgc25ba8d">
+<p>
+Why3 is another particularly interesting one:
+</p>
+
+<pre class="example" id="orgaae012b">
+              WhyML
+                |
+       +--------+--------+
+       |                 |
+  verification       extraction
+       |                 |
+  SMT solvers       +----+----+
+                    |    |    |
+                 OCaml   C   Java
+</pre>
+
+<p>
+The verification infrastructure is not needed to execute the resulting program. That makes
+it quite attractive for the: <b>"Prove it here, deploy it somewhere completely unrelated."</b> model.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf0cc84d" class="outline-4">
+<h4 id="orgf0cc84d">Verus</h4>
+<div class="outline-text-4" id="text-orgf0cc84d">
+<p>
+Verus is perhaps even cleaner conceptually, because executable code is <b>already Rust</b>:
+</p>
+
+<pre class="example" id="org90295b4">
+fn verified_algorithm(...) -&gt; ... {
+    ...
+}
+
+----- alongside -----
+
+spec fn ...
+proof fn ...
+</pre>
+
+<p>
+The specification/proof portions are ghost material.
+</p>
+
+<p>
+Conceptually:
+</p>
+
+<pre class="example" id="orgd71954e">
+     Rust + proofs
+          |
+    Verus verifier
+          |
+          v
+   erase ghost code
+          |
+          v
+     ordinary Rust
+          |
+        rustc
+          |
+          v
+    native binary
+</pre>
+
+<p>
+There is <b>no Verus runtime</b> that the deployed program needs. That's a very different architecture from Dafny.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbfb0b5a" class="outline-2">
+<h2 id="orgbfb0b5a">Garbage collection</h2>
+<div class="outline-text-2" id="text-orgbfb0b5a">
+<p>
+If your concern is not merely "special verifier runtime" but also "I want predictable systems code with no GC", the classification changes substantially.
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">System/target</th>
+<th scope="col" class="org-left">Typical GC?</th>
+<th scope="col" class="org-left">Suitable for GC-free systems code?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">F* -&gt; C</td>
+<td class="org-left">No tracing GC required by C itself</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Why3 -&gt; C</td>
+<td class="org-left">No</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">ACL2 -&gt; C</td>
+<td class="org-left">No</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Verus -&gt; Rust</td>
+<td class="org-left">No tracing GC</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Vale -&gt; assembly</td>
+<td class="org-left">No</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">SPARK -&gt; Ada</td>
+<td class="org-left">No tracing GC normally</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Rocq -&gt; OCaml</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no for hard real-time/GC-free requirements</td>
+</tr>
+
+<tr>
+<td class="org-left">Isabelle -&gt; OCaml</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">F* -&gt; OCaml</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Rocq -&gt; Haskell</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Agda -&gt; Haskell</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Liquid Haskell</td>
+<td class="org-left">Yes</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Dafny -&gt; C#</td>
+<td class="org-left">Yes (.NET GC)</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Dafny -&gt; Java</td>
+<td class="org-left">Yes (JVM GC)</td>
+<td class="org-left">Usually no</td>
+</tr>
+
+<tr>
+<td class="org-left">Dafny -&gt; Python</td>
+<td class="org-left">Yes/managed memory</td>
+<td class="org-left">No for this requirement</td>
+</tr>
+
+<tr>
+<td class="org-left">Lean native</td>
+<td class="org-left">Runtime-managed</td>
+<td class="org-left">Depends heavily on application, but not equivalent to bare C</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Important distinction - 4 different questions:
+</p>
+
+<ol class="org-ol">
+<li>Does the target language normally have a garbage collector?</li>
+<li>Does the generated program require a GC?</li>
+<li>Does the generated program require a special runtime supplied by the verifier?</li>
+<li>Can the generated program use manual, ownership, region-based memory management instead?</li>
+</ol>
+
+<p>
+These must not be conflated.
+</p>
+
+<p>
+For example, C has no built-in GC:
+</p>
+
+<pre class="example" id="org586cf8e">
+C program
+    |
+    +--&gt; malloc/free
+    |
+    +--&gt; custom allocator
+    |
+    +--&gt; tracing GC library
+</pre>
+
+<p>
+And all 3 are perfectly legitimate C programs.
+</p>
+
+<p>
+Therefore: "generates C" does not automatically means "does not use GC".
+</p>
+
+<p>
+Also distinct "GC added by PA" and "GC pre-existing in the target language", e.g.:
+</p>
+
+<pre class="example" id="orgc5fe7ed">
+                 WhyML
+                   |
+              verification
+                   |
+          +--------+--------+
+          |                 |
+        OCaml               C
+          |                 |
+      OCaml GC      explicit C memory
+          |                 |
+          v                 v
+      executable        executable
+</pre>
+
+<p>
+So, for <code>Why3 -&gt; OCaml</code> you naturally get OCaml's GC, bcs you cannot remove the OCaml's GC
+from OCaml. But for extraction of C - you don't get any GC from Why3.
+</p>
+</div>
+<div id="outline-container-org21765a0" class="outline-3">
+<h3 id="org21765a0">F* (Low*, KaRaMeL)</h3>
+<div class="outline-text-3" id="text-org21765a0">
+<p>
+F* is one of the most interesting systems for this particular question.
+</p>
+
+<p>
+Low* is explicitly designed to model C-like low-level computation. Its libraries model:
+</p>
+
+<ul class="org-ul">
+<li>stack allocation</li>
+<li>heap allocation</li>
+<li>C arrays</li>
+<li>machine integers</li>
+<li>C memory</li>
+<li>system-level C functionality</li>
+</ul>
+
+<p>
+and KaRaMeL erases proofs before generating C (comparing to Why3 which can keep runtime
+asserts, if you need such ones).
+</p>
+
+<p>
+Conceptually:
+</p>
+
+<pre class="example" id="orgaa8b97e">
+F*/Low*
+    |
+    | proofs specifications
+    |
+    v
+verification
+    |
+    | erase proofs
+    |
+    v
+Low-level implementation
+    |
+    v
+    C
+    |
+    +--&gt; stack
+    |
+    +--&gt; heap
+    |
+    +--&gt; explicit allocation
+    |
+    +--&gt; no GC required
+</pre>
+
+<p>
+This is fundamentally different from:
+</p>
+
+<pre class="example" id="orgdebaca0">
+high-level functional language
+             |
+             v
+             C
+             |
+             v
+    generated GC runtime
+</pre>
+
+<p>
+Low* is specifically trying <b>to model the C memory behavior rather than hide it behind a tracing collector</b>.
+</p>
+
+<p>
+However, F* as a <b>whole</b> should not be labeled "no GC" bcs:
+</p>
+
+<pre class="example" id="orgb53f084">
+F*
+ |
+ +--&gt; OCaml backend       -&gt; OCaml GC
+ |
+ +--&gt; F# backend          -&gt; .NET GC
+ |
+ +--&gt; Low*/KaRaMeL -&gt; C   -&gt; can be GC-free
+ |
+ +--&gt; other backends      -&gt; depends
+</pre>
+
+<p>
+So F* can be treated as "backend-dependent" classification.
+</p>
+</div>
+</div>
+<div id="outline-container-org195ec38" class="outline-3">
+<h3 id="org195ec38">Dafny</h3>
+<div class="outline-text-3" id="text-org195ec38">
+<p>
+Dafny is almost the opposite example. Supposing <code>Dafny -&gt; C++</code> it does <b>not</b> follow that
+you get "normal manual-memory C++". Dafny has its own runtime, support infrastructure, and
+generated C++ can depend on that infrastructure.
+</p>
+
+<p>
+Therefore:
+</p>
+
+<pre class="example" id="org90820ae">
+  Dafny
+   |
+   v
+  C++
+   |
+   +--&gt; Dafny runtime
+   |      |
+   |      +--&gt; runtime representations
+   |      |
+   |      +--&gt; collections
+   |      |
+   |      +--&gt; memory management
+   |
+   v
+program
+</pre>
+
+<p>
+The generated C++ can therefore effectively have managed-memory semantics even though C++
+itself has no mandatory tracing GC.
+</p>
+</div>
+</div>
+<div id="outline-container-org4df3cde" class="outline-3">
+<h3 id="org4df3cde">Isabelle/HOL</h3>
+<div class="outline-text-3" id="text-org4df3cde">
+<p>
+Isabelle's code generator produces SML, OCaml, Haskell and Scala.
+</p>
+
+<p>
+Therefore the memory-management story is inherited largely from the target:
+</p>
+
+<pre class="example" id="orgc32dc97">
+Isabelle/HOL
+ |
+ +--&gt; SML      -&gt; SML runtime/GC
+ |
+ +--&gt; OCaml    -&gt; OCaml GC
+ |
+ +--&gt; Haskell  -&gt; GHC GC
+ |
+ +--&gt; Scala    -&gt; JVM GC
+</pre>
+
+<p>
+So Isabelle doesn't need an its own "Isabelle GC", but the generated program is certainly
+not necessarily GC-free.
+</p>
+</div>
+</div>
+<div id="outline-container-org32a0780" class="outline-3">
+<h3 id="org32a0780">Agda</h3>
+<div class="outline-text-3" id="text-org32a0780">
+<p>
+Agda is similar:
+</p>
+
+<pre class="example" id="org738c8e0">
+Agda
+ |
+ +--&gt; Haskell     -&gt; GHC GC
+ |
+ +--&gt; JavaScript  -&gt; JS engine GC
+</pre>
+</div>
+</div>
+<div id="outline-container-orgf7edc38" class="outline-3">
+<h3 id="orgf7edc38">Lean</h3>
+<div class="outline-text-3" id="text-orgf7edc38">
+<p>
+Lean is different.
+</p>
+
+<p>
+Lean's executable model includes a runtime system, and its compiler targets native code
+through its compilation infrastructure.
+</p>
+
+<p>
+A more accurate model for Lean is:
+</p>
+
+<pre class="example" id="orga578ae7">
+    Lean
+     |
+     v
+Lean compiler
+     |
+     v
+native code
+     |
+     +--&gt; Lean runtime
+              |
+              +--&gt; runtime representations
+              |
+              +--&gt; memory management
+              |
+              +--&gt; GC/runtime machinery
+</pre>
+</div>
+</div>
+<div id="outline-container-org53d53c3" class="outline-3">
+<h3 id="org53d53c3">ACL2/ATC</h3>
+<div class="outline-text-3" id="text-org53d53c3">
+<p>
+ACL2's ATC is interesting because it generates C and is explicitly designed as a
+proof-generating C code generator.
+</p>
+
+<p>
+The conceptual model is:
+</p>
+
+<pre class="example" id="orgfa62a11">
+       ACL2
+        |
+        | proof
+        |
+        v
+       ATC
+        |
+        v
+        C
+        |
+        v
+ordinary C compiler
+</pre>
+
+<p>
+ATC is much closer to: "generate C that follows the proved semantics" than to: "generate C
+plus a large managed-language runtime".
+</p>
+
+<p>
+So GC is <b>not normally intrinsic</b> for ACL2.
+</p>
+
+<p>
+Of course, nothing prevents the generated C program from linking against a GC library if
+the application requires one.
+</p>
+</div>
+</div>
+<div id="outline-container-org9d1c355" class="outline-3">
+<h3 id="org9d1c355">Vale</h3>
+<div class="outline-text-3" id="text-org9d1c355">
+<p>
+Vale operates at a much lower level - <a href="https://github.com/project-everest/vale">Vale</a> is a DSL/toolchain for verified ASSEMBLY (ARM,
+x86?) for F* and Dafny, see <a href="https://www.microsoft.com/en-us/research/project/project-everest-verified-secure-implementations-https-ecosystem/tools/">more</a>. The project today does not look as too alive though.
+</p>
+
+<p>
+Its generated/verified code can be incorporated into systems software without a mandatory tracing GC.
+</p>
+
+<p>
+But, just as with C or assembly generally:
+</p>
+
+<pre class="example" id="org15cc005">
+"no mandatory GC"
+       !=
+"GC impossible"
+</pre>
+
+<p>
+You can implement a GC in assembly.
+</p>
+
+<p>
+The relevant question is whether the <b>Vale-generated code requires one</b>. Normally, no.
+</p>
+</div>
+</div>
+<div id="outline-container-org5a1604e" class="outline-3">
+<h3 id="org5a1604e">HOL4</h3>
+<div class="outline-text-3" id="text-org5a1604e">
+<p>
+HOL4 can generate SML, so its extracted code uses GC of SML (not specially generated by HOL4).
+</p>
+</div>
+</div>
+<div id="outline-container-org12ca30d" class="outline-3">
+<h3 id="org12ca30d">A better overall classification</h3>
+<div class="outline-text-3" id="text-org12ca30d">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Category</th>
+<th scope="col" class="org-left">Systems</th>
+<th scope="col" class="org-left">GC status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">GC-free by design for the main low-level target</td>
+<td class="org-left">Verus → Rust, F*/Low* → C, Why3 → C, SPARK → Ada, Vale → assembly</td>
+<td class="org-left">No tracing GC required by the normal architecture</td>
+</tr>
+
+<tr>
+<td class="org-left">Generated target inherits a GC</td>
+<td class="org-left">Rocq → OCaml, Rocq → Haskell, Isabelle → OCaml/Haskell/SML/Scala, Agda → Haskell, Liquid Haskell → Haskell, HOL4 → SML, Minlog → Scheme</td>
+<td class="org-left">GC normally present</td>
+</tr>
+
+<tr>
+<td class="org-left">Special runtime/managed execution model</td>
+<td class="org-left">Dafny, Lean</td>
+<td class="org-left">GC/managed memory can be part of runtime architecture</td>
+</tr>
+
+<tr>
+<td class="org-left">Backend-dependent</td>
+<td class="org-left">F*, Stainless, ACL2, B/Event-B, K, PVS</td>
+<td class="org-left">Must inspect particular backend</td>
+</tr>
+
+<tr>
+<td class="org-left">Not primarily executable-code generators</td>
+<td class="org-left">Viper, some PVS/K workflows</td>
+<td class="org-left">GC question is not directly applicable</td>
+</tr>
+
+<tr>
+<td class="org-left">Can deliberately verify a GC itself</td>
+<td class="org-left">Rocq/CertiCoq ecosystem, verified-GC projects</td>
+<td class="org-left">GC can itself be a formally verified component</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+There are actually <b>3 independent axes</b>:
+</p>
+
+<pre class="example" id="org4829a4d">
+                       GENERATED PROGRAM
+                              |
+             +----------------+----------------+
+             |                                 |
+          managed                          explicit
+             |                               memory
+             |                                 |
+       +-----+-----+                    +------+------+
+       |           |                    |             |
+      GC       RC/other              malloc,       ownership,
+       |                              free         regions
+       |
+       v
+runtime support
+</pre>
+
+<p>
+So "GC or no GC" is not the whole story.
+</p>
+
+<p>
+For systems programming, this it a richer classification:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Memory model</th>
+<th scope="col" class="org-left">Examples</th>
+<th scope="col" class="org-left">Main characteristic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">Tracing GC</td>
+<td class="org-left">Dafny managed targets, Lean runtime, OCaml, Haskell, JVM/Scala</td>
+<td class="org-left">Automatic object reclamation</td>
+</tr>
+
+<tr>
+<td class="org-left">Reference counting</td>
+<td class="org-left">Possible in generated/runtime code</td>
+<td class="org-left">Deterministic reclamation but reference cycles need handling</td>
+</tr>
+
+<tr>
+<td class="org-left">Ownership/borrowing</td>
+<td class="org-left">Verus/Rust</td>
+<td class="org-left">Compile-time resource management</td>
+</tr>
+
+<tr>
+<td class="org-left">Manual allocation</td>
+<td class="org-left">Low*/C, Why3/C, ordinary C</td>
+<td class="org-left">Programmer/program proof controls allocation/deallocation</td>
+</tr>
+
+<tr>
+<td class="org-left">Regions/arenas</td>
+<td class="org-left">Low-level verified systems, some functional implementations</td>
+<td class="org-left">Lifetime is controlled by region</td>
+</tr>
+
+<tr>
+<td class="org-left">Stack/static</td>
+<td class="org-left">SPARK, Low* portions</td>
+<td class="org-left">No general heap required</td>
+</tr>
+
+<tr>
+<td class="org-left">Hybrid</td>
+<td class="org-left">F*, Stainless, custom runtimes</td>
+<td class="org-left">Different types/data structures can use different strategies</td>
+</tr>
+
+<tr>
+<td class="org-left">Verified GC</td>
+<td class="org-left">CertiCoq/verified-GC research</td>
+<td class="org-left">GC exists, but its behavior can itself be formally verified</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org0f9f398" class="outline-3">
+<h3 id="org0f9f398">The surprising case: C + verified GC</h3>
+<div class="outline-text-3" id="text-org0f9f398">
+<p>
+This is why the CertiCoq ecosystem is particularly interesting.
+</p>
+
+<p>
+It is possible to have:
+</p>
+
+<pre class="example" id="orgce5b2f8">
+               Rocq
+                 |
+           proof/program
+                 |
+             CertiCoq
+                 |
+                 v
+             generated C
+                 |
+        +--------+--------+
+        |                 |
+   application        verified GC
+        |                 |
+        +--------+--------+
+                 |
+                 v
+           machine code
+</pre>
+
+<p>
+So there is nothing contradictory about:
+</p>
+
+<pre class="example" id="orge37fc76">
+      "C code"
+         +
+"garbage collection"
+         +
+"formally verified"
+</pre>
+
+<p>
+C doesn't prohibit GC; it simply doesn't provide one as part of the language.
+</p>
+
+<p>
+Reduce the enormous table:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">System</th>
+<th scope="col" class="org-left">Target</th>
+<th scope="col" class="org-left">GC mandatory?</th>
+<th scope="col" class="org-left">Special runtime mandatory?</th>
+<th scope="col" class="org-left">Explicit memory possible?</th>
+<th scope="col" class="org-left">Ownership/regions possible?</th>
+<th scope="col" class="org-left">Particularly suitable for systems code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">F*/Low*</td>
+<td class="org-left">C</td>
+<td class="org-left">NO</td>
+<td class="org-left">NO in the Low/C model</td>
+<td class="org-left">YES</td>
+<td class="org-left">YES/modeled regions</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Why3</td>
+<td class="org-left">C</td>
+<td class="org-left">NO</td>
+<td class="org-left">NO</td>
+<td class="org-left">YES</td>
+<td class="org-left">Limited/model-dependent</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">ACL2/ATC</td>
+<td class="org-left">C</td>
+<td class="org-left">NO normally</td>
+<td class="org-left">NO normally</td>
+<td class="org-left">YES</td>
+<td class="org-left">C-style</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Verus</td>
+<td class="org-left">Rust</td>
+<td class="org-left">NO</td>
+<td class="org-left">NO</td>
+<td class="org-left">Controlled by Rust</td>
+<td class="org-left">YES</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">SPARK</td>
+<td class="org-left">Ada</td>
+<td class="org-left">NO normally</td>
+<td class="org-left">NO</td>
+<td class="org-left">YES</td>
+<td class="org-left">YES</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Vale</td>
+<td class="org-left">Assembly</td>
+<td class="org-left">NO</td>
+<td class="org-left">NO</td>
+<td class="org-left">YES</td>
+<td class="org-left">Explicit low-level</td>
+<td class="org-left">YES</td>
+</tr>
+
+<tr>
+<td class="org-left">Dafny</td>
+<td class="org-left">C++/other</td>
+<td class="org-left">Potentially/runtime-managed</td>
+<td class="org-left">YES support runtime</td>
+<td class="org-left">Abstracted by runtime</td>
+<td class="org-left">Not primary model</td>
+<td class="org-left">Depends</td>
+</tr>
+
+<tr>
+<td class="org-left">Rocq/CertiCoq</td>
+<td class="org-left">C</td>
+<td class="org-left">Can be YES</td>
+<td class="org-left">Runtime/support may be required</td>
+<td class="org-left">YES</td>
+<td class="org-left">Possible</td>
+<td class="org-left">YES, especially research/verified-runtime scenarios</td>
+</tr>
+
+<tr>
+<td class="org-left">F -&gt; OCaml</td>
+<td class="org-left">OCaml</td>
+<td class="org-left">YES</td>
+<td class="org-left">NO F runtime necessarily</td>
+<td class="org-left">Abstracted</td>
+<td class="org-left">Not the Low model</td>
+<td class="org-left">Less suitable for GC-free systems code</td>
+</tr>
+
+<tr>
+<td class="org-left">Rocq -&gt; OCaml</td>
+<td class="org-left">OCaml</td>
+<td class="org-left">YES</td>
+<td class="org-left">NO Coq runtime</td>
+<td class="org-left">Abstracted</td>
+<td class="org-left">Not normally the goal</td>
+<td class="org-left">Excellent verified functional code</td>
+</tr>
+
+<tr>
+<td class="org-left">Why3 -&gt; OCaml</td>
+<td class="org-left">OCaml</td>
+<td class="org-left">YES</td>
+<td class="org-left">NO Why3 runtime</td>
+<td class="org-left">Abstracted</td>
+<td class="org-left">Not normally the goal</td>
+<td class="org-left">Excellent verified functional code</td>
+</tr>
+
+<tr>
+<td class="org-left">Isabelle -&gt; OCaml/Haskell/SML</td>
+<td class="org-left">Managed functional targets</td>
+<td class="org-left">YES</td>
+<td class="org-left">NO Isabelle runtime</td>
+<td class="org-left">Abstracted</td>
+<td class="org-left">Not normally the goal</td>
+<td class="org-left">Excellent verified functional code</td>
+</tr>
+
+<tr>
+<td class="org-left">Agda -&gt; Haskell</td>
+<td class="org-left">Haskell</td>
+<td class="org-left">YES</td>
+<td class="org-left">NO Agda runtime</td>
+<td class="org-left">Abstracted</td>
+<td class="org-left">Not normally the goal</td>
+<td class="org-left">Excellent dependent functional code</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-orgba53391" class="outline-3">
+<h3 id="orgba53391">Bottom line</h3>
+<div class="outline-text-3" id="text-orgba53391">
+<p>
+So, <b>yes: there absolutely are provers/formal-verification systems where the generated
+language is C/C++ but the resulting program can still have a garbage collector.</b>
+</p>
+
+<p>
+The cleanest conceptual distinction is:
+</p>
+
+<pre class="example" id="org83fafd6">
+                   C/C++
+                     |
+          +----------+----------+
+          |                     |
+       GC-based             GC-free
+          |                     |
+   runtime/collector       malloc/free
+          |                 ownership
+          |                  regions
+          |                  arenas
+          |                     |
+   CertiCoq-style         Low*/KaRaMeL
+   / Dafny-style             Why3/C
+                            ACL2/ATC
+</pre>
+
+<blockquote>
+<p>
+CertiRocq-generated code normally relies on a CertiRocq runtime, and that runtime includes
+a generational garbage collector.
+</p>
+
+<p>
+See: <a href="https://github-wiki-see.page/m/CertiRocq/certirocq/wiki/Memory-Model-and-Garbage-Collection">"Memory Model and Garbage Collection - CertiRocq"</a>
+</p>
+
+<p>
+And: <a href="https://www.researchgate.net/publication/336454132_Certifying_graph-manipulating_C_programs_via_localizations_within_data_structures">"Certifying graph-manipulating C programs via localizations within data structures"</a>
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
