@@ -1,0 +1,119 @@
+#+title: Why3: trace but effects
+#+description: Why3
+#+keywords: Why3,Theorem,Proving
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Why3 Theorem Proving
+#+date: <2026-10-07 Wed 19:18>
+
+* The task
+
+Real world example. I was asked: will the application make some insecure call if some
+special setting was set in the configuration file? I was sure, it won't. I thought the
+application followed this policy and that this setting allowed you to prevent the
+execution of unsafe code. I was wrong. How to check it?
+
+* Why3 approach
+
+*Why3 has not effects system*. But they can be modeled - with a /ghost effect log/. The idea
+is simple: effectful (or insecure, or the ones that interest you) functions will "log"
+when they are called. In some special "ghost log", then we can check the log - if it was
+changed then they were called. It's called "ghost" bcs it is not planned to exist in the
+real code (for example after extraction of C, Ocaml, etc from the model). The log can be
+very simple record with mutable fields: one per a function:
+
+#+begin_example
+  type trace = { mutable f1_calls: int }
+#+end_example
+
+Here we trace/log only one function: ~f1~. I made it integer, bcs I wanted to be able to
+check the fact of call many times: it any particular function (so, it is not just ~bool~).
+
+The whole code is:
+
+#+begin_example
+ 1   module Call1
+ 2     use int.Int
+ 3   
+ 4     type trace = { mutable f1_calls: int }
+ 5   
+ 6     let ghost trace : trace = { f1_calls = 0 }
+ 7   
+ 8     predicate f1_was_called (before after: int) = after = before + 1
+ 9     predicate f1_was_not_called (before after: int) = after = before  
+10   
+11     let ghost f1 () : unit
+12       writes { trace.f1_calls }
+13       ensures { f1_was_called (old trace.f1_calls) trace.f1_calls }
+14     =
+15       trace.f1_calls <- trace.f1_calls + 1
+16   
+17     let f2 (a1: int) : int
+18       ensures { a1 = 0 -> f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+19       ensures { a1 <> 0 -> f1_was_called (old trace.f1_calls) trace.f1_calls }
+20     =
+21       if a1 = 0 then 100
+22       else begin
+23         f1 ();
+24         101
+25       end
+26   
+27     let main () : unit
+28       requires { trace.f1_calls = 0 }
+29       ensures { trace.f1_calls > 0 }
+30     =
+31       let _ = f2 2 in
+32       ()
+33   
+34   end
+#+end_example
+
+I added 2 predicates: ~f1_was_called~ and ~f1_was_not_called~. They check the ghost and
+mutable counter in the ghost trace (log).
+
+The idea of this simple example is to demonstrate that you can check the fact that some
+interesting function ~f1~ was (or was not) called. See at ~main~: we check exactly this with
+its ~ensures {..}~, we just need to provide some help to Why3, for example, that the
+initial value of the counter was 0.
+
+We simulate nested function calls with additional function ~f2~. So, ~ensures {..}~ on 29
+line tells - "the ~main~ has ~f1~ effect". You can check the opposite as well (that it has
+not ~f1~ effect):
+
+#+begin_example
+ let main () : unit
+   requires { trace.f1_calls = 0 }
+   ensures { trace.f1_calls = 0 }
+ =
+   let _ = f2 0 in
+   ()
+#+end_example
+
+Why did we need ~ensures {..}~ postconditions on ~f2~ for example? IT does not look as a
+black box, yes?
+
+#+begin_quote
+Why3 verification is modular.
+#+end_quote
+
+When proving a caller of ~f2~, Why3 *uses the contract of ~f2~, not its implementation!*
+
+So if we have:
+
+#+begin_example
+let main () : unit
+  requires { trace.f1_calls = 0 }
+  ensures {
+    f1_was_called (old trace.f1_calls) trace.f1_calls
+  }
+=
+  let _ = f2 1 in
+  ()
+#+end_example
+
+and ~f2~ has no relevant postcondition, *Why3 has no reason to believe* that calling ~f2 1~
+changes the counter!
+
+Even though it can see the implementation while verifying ~f2~ itself, *that
+implementation is not automatically propagated into callers.*
