@@ -24,7 +24,7 @@ real code (for example after extraction of C, Ocaml, etc from the model). The lo
 very simple record with mutable fields: one per a function:
 
 #+begin_example
-  type trace = { mutable f1_calls: int }
+type trace = { mutable f1_calls: int }
 #+end_example
 
 Here we trace/log only one function: ~f1~. I made it integer, bcs I wanted to be able to
@@ -117,3 +117,58 @@ changes the counter!
 
 Even though it can see the implementation while verifying ~f2~ itself, *that
 implementation is not automatically propagated into callers.*
+
+To reason about ~f2~, Why3 needs its contract, call it "a passport" - what is it? What
+does it do? Well... ~f2~ can be... a BLACK BOX! It can be "abstract", to be only a
+contract!
+
+See:
+
+#+begin_example
+ 1   module Call1
+ 2     use int.Int
+ 3   
+ 4     type trace = { mutable f1_calls: int }
+ 5   
+ 6     let ghost trace : trace = { f1_calls = 0 }
+ 7   
+ 8     predicate f1_was_called (before after: int) = after = before + 1
+ 9     predicate f1_was_not_called (before after: int) = after = before  
+10   
+11     let ghost f1 () : unit
+12       writes { trace.f1_calls }
+13       ensures { f1_was_called (old trace.f1_calls) trace.f1_calls }
+14     =
+15       trace.f1_calls <- trace.f1_calls + 1
+16   
+17     val f2 (a1: int) : int
+18       writes { trace.f1_calls }
+19       ensures { result = if a1 = 0 then 100 else 101 }
+20       ensures { a1 = 0 -> f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+21       ensures { a1 <> 0 -> f1_was_called (old trace.f1_calls) trace.f1_calls }
+22   
+23     let main () : unit
+24       requires { trace.f1_calls = 0 }
+25       ensures { trace.f1_calls = 0 }
+26     =
+27       let _ = f2 0 in
+28       ()
+29   
+30   end
+#+end_example
+
+Look at ~f2~ now: it specifies when ~f1~ effect happens. Also it specifies (and it's
+important to avoid a warning that ~trace~ actually is not changed) that ~f2~ MAY CHANGE
+~trace.f1_calls~.
+
+* Semantic of predicates
+
+If we mean "one or more calls" (to check that ~f1~ effect happened somewhere in the depth
+of nested calls), then the predicate could be:
+
+#+begin_example
+predicate f1_was_called (before after: int) = after > before
+#+end_example
+
+Similar technique is used in many other Proof Assistants.
+

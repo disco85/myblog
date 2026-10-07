@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-07 Wed 20:15 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why3: trace but effects</title>
+<meta name="description" content="Why3" />
+<meta name="keywords" content="Why3,Theorem,Proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Why3: trace but effects</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org604b9f9">The task</a></li>
+<li><a href="#org6376f53">Why3 approach</a></li>
+<li><a href="#orgacc8168">Semantic of predicates</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org604b9f9" class="outline-2">
+<h2 id="org604b9f9">The task</h2>
+<div class="outline-text-2" id="text-org604b9f9">
+<p>
+Real world example. I was asked: will the application make some insecure call if some
+special setting was set in the configuration file? I was sure, it won't. I thought the
+application followed this policy and that this setting allowed you to prevent the
+execution of unsafe code. I was wrong. How to check it?
+</p>
+</div>
+</div>
+<div id="outline-container-org6376f53" class="outline-2">
+<h2 id="org6376f53">Why3 approach</h2>
+<div class="outline-text-2" id="text-org6376f53">
+<p>
+<b>Why3 has not effects system</b>. But they can be modeled - with a <i>ghost effect log</i>. The idea
+is simple: effectful (or insecure, or the ones that interest you) functions will "log"
+when they are called. In some special "ghost log", then we can check the log - if it was
+changed then they were called. It's called "ghost" bcs it is not planned to exist in the
+real code (for example after extraction of C, Ocaml, etc from the model). The log can be
+very simple record with mutable fields: one per a function:
+</p>
+
+<pre class="example" id="org2cc1a1d">
+type trace = { mutable f1_calls: int }
+</pre>
+
+<p>
+Here we trace/log only one function: <code>f1</code>. I made it integer, bcs I wanted to be able to
+check the fact of call many times: it any particular function (so, it is not just <code>bool</code>).
+</p>
+
+<p>
+The whole code is:
+</p>
+
+<pre class="example" id="orga588c46">
+ 1   module Call1
+ 2     use int.Int
+ 3   
+ 4     type trace = { mutable f1_calls: int }
+ 5   
+ 6     let ghost trace : trace = { f1_calls = 0 }
+ 7   
+ 8     predicate f1_was_called (before after: int) = after = before + 1
+ 9     predicate f1_was_not_called (before after: int) = after = before  
+10   
+11     let ghost f1 () : unit
+12       writes { trace.f1_calls }
+13       ensures { f1_was_called (old trace.f1_calls) trace.f1_calls }
+14     =
+15       trace.f1_calls &lt;- trace.f1_calls + 1
+16   
+17     let f2 (a1: int) : int
+18       ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+19       ensures { a1 &lt;&gt; 0 -&gt; f1_was_called (old trace.f1_calls) trace.f1_calls }
+20     =
+21       if a1 = 0 then 100
+22       else begin
+23         f1 ();
+24         101
+25       end
+26   
+27     let main () : unit
+28       requires { trace.f1_calls = 0 }
+29       ensures { trace.f1_calls &gt; 0 }
+30     =
+31       let _ = f2 2 in
+32       ()
+33   
+34   end
+</pre>
+
+<p>
+I added 2 predicates: <code>f1_was_called</code> and <code>f1_was_not_called</code>. They check the ghost and
+mutable counter in the ghost trace (log).
+</p>
+
+<p>
+The idea of this simple example is to demonstrate that you can check the fact that some
+interesting function <code>f1</code> was (or was not) called. See at <code>main</code>: we check exactly this with
+its <code>ensures {..}</code>, we just need to provide some help to Why3, for example, that the
+initial value of the counter was 0.
+</p>
+
+<p>
+We simulate nested function calls with additional function <code>f2</code>. So, <code>ensures {..}</code> on 29
+line tells - "the <code>main</code> has <code>f1</code> effect". You can check the opposite as well (that it has
+not <code>f1</code> effect):
+</p>
+
+<pre class="example" id="org0c19bd9">
+ let main () : unit
+   requires { trace.f1_calls = 0 }
+   ensures { trace.f1_calls = 0 }
+ =
+   let _ = f2 0 in
+   ()
+</pre>
+
+<p>
+Why did we need <code>ensures {..}</code> postconditions on <code>f2</code> for example? IT does not look as a
+black box, yes?
+</p>
+
+<blockquote>
+<p>
+Why3 verification is modular.
+</p>
+</blockquote>
+
+<p>
+When proving a caller of <code>f2</code>, Why3 <b>uses the contract of <code>f2</code>, not its implementation!</b>
+</p>
+
+<p>
+So if we have:
+</p>
+
+<pre class="example" id="orgd53bfb2">
+let main () : unit
+  requires { trace.f1_calls = 0 }
+  ensures {
+    f1_was_called (old trace.f1_calls) trace.f1_calls
+  }
+=
+  let _ = f2 1 in
+  ()
+</pre>
+
+<p>
+and <code>f2</code> has no relevant postcondition, <b>Why3 has no reason to believe</b> that calling <code>f2 1</code>
+changes the counter!
+</p>
+
+<p>
+Even though it can see the implementation while verifying <code>f2</code> itself, <b>that
+implementation is not automatically propagated into callers.</b>
+</p>
+
+<p>
+To reason about <code>f2</code>, Why3 needs its contract, call it "a passport" - what is it? What
+does it do? Well... <code>f2</code> can be... a BLACK BOX! It can be "abstract", to be only a
+contract!
+</p>
+
+<p>
+See:
+</p>
+
+<pre class="example" id="org528d7f5">
+ 1   module Call1
+ 2     use int.Int
+ 3   
+ 4     type trace = { mutable f1_calls: int }
+ 5   
+ 6     let ghost trace : trace = { f1_calls = 0 }
+ 7   
+ 8     predicate f1_was_called (before after: int) = after = before + 1
+ 9     predicate f1_was_not_called (before after: int) = after = before  
+10   
+11     let ghost f1 () : unit
+12       writes { trace.f1_calls }
+13       ensures { f1_was_called (old trace.f1_calls) trace.f1_calls }
+14     =
+15       trace.f1_calls &lt;- trace.f1_calls + 1
+16   
+17     val f2 (a1: int) : int
+18       writes { trace.f1_calls }
+19       ensures { result = if a1 = 0 then 100 else 101 }
+20       ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+21       ensures { a1 &lt;&gt; 0 -&gt; f1_was_called (old trace.f1_calls) trace.f1_calls }
+22   
+23     let main () : unit
+24       requires { trace.f1_calls = 0 }
+25       ensures { trace.f1_calls = 0 }
+26     =
+27       let _ = f2 0 in
+28       ()
+29   
+30   end
+</pre>
+
+<p>
+Look at <code>f2</code> now: it specifies when <code>f1</code> effect happens. Also it specifies (and it's
+important to avoid a warning that <code>trace</code> actually is not changed) that <code>f2</code> MAY CHANGE
+<code>trace.f1_calls</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgacc8168" class="outline-2">
+<h2 id="orgacc8168">Semantic of predicates</h2>
+<div class="outline-text-2" id="text-orgacc8168">
+<p>
+If we mean "one or more calls" (to check that <code>f1</code> effect happened somewhere in the depth
+of nested calls), then the predicate could be:
+</p>
+
+<pre class="example" id="org981c759">
+predicate f1_was_called (before after: int) = after &gt; before
+</pre>
+
+<p>
+Similar technique is used in many other Proof Assistants.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
