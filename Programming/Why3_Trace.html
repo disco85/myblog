@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-10-07 Wed 20:15 -->
+<!-- 2026-10-07 Wed 21:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Why3: trace but effects</title>
@@ -314,6 +314,7 @@ function toggleTheme() {
 <ul>
 <li><a href="#org604b9f9">The task</a></li>
 <li><a href="#org6376f53">Why3 approach</a></li>
+<li><a href="#orge4f0c8c">The whole model</a></li>
 <li><a href="#orgacc8168">Semantic of predicates</a></li>
 </ul>
 </div>
@@ -341,7 +342,7 @@ real code (for example after extraction of C, Ocaml, etc from the model). The lo
 very simple record with mutable fields: one per a function:
 </p>
 
-<pre class="example" id="org2cc1a1d">
+<pre class="example" id="org90dc60e">
 type trace = { mutable f1_calls: int }
 </pre>
 
@@ -354,7 +355,7 @@ check the fact of call many times: it any particular function (so, it is not jus
 The whole code is:
 </p>
 
-<pre class="example" id="orga588c46">
+<pre class="example" id="org0817719">
  1   module Call1
  2     use int.Int
  3   
@@ -409,7 +410,7 @@ line tells - "the <code>main</code> has <code>f1</code> effect". You can check t
 not <code>f1</code> effect):
 </p>
 
-<pre class="example" id="org0c19bd9">
+<pre class="example" id="org6d95f89">
  let main () : unit
    requires { trace.f1_calls = 0 }
    ensures { trace.f1_calls = 0 }
@@ -437,7 +438,7 @@ When proving a caller of <code>f2</code>, Why3 <b>uses the contract of <code>f2<
 So if we have:
 </p>
 
-<pre class="example" id="orgd53bfb2">
+<pre class="example" id="orgf887b92">
 let main () : unit
   requires { trace.f1_calls = 0 }
   ensures {
@@ -461,14 +462,15 @@ implementation is not automatically propagated into callers.</b>
 <p>
 To reason about <code>f2</code>, Why3 needs its contract, call it "a passport" - what is it? What
 does it do? Well... <code>f2</code> can be... a BLACK BOX! It can be "abstract", to be only a
-contract!
+contract! We introduce such a function not with <code>let ...</code> but with <code>val ...</code>! And it has
+not a body.
 </p>
 
 <p>
 See:
 </p>
 
-<pre class="example" id="org528d7f5">
+<pre class="example" id="org9d91a1b">
  1   module Call1
  2     use int.Int
  3   
@@ -506,6 +508,80 @@ Look at <code>f2</code> now: it specifies when <code>f1</code> effect happens. A
 important to avoid a warning that <code>trace</code> actually is not changed) that <code>f2</code> MAY CHANGE
 <code>trace.f1_calls</code>.
 </p>
+
+<p>
+OK. Now lets return to the original task: <code>main</code> embodies such a function that should be
+verified about an effect, but we can do it with <code>f2</code> too:
+</p>
+
+<pre class="example" id="org81d843b">
+ 1   let f2 (a1: int) : int
+ 2     writes { trace.f1_calls }
+ 3     ensures { result = if a1 = 0 then 100 else 101 }
+ 4     ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+ 5     ensures { a1 &lt;&gt; 0 -&gt; f1_was_called (old trace.f1_calls) trace.f1_calls }
+ 6   = if a1 = 0 then begin
+ 7      f1 ();        (* DENIES THE CONTRACT ! *)
+ 8      100
+ 9     end
+10     else begin
+11       f1 ();
+12       101
+13     end
+</pre>
+
+<p>
+And <b>this demonstrate the original task ideally!</b> Look - we are sure that:
+</p>
+
+<ul class="org-ul">
+<li>if the setting (<code>a1</code>) is 0 then <code>f1</code> effect will not happen</li>
+<li>else <code>f1</code> effect will happen</li>
+</ul>
+
+<p>
+<b>this is our expectation.</b> This is what we think about the function <code>f2</code>.
+</p>
+
+<p>
+The result of our proving :
+</p>
+
+<pre class="example" id="org7af0306">
+$ why3 prove Call1.mlw -P z3 
+File Call1.mlw:
+Goal f1'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File Call1.mlw:
+Goal f2'vc.
+Prover result is: Unknown (sat) (0.00s, 258 steps).
+
+File Call1.mlw:
+Goal main'vc.
+Prover result is: Valid (0.00s, 40 steps).
+</pre>
+
+<p>
+and it happens bcs the body modeled the behavior of some real existing function denies its
+contract - our expectation about the behavior of <code>f2</code>: when the setting <code>a1</code> is 0 which
+means "don't call the insecure function <code>f1</code>", the body actually calls it.
+</p>
+</div>
+</div>
+<div id="outline-container-orge4f0c8c" class="outline-2">
+<h2 id="orge4f0c8c">The whole model</h2>
+<div class="outline-text-2" id="text-orge4f0c8c">
+<p>
+We modeled our task as:
+</p>
+
+<ul class="org-ul">
+<li><code>a1</code> is our setting from the configuration file</li>
+<li><code>f1</code> is our insecure function</li>
+<li><code>trace</code> is ghost and it is used only for verification</li>
+<li>verified functions can be represented abstractly</li>
+</ul>
 </div>
 </div>
 <div id="outline-container-orgacc8168" class="outline-2">
@@ -516,7 +592,7 @@ If we mean "one or more calls" (to check that <code>f1</code> effect happened so
 of nested calls), then the predicate could be:
 </p>
 
-<pre class="example" id="org981c759">
+<pre class="example" id="org18c9114">
 predicate f1_was_called (before after: int) = after &gt; before
 </pre>
 

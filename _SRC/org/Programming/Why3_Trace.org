@@ -120,7 +120,8 @@ implementation is not automatically propagated into callers.*
 
 To reason about ~f2~, Why3 needs its contract, call it "a passport" - what is it? What
 does it do? Well... ~f2~ can be... a BLACK BOX! It can be "abstract", to be only a
-contract!
+contract! We introduce such a function not with ~let ...~ but with ~val ...~! And it has
+not a body.
 
 See:
 
@@ -160,6 +161,62 @@ See:
 Look at ~f2~ now: it specifies when ~f1~ effect happens. Also it specifies (and it's
 important to avoid a warning that ~trace~ actually is not changed) that ~f2~ MAY CHANGE
 ~trace.f1_calls~.
+
+OK. Now lets return to the original task: ~main~ embodies such a function that should be
+verified about an effect, but we can do it with ~f2~ too:
+
+#+begin_example
+ 1   let f2 (a1: int) : int
+ 2     writes { trace.f1_calls }
+ 3     ensures { result = if a1 = 0 then 100 else 101 }
+ 4     ensures { a1 = 0 -> f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+ 5     ensures { a1 <> 0 -> f1_was_called (old trace.f1_calls) trace.f1_calls }
+ 6   = if a1 = 0 then begin
+ 7      f1 ();        (* DENIES THE CONTRACT ! *)
+ 8      100
+ 9     end
+10     else begin
+11       f1 ();
+12       101
+13     end
+#+end_example
+
+And *this demonstrate the original task ideally!* Look - we are sure that:
+
+- if the setting (~a1~) is 0 then ~f1~ effect will not happen
+- else ~f1~ effect will happen
+
+*this is our expectation.* This is what we think about the function ~f2~.
+
+The result of our proving :
+
+#+begin_example
+$ why3 prove Call1.mlw -P z3 
+File Call1.mlw:
+Goal f1'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File Call1.mlw:
+Goal f2'vc.
+Prover result is: Unknown (sat) (0.00s, 258 steps).
+
+File Call1.mlw:
+Goal main'vc.
+Prover result is: Valid (0.00s, 40 steps).
+#+end_example
+
+and it happens bcs the body modeled the behavior of some real existing function denies its
+contract - our expectation about the behavior of ~f2~: when the setting ~a1~ is 0 which
+means "don't call the insecure function ~f1~", the body actually calls it.
+
+* The whole model
+
+We modeled our task as:
+
+- ~a1~ is our setting from the configuration file
+- ~f1~ is our insecure function
+- ~trace~ is ghost and it is used only for verification
+- verified functions can be represented abstractly
 
 * Semantic of predicates
 
