@@ -73,7 +73,7 @@ i.e., ~f2~ cannot be proven. What does it mean?
 
 * Messages
 
-See [[https://why3.org/api/Call_provers.html][this]]:
+See [[https://why3.org/api/Call_provers.html][this]] - it is the source code of Why3:
 
 #+name: prover_answer
 #+begin_example
@@ -211,6 +211,131 @@ has a documentation listing these functions-commands - [[https://microsoft.githu
 - ~(=> P Q)~ is classical implication.
 - ~(check-sat)~ asks Z3 whether all the asserted constraints can be satisfied simultaneously.
 
+Lets rewrite this SMT commands *IGNORING CURRENTLY LEADING "NOT"* (it's like to write ~G~ remembering
+that the whole formula is ~¬G~), ok, so ~G~:
+
+#+begin_example
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -> 100 = (a1=0 /\ 100)
+                   \/
+                   (a1≠0 /\ 101)
+             /\
+             (a1=0 -> t2=t1)
+             /\
+             (a1≠0 -> t2=t1+1)
+\/             
+a1≠0
+  /\
+  t2=t1+1 -> 101 = (a1=0 /\ 100)
+                   \/
+                   (a1≠0 /\ 101)
+             /\
+             (a1=0 -> t2=t1)
+             /\
+             (a1≠0 -> t2=t1+1)
+#+end_example
+
+#+begin_example
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -> 100 = 100
+             /\
+             (⊤ -> ⊥)
+             /\
+             (⊥ -> ⊤)
+\/             
+a1≠0
+  /\
+  t2=t1+1 -> 101 = ⊥
+                   \/
+                   101
+             /\
+             (⊥ -> ⊥)
+             /\
+             (⊤ -> ⊤)
+#+end_example
+
+#+begin_example
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -> ⊤
+             /\
+             ⊥
+             /\
+             ⊤
+\/             
+a1≠0
+  /\
+  t2=t1+1 -> 101 = 101
+             /\
+             ⊤
+             /\
+             ⊤
+#+end_example
+
+#+begin_example
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -> ⊥
+\/             
+a1≠0
+  /\
+  t2=t1+1 -> ⊤
+#+end_example
+
+Now, looking at the implication's truth table:
+
+| p | q | p->q |
+|---+---+------|
+| 0 | 0 |    1 |
+| 0 | 1 |    1 |
+| 1 | 0 |    0 |
+| 1 | 1 |    1 |
+
+we see that (see the result ~p->q~ relative to ~p~, ~q~ is ~⊥~ or ~⊤~):
+
+#+begin_example
+P -> ⊥ ≡ ¬P
+P -> ⊤ ≡ ⊤
+#+end_example
+
+taking these 2 into account we get now:
+
+#+begin_example
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  ¬(t2=t1+1)
+\/             
+a1≠0
+  /\
+  ⊤
+#+end_example
+
+We can write it as ~∀a1,t1,t2∈Z: t2≠t1+1 \/ a1≠0~. SMT works with integer domain and easy finds
+counterexamples, e.g., ~t2=6~, ~t1=5~ and ~t2=t1+1~ in this case which is a contradiction to the 
+universal quantifiers telling "for ANY integers", any, at least for 5, 6 it is not true. We ignored
+negation, so this is ~G~ and it's false, ~¬G~ though is true. It leads to "sat" answer from SMT.
+
+What is this? *This is a successful prof treating by Why3 as proving that ~f2~ is Unknown*. Why?
+Because ~a1=0 /\ ...~ and ~a1≠0 /\ ...~ are ~ensures {..}~ in our ~f2~:
+
+#+begin_example
+...
+    ensures { a1 = 0 -> f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+    ensures { a1 <> 0 -> f1_was_called (old trace.f1_calls) trace.f1_calls }
+...
+#+end_example
+
+This is the first way to understand the reason of ~Unknown~.
+
+
+TODO
 
 -------------------------------------------------------------
 
