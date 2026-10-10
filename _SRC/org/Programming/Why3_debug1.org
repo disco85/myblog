@@ -334,8 +334,104 @@ Because ~a1=0 /\ ...~ and ~a1≠0 /\ ...~ are ~ensures {..}~ in our ~f2~:
 
 This is the first way to understand the reason of ~Unknown~.
 
+* Theory printing
+
+Another way to see how Why3 came to the conclusion ~Unknown~ is to print the whole theory with:
+
+#+begin_example
+$ why3 prove Call1.mlw -P z3 --print-theory
+#+end_example
+
+The result is:
+
+#+begin_example
+ 1   theory Call1
+ 2     
+ 3     (* use why3.BuiltIn.BuiltIn *)
+ 4     
+ 5     (* use why3.Bool.Bool *)
+ 6     
+ 7     (* use why3.Unit.Unit *)
+ 8     
+ 9     (* use int.Int *)
+10     
+11     type trace =
+12       | Trace'mk (f1_calls:int)
+13     
+14     (* meta model_record function f1_calls *)
+15     
+16     predicate f1_was_called (before:int) (after:int) = after = (before + 1)
+17     
+18     predicate f1_was_not_called (before:int) (after:int) = after = before
+19     
+20     goal f1'vc :
+21       forall trace:int.
+22        let trace'unused = Trace'mk trace in
+23        let trace'unused1 = Trace'mk trace in
+24        let f1_calls'result'unused = trace in
+25        let o = trace + 1 in
+26        let (+)'result'unused = o in
+27        forall trace1:int.
+28         let trace'unused2 = Trace'mk trace1 in
+29         trace1 = o -> f1_was_called trace trace1
+30     
+31     goal f2'vc :
+32       forall trace:int.
+33        let trace1 = Trace'mk trace in
+34        forall a1:int.
+35         let trace'unused = trace1 in
+36         let (=)'result'unused = (if a1 = 0 then True else False) in
+37         if a1 = 0
+38         then let trace'unused1 = trace1 in
+39              forall trace2:int.
+40               let trace'unused2 = Trace'mk trace2 in
+41               f1_was_called trace trace2 ->
+42               (let result'unused = 100 in
+43                100 = (if a1 = 0 then 100 else 101) &&
+44                (a1 = 0 -> f1_was_not_called trace trace2) &&
+45                (not a1 = 0 -> f1_was_called trace trace2))
+46         else let trace'unused1 = trace1 in
+47              forall trace2:int.
+48               let trace'unused2 = Trace'mk trace2 in
+49               f1_was_called trace trace2 ->
+50               (let result'unused = 101 in
+51                101 = (if a1 = 0 then 100 else 101) &&
+52                (a1 = 0 -> f1_was_not_called trace trace2) &&
+53                (not a1 = 0 -> f1_was_called trace trace2))
+54     
+55     goal main'vc :
+56       forall trace:int.
+57        let trace'unused = Trace'mk trace in
+58        trace = 0 ->
+59        (let trace'unused1 = Trace'mk trace in
+60         forall trace1:int.
+61          let trace'unused2 = Trace'mk trace1 in
+62          let _'unused = (if true then 100 else 101) in
+63          (true -> f1_was_not_called trace trace1) /\
+64          (false -> f1_was_called trace trace1) ->
+65          (let f2'result'unused = (if true then 100 else 101) in trace1 = 0))
+66     
+67   end
+#+end_example
+
+The line 31 is the ~f2~ goal. It corresponds to SMT script. Looking at it we see ~if...else~ on
+lines 37...46 - they correspond to ~ensures {..}~ in WhyML.
+
+
 
 TODO
+
+* Debug output
+
+Yet another approach for debugging is to use a special ~--debug~ CLI option (it requires different
+flags, you can see them with ~--list-debug-flags~):
+
+#+begin_example
+$ why3 prove Call1.mlw -P z3 --debug vc_debug
+#+end_example
+
+TODO
+
 
 -------------------------------------------------------------
 
