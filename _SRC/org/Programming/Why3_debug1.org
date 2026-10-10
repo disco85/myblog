@@ -198,7 +198,19 @@ $ z3 Call1-Call1-f2qtvc.smt2
 sat
 #+end_example
 
-Bingo!
+The same "sat". Commands in this listing are Lisp-like language processes by Z3 SMT solver which
+has a documentation listing these functions-commands - [[https://microsoft.github.io/z3guide/docs/logic/intro/][here]]:
+
+- ~delcare-datatypes~ is for our type: ~traceqtmk~ is its constructor, ~0~ is the arity (i.e.,
+  ~trace~ does not take arguments).
+- ~(define-fun f1_was_called ...)~ defines our original predicate.
+- ~;; Goal "f2'vc"~ - the comment opening the code of the goal's VC
+- VC starts with ~(assert ...)~ with negation (see ~not~).
+- ~forall~ introduces quantifiers: ~∀trace1∈Z,∀a1∈Z: ...~.
+- ~(ite cond then_expr else_expr)~ - /if..then..else/
+- ~(=> P Q)~ is classical implication.
+- ~(check-sat)~ asks Z3 whether all the asserted constraints can be satisfied simultaneously.
+
 
 -------------------------------------------------------------
 
