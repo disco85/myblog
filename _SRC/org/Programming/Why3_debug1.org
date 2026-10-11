@@ -131,7 +131,7 @@ $ why3 prove Call1.mlw -P z3 -T Call1 -G "f2'vc" -o A
 
 This command saves the request corresponding to the goal ~f2~ to SMT
 in a directory ~A/~, there you can see only one file, e.g.,
-~Call1-Call1-f2qtvc.smt2~.
+~Call1-Call1-f2qtvc.smt2~. Another terminology - /SMT solver trace/.
 
 If to execute:
 
@@ -481,8 +481,8 @@ then let trace'unused1 = trace1 in
       f1_was_called trace trace2 ->                     ‼  trace2 = trace + 1 ->       ⇦ f1() call
       (let result'unused = 100 in                          result = 100                  ~~~~~~~~~
        100 = (if a1 = 0 then 100 else 101) &&              100 = 100 &&
-       (a1 = 0 -> f1_was_not_called trace trace2) &&       a1 = 0 -> (trace2 = trace) &&
-       (not a1 = 0 -> f1_was_called trace trace2))      ⁈  a1 <> 0 -> (trace2 = trace + 1)
+       (a1 = 0 -> f1_was_not_called trace trace2) &&    ⁈  a1 = 0 -> (trace2 = trace) &&
+       (not a1 = 0 -> f1_was_called trace trace2))         a1 <> 0 -> (trace2 = trace + 1)
 else let trace'unused1 = trace1 in                                                       
      forall trace2:int.                                                a1 <> 0 :
       let trace'unused2 = Trace'mk trace2 in                           ~~~~~~~~~
@@ -510,16 +510,75 @@ flags, you can see them with ~--list-debug-flags~):
 $ why3 prove Call1.mlw -P z3 --debug vc_debug
 #+end_example
 
-TODO
+The output is an *intermediate language used internally by Why3's VC generator*, so syntax forms like
+~HAVOC~, ~VAL~, ~STOP~, ~WITH~, etc. are part of Why3's internal program representation/VC-generation language:
 
+It is how Why3 *symbolically processes program expressions and constructs verification conditions
+(VC)*.
 
--------------------------------------------------------------
+** Symbolic execution
 
+#+begin_quote
+Symbolic execution is evaluating a program using symbolic values and logical constraints instead
+of running it with concrete inputs.
+#+end_quote
+
+For example, WhyML is:
 
 #+begin_example
-$ why3 prove Call1.mlw -P z3 --debug vc_debug
+if a1 = 0 then
+  100
+else
+  101
 #+end_example
 
+A normal execution might use the variable ~a1 = 0~, choose the first branch, and return 100.
+
+Symbolic execution leaves ~a1~ /unknown and explores the two possible cases/:
+
+#+begin_example
+          Initial symbolic state:             
+             • a1: int                        
+             • trace.f1_calls: int            
+                      |                       
+          Test the condition a1 = 0           
+                   /    \                     
+                  /      \                    
+             a1 = 0    a1 <> 0                
+                /          \                  
+       first branch       second branch       
+       symbolic expr      symbolic expr       
+#+end_example
+
+Each branch has its own path condition and symbolic state.
+
+Why3 uses symbolic reasoning to construct a formula that expresses what must be true for the
+program to satisfy its specification. Its VC generator uses weakest-precondition calculus by
+default, with a strongest-postcondition mode also available.
+
+It is like integer integration, using a series or an analytical solution to the integral -
+resulting in a new formula.
+
+E.g., ~HAVOC { trace @rho -> { f1_calls1 -> []; }};~ *does not do any calls*, it describes an
+abstraction of a mutable-state update during VC generation. It isn't a runtime instruction that
+randomly changes the counter. And ~STOP trace1.f1_calls = 0~ *marks the terminal verification
+formula* for that symbolic computation. It doesn't mean that execution of main stopped at runtime.
+
+The next listing contain some tokens of this /internal representation/, it is not 100% stable, so,
+I suppose, it can changes lesser or more in the next versions, but the short brief table of them:
+
+| Token                   | Meaning in this trace                                                             |
+|-------------------------+-----------------------------------------------------------------------------------|
+| ~K VAL~                 | Introduces a symbolic evaluation case; ~K~ is part of the internal trace notation |
+| ~LET x = e~             | Binds a generated symbolic name to an expression                                  |
+| ~IF .. THEN .. ELSE ..~ | Processes the two conditional branches symbolically                               |
+| ~HAVOC { .. }~          | Represents an abstract update to the symbolic memory/state                        |
+| ~VAL .. WITH ..~        | Introduces a value together with logical conditions associated with it            |
+| ~STOP formula~          | Ends this symbolic evaluation with a verification formula to establish            |
+| ~vars = ..~             | Displays a mapping between symbolic variables/states                              |
+| ~regs = ..~             | Displays a mapping for symbolic memory regions                                    |
+
+** Debug listing
 
 #+begin_example
  1   <vc_debug>Calling eval_match with keep_trace = true
@@ -584,3 +643,122 @@ $ why3 prove Call1.mlw -P z3 --debug vc_debug
 60   Goal f2'vc.
 61   Prover result is: Unknown (sat) (0.00s, 258 steps).
 #+end_example
+
+It is a trace of "prooving" on the Why3 side. <-- TODO or? Plan of proving?
+
+Lines 1..6 are the creating (constructing) of the ghost variable ~trace~ with the initial value 0
+for ~f1_calls~. ~STOP true~ means the symbolic execution has reached a terminal condition whose
+verification formula is true - at the beginning there was ~K VAL ;~ introducing /a symbolic
+evaluation/ of a value expression (the semicolon represents the empty or unit result in this
+context).
+
+Lines 7..18 is the verification of the body of ~f1~:
+
+- Line 7: Begins evaluation of the function body, whose result is unit: ~_~.
+- Line 8: Binds trace to the current symbolic record ~trace1~.
+- Line 9: Introduces the increment, 1.
+- Line 10: Reads the current counter, ~trace1.f1_calls~.
+- Line 11: Gives that value another generated name.
+- Line 12: Computes the incremented value, ~o2 + o1~.
+- Line 13: Names the result of the addition.
+- Line 14: HAVOC updates the symbolic memory model to account for the write to ~trace.f1_calls~. The
+  new field value is ~o3~. It does not mean that the counter is randomly modified; the preceding
+  arithmetic determines its new value.
+- Line 15: Introduces the unit result of ~f1~.
+- Line 16: Checks the postcondition ~f1_was_called (trace.f1_calls) (trace1.f1_calls)~ in this
+  internal representation. Notice the ordering of the two record expressions here; the surrounding
+  state substitutions matter when interpreting it.
+- Line 17: Records the mapping ~trace1 -> trace2~.
+- Line 18: Records the corresponding mapping for the memory region ~trace @rho~.
+
+Then, the verification of ~f2~:
+
+- Line 19: Begins symbolic evaluation of ~f2~.
+- Line 20: Introduces the parameter ~a1~.
+- Line 21: Saves the current record state in ~trace3~. This is useful for expressing postconditions
+  relative to the initial state.
+- Line 22: Introduces the constant zero.
+- Line 23: Computes the branch condition, ~a1 = 0~.
+- Line 24: Names the Boolean result of the equality.
+- Line 25: Starts symbolic execution of the conditional. Both branches are analyzed.
+
+  
+- Line 26: Introduces the unit argument ~()~ passed to ~f1()~.
+- Line 27: Captures the current record state as ~trace4~.
+- Line 28: Havocs the mutable field in the symbolic memory model to account for the callee's
+  declared write effect. The empty list ~[]~ here is part of the internal representation of the
+  update; it does not mean that the call has no effect.
+- Line 29: This is the key line for the call to ~f1()~ in the first branch. ~VAL _1 WITH ..~
+  introduces a symbolic result together with the logical contract condition associated with the
+  call. The predicate ~f1_was_called~ describes the relationship between the states.
+- Line 30: Binds the result of the call to the generated variable ~f1'result~. Since ~f1~ returns unit,
+  this is not an integer result.
+- Line 31: Evaluates the branch's result to 100.
+
+Notice the difference from lines 10–14: here, where we call ~f1~, Why3 does not symbolically
+execute the arithmetic in the body of ~f1~ like imperative languages do it. Instead, it models the
+call using the callee's effects and contract. This is the modular treatment of the function call.
+
+And the second call site:
+
+- Line 32: Introduces the unit argument.
+- Line 33: Captures the state in ~trace5~.
+- Line 34: Accounts for the callee's mutable-state effect.
+- Line 35: This is the key line for the call to ~f1()~ in the else branch. The same postcondition is
+  associated with this call.
+- Line 36: Binds the unit result.
+- Line 37: Evaluates the branch result to 101.
+
+So, calls of ~f1~ look as:
+
+| Source-level call         | vc_debug line |
+|---------------------------+---------------|
+| f1() in the a1 = 0 branch |            29 |
+| f1() in the else branch   |            35 |
+
+- Lines 38–44 are the checking ~f2~'s contract:
+- Line 38: The result must match the postcondition ~result = if a1 = 0 then 100 else 101~.
+- Line 39: If ~a1 = 0~, the counter must remain unchanged.
+- Line 40: If ~a1 <> 0~, the counter must increase by one.
+- Lines 41–44: Record the symbolic substitutions for the two branches' resulting states. ~trace6~ and
+  ~trace7~ are generated symbolic state names, not additional source-level calls.
+
+The ~STOP~ expression is particularly important: it combines all three postconditions of ~f2~. The
+verification condition must establish this expression under the assumptions generated by symbolic
+execution.
+
+Lines 45.. 57: this section illustrates the call to ~f2 0~ and the attempt to establish main's
+postcondition:
+
+- Line 45: Starts another symbolic evaluation.
+- Line 46: The ~WITH~ clause supplies the assumption ~trace1.f1_calls = 0~, corresponding to main's
+  precondition.
+- Line 47: Binds the argument 0.
+- Line 48: Captures the initial state.
+- Line 49: Accounts for ~f2~'s declared write effect.
+- Lines 50–52: Introduce the result and postconditions of ~f2~ at the call site. Notice that these
+  are ~f2~'s postconditions, not a fresh expansion of its implementation.
+- Line 53: Binds the call result.
+- Line 54: Evaluates the unit result of main.
+- Line 55: The final obligation is ~trace1.f1_calls = 0~, which is main's postcondition.
+- Lines 56–57: Record the resulting symbolic state mapping.
+
+And the reported result:
+
+- Line 58: Ends the trace-generation sequence.
+- Line 59: Identifies the source file.
+- Line 60: Names the verification goal ~f2~'vc.
+- Line 61: Reports the prover result. "Unknown (sat)" means the prover did not establish the goal as
+  valid; the parenthesized sat indicates a satisfiable counterexample condition in this output
+  format. It is not a proof that the goal is valid.
+
+Usefull [[https://why3.org/doc/vcgen.html][documentation]] and [[https://why3.gitlabpages.inria.fr/why3/technical.html][this]] (includes also transformations) 
+
+TODO what is symb execution.
+TODO where to find docs on LET, STOP, HAVOC...
+
+TODO
+
+* Why3 IDE
+
+TODO
