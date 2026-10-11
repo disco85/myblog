@@ -478,7 +478,7 @@ if a1 = 0
 then let trace'unused1 = trace1 in                                               
      forall trace2:int.                                                a1 = 0 :
       let trace'unused2 = Trace'mk trace2 in                           ~~~~~~~~     
-      f1_was_called trace trace2 ->                     ‼  trace2 = trace + 1 ->       ⇦ f1() call
+      f1_was_called trace trace2 ->                     ‼  trace2 = trace + 1 ->       ⇽ f1() call
       (let result'unused = 100 in                          result = 100                  ~~~~~~~~~
        100 = (if a1 = 0 then 100 else 101) &&              100 = 100 &&
        (a1 = 0 -> f1_was_not_called trace trace2) &&    ⁈  a1 = 0 -> (trace2 = trace) &&
@@ -486,7 +486,7 @@ then let trace'unused1 = trace1 in
 else let trace'unused1 = trace1 in                                                       
      forall trace2:int.                                                a1 <> 0 :
       let trace'unused2 = Trace'mk trace2 in                           ~~~~~~~~~
-      f1_was_called trace trace2 ->                     ‼  trace2 = trace + 1 ->       ⇦ f1() call
+      f1_was_called trace trace2 ->                     ‼  trace2 = trace + 1 ->       ⇽ f1() call
       (let result'unused = 101 in                          result = 101                  ~~~~~~~~~
        101 = (if a1 = 0 then 100 else 101) &&              101 = 101 &&
        (a1 = 0 -> f1_was_not_called trace trace2) &&    ⁈  a1 = 0 -> (trace2 = trace) &&
@@ -783,7 +783,114 @@ The distinction is important: the caller's VC does not automatically inherit the
 implementation-level failure of the callee. It trusts the callee's contract for modular reasoning.
 #+end_quote
 
+* Ideas for AI
 
-* Why3 IDE
+You can pass all outputs to AI so it helps you to analyze it: the better together with WhyML
+original code. AI understands internal representation of the symbolic execution as well as SMT
+traces (queries), especially since their languages are good documented.
 
-TODO
+* Counterexamples
+
+Another technique is to get counterexamples, but they are not so useful. They can be got from IDE
+(press 'G' while you are on the node which is the result of proving) or from CLI:
+
+first, find the prover with counterexamples:
+  
+#+begin_example
+$ why3 config show
+...
+[prover]
+alternative = "counterexamples"
+command = "'/usr/bin/cvc4' --stats --tlimit-per=%T --lang=smt2 %f"
+command_steps = "'/usr/bin/cvc4' --stats --rlimit=%S --lang=smt2 %f"
+driver = "cvc4_17_counterexample"
+editor = ""
+in_place = false
+interactive = false
+name = "CVC4"
+shortcut = "cvc4-ce"
+version = "1.8"
+...
+#+end_example
+
+then use this short name "cvc4-ce":
+
+#+begin_example
+$ why3 prove Call1.mlw -P cvc4-ce
+File Call1.mlw:
+Goal f1'vc.
+Prover result is: Valid (0.01s, 231 steps).
+
+File Call1.mlw:
+Goal f2'vc.
+Prover result is: Unknown (sat) (0.01s, 725 steps).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a1 : int = 0
+File Call1.mlw:
+  Line 6:
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 2}
+    trace : trace = {f1_calls = 2}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : int = 0
+    trace : int = 0
+  Line 13:
+    trace : int = 1
+    trace : int = -1
+  Line 17:
+    a1 : int = 0
+  Line 22:
+    result : int = 100
+    result : int = 100
+    result : int = 0
+    result : int = 0
+    result of call at line 22, characters 7-13 : bool = true
+    result of call at line 22, characters 7-13 : bool = true
+  Line 23:
+    trace : trace = {f1_calls = 1}
+    trace : trace = {f1_calls = 1}
+    trace : int = 1
+  Line 27:
+    trace : trace = {f1_calls = -2}
+    trace : trace = {f1_calls = -2}
+    trace : int = -1
+
+File Call1.mlw:
+Goal main'vc.
+Prover result is: Valid (0.00s, 214 steps).
+#+end_example
+
+It seems the line numbers correspond to non-empty lines, see it with ~nl Call1.mlw~. This:
+
+#+begin_example
+  Line 17:
+    a1 : int = 0
+#+end_example
+
+could be useful - exactly at ~a1=0~ branch we unexpectedly call ~f1~! Then this:
+
+#+begin_example
+  Line 23:
+    trace : trace = {f1_calls = 1}
+    trace : trace = {f1_calls = 1}
+#+end_example
+
+but we expected it to be ~f1_calls = 0~ (our ~ensures { a1 = 0 -> f1_was_not_called (old
+trace.f1_calls) trace.f1_calls }~ says it). So, counterexamples also can help, but they look
+confusing - *they are not a trace corresponding to "calls" in some time line*
+
+#+begin_quote
+A counterexample is most useful when it gives a concrete input or branch choice. It may be
+incomplete or awkwardly named, and it can include values that are irrelevant to the failure.
+
+Finally, "Unknown (sat)" means the prover produced a satisfying model for the negated VC, but Why3/Z3
+could not establish a proof. In this case, the sat model is the useful part: it exhibits the
+failing case.
+#+end_quote

@@ -1,0 +1,1566 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-10-11 Sun 18:14 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why3: debug, part 1</title>
+<meta name="description" content="Debug of failures in Why3" />
+<meta name="keywords" content="Why3,debug,Theorem,Proving" />
+<meta name="generator" content="Org Mode" />
+<style>
+:root {
+  color-scheme: dark;
+  --stroke-color: #FF8000;
+  /* theme attributes: */
+  --background-color: black;
+  --color: #FF8000;
+  --border-color: #FF8000;
+  --code-background-color: #FF8000;
+  --code-color: black;
+  --link-color: #FF8000;
+  --syn-selection-background-color: #FF8000;
+  --syn-selection-color: black;
+  --syn-builtin-color: #00FFFF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: #FF8000;
+  --syn-keyword-color: #FF8000;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #00FFFF;
+  --syn-variable-name-color: #FF8000;
+  --syn-constant-color: #00FFFF;
+}
+html.light {
+  color-scheme: light;
+  --stroke-color: black;
+  /* theme attributes: */
+  --background-color: white;
+  --color: black;
+  --border-color: black;
+  --code-background-color: black;
+  --code-color: white;
+  --link-color: black;
+  --syn-selection-background-color: black;
+  --syn-selection-color: white;
+  --syn-builtin-color: #0000CF;
+  --syn-comment-color: grey;
+  --syn-doc-color: grey;
+  --syn-function-name-color: black;
+  --syn-keyword-color: black;
+  --syn-string-color: fuchsia;
+  --syn-type-color: #0000CF;
+  --syn-variable-name-color: black;
+  --syn-constant-color: #0000CF;
+}
+body {
+  font-family: monospace,  sans-serif;
+  color-scheme: light dark;
+  color: var(--color);
+  background-color: var(--background-color);
+}
+#theme-toggle {
+  /*float: right;*/
+  cursor: pointer;
+  user-select: none;
+  font-size: 1.2em;
+  margin-left: 10px;
+}
+svg {
+  background: transparent !important;
+  color: var(--color);
+}
+h1, h2, h3, h4 {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-color);
+  padding-bottom: 0.1em;
+}
+a:link, a:visited {
+  color: var(--link-color);
+  text-decoration: underlined;
+}
+div {
+  padding: 0;
+  margin: 0;
+}
+code {
+  background-color: var(--code-background-color);
+  border: 1px solid var(--border-color);
+  color: var(--code-color);
+  padding: 1px;
+  font-family: monospace;
+}
+pre, .verse {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+blockquote {
+    border-left: 5px solid;
+    padding-left: 1em;
+    margin-left: 2em;
+    font-style: italic;
+}
+#table-of-contents h2 { display: none; }
+.verse br { display: none; }
+.verse::before {
+  content: "";
+  display: block;
+  margin-top: -1lh; /* better than -1em if supported */
+}
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 5px;
+}
+.org-src-name {
+  display: block;
+  font-style: italic;
+  font-size: 0.85em;
+}
+/* SYNTAX HIGHLIGHT */
+::selection {
+  background: var(--syn-selection-background-color);
+  color: var(--syn-selection-color);
+}
+.org-builtin {
+  color: var(--syn-builtin-color);
+}
+.org-comment {
+  color: var(--syn-comment-color);
+}
+.org-doc {
+  color: var(--syn-doc-color);
+  font-style: italic;
+}
+.org-function-name {
+  color: var(--syn-function-name-color);
+  font-weight: bold;
+}
+.org-keyword {
+  color: var(--syn-keyword-color);
+  font-weight: bold;
+}
+.org-string {
+  color: var(--syn-string-color);
+}
+.org-type {
+  color: var(--syn-type-color);
+}
+.org-variable-name {
+  color: var(--syn-variable-name-color);
+}
+.org-constant {
+  color: var(--syn-constant-color);
+}
+h2.footnotes {
+  border-style: none;
+  border-width: 2px;
+  font-style: italic;
+  font-size: 0.7em;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#footnotes {
+  border-top: 2px solid;
+  margin: 2em 0 0 1em;
+}
+.footdef {
+  margin: 1.2em;
+  font-style: italic;
+}
+.footpara {
+  display: inline;
+}
+/* STYLES FOR PRINTING */
+@media print {
+  :root {
+    color-scheme: light;
+    --stroke-color: black;
+    padding: 1px;
+    font-size: 11pt;
+  }
+  svg {
+    background: transparent !important;
+    stroke: black !important;
+    fill: black !important;
+    color: black;
+  }
+  nav { display: none; }
+  body {
+    font-family: monospace,  sans-serif;
+    color-scheme: light;
+    color: black;
+    background-color: white;
+    padding: 1px;
+  }
+  h1, h2, h3, h4 {
+    display: inline-block;
+    border-bottom: 2px dashed black;
+    padding-bottom: 0.1em;
+  }
+  a:link, a:visited {
+    color: black;
+    text-decoration: underlined;
+  }
+  div {
+    padding: 0;
+    margin: 0;
+  }
+  code {
+    border: 1px solid black;
+    color: black;
+    padding: 1px;
+    font-family: monospace;
+  }
+  pre, .verse {
+    color: black !important;
+    background-color:: white !important;
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  pre *, .verse * {
+    color: black !important;
+    background-color:: white !important;
+  }
+  blockquote {
+      border-left: 5px solid;
+      padding-left: 1em;
+      margin-left: 2em;
+      font-style: italic;
+  }
+  #table-of-contents h2 { display: none; }
+  .verse br { display: none; }
+  .verse::before {
+    content: "";
+    display: block;
+    margin-top: -1lh;
+  }
+  table {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  .org-src-name {
+    display: block;
+    font-style: italic;
+    font-size: 0.85em;
+  }
+  h2.footnotes {
+    border-style: none;
+    border-width: 2px;
+    font-style: italic;
+    font-size: 0.7em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  #footnotes {
+    border-top: 2px solid;
+    margin: 2em 0 0 1em;
+  }
+  .footdef {
+    margin: 1.2em;
+    font-style: italic;
+  }
+  .footpara {
+    display: inline;
+  }
+}
+</style>
+<!-- Theme support... -->
+<script>
+(function () {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.classList.add("light");
+  }
+})();
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.toggle("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+}
+</script>
+</head>
+<body>
+<div id="preamble" class="status">
+<nav>
+<span id="theme-toggle" onclick="toggleTheme()" title="Click to toggle the theme (light/dark)">◒</span>
+[<a href="../cv.html">CV</a>]
+[<a href="../index.html">Sitemap</a>]
+[<a href="https://github.com/disco85/">Github</a>]
+</nav>
+</div>
+<div id="content" class="content">
+<h1 class="title">Why3: debug, part 1</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org8f6456f">Failure</a></li>
+<li><a href="#orgf71c984">Messages</a></li>
+<li><a href="#orga66a354">SMT requests</a></li>
+<li><a href="#org62ed183">Theory printing</a></li>
+<li><a href="#orga9b6714">Debug output</a>
+<ul>
+<li><a href="#org888a63a">Symbolic execution</a></li>
+<li><a href="#org74c9187">Debug listing</a></li>
+</ul>
+</li>
+<li><a href="#orgecbcc25">Ideas for AI</a></li>
+<li><a href="#orgb6b207a">Counterexamples</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org8f6456f" class="outline-2">
+<h2 id="org8f6456f">Failure</h2>
+<div class="outline-text-2" id="text-org8f6456f">
+<p>
+Lets say we have such WhyML code:
+</p>
+
+<pre class="example" id="org2efe658">
+module Call1
+  use int.Int
+
+  type trace = { mutable f1_calls: int }
+
+  let ghost trace : trace = { f1_calls = 0 }
+
+  predicate f1_was_called (before after: int) = after = before + 1
+  predicate f1_was_not_called (before after: int) = after = before  
+
+  let ghost f1 () : unit
+    writes { trace.f1_calls }
+    ensures { f1_was_called (old trace.f1_calls) trace.f1_calls }
+  =
+    trace.f1_calls &lt;- trace.f1_calls + 1
+
+  let f2 (a1: int) : int
+    writes { trace.f1_calls }
+    ensures { result = if a1 = 0 then 100 else 101 }
+    ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+    ensures { a1 &lt;&gt; 0 -&gt; f1_was_called (old trace.f1_calls) trace.f1_calls }
+  = if a1 = 0 then begin
+     f1 ();
+     100
+    end
+    else begin
+      f1 ();
+      101
+    end
+
+  let main () : unit
+    requires { trace.f1_calls = 0 }
+    ensures { trace.f1_calls = 0 }
+  =
+    let _ = f2 0 in
+    ()
+
+end
+</pre>
+
+<p>
+it is explained <a href="Why3_Trace.html">here</a>. If to prove it:
+</p>
+
+<pre class="example" id="org4aadf3e">
+$ why3 prove Call1.mlw -P z3 
+File Call1.mlw:
+Goal f1'vc.
+Prover result is: Valid (0.00s, 38 steps).
+
+File Call1.mlw:
+Goal f2'vc.
+Prover result is: Unknown (sat) (0.00s, 258 steps).
+
+File Call1.mlw:
+Goal main'vc.
+Prover result is: Valid (0.00s, 40 steps).
+</pre>
+
+<p>
+i.e., <code>f2</code> cannot be proven. What does it mean?
+</p>
+</div>
+</div>
+<div id="outline-container-orgf71c984" class="outline-2">
+<h2 id="orgf71c984">Messages</h2>
+<div class="outline-text-2" id="text-orgf71c984">
+<p>
+See <a href="https://why3.org/api/Call_provers.html">this</a> - it is the source code of Why3 describing possible values of a prover result - one of
+them is <code>Unknown</code>:
+</p>
+
+<pre class="example" id="orgd4c0577">
+type prover_answer = 
+| Valid                   (* The task is valid according to the prover *)
+| Invalid                 (* The task is invalid *)
+| Timeout                 (* The task timeouts, ie it takes more time than specified *)
+| OutOfMemory             (* The task runs out of memory *)
+| StepLimitExceeded       (* The task required more steps than the limit provided *)
+| Unknown of string       (* The prover can't determine if the task is valid *)
+| Failure of string       (* The prover reports a failure *)
+| HighFailure of string   (* An error occured during the call to the prover
+                             or none of the given regexps match the output of the prover *)
+</pre>
+
+<p>
+Why3 forms a request to SMT and the result of SMT is "sat":
+</p>
+
+<pre class="example" id="orgd1798c3">
+Prover result is: Unknown (sat) (0.00s, 258 steps).
+                           ^^^
+                         t h i s
+</pre>
+
+<p>
+There are 2 different questions a solver can ask about a Why3 <i>verification condition (VC)</i>:
+</p>
+
+<ul class="org-ul">
+<li>Is the formula satisfiable (sat)? Can it be true under some assignment of values?</li>
+<li>Is the formula unsatisfiable (unsat)? Is there no assignment of values that makes it true?</li>
+</ul>
+
+<p>
+For verification, Why3 normally wants to prove that the VC is
+valid. An equivalent way to do that is to ask whether its negation is
+unsatisfiable.
+</p>
+
+<p>
+So, possible answers of SMT in short are:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Solver result</th>
+<th scope="col" class="org-left">Meaning for verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">unsat</td>
+<td class="org-left">No counterexample exists; the VC is proved.</td>
+</tr>
+
+<tr>
+<td class="org-left">sat</td>
+<td class="org-left">A counterexample exists; the VC is not valid.</td>
+</tr>
+
+<tr>
+<td class="org-left">unknown</td>
+<td class="org-left">The solver cannot decide.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Why3 translates the prover's responses into its own result categories,
+including <code>Valid</code>, <code>Invalid</code>, and <code>Unknown</code> - see <a href="#orgd4c0577">prover answer</a>.
+</p>
+
+<p>
+So, the result is "The prover can't determine if the task is valid", and SMT returned "sat".
+</p>
+</div>
+</div>
+<div id="outline-container-orga66a354" class="outline-2">
+<h2 id="orga66a354">SMT requests</h2>
+<div class="outline-text-2" id="text-orga66a354">
+<p>
+We can check it watching the requests to the SMT solver. First, create
+directories, let's say "A" and "B" (<code>mkdir A B</code>) and then:
+</p>
+
+<pre class="example" id="org39a2aac">
+$ why3 prove Call1.mlw -P z3 -T Call1 -G "f2'vc" -o A
+</pre>
+
+<p>
+This command saves the request corresponding to the goal <code>f2</code> to SMT
+in a directory <code>A/</code>, there you can see only one file, e.g.,
+<code>Call1-Call1-f2qtvc.smt2</code>. Another terminology - <i>SMT solver trace</i>.
+</p>
+
+<p>
+If to execute:
+</p>
+
+<pre class="example" id="org7d16d82">
+$ why3 prove Call1.mlw -P z3 -o B
+</pre>
+
+<p>
+There:
+</p>
+
+<pre class="example" id="org8f17cf0">
+B
+├── Call1-Call1-f1qtvc.smt2
+├── Call1-Call1-f2qtvc.smt2
+└── Call1-Call1-mainqtvc.smt2
+
+1 directory, 3 files
+</pre>
+
+<p>
+There are 3 requests of SMT regarding 3 goals (<code>f1</code>, <code>f2</code>,
+<code>main</code>). But we have a problem with <code>f2</code> only, so lets see it:
+</p>
+
+<pre class="example" id="org249f3ba">
+;;; generated by SMT-LIB2 driver
+;;; SMT-LIB2 driver: bit-vectors, common part
+;;; generated by SMT-LIB strings
+;;; SMT-LIB2: integer arithmetic
+(declare-datatypes ((trace 0))
+  (((traceqtmk (f1_calls Int)))))
+
+;; "f1_was_called"
+(define-fun f1_was_called ((before Int) (after Int)) Bool
+  (= after (+ before 1)))
+
+;; Goal "f2'vc"
+;; File "Call1.mlw", line 17, characters 6-8
+(assert
+  (not
+  (forall ((trace1 Int))
+    (forall ((a1 Int))
+      (ite (= a1 0)
+        (forall ((trace2 Int))
+          (=&gt;
+            (f1_was_called trace1 trace2)
+            (and
+              (= 100 (ite (= a1 0) 100 101))
+              (and
+                (=&gt; (= a1 0) (= trace2 trace1))
+                (=&gt; (not (= a1 0)) (f1_was_called trace1 trace2))))))
+        (forall ((trace2 Int))
+          (=&gt;
+            (f1_was_called trace1 trace2)
+            (and
+              (= 101 (ite (= a1 0) 100 101))
+              (and
+                (=&gt; (= a1 0) (= trace2 trace1))
+                (=&gt; (not (= a1 0)) (f1_was_called trace1 trace2)))))))))))
+
+(check-sat)
+</pre>
+
+<p>
+And we can try it in SMT (currently, I use Z3):
+</p>
+
+<pre class="example" id="orgb8ac66b">
+$ z3 Call1-Call1-f2qtvc.smt2 
+sat
+</pre>
+
+<p>
+The same "sat". Commands in this listing are Lisp-like language processes by Z3 SMT solver which
+has a documentation listing these functions-commands - <a href="https://microsoft.github.io/z3guide/docs/logic/intro/">here</a>:
+</p>
+
+<ul class="org-ul">
+<li><code>delcare-datatypes</code> is for our type: <code>traceqtmk</code> is its constructor, <code>0</code> is the arity (i.e.,
+<code>trace</code> does not take arguments).</li>
+<li><code>(define-fun f1_was_called ...)</code> defines our original predicate.</li>
+<li><code>;; Goal "f2'vc"</code> - the comment opening the code of the goal's VC</li>
+<li>VC starts with <code>(assert ...)</code> with negation (see <code>not</code>).</li>
+<li><code>forall</code> introduces quantifiers: <code>∀trace1∈Z,∀a1∈Z: ...</code>.</li>
+<li><code>(ite cond then_expr else_expr)</code> - <i>if..then..else</i></li>
+<li><code>(=&gt; P Q)</code> is classical implication.</li>
+<li><code>(check-sat)</code> asks Z3 whether all the asserted constraints can be satisfied simultaneously.</li>
+</ul>
+
+<p>
+Lets rewrite this SMT commands <b>IGNORING CURRENTLY LEADING "NOT"</b> (it's like to write <code>G</code> remembering
+that the whole formula is <code>¬G</code>), ok, so <code>G</code>:
+</p>
+
+<pre class="example" id="org4f76970">
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -&gt; 100 = (a1=0 /\ 100)
+                   \/
+                   (a1≠0 /\ 101)
+             /\
+             (a1=0 -&gt; t2=t1)
+             /\
+             (a1≠0 -&gt; t2=t1+1)
+\/             
+a1≠0
+  /\
+  t2=t1+1 -&gt; 101 = (a1=0 /\ 100)
+                   \/
+                   (a1≠0 /\ 101)
+             /\
+             (a1=0 -&gt; t2=t1)
+             /\
+             (a1≠0 -&gt; t2=t1+1)
+</pre>
+
+<pre class="example" id="org1aada3e">
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -&gt; 100 = 100
+             /\
+             (⊤ -&gt; ⊥)
+             /\
+             (⊥ -&gt; ⊤)
+\/             
+a1≠0
+  /\
+  t2=t1+1 -&gt; 101 = ⊥
+                   \/
+                   101
+             /\
+             (⊥ -&gt; ⊥)
+             /\
+             (⊤ -&gt; ⊤)
+</pre>
+
+<pre class="example" id="orga1bbb9b">
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -&gt; ⊤
+             /\
+             ⊥
+             /\
+             ⊤
+\/             
+a1≠0
+  /\
+  t2=t1+1 -&gt; 101 = 101
+             /\
+             ⊤
+             /\
+             ⊤
+</pre>
+
+<pre class="example" id="org6129106">
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  t2=t1+1 -&gt; ⊥
+\/             
+a1≠0
+  /\
+  t2=t1+1 -&gt; ⊤
+</pre>
+
+<p>
+Now, looking at the implication's truth table:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">p</th>
+<th scope="col" class="org-right">q</th>
+<th scope="col" class="org-right">p-&gt;q</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">0</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">0</td>
+<td class="org-right">0</td>
+</tr>
+
+<tr>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+<td class="org-right">1</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+we see that (see the result <code>p-&gt;q</code> relative to <code>p</code>, <code>q</code> is <code>⊥</code> or <code>⊤</code>):
+</p>
+
+<pre class="example" id="org52ea8bc">
+P -&gt; ⊥ ≡ ¬P       █ 
+P -&gt; ⊤ ≡ ⊤        ▄ 
+</pre>
+
+<p>
+taking these 2 into account we get now:
+</p>
+
+<pre class="example" id="orgef33a44">
+∀a1,t1,t2∈Z
+a1=0
+  /\
+  ¬(t2=t1+1)
+\/             
+a1≠0
+  /\
+  ⊤
+</pre>
+
+<p>
+We can write it as <code>∀a1,t1,t2∈Z: t2≠t1+1 \/ a1≠0</code>. SMT works with integer domain and easy finds
+counterexamples, e.g., <code>t2=6</code>, <code>t1=5</code> and <code>t2=t1+1</code> in this case which is a contradiction to the 
+universal quantifiers telling "for ANY integers", any, at least for 5, 6 it is not true. We ignored
+negation, so this is <code>G</code> and it's false, <code>¬G</code> though is true. It leads to "sat" answer from SMT.
+</p>
+
+<p>
+What is this? <b>This is a successful prof treating by Why3 as proving that <code>f2</code> is Unknown</b>. Why?
+Because <code>a1=0 /\ ...</code> and <code>a1≠0 /\ ...</code> are <code>ensures {..}</code> in our <code>f2</code>:
+</p>
+
+<pre class="example" id="org73780db">
+...
+    ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }
+    ensures { a1 &lt;&gt; 0 -&gt; f1_was_called (old trace.f1_calls) trace.f1_calls }
+...
+</pre>
+
+<p>
+This is the first way to understand the reason of <code>Unknown</code>.
+</p>
+
+<p>
+2 separate conclusions:
+</p>
+
+<ul class="org-ul">
+<li>calls of functions (like of <code>f1()</code>) usually are replaced by their postconditions (if they were
+declared)</li>
+<li>as you see SMT request could be simplified before to be form for SMT, but Why3 did not do it, it
+means that more strict logical description of situation (more asserts, invariants, ...) can help
+to make the request more optimal. It makes sense when you hit timeouts, out of memory, too slow prooving...</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org62ed183" class="outline-2">
+<h2 id="org62ed183">Theory printing</h2>
+<div class="outline-text-2" id="text-org62ed183">
+<p>
+Another way to see how Why3 came to the conclusion <code>Unknown</code> is to print the whole theory with:
+</p>
+
+<pre class="example" id="org0316517">
+$ why3 prove Call1.mlw -P z3 --print-theory
+</pre>
+
+<p>
+The result is:
+</p>
+
+<pre class="example" id="org2ffa654">
+ 1   theory Call1
+ 2     
+ 3     (* use why3.BuiltIn.BuiltIn *)
+ 4     
+ 5     (* use why3.Bool.Bool *)
+ 6     
+ 7     (* use why3.Unit.Unit *)
+ 8     
+ 9     (* use int.Int *)
+10     
+11     type trace =
+12       | Trace'mk (f1_calls:int)
+13     
+14     (* meta model_record function f1_calls *)
+15     
+16     predicate f1_was_called (before:int) (after:int) = after = (before + 1)
+17     
+18     predicate f1_was_not_called (before:int) (after:int) = after = before
+19     
+20     goal f1'vc :
+21       forall trace:int.
+22        let trace'unused = Trace'mk trace in
+23        let trace'unused1 = Trace'mk trace in
+24        let f1_calls'result'unused = trace in
+25        let o = trace + 1 in
+26        let (+)'result'unused = o in
+27        forall trace1:int.
+28         let trace'unused2 = Trace'mk trace1 in
+29         trace1 = o -&gt; f1_was_called trace trace1
+30     
+31     goal f2'vc :
+32       forall trace:int.
+33        let trace1 = Trace'mk trace in
+34        forall a1:int.
+35         let trace'unused = trace1 in
+36         let (=)'result'unused = (if a1 = 0 then True else False) in
+37         if a1 = 0
+38         then let trace'unused1 = trace1 in
+39              forall trace2:int.
+40               let trace'unused2 = Trace'mk trace2 in
+41               f1_was_called trace trace2 -&gt;
+42               (let result'unused = 100 in
+43                100 = (if a1 = 0 then 100 else 101) &amp;&amp;
+44                (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;
+45                (not a1 = 0 -&gt; f1_was_called trace trace2))
+46         else let trace'unused1 = trace1 in
+47              forall trace2:int.
+48               let trace'unused2 = Trace'mk trace2 in
+49               f1_was_called trace trace2 -&gt;
+50               (let result'unused = 101 in
+51                101 = (if a1 = 0 then 100 else 101) &amp;&amp;
+52                (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;
+53                (not a1 = 0 -&gt; f1_was_called trace trace2))
+54     
+55     goal main'vc :
+56       forall trace:int.
+57        let trace'unused = Trace'mk trace in
+58        trace = 0 -&gt;
+59        (let trace'unused1 = Trace'mk trace in
+60         forall trace1:int.
+61          let trace'unused2 = Trace'mk trace1 in
+62          let _'unused = (if true then 100 else 101) in
+63          (true -&gt; f1_was_not_called trace trace1) /\
+64          (false -&gt; f1_was_called trace trace1) -&gt;
+65          (let f2'result'unused = (if true then 100 else 101) in trace1 = 0))
+66     
+67   end
+</pre>
+
+<p>
+The line 31 is the <code>f2</code> goal. It corresponds to SMT script. First <code>if a1 = 0</code> is the same <code>if</code> in
+the original <code>f2</code> function. It introduces 2 branches (they mostly repeat each other bcs they are
+the same in the original <code>f2</code>). Inside these branches we see <code>ensures {..}</code>:
+</p>
+
+<pre class="example" id="orgd410847">
+...
+43  100 = (if a1 = 0 then 100 else 101) &amp;&amp;
+44  (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;
+45  (not a1 = 0 -&gt; f1_was_called trace trace2))
+...
+51  101 = (if a1 = 0 then 100 else 101) &amp;&amp;
+52  (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;
+53  (not a1 = 0 -&gt; f1_was_called trace trace2))
+...
+</pre>
+
+<pre class="example" id="org7a399b2">
+;;         SMT request:
+(= 100 (ite (= a1 0) 100 101))
+(and
+  (=&gt; (= a1 0) (= trace2 trace1))
+  (=&gt; (not (= a1 0)) (f1_was_called trace1 trace2))))))
+</pre>
+
+<p>
+The same. The printed theory is the code translated +/- to the SMT request.
+</p>
+
+<p>
+Another very interesting place is:
+</p>
+
+<pre class="example" id="org5f2067b">
+...
+47     forall trace2:int.
+48      let trace'unused2 = Trace'mk trace2 in
+49      f1_was_called trace trace2 -&gt;
+...
+</pre>
+
+<p>
+and if you ask "but where is my call of <code>f1</code>?" then - this is. The function <code>f1</code> effects the ghost
+variable <code>trace</code>, so it is created by its constructor <code>Trace'mk</code> (sure under universal quantifier
+<code>forall trace2:int</code>) and then we see checking of the <code>f1</code>'s postcondition:
+<code>f1_was_called trace trace2</code>. Pay attention, it is represented <b>as a left side of an implication</b>:
+</p>
+
+<blockquote>
+<p>
+It means that the postcondition of <code>f1()</code> is used as a hypothesis for the subsequent proof obligation.
+</p>
+</blockquote>
+
+<p>
+The surrounding quantifiers, implications, and branch conditions determine how that relation is used.
+</p>
+
+<p>
+Now, looking at the printed theory, you can also find the problem:
+</p>
+
+<pre class="example" id="org11b6750">
+...
+if a1 = 0
+then let trace'unused1 = trace1 in                                               
+     forall trace2:int.                                                a1 = 0 :
+      let trace'unused2 = Trace'mk trace2 in                           ~~~~~~~~     
+      f1_was_called trace trace2 -&gt;                     ‼  trace2 = trace + 1 -&gt;       ⇽ f1() call
+      (let result'unused = 100 in                          result = 100                  ~~~~~~~~~
+       100 = (if a1 = 0 then 100 else 101) &amp;&amp;              100 = 100 &amp;&amp;
+       (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;    ⁈  a1 = 0 -&gt; (trace2 = trace) &amp;&amp;
+       (not a1 = 0 -&gt; f1_was_called trace trace2))         a1 &lt;&gt; 0 -&gt; (trace2 = trace + 1)
+else let trace'unused1 = trace1 in                                                       
+     forall trace2:int.                                                a1 &lt;&gt; 0 :
+      let trace'unused2 = Trace'mk trace2 in                           ~~~~~~~~~
+      f1_was_called trace trace2 -&gt;                     ‼  trace2 = trace + 1 -&gt;       ⇽ f1() call
+      (let result'unused = 101 in                          result = 101                  ~~~~~~~~~
+       101 = (if a1 = 0 then 100 else 101) &amp;&amp;              101 = 101 &amp;&amp;
+       (a1 = 0 -&gt; f1_was_not_called trace trace2) &amp;&amp;    ⁈  a1 = 0 -&gt; (trace2 = trace) &amp;&amp;
+       (not a1 = 0 -&gt; f1_was_called trace trace2))         a1 &lt;&gt; 0 -&gt;
+...
+</pre>
+
+<p>
+and you see that finally we hit: <code>trace2 = trace + 1 -&gt; trace2 = trace</code>, i.e., <code>true -&gt; false</code>
+which is <code>false</code>, sure.
+</p>
+
+<p>
+Debug based on the printed theory (like on SMT request) needs to make mental revrsed translation:
+from them - back to the original WhyML code. Interesting, that Why3 does not solve it but prepares
+the query to SMT and SMT simplifies those logical formulas to short answer: "sat".
+</p>
+</div>
+</div>
+<div id="outline-container-orga9b6714" class="outline-2">
+<h2 id="orga9b6714">Debug output</h2>
+<div class="outline-text-2" id="text-orga9b6714">
+<p>
+Yet another approach for debugging is to use a special <code>--debug</code> CLI option (it requires different
+flags, you can see them with <code>--list-debug-flags</code>):
+</p>
+
+<pre class="example" id="org65f9baa">
+$ why3 prove Call1.mlw -P z3 --debug vc_debug
+</pre>
+
+<p>
+The output is an <b>intermediate language used internally by Why3's VC generator</b>, so syntax forms like
+<code>HAVOC</code>, <code>VAL</code>, <code>STOP</code>, <code>WITH</code>, etc. are part of Why3's internal program representation/VC-generation language:
+</p>
+
+<p>
+It is how Why3 <b>symbolically processes program expressions and constructs verification conditions
+(VC)</b>.
+</p>
+</div>
+<div id="outline-container-org888a63a" class="outline-3">
+<h3 id="org888a63a">Symbolic execution</h3>
+<div class="outline-text-3" id="text-org888a63a">
+<blockquote>
+<p>
+Symbolic execution is evaluating a program using symbolic values and logical constraints instead
+of running it with concrete inputs.
+</p>
+</blockquote>
+
+<p>
+For example, WhyML is:
+</p>
+
+<pre class="example" id="orge673ab3">
+if a1 = 0 then
+  100
+else
+  101
+</pre>
+
+<p>
+A normal execution might use the variable <code>a1 = 0</code>, choose the first branch, and return 100.
+</p>
+
+<p>
+Symbolic execution leaves <code>a1</code> <i>unknown and explores the two possible cases</i>:
+</p>
+
+<pre class="example" id="org2f20111">
+          Initial symbolic state:             
+             • a1: int                        
+             • trace.f1_calls: int            
+                      |                       
+          Test the condition a1 = 0           
+                   /    \                     
+                  /      \                    
+             a1 = 0    a1 &lt;&gt; 0                
+                /          \                  
+       first branch       second branch       
+       symbolic expr      symbolic expr       
+</pre>
+
+<p>
+Each branch has its own path condition and symbolic state.
+</p>
+
+<p>
+Why3 uses symbolic reasoning to construct a formula that expresses what must be true for the
+program to satisfy its specification. Its VC generator uses weakest-precondition calculus by
+default, with a strongest-postcondition mode also available.
+</p>
+
+<p>
+It is like integer integration, using a series or an analytical solution to the integral -
+resulting in a new formula.
+</p>
+
+<p>
+E.g., <code>HAVOC { trace @rho -&gt; { f1_calls1 -&gt; []; }};</code> <b>does not do any calls</b>, it describes an
+abstraction of a mutable-state update during VC generation. It isn't a runtime instruction that
+randomly changes the counter. And <code>STOP trace1.f1_calls = 0</code> <b>marks the terminal verification
+formula</b> for that symbolic computation. It doesn't mean that execution of main stopped at runtime.
+</p>
+
+<p>
+The next listing contain some tokens of this <i>internal representation</i>, it is not 100% stable, so,
+I suppose, it can changes lesser or more in the next versions, but the short brief table of them:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Token</th>
+<th scope="col" class="org-left">Meaning in this trace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left"><code>K VAL</code></td>
+<td class="org-left">Introduces a symbolic evaluation case; <code>K</code> is part of the internal trace notation</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>LET x = e</code></td>
+<td class="org-left">Binds a generated symbolic name to an expression</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>IF .. THEN .. ELSE ..</code></td>
+<td class="org-left">Processes the two conditional branches symbolically</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>HAVOC { .. }</code></td>
+<td class="org-left">Represents an abstract update to the symbolic memory/state</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>VAL .. WITH ..</code></td>
+<td class="org-left">Introduces a value together with logical conditions associated with it</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>STOP formula</code></td>
+<td class="org-left">Ends this symbolic evaluation with a verification formula to establish</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>vars = ..</code></td>
+<td class="org-left">Displays a mapping between symbolic variables/states</td>
+</tr>
+
+<tr>
+<td class="org-left"><code>regs = ..</code></td>
+<td class="org-left">Displays a mapping for symbolic memory regions</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-org74c9187" class="outline-3">
+<h3 id="org74c9187">Debug listing</h3>
+<div class="outline-text-3" id="text-org74c9187">
+<p>
+So, the option <code>--debug vc_debug</code> gives us this listing:
+</p>
+
+<pre class="example" id="orgbd4a2a3">
+ 1   &lt;vc_debug&gt;Calling eval_match with keep_trace = true
+ 2   K VAL ;
+ 3     LET o = 0;
+ 4     LET result = trace'mk o;
+ 5     LET trace'mk'result = result;
+ 6     STOP true
+ 7   K VAL _;
+ 8     LET trace = trace1;
+ 9     LET o1 = 1;
+10     LET o2 = trace1.f1_calls;
+11     LET f1_calls'result = o2;
+12     LET o3 = o2 + o1;
+13     LET (+)'result = o3;
+14     HAVOC { trace @rho -&gt; { f1_calls1 -&gt; [o3]; }};
+15     VAL result1;
+16     STOP f1_was_called (trace.f1_calls) (trace1.f1_calls)
+17   vars = (trace1 -&gt; trace2)
+18   regs = (trace @rho -&gt; trace2)
+19   &lt;vc_debug&gt;Calling eval_match with keep_trace = true
+20   K VAL a1;
+21     LET trace3 = trace1;
+22     LET o4 = 0;
+23     LET o5 = if a1 = o4 then True else False;
+24     LET (=)'result = o5;
+25     IF o5
+26     THEN LET o6 = ();
+27          LET trace4 = trace1;
+28          HAVOC { trace @rho -&gt; { f1_calls1 -&gt; []; }};
+29          VAL _1 WITH f1_was_called (trace4.f1_calls) (trace1.f1_calls);
+30          LET f1'result = _1;
+31          LET result2 = 100
+32     ELSE LET o7 = ();
+33          LET trace5 = trace1;
+34          HAVOC { trace @rho -&gt; { f1_calls1 -&gt; []; }};
+35          VAL _2 WITH f1_was_called (trace5.f1_calls) (trace1.f1_calls);
+36          LET f1'result1 = _2;
+37          LET result2 = 101;
+38     STOP result2 = (if a1 = 0 then 100 else 101) &amp;&amp;
+39          (a1 = 0 -&gt; f1_was_not_called (trace3.f1_calls) (trace1.f1_calls)) &amp;&amp;
+40          (not a1 = 0 -&gt; f1_was_called (trace3.f1_calls) (trace1.f1_calls))
+41   vars = (trace1 -&gt; trace6)
+42   regs = (trace @rho -&gt; trace6)
+43   vars = (trace1 -&gt; trace7)
+44   regs = (trace @rho -&gt; trace7)
+45   &lt;vc_debug&gt;Calling eval_match with keep_trace = true
+46   K VAL _3 WITH trace1.f1_calls = 0;
+47     LET o8 = 0;
+48     LET trace8 = trace1;
+49     HAVOC { trace @rho -&gt; { f1_calls1 -&gt; []; }};
+50     LET _4 = if o8 = 0 then 100 else 101 WITH
+51         (o8 = 0 -&gt; f1_was_not_called (trace8.f1_calls) (trace1.f1_calls)) /\
+52         (not o8 = 0 -&gt; f1_was_called (trace8.f1_calls) (trace1.f1_calls));
+53     LET f2'result = _4;
+54     LET result3 = ();
+55     STOP trace1.f1_calls = 0
+56   vars = (trace1 -&gt; trace9)
+57   regs = (trace @rho -&gt; trace9)
+58   &lt;vc_debug&gt;Calling eval_match with keep_trace = true
+59   File Call1.mlw:
+60   Goal f2'vc.
+61   Prover result is: Unknown (sat) (0.00s, 258 steps).
+</pre>
+
+<p>
+Lines 1..6 are the creating (constructing) of the ghost variable <code>trace</code> with the initial value 0
+for <code>f1_calls</code>. <code>STOP true</code> means the symbolic execution has reached a terminal condition whose
+verification formula is true - at the beginning there was <code>K VAL ;</code> introducing <i>a symbolic
+evaluation</i> of a value expression (the semicolon represents the empty or unit result in this
+context).
+</p>
+
+<p>
+Lines 7..18 is the verification of the body of <code>f1</code>:
+</p>
+
+<ul class="org-ul">
+<li>Line 7: Begins evaluation of the function body, whose result is unit: <code>_</code>.</li>
+<li>Line 8: Binds trace to the current symbolic record <code>trace1</code>.</li>
+<li>Line 9: Introduces the increment, 1.</li>
+<li>Line 10: Reads the current counter, <code>trace1.f1_calls</code>.</li>
+<li>Line 11: Gives that value another generated name.</li>
+<li>Line 12: Computes the incremented value, <code>o2 + o1</code>.</li>
+<li>Line 13: Names the result of the addition.</li>
+<li>Line 14: <code>HAVOC</code> updates the symbolic memory model to account for the write to <code>trace.f1_calls</code>. The
+new field value is <code>o3</code>. It does not mean that the counter is randomly modified; the preceding
+arithmetic determines its new value.</li>
+<li>Line 15: Introduces the unit result of <code>f1</code>.</li>
+<li>Line 16: Checks the postcondition <code>f1_was_called (trace.f1_calls) (trace1.f1_calls)</code> in this
+internal representation. Notice the ordering of the two record expressions here; the surrounding
+state substitutions matter when interpreting it.</li>
+<li>Line 17: Records the mapping <code>trace1 -&gt; trace2</code>.</li>
+<li>Line 18: Records the corresponding mapping for the memory region <code>trace @rho</code>.</li>
+</ul>
+
+<p>
+Then, the verification of <code>f2</code>:
+</p>
+
+<ul class="org-ul">
+<li>Line 19: Begins symbolic evaluation of <code>f2</code>.</li>
+<li>Line 20: Introduces the parameter <code>a1</code>.</li>
+<li>Line 21: Saves the current record state in <code>trace3</code>. This is useful for expressing postconditions
+relative to the initial state.</li>
+<li>Line 22: Introduces the constant zero.</li>
+<li>Line 23: Computes the branch condition, <code>a1 = 0</code>.</li>
+<li>Line 24: Names the Boolean result of the equality.</li>
+<li>Line 25: Starts symbolic execution of the conditional. Both branches are analyzed.</li>
+</ul>
+
+<p>
+and then:
+</p>
+
+<ul class="org-ul">
+<li>Line 26: Introduces the unit argument <code>()</code> passed to <code>f1()</code>.</li>
+<li>Line 27: Captures the current record state as <code>trace4</code>.</li>
+<li>Line 28: Havocs the mutable field in the symbolic memory model to account for the callee's
+declared write effect. The empty list <code>[]</code> here is part of the internal representation of the
+update; it does not mean that the call has no effect.</li>
+<li>Line 29: This is the key line for the call to <code>f1()</code> in the first branch. <code>VAL _1 WITH ..</code>
+introduces a symbolic result together with the logical contract condition associated with the
+call. The predicate <code>f1_was_called</code> describes the relationship between the states.</li>
+<li>Line 30: Binds the result of the call to the generated variable <code>f1'result</code>. Since <code>f1</code> returns unit,
+this is not an integer result.</li>
+<li>Line 31: Evaluates the branch's result to 100.</li>
+</ul>
+
+<p>
+Notice the difference from lines 10..14: here, where we call <code>f1</code>, Why3 does not symbolically
+execute the arithmetic in the body of <code>f1</code> like imperative languages do it. Instead, it models the
+call using the callee's effects and contract. This is the modular treatment of the function call.
+</p>
+
+<p>
+And the second call site:
+</p>
+
+<ul class="org-ul">
+<li>Line 32: Introduces the unit argument.</li>
+<li>Line 33: Captures the state in <code>trace5</code>.</li>
+<li>Line 34: Accounts for the callee's mutable-state effect.</li>
+<li>Line 35: This is the key line for the call to <code>f1()</code> in the else branch. The same postcondition is
+associated with this call.</li>
+<li>Line 36: Binds the unit result.</li>
+<li>Line 37: Evaluates the branch result to 101.</li>
+</ul>
+
+<p>
+So, calls of <code>f1</code> look as:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Source-level call</th>
+<th scope="col" class="org-right">vc<sub>debug</sub> line</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">f1() in the a1 = 0 branch</td>
+<td class="org-right">29</td>
+</tr>
+
+<tr>
+<td class="org-left">f1() in the else branch</td>
+<td class="org-right">35</td>
+</tr>
+</tbody>
+</table>
+
+<ul class="org-ul">
+<li>Lines 38..44 are the checking <code>f2</code>'s contract:</li>
+<li>Line 38: The result must match the postcondition <code>result = if a1 = 0 then 100 else 101</code>.</li>
+<li>Line 39: If <code>a1 = 0</code>, the counter must remain unchanged.</li>
+<li>Line 40: If <code>a1 &lt;&gt; 0</code>, the counter must increase by one.</li>
+<li>Lines 41..44: Record the symbolic substitutions for the two branches' resulting states. <code>trace6</code> and
+<code>trace7</code> are generated symbolic state names, not additional source-level calls.</li>
+</ul>
+
+<p>
+The <code>STOP</code> expression is particularly important: it combines all three postconditions of <code>f2</code>. The
+verification condition must establish this expression under the assumptions generated by symbolic
+execution.
+</p>
+
+<p>
+Lines 45..57: this section illustrates the call to <code>f2 0</code> and the attempt to establish main's
+postcondition:
+</p>
+
+<ul class="org-ul">
+<li>Line 45: Starts another symbolic evaluation.</li>
+<li>Line 46: The <code>WITH</code> clause supplies the assumption <code>trace1.f1_calls = 0</code>, corresponding to main's
+precondition.</li>
+<li>Line 47: Binds the argument 0.</li>
+<li>Line 48: Captures the initial state.</li>
+<li>Line 49: Accounts for <code>f2</code>'s declared write effect.</li>
+<li>Lines 50..52: Introduce the result and postconditions of <code>f2</code> at the call site. Notice that these
+are <code>f2</code>'s postconditions, not a fresh expansion of its implementation.</li>
+<li>Line 53: Binds the call result.</li>
+<li>Line 54: Evaluates the unit result of main.</li>
+<li>Line 55: The final obligation is <code>trace1.f1_calls = 0</code>, which is main's postcondition.</li>
+<li>Lines 56..57: Record the resulting symbolic state mapping.</li>
+</ul>
+
+<p>
+And the reported result:
+</p>
+
+<ul class="org-ul">
+<li>Line 58: Ends the trace-generation sequence.</li>
+<li>Line 59: Identifies the source file.</li>
+<li>Line 60: Names the verification goal <code>f2</code>'vc.</li>
+<li>Line 61: Reports the prover result. "Unknown (sat)" means the prover did not establish the goal as
+valid; the parenthesized sat indicates a satisfiable counterexample condition in this output
+format. It is not a proof that the goal is valid.</li>
+</ul>
+
+<p>
+Check the <a href="https://why3.org/doc/vcgen.html">documentation</a> and <a href="https://why3.gitlabpages.inria.fr/why3/technical.html">this</a> (includes also transformations) but in general no official
+documentation on the internal representation so I used AI to extract this info.
+</p>
+
+<p>
+OK, then, can we find the problem analyzing <code>vc_debug</code> listing? Yes, look:
+</p>
+
+<ul class="org-ul">
+<li>Line 25 is our <code>if a1 = 0</code></li>
+<li>Line 29 is the postcondition of the call of <code>f1</code> in the positive <code>if</code> branch</li>
+<li>Line 35 is the same but in the negative <code>if</code> branch</li>
+<li>so in both <code>if</code> branches <code>f1</code> is "called" (symbolically)</li>
+<li>but the postcondition of <code>f2</code> (line 38: <code>STOP ..</code>) is a conjunction including check
+<code>f1_was_not_called</code> for <code>a1=0</code>. It is the original <code>f2</code>'s postcondition
+<code>ensures { a1 = 0 -&gt; f1_was_not_called (old trace.f1_calls) trace.f1_calls }</code></li>
+</ul>
+
+<p>
+It literally corresponds to the original Why3. This is how Why3 treats it when it does "symbolic
+execution" and this is the problem with <code>f2</code>. Well, remember: this example is very simple, you can
+find the problem directly in Why3...
+</p>
+
+<p>
+OK, then Why doesn't Why3 reject <code>main</code> too? It cannot be satisfied, right? No, bcs these
+are <b>separate proof obligations</b>:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Proof obligation</th>
+<th scope="col" class="org-left">What Why3 uses</th>
+<th scope="col" class="org-left">Expected outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">f2'vc</td>
+<td class="org-left">The implementation of f2 and its postconditions</td>
+<td class="org-left">Fails: the first branch calls f1 but promises not to</td>
+</tr>
+
+<tr>
+<td class="org-left">main's VC</td>
+<td class="org-left">The precondition of main and the declared contract of f2</td>
+<td class="org-left">Can succeed: f2 promises to preserve the counter for argument zero</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>
+<p>
+The distinction is important: the caller's VC does not automatically inherit the
+implementation-level failure of the callee. It trusts the callee's contract for modular reasoning.
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="outline-container-orgecbcc25" class="outline-2">
+<h2 id="orgecbcc25">Ideas for AI</h2>
+<div class="outline-text-2" id="text-orgecbcc25">
+<p>
+You can pass all outputs to AI so it helps you to analyze it: the better together with WhyML
+original code. AI understands internal representation of the symbolic execution as well as SMT
+traces (queries), especially since their languages are good documented.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb6b207a" class="outline-2">
+<h2 id="orgb6b207a">Counterexamples</h2>
+<div class="outline-text-2" id="text-orgb6b207a">
+<p>
+Another technique is to get counterexamples, but they are not so useful. They can be got from IDE
+(press 'G' while you are on the node which is the result of proving) or from CLI:
+</p>
+
+<p>
+first, find the prover with counterexamples:
+</p>
+
+<pre class="example" id="orgf450e8b">
+$ why3 config show
+...
+[prover]
+alternative = "counterexamples"
+command = "'/usr/bin/cvc4' --stats --tlimit-per=%T --lang=smt2 %f"
+command_steps = "'/usr/bin/cvc4' --stats --rlimit=%S --lang=smt2 %f"
+driver = "cvc4_17_counterexample"
+editor = ""
+in_place = false
+interactive = false
+name = "CVC4"
+shortcut = "cvc4-ce"
+version = "1.8"
+...
+</pre>
+
+<p>
+then use this short name "cvc4-ce":
+</p>
+
+<pre class="example" id="orgffa5ad8">
+$ why3 prove Call1.mlw -P cvc4-ce
+File Call1.mlw:
+Goal f1'vc.
+Prover result is: Valid (0.01s, 231 steps).
+
+File Call1.mlw:
+Goal f2'vc.
+Prover result is: Unknown (sat) (0.01s, 725 steps).
+The following counterexample model has not been verified
+  (not checking CE model, missing option --check-ce):
+File int.mlw:
+  Line 16:
+    a1 : int = 0
+File Call1.mlw:
+  Line 6:
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 2}
+    trace : trace = {f1_calls = 2}
+    trace : trace = {f1_calls = 0}
+    trace : trace = {f1_calls = 0}
+    trace : int = 0
+    trace : int = 0
+  Line 13:
+    trace : int = 1
+    trace : int = -1
+  Line 17:
+    a1 : int = 0
+  Line 22:
+    result : int = 100
+    result : int = 100
+    result : int = 0
+    result : int = 0
+    result of call at line 22, characters 7-13 : bool = true
+    result of call at line 22, characters 7-13 : bool = true
+  Line 23:
+    trace : trace = {f1_calls = 1}
+    trace : trace = {f1_calls = 1}
+    trace : int = 1
+  Line 27:
+    trace : trace = {f1_calls = -2}
+    trace : trace = {f1_calls = -2}
+    trace : int = -1
+
+File Call1.mlw:
+Goal main'vc.
+Prover result is: Valid (0.00s, 214 steps).
+</pre>
+
+<p>
+It seems the line numbers correspond to non-empty lines, see it with <code>nl Call1.mlw</code>. This:
+</p>
+
+<pre class="example" id="org4e71288">
+  Line 17:
+    a1 : int = 0
+</pre>
+
+<p>
+could be useful - exactly at <code>a1=0</code> branch we unexpectedly call <code>f1</code>! Then this:
+</p>
+
+<pre class="example" id="orgee8fac7">
+  Line 23:
+    trace : trace = {f1_calls = 1}
+    trace : trace = {f1_calls = 1}
+</pre>
+
+<p>
+but we expected it to be <code>f1_calls = 0</code> (our <code>ensures { a1 = 0 -&gt; f1_was_not_called (old
+trace.f1_calls) trace.f1_calls }</code> says it). So, counterexamples also can help, but they look
+confusing - <b>they are not a trace corresponding to "calls" in some time line</b>
+</p>
+
+<blockquote>
+<p>
+A counterexample is most useful when it gives a concrete input or branch choice. It may be
+incomplete or awkwardly named, and it can include values that are irrelevant to the failure.
+</p>
+
+<p>
+Finally, "Unknown (sat)" means the prover produced a satisfying model for the negated VC, but Why3/Z3
+could not establish a proof. In this case, the sat model is the useful part: it exhibits the
+failing case.
+</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<div class='footer'></div>
+</div>
+</body>
+</html>
