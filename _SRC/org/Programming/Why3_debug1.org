@@ -73,7 +73,8 @@ i.e., ~f2~ cannot be proven. What does it mean?
 
 * Messages
 
-See [[https://why3.org/api/Call_provers.html][this]] - it is the source code of Why3:
+See [[https://why3.org/api/Call_provers.html][this]] - it is the source code of Why3 describing possible values of a prover result - one of
+them is ~Unknown~:
 
 #+name: prover_answer
 #+begin_example
@@ -334,6 +335,14 @@ Because ~a1=0 /\ ...~ and ~a1≠0 /\ ...~ are ~ensures {..}~ in our ~f2~:
 
 This is the first way to understand the reason of ~Unknown~.
 
+2 separate conclusions:
+
+- calls of functions (like of ~f1()~) usually are replaced by their postconditions (if they were
+  declared)
+- as you see SMT request could be simplified before to be form for SMT, but Why3 did not do it, it
+  means that more strict logical description of situation (more asserts, invariants, ...) can help
+  to make the request more optimal. It makes sense when you hit timeouts, out of memory, too slow prooving...
+
 * Theory printing
 
 Another way to see how Why3 came to the conclusion ~Unknown~ is to print the whole theory with:
@@ -414,9 +423,54 @@ The result is:
 67   end
 #+end_example
 
-The line 31 is the ~f2~ goal. It corresponds to SMT script. Looking at it we see ~if...else~ on
-lines 37...46 - they correspond to ~ensures {..}~ in WhyML.
+The line 31 is the ~f2~ goal. It corresponds to SMT script. First ~if a1 = 0~ is the same ~if~ in
+the original ~f2~ function. It introduces 2 branches (they mostly repeat each other bcs they are
+the same in the original ~f2~). Inside these branches we see ~ensures {..}~:
 
+#+begin_example
+...
+43  100 = (if a1 = 0 then 100 else 101) &&
+44  (a1 = 0 -> f1_was_not_called trace trace2) &&
+45  (not a1 = 0 -> f1_was_called trace trace2))
+...
+51  101 = (if a1 = 0 then 100 else 101) &&
+52  (a1 = 0 -> f1_was_not_called trace trace2) &&
+53  (not a1 = 0 -> f1_was_called trace trace2))
+...
+#+end_example
+
+#+begin_example
+;;         SMT request:
+(= 100 (ite (= a1 0) 100 101))
+(and
+  (=> (= a1 0) (= trace2 trace1))
+  (=> (not (= a1 0)) (f1_was_called trace1 trace2))))))
+#+end_example
+
+The same. The printed theory is the code translated +/- to the SMT request.
+
+Another very interesting place is:
+
+#+begin_example
+...
+47     forall trace2:int.
+48      let trace'unused2 = Trace'mk trace2 in
+49      f1_was_called trace trace2 ->
+...
+#+end_example
+
+and if you ask "but where is my call of ~f1~?" then - this is. The function ~f1~ effects the ghost
+variable ~trace~, so it is created by its constructor ~Trace'mk~ (sure under universal quantifier
+~forall trace2:int~) and then we see checking of the ~f1~'s postcondition:
+~f1_was_called trace trace2~. Pay attention, it is represented *as a left side of an implication*:
+
+#+begin_quote
+It means that the postcondition of ~f1()~ is used as a hypothesis for the subsequent proof obligation.
+#+end_quote
+
+The surrounding quantifiers, implications, and branch conditions determine how that relation is used.
+
+Now, looking at the printed theory, you can also find the problem:
 
 
 TODO
