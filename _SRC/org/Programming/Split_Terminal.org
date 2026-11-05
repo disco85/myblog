@@ -1,0 +1,137 @@
+#+title: Tiling Terminal and Emacs
+#+description: How to use emacs with tiling terminal
+#+keywords: terminal,emacs
+#+options: smartquotes:nil
+#+options: html-style:nil html-scripts:nil author:nil validate:nil html-allow-html:t tex:t ':nil ...:nil -:nil
+#+property: header-args :eval no-export
+#+tags: Terminal Emacs
+#+date: <2026-11-05 Thu 17:10>
+
+* The goal
+
+Imagine you want to have a chat with an AI in one window, while in another window right next to it,
+you open the code at the exact location the AI is referring to. You can browse you code in the one
+window with Emacs. In another one - is your AI CLI client. Well, you can use wonderful Emacs
+packages for AI:
+
+- [[https://github.com/xenodium/agent-shell][agent-shell]]
+- [[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide]]
+- [[https://github.com/stevemolitor/claude-code.el][claude-code]]
+
+and many others. But sometimes you want to run the original CLI client (for example, Claude Code
+supports more new models then, for example, ~agent-shell~). Well, you can run AI in dedicated
+terminal window but it also can have problems (no way to walk free among the terminal, etc), also
+~clause-code-ide~ opens it in a side panel and no way to manipulate its buffer in free way.
+
+* Tiling terminal
+
+The solution can be usage of a tiling terminal. There are many such terminals for Linux (and for
+Windows too!), one of them is GNOME application [[https://gnome-terminator.org/][Terminator]]. It supports tabs, splitting, custom
+keyboard strokes, etc, etc and custom plugins /allowing to control links recognition./
+
+Create in your ~$HOME/.config~ directory:
+
+#+begin_example
+.
+├── config
+└── plugins/
+    └── emacs_url_handler.py
+#+end_example
+
+And put to this ~emacs_url_plugin.py~ file this code:
+
+#+begin_src python :eval no
+#!/usr/bin/env python3
+# Terminator URL-handler plugin + executable
+# Recognizes:
+#   src/main.c:42
+#   src/main.c
+#   ./lib/foo.py:123
+#   /home/xyz/project/app.js
+#   /home/xyz/project/app.js:55
+
+import os
+import sys
+import subprocess
+from urllib.parse import urlsplit, parse_qs, urlencode
+
+# XXX PUT REAL PATH TO YOUR EMACSCLIENT OR JUST 'emacsclient' IF IT IN IN $PATH
+EMACSCLIENT = '/home/xyz/emacs30/bin/emacsclient'
+
+# When executed by Terminator as a URL handler:
+if __name__ == "__main__":
+    uri = sys.argv[1]
+    parsed = urlsplit(uri)
+    if parsed.scheme == "emacs" and parsed.netloc == "open":
+        params = parse_qs(parsed.query)
+        filename = params["file"][0]
+        line = params.get("line", [""])[0]
+        filename = os.path.abspath(filename)
+        args = [EMACSCLIENT, "-n"]
+        if line:
+            args.append("+" + line)
+        args.append(filename)
+        print(
+            f"Try to open {filename}"
+            + (f" at line {line}" if line else "")
+        )
+        subprocess.Popen(args)
+    else:
+        subprocess.Popen(["xdg-open", uri])
+    sys.exit(0)
+
+# When imported by Terminator as a plugin:
+import terminatorlib.plugin as plugin
+class EmacsPathLineURLHandler(plugin.URLHandler):
+    capabilities = ["url_handler"]
+    handler_name = "emacs_path_line"
+    # Recognizes filenames with extensions, optionally followed by :line.
+    match = r'([[:alnum:]_./+-]+\.[[:alnum:]_+-]+(?::[0-9]+)?)'
+    nameopen = "Open in Emacs"
+    namecopy = "Copy Emacs URL"
+    def callback(self, url):
+        if ":" in url and url.rsplit(":", 1)[1].isdigit():
+            filename, line = url.rsplit(":", 1)
+        else:
+            filename = url
+            line = ""
+        query = urlencode({
+            "file": filename,
+            "line": line
+        })
+        return "emacs://open/?" + query
+AVAILABLE = ["EmacsPathLineURLHandler"]
+#+end_src
+
+and add to the content of the ~config~ file this:
+
+#+begin_example
+[global_config]
+  use_custom_url_handler = True
+  custom_url_handler = /home/xyz/.config/terminator/plugins/emacs_url_handler.py
+  enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EmacsPathLineURLHandler
+#+end_example
+
+As you see, we also added our plugin name ~EmacsPathLineURLHandler~ to the list of enabled plugins.
+
+Then you can configure Terminator like you like, for example I bound ~F11~ key to full screen, ~F12~
+to toggle of the terminal (you can maximize just one, current pane/console) and unbound all other
+keys so Emacs could use them.
+
+Then I asked AI always to use absolute paths (when no location) or ~<absolute-path>:<line-number>~
+when there is some known location (put it to skills of your AI, example for [[https://code.claude.com/docs/en/skills][Claude Code]]).
+
+Now, when AI prints you some path to a file (with or without a line), press CTRL and click on it
+with the mouse. It will call ~emacsclient~. And Emacs running in the other pane of the Terminator
+will open the fil at the right line. Sure you need:
+
+#+begin_example
+(server-start)
+#+end_example
+
+in your ~init.el~ file in Emacs.
+
+* Other plugins
+
+Ask AI for other plugin ideas - they can easy wrote you plugins for GNOME Terminator like Claude did
+it for me :)
