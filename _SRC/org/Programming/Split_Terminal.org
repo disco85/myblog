@@ -41,66 +41,30 @@ Create in your ~$HOME/.config~ directory:
 And put to this ~emacs_url_plugin.py~ file this code:
 
 #+begin_src python :eval no
-#!/usr/bin/env python3
-# Terminator URL-handler plugin + executable
-# Recognizes:
-#   src/main.c:42
-#   src/main.c
-#   ./lib/foo.py:123
-#   /home/xyz/project/app.js
-#   /home/xyz/project/app.js:55
-
 import os
-import sys
 import subprocess
-from urllib.parse import urlsplit, parse_qs, urlencode
-
-# XXX PUT REAL PATH TO YOUR EMACSCLIENT OR JUST 'emacsclient' IF IT IN IN $PATH
-EMACSCLIENT = '/home/xyz/emacs30/bin/emacsclient'
-
-# When executed by Terminator as a URL handler:
-if __name__ == "__main__":
-    uri = sys.argv[1]
-    parsed = urlsplit(uri)
-    if parsed.scheme == "emacs" and parsed.netloc == "open":
-        params = parse_qs(parsed.query)
-        filename = params["file"][0]
-        line = params.get("line", [""])[0]
-        filename = os.path.abspath(filename)
-        args = [EMACSCLIENT, "-n"]
-        if line:
-            args.append("+" + line)
-        args.append(filename)
-        print(
-            f"Try to open {filename}"
-            + (f" at line {line}" if line else "")
-        )
-        subprocess.Popen(args)
-    else:
-        subprocess.Popen(["xdg-open", uri])
-    sys.exit(0)
-
-# When imported by Terminator as a plugin:
 import terminatorlib.plugin as plugin
+
+AVAILABLE = ["EmacsPathLineURLHandler"]
+
 class EmacsPathLineURLHandler(plugin.URLHandler):
     capabilities = ["url_handler"]
     handler_name = "emacs_path_line"
-    # Recognizes filenames with extensions, optionally followed by :line.
-    match = r'([[:alnum:]_./+-]+\.[[:alnum:]_+-]+(?::[0-9]+)?)'
+    match = r'([A-Za-z0-9_./+-]+\.[A-Za-z0-9_+-]+(?::[0-9]+)?)'
     nameopen = "Open in Emacs"
     namecopy = "Copy Emacs URL"
     def callback(self, url):
         if ":" in url and url.rsplit(":", 1)[1].isdigit():
             filename, line = url.rsplit(":", 1)
         else:
-            filename = url
-            line = ""
-        query = urlencode({
-            "file": filename,
-            "line": line
-        })
-        return "emacs://open/?" + query
-AVAILABLE = ["EmacsPathLineURLHandler"]
+            filename, line = url, ""
+        filename = os.path.abspath(filename)
+        args = ["emacsclient", "-n"]
+        if line:
+            args.append("+" + line)
+        args.append(filename)
+        subprocess.Popen(args)
+        return "terminator://emacs-open"
 #+end_src
 
 and add to the content of the ~config~ file this:
@@ -113,6 +77,7 @@ and add to the content of the ~config~ file this:
 #+end_example
 
 As you see, we also added our plugin name ~EmacsPathLineURLHandler~ to the list of enabled plugins.
+It works with new GNOME Terminal versions.
 
 Then you can configure Terminator like you like, for example I bound ~F11~ key to full screen, ~F12~
 to toggle of the terminal (you can maximize just one, current pane/console) and unbound all other

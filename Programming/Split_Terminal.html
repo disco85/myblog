@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-11-05 Thu 17:46 -->
+<!-- 2026-11-05 Thu 20:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tiling Terminal and Emacs</title>
@@ -355,7 +355,7 @@ keyboard strokes, etc, etc and custom plugins <i>allowing to control links recog
 Create in your <code>$HOME/.config</code> directory:
 </p>
 
-<pre class="example" id="org345cbdb">
+<pre class="example" id="org88cfb05">
 .
 ├── config
 └── plugins/
@@ -367,66 +367,30 @@ And put to this <code>emacs_url_plugin.py</code> file this code:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/env python3
-</span><span class="org-comment-delimiter"># </span><span class="org-comment">Terminator URL-handler plugin + executable
-</span><span class="org-comment-delimiter"># </span><span class="org-comment">Recognizes:
-</span><span class="org-comment-delimiter">#   </span><span class="org-comment">src/main.c:42
-</span><span class="org-comment-delimiter">#   </span><span class="org-comment">src/main.c
-</span><span class="org-comment-delimiter">#   </span><span class="org-comment">./lib/foo.py:123
-</span><span class="org-comment-delimiter">#   </span><span class="org-comment">/home/xyz/project/app.js
-</span><span class="org-comment-delimiter">#   </span><span class="org-comment">/home/xyz/project/app.js:55
-</span>
-<span class="org-keyword">import</span> os
-<span class="org-keyword">import</span> sys
+<pre class="src src-python"><span class="org-keyword">import</span> os
 <span class="org-keyword">import</span> subprocess
-<span class="org-keyword">from</span> urllib.parse <span class="org-keyword">import</span> urlsplit, parse_qs, urlencode
+<span class="org-keyword">import</span> terminatorlib.plugin <span class="org-keyword">as</span> plugin
 
-<span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> PUT REAL PATH TO YOUR EMACSCLIENT OR JUST 'emacsclient' IF IT IN IN $PATH
-</span><span class="org-variable-name">EMACSCLIENT</span> <span class="org-operator">=</span> <span class="org-string">'/home/xyz/emacs30/bin/emacsclient'</span>
+<span class="org-variable-name">AVAILABLE</span> <span class="org-operator">=</span> [<span class="org-string">"EmacsPathLineURLHandler"</span>]
 
-<span class="org-comment-delimiter"># </span><span class="org-comment">When executed by Terminator as a URL handler:
-</span><span class="org-keyword">if</span> <span class="org-builtin">__name__</span> <span class="org-operator">==</span> <span class="org-string">"__main__"</span>:
-    <span class="org-variable-name">uri</span> <span class="org-operator">=</span> sys.argv[1]
-    <span class="org-variable-name">parsed</span> <span class="org-operator">=</span> urlsplit(uri)
-    <span class="org-keyword">if</span> parsed.scheme <span class="org-operator">==</span> <span class="org-string">"emacs"</span> <span class="org-keyword">and</span> parsed.netloc <span class="org-operator">==</span> <span class="org-string">"open"</span>:
-        <span class="org-variable-name">params</span> <span class="org-operator">=</span> parse_qs(parsed.query)
-        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> params[<span class="org-string">"file"</span>][0]
-        <span class="org-variable-name">line</span> <span class="org-operator">=</span> params.get(<span class="org-string">"line"</span>, [<span class="org-string">""</span>])[0]
-        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> os.path.abspath(filename)
-        <span class="org-variable-name">args</span> <span class="org-operator">=</span> [EMACSCLIENT, <span class="org-string">"-n"</span>]
-        <span class="org-keyword">if</span> line:
-            args.append(<span class="org-string">"+"</span> <span class="org-operator">+</span> line)
-        args.append(filename)
-        <span class="org-builtin">print</span>(
-            f<span class="org-string">"Try to open </span>{filename}<span class="org-string">"</span>
-            <span class="org-operator">+</span> (f<span class="org-string">" at line </span>{line}<span class="org-string">"</span> <span class="org-keyword">if</span> line <span class="org-keyword">else</span> <span class="org-string">""</span>)
-        )
-        subprocess.Popen(args)
-    <span class="org-keyword">else</span>:
-        subprocess.Popen([<span class="org-string">"xdg-open"</span>, uri])
-    sys.<span class="org-constant">exit</span>(0)
-
-<span class="org-comment-delimiter"># </span><span class="org-comment">When imported by Terminator as a plugin:
-</span><span class="org-keyword">import</span> terminatorlib.plugin <span class="org-keyword">as</span> plugin
 <span class="org-keyword">class</span> <span class="org-type">EmacsPathLineURLHandler</span>(plugin.URLHandler):
     <span class="org-variable-name">capabilities</span> <span class="org-operator">=</span> [<span class="org-string">"url_handler"</span>]
     <span class="org-variable-name">handler_name</span> <span class="org-operator">=</span> <span class="org-string">"emacs_path_line"</span>
-    <span class="org-comment-delimiter"># </span><span class="org-comment">Recognizes filenames with extensions, optionally followed by :line.
-</span>    <span class="org-keyword">match</span> <span class="org-operator">=</span> r<span class="org-string">'([[:alnum:]_./+-]+\.[[:alnum:]_+-]+(?::[0-9]+)?)'</span>
+    <span class="org-keyword">match</span> <span class="org-operator">=</span> r<span class="org-string">'([A-Za-z0-9_./+-]+\.[A-Za-z0-9_+-]+(?::[0-9]+)?)'</span>
     <span class="org-variable-name">nameopen</span> <span class="org-operator">=</span> <span class="org-string">"Open in Emacs"</span>
     <span class="org-variable-name">namecopy</span> <span class="org-operator">=</span> <span class="org-string">"Copy Emacs URL"</span>
     <span class="org-keyword">def</span> <span class="org-function-name">callback</span>(<span class="org-keyword">self</span>, url):
         <span class="org-keyword">if</span> <span class="org-string">":"</span> <span class="org-keyword">in</span> url <span class="org-keyword">and</span> url.rsplit(<span class="org-string">":"</span>, 1)[1].isdigit():
             <span class="org-variable-name">filename</span>, <span class="org-variable-name">line</span> <span class="org-operator">=</span> url.rsplit(<span class="org-string">":"</span>, 1)
         <span class="org-keyword">else</span>:
-            <span class="org-variable-name">filename</span> <span class="org-operator">=</span> url
-            <span class="org-variable-name">line</span> <span class="org-operator">=</span> <span class="org-string">""</span>
-        <span class="org-variable-name">query</span> <span class="org-operator">=</span> urlencode({
-            <span class="org-string">"file"</span>: filename,
-            <span class="org-string">"line"</span>: line
-        })
-        <span class="org-keyword">return</span> <span class="org-string">"emacs://open/?"</span> <span class="org-operator">+</span> query
-<span class="org-variable-name">AVAILABLE</span> <span class="org-operator">=</span> [<span class="org-string">"EmacsPathLineURLHandler"</span>]
+            <span class="org-variable-name">filename</span>, <span class="org-variable-name">line</span> <span class="org-operator">=</span> url, <span class="org-string">""</span>
+        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> os.path.abspath(filename)
+        <span class="org-variable-name">args</span> <span class="org-operator">=</span> [<span class="org-string">"emacsclient"</span>, <span class="org-string">"-n"</span>]
+        <span class="org-keyword">if</span> line:
+            args.append(<span class="org-string">"+"</span> <span class="org-operator">+</span> line)
+        args.append(filename)
+        subprocess.Popen(args)
+        <span class="org-keyword">return</span> <span class="org-string">"terminator://emacs-open"</span>
 </pre>
 </div>
 
@@ -434,7 +398,7 @@ And put to this <code>emacs_url_plugin.py</code> file this code:
 and add to the content of the <code>config</code> file this:
 </p>
 
-<pre class="example" id="orgfec9025">
+<pre class="example" id="orgacceb31">
 [global_config]
   use_custom_url_handler = True
   custom_url_handler = /home/xyz/.config/terminator/plugins/emacs_url_handler.py
@@ -443,6 +407,7 @@ and add to the content of the <code>config</code> file this:
 
 <p>
 As you see, we also added our plugin name <code>EmacsPathLineURLHandler</code> to the list of enabled plugins.
+It works with new GNOME Terminal versions.
 </p>
 
 <p>
@@ -462,7 +427,7 @@ with the mouse. It will call <code>emacsclient</code>. And Emacs running in the 
 will open the fil at the right line. Sure you need:
 </p>
 
-<pre class="example" id="org5022458">
+<pre class="example" id="org7f9b831">
 (server-start)
 </pre>
 
