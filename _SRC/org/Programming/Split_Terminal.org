@@ -72,7 +72,7 @@ and add to the content of the ~config~ file this:
 #+begin_example
 [global_config]
   use_custom_url_handler = True
-  custom_url_handler = /home/xyz/.config/terminator/plugins/emacs_url_handler.py
+  custom_url_handler = /home/YOUR-NAME/.config/terminator/plugins/emacs_url_plugin.py
   enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EmacsPathLineURLHandler
 #+end_example
 
@@ -95,6 +95,583 @@ will open the fil at the right line. Sure you need:
 #+end_example
 
 in your ~init.el~ file in Emacs.
+
+** Fully functional navigator
+
+My next attempt was to fix some problems and to implement (with AI) navigation using:
+
+- jump to Git hash (branch...) in Emacs vc-dir - without to checkout it, just to put the point on it
+  in the git log
+- jump to the definition
+- find a tag
+- find usage of something
+- open a file (optionally with a line or/and a column), directory
+- etc...
+
+"Links" (including Git revisions) are "jumpable" with CTRL-mouse-click, other things - select it then
+open the popup menu and choose Emacs menu item...
+
+This is the full plugin code - just change if you want the paths to your ~emacsclient~ (btw, it can be
+set as an environment variable ~EMACSCLIENT~ as well) - this is =~/.config/terminator/plugins/emacs_nav.py=:
+
+#+begin_src python :eval no
+#!/usr/bin/env python3
+"""
+Terminator Emacs Navigation plugin.
+Features:
+  ,* Clickable file/path/line/column references.
+  ,* Right-click Emacs submenu for selected text.
+  ,* Tags, Xref, Imenu navigation.
+  ,* Project-aware regexp search, with rgrep fallback.
+  ,* Git commit hashes: show the commit in the vc root log (C-x v L).
+"""
+import os
+import re
+import shutil
+import subprocess
+import logging
+from gi.repository import Gtk, Gdk
+import terminatorlib.plugin as plugin
+AVAILABLE = ["EmacsPathLineURLHandler", "EmacsNavigationMenu"]
+LOG = logging.getLogger(__name__)
+
+
+def find_emacsclient():
+    """Locate emacsclient: $EMACSCLIENT, PATH, next to `emacs`, local builds."""
+    env = os.environ.get("EMACSCLIENT")
+    if env and os.access(env, os.X_OK):
+        return env
+    found = shutil.which("emacsclient")
+    if found:
+        return found
+    # e.g. ~/.local/bin/emacs -> ~/emacs30/bin/emacs-30.1 => ~/emacs30/bin/emacsclient
+    emacs = shutil.which("emacs")
+    if emacs:
+        candidate = os.path.join(os.path.dirname(os.path.realpath(emacs)), "emacsclient")
+        if os.access(candidate, os.X_OK):
+            return candidate
+    # XXX better change them to your paths where emacslient binary can be:
+    for candidate in ("~/emacs30/bin/emacsclient", "~/emacs29/bin/emacsclient",
+                      "/usr/local/bin/emacsclient", "/usr/bin/emacsclient"):
+        candidate = os.path.expanduser(candidate)
+        if os.access(candidate, os.X_OK):
+            return candidate
+    return "emacsclient"
+
+
+# Override by exporting EMACSCLIENT=/path/to/emacsclient before starting Terminator.
+EMACSCLIENT = find_emacsclient()
+# ------------------------------------------------------------
+# Common helpers
+# ------------------------------------------------------------
+def run_emacs(*args):
+    """Launch emacsclient without a shell."""
+    try:
+        subprocess.Popen([EMACSCLIENT, "-n"] + list(args), close_fds=True)
+    except OSError:
+        LOG.exception("Cannot execute emacsclient: %s", EMACSCLIENT)
+def lisp_string(value):
+    """Convert Python string into a properly quoted Lisp string."""
+    value = str(value)
+    value = value.replace("\\", "\\\\")
+    value = value.replace('"', '\\"')
+    value = value.replace("\n", "\\n")
+    value = value.replace("\r", "\\r")
+    return '"' + value + '"'
+def eval_emacs(expression):
+    run_emacs("--eval", expression)
+
+# Elisp helpers sent along with every xref request.
+#
+# Why not just (xref-find-definitions "ID")?
+#  * emacsclient --eval runs in an arbitrary buffer (whatever the server has
+#    current), so the wrong xref backend / project is used.
+#  * Eglot ignores the ID string (unless it sits in its completion cache) and
+#    looks up the symbol AT POINT instead -- so a plain string finds nothing.
+# So: pick a buffer of the terminal's project as context, resolve the ID via
+# LSP workspace/symbol (exact name), falling back to the non-LSP backends
+# (dumb-jump, etags).  For references, jump to the definition and ask there.
+XREF_ELISP = r'''
+(progn
+  (require 'xref)
+  (require 'project)
+  (require 'seq)
+  (require 'cl-lib)
+  (require 'imenu)
+
+  (defun terminator-nav--project-buffers (dir)
+    "File buffers inside DIR's project (or DIR), most recent first."
+    (let* ((dir (file-name-as-directory (file-truename dir)))
+           (proj (let ((default-directory dir))
+                   (ignore-errors (project-current nil))))
+           (root (if proj
+                     (file-name-as-directory (file-truename (project-root proj)))
+                   dir)))
+      (seq-filter
+       (lambda (b)
+         (let ((f (buffer-file-name b)))
+           (and f (string-prefix-p root (file-truename f)))))
+       (buffer-list))))
+
+  (defun terminator-nav--context-buffer (dir)
+    "Most recent file buffer inside DIR's project; Eglot-managed preferred."
+    (let ((bufs (terminator-nav--project-buffers dir)))
+      (or (seq-find (lambda (b)
+                      (with-current-buffer b
+                        (and (fboundp 'eglot-managed-p) (eglot-managed-p))))
+                    bufs)
+          (car bufs))))
+
+  (defun terminator-nav--eglot-defs (id)
+    "Definitions of ID via LSP workspace/symbol, exact name match."
+    (when (and (fboundp 'eglot-managed-p) (eglot-managed-p)
+               (eglot-server-capable :workspaceSymbolProvider))
+      (delq nil
+            (mapcar
+             (lambda (s)
+               (let ((wss (get-text-property 0 'eglot--lsp-workspaceSymbol s)))
+                 (when (equal (plist-get wss :name) id)
+                   (let ((loc (plist-get wss :location)))
+                     (eglot--xref-make-match id (plist-get loc :uri)
+                                             (plist-get loc :range))))))
+             (ignore-errors (eglot--workspace-symbols id))))))
+
+  (defun terminator-nav--plain-backend ()
+    "First non-Eglot xref backend (dumb-jump, etags, ...) for this buffer."
+    (let ((xref-backend-functions
+           (remq 'eglot-xref-backend (default-value 'xref-backend-functions))))
+      (xref-find-backend)))
+
+  (defun terminator-nav--plain-defs (id)
+    (let ((backend (terminator-nav--plain-backend)))
+      (and backend (ignore-errors (xref-backend-definitions backend id)))))
+
+  (defun terminator-nav-xref (id dir kind)
+    "Show definitions or references (KIND) of ID, using DIR's project."
+    (let* ((ctx (or (terminator-nav--context-buffer dir)
+                    (with-current-buffer (get-buffer-create " *terminator-nav*")
+                      (setq default-directory (file-name-as-directory dir))
+                      (current-buffer))))
+           (lsp-defs (with-current-buffer ctx (terminator-nav--eglot-defs id)))
+           (defs (or lsp-defs
+                     (with-current-buffer ctx (terminator-nav--plain-defs id)))))
+      (ignore-errors (select-frame-set-input-focus (selected-frame)))
+      (when (window-minibuffer-p (selected-window))
+        (select-window (or (minibuffer-selected-window) (get-largest-window))))
+      (cond
+       ((eq kind 'definitions)
+        (if (null defs)
+            (message "Terminator: no definition found for %s" id)
+          (xref-push-marker-stack)
+          (xref--show-defs (lambda () defs) nil)))
+       (lsp-defs
+        ;; Eglot finds references of the symbol at point: go to the definition.
+        (let ((m (xref-location-marker (xref-item-location (car lsp-defs)))))
+          (with-current-buffer (marker-buffer m)
+            (unless (and (fboundp 'eglot-managed-p) (eglot-managed-p))
+              (ignore-errors (eglot--maybe-activate-editing-mode)))
+            (save-excursion
+              (goto-char m)
+              (when (re-search-forward
+                     (concat "\\_<" (regexp-quote id) "\\_>")
+                     (save-excursion (forward-line 5) (point)) t)
+                (goto-char (match-beginning 0)))
+              (xref-find-references id)))))
+       (t
+        (with-current-buffer ctx
+          (let ((xref-backend-functions
+                 (remq 'eglot-xref-backend
+                       (default-value 'xref-backend-functions))))
+            (xref-find-references id))))))))
+
+  (defun terminator-nav--imenu-find (id index)
+    "Imenu item in INDEX named ID (exact), else one containing ID as a word."
+    (let ((re (concat "\\_<" (regexp-quote id) "\\_>"))
+          exact fuzzy)
+      (cl-labels ((walk (alist)
+                    (dolist (elt alist)
+                      (cond ((imenu--subalist-p elt)
+                             ;; Eglot: a symbol with children (e.g. an object
+                             ;; or class) is a group; its position lives in
+                             ;; the `breadcrumb-region' text property.
+                             (let* ((name (car elt))
+                                    (reg (and (stringp name)
+                                              (get-text-property
+                                               0 'breadcrumb-region name)))
+                                    (item (and reg (cons name (car reg)))))
+                               (when item
+                                 (cond ((equal name id)
+                                        (unless exact (setq exact item)))
+                                       ((string-match-p re name)
+                                        (unless fuzzy (setq fuzzy item))))))
+                             (walk (cdr elt)))
+                            ((not (stringp (car-safe elt))))
+                            ((equal (car elt) id) (unless exact (setq exact elt)))
+                            ((string-match-p re (car elt))
+                             (unless fuzzy (setq fuzzy elt)))))))
+        (walk index))
+      (or exact fuzzy)))
+
+  (defun terminator-nav-imenu (id dir)
+    "Jump to imenu entry ID: shown buffer first, then DIR's project buffers.
+If not found, prompt with ID pre-filled."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (require 'imenu)
+    (let* ((shown (window-buffer (selected-window)))
+           (bufs (delete-dups
+                  (append (and (buffer-file-name shown) (list shown))
+                          (terminator-nav--project-buffers dir))))
+           (prompt-buf (car bufs))
+           found)
+      (while (and bufs (not found))
+        (let* ((buf (pop bufs))
+               (item (with-current-buffer buf
+                       (ignore-errors
+                         (terminator-nav--imenu-find
+                          id (imenu--make-index-alist t))))))
+          (when item (setq found (cons buf item)))))
+      (if found
+          (progn
+            (xref-push-marker-stack)
+            (switch-to-buffer (car found))
+            (imenu (cdr found)))
+        (if (not prompt-buf)
+            (message "Terminator: no imenu entry %s (no project file open)" id)
+          ;; Prompt in a real file buffer, not e.g. *Messages*.
+          (switch-to-buffer prompt-buf)
+          (let ((enable-recursive-minibuffers t))
+            (minibuffer-with-setup-hook (lambda () (insert id))
+              (call-interactively #'imenu)))))))
+
+  (defun terminator-nav-find-tag (id dir)
+    "Find ID using the nearest TAGS file at/above DIR; never prompt for one."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (require 'etags)
+    (let ((root (locate-dominating-file dir "TAGS")))
+      (if (not root)
+          (message "Terminator: no TAGS file in %s or above (create one: etags / ctags -e -R)"
+                   (abbreviate-file-name dir))
+        (let ((tags-file-name (expand-file-name "TAGS" root))
+              (tags-table-list nil)
+              (xref-backend-functions '(etags--xref-backend)))
+          (condition-case err
+              (xref-find-definitions id)
+            (error (message "Terminator: %s" (error-message-string err))))))))
+'''
+
+
+# Elisp for "show commit in vc log": open the root log (C-x v L) of the
+# terminal's repository and put point on the commit's line.  Does NOT check
+# anything out.
+#  * The log is async: point is moved with `vc-run-delayed' once git is done.
+#  * vc-git-show-log-entry only understands the long format ("commit HASH"),
+#    the root log is the short one (abbreviated %h), so lines are matched via
+#    `log-view-message-re' and a prefix test against the full hash.
+#  * The limit (`vc-log-show-limit', 2000 by default) is raised so that old
+#    commits are still in the log; a commit not reachable from HEAD (another
+#    branch) gets a log starting at that commit.
+GIT_ELISP = r'''
+(progn
+  (require 'vc)
+  (require 'vc-git)
+  (require 'log-view)
+
+  (defun terminator-nav--git (dir &rest args)
+    "Trimmed output of git ARGS in DIR, or nil if git fails."
+    (let ((default-directory (file-name-as-directory dir)))
+      (with-temp-buffer
+        (when (eq 0 (apply #'process-file "git" nil '(t nil) nil args))
+          (string-trim (buffer-string))))))
+
+  (defun terminator-nav--goto-commit (full)
+    "In a log-view buffer, move point to the entry of commit FULL."
+    (let ((pos (save-excursion
+                 (goto-char (point-min))
+                 (catch 'found
+                   (while (re-search-forward log-view-message-re nil t)
+                     (let ((rev (match-string-no-properties 1)))
+                       (when (and rev (>= (length rev) 4)
+                                  (string-prefix-p rev full))
+                         (throw 'found (line-beginning-position)))))
+                   nil))))
+      (if (not pos)
+          (message "Terminator: commit %s is not in the log" (substring full 0 10))
+        (goto-char pos)
+        ;; vc's process sentinel restores point afterwards unless told so.
+        (setq vc-sentinel-movepoint pos)
+        (dolist (w (get-buffer-window-list (current-buffer) nil t))
+          (set-window-point w pos))
+        (let ((w (get-buffer-window (current-buffer) t)))
+          (when w (select-window w) (recenter)))
+        (when (fboundp 'pulse-momentary-highlight-one-line)
+          (pulse-momentary-highlight-one-line pos))
+        (message "Terminator: commit %s" (substring full 0 10)))))
+
+  (defun terminator-nav-git-log (hash dir)
+    "Show the vc root log of DIR's repository with point on commit HASH."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (let* ((root (terminator-nav--git dir "rev-parse" "--show-toplevel"))
+           (full (and root (terminator-nav--git
+                            dir "rev-parse" "--verify" "--quiet"
+                            (concat hash "^{commit}")))))
+      (cond
+       ((not root) (message "Terminator: %s is not in a Git repository"
+                            (abbreviate-file-name dir)))
+       ((not full) (message "Terminator: %s is not a commit in %s"
+                            hash (abbreviate-file-name root)))
+       (t
+        (let* ((ancestor (terminator-nav--git
+                          root "merge-base" "--is-ancestor" full "HEAD"))
+               (newer (and ancestor
+                           (string-to-number
+                            (or (terminator-nav--git
+                                 root "rev-list" "--count" (concat full "..HEAD"))
+                                "0"))))
+               (limit (and (> vc-log-show-limit 0)
+                           (max vc-log-show-limit (+ (or newer 0) 100)))))
+          ;; What `vc-print-root-log' (C-x v L) does, but with an explicit
+          ;; backend and root: it deduces them from the current buffer,
+          ;; which for emacsclient may be unrelated to the terminal's repo.
+          (let ((root (file-name-as-directory root)))
+            (let ((default-directory root))
+              (vc-print-log-internal 'Git (list root)
+                                     (unless ancestor full) (not ancestor)
+                                     limit))
+            (with-current-buffer "*vc-change-log*"
+              (setq default-directory root)
+              (setq vc-parent-buffer-name nil)))
+          (with-current-buffer "*vc-change-log*"
+            ;; apply-partially, not a lambda: --eval code may be evaluated
+            ;; with dynamic binding, so a lambda would not capture FULL.
+            (vc-exec-after (apply-partially #'terminator-nav--goto-commit
+                                            full)))))))))
+'''
+
+GIT_HASH_RE = re.compile(r"^[0-9a-fA-F]{7,64}$")
+
+
+def is_git_commit(text, cwd):
+    """True if TEXT looks like a hash and is a commit of CWD's repository."""
+    if not GIT_HASH_RE.match(text):
+        return False
+    try:
+        result = subprocess.run(
+            ["git", "-C", cwd, "rev-parse", "--verify", "--quiet", text + "^{commit}"],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=3)
+        return result.returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def git_log_expression(commit, cwd):
+    return "(progn %s (terminator-nav-git-log %s %s))" % (
+        GIT_ELISP, lisp_string(commit), lisp_string(cwd))
+
+
+def xref_expression(symbol, cwd, kind):
+    return "(progn %s (terminator-nav-xref %s %s '%s))" % (
+        XREF_ELISP, lisp_string(symbol), lisp_string(cwd), kind)
+
+
+def imenu_expression(symbol, cwd):
+    return "(progn %s (terminator-nav-imenu %s %s))" % (
+        XREF_ELISP, lisp_string(symbol), lisp_string(cwd))
+def parse_file_location(text):
+    """
+    Parse:
+        file
+        file:42
+        file:42:8
+    Returns (filename, line, column).
+    """
+    parts = text.rsplit(":", 2)
+    if len(parts) == 3 and parts[1].isdigit() and parts[2].isdigit():
+        return parts[0], int(parts[1]), int(parts[2])
+    if len(parts) >= 2 and parts[-1].isdigit():
+        return ":".join(parts[:-1]), int(parts[-1]), None
+    return text, None, None
+def terminal_cwd(terminal):
+    try:
+        cwd = terminal.get_cwd()
+        if cwd and os.path.isdir(cwd):
+            return cwd
+    except Exception:
+        pass
+    return os.getcwd()
+def focused_terminal_cwd():
+    """CWD of the last focused terminal (URL callbacks are not given the terminal)."""
+    try:
+        from terminatorlib.terminator import Terminator
+        term = Terminator().last_focused_term
+        if term is not None:
+            return terminal_cwd(term)
+    except Exception:
+        pass
+    return os.getcwd()
+def resolve_path(filename, cwd):
+    filename = os.path.expanduser(filename)
+    if not os.path.isabs(filename):
+        filename = os.path.join(cwd, filename)
+    return os.path.abspath(filename)
+# ------------------------------------------------------------
+# URL HANDLER
+# ------------------------------------------------------------
+class EmacsPathLineURLHandler(plugin.URLHandler):
+    """Recognize paths and open them in Emacs."""
+    capabilities = ["url_handler"]
+    handler_name = "emacs_path_line"
+    match = (
+        r'(?<![A-Za-z0-9_~./+-])'
+        r'[A-Za-z0-9_~./+-]+'
+        r'(?::[0-9]+(?::[0-9]+)?)?'
+        r'(?![A-Za-z0-9_./+-]|:)'
+    )
+    nameopen = "Open in Emacs"
+    namecopy = "Copy Emacs URL"
+    def callback(self, url):
+        cwd = focused_terminal_cwd()
+        filename, line, column = parse_file_location(url)
+        filename = resolve_path(filename, cwd)
+        # A Git hash (e.g. from `git log --oneline`): not a file, but a commit.
+        if line is None and not os.path.exists(filename) and is_git_commit(url, cwd):
+            eval_emacs(git_log_expression(url, cwd))
+            return "terminator://emacs-git-log"
+        if line is not None and column is not None:
+            expression = """
+(progn
+  (find-file %s)
+  (goto-char (point-min))
+  (forward-line %d)
+  (move-to-column %d))
+""" % (lisp_string(filename), line - 1, column - 1)
+            eval_emacs(expression)
+        elif line is not None:
+            run_emacs("+" + str(line), filename)
+        else:
+            run_emacs(filename)
+        return "terminator://emacs-open"
+# ------------------------------------------------------------
+# CONTEXT MENU
+# ------------------------------------------------------------
+class EmacsNavigationMenu(plugin.MenuItem):
+    capabilities = ["terminal_menu"]
+    def get_selection(self):
+        """Get selected text from GTK PRIMARY selection."""
+        if not self.terminal.vte.get_has_selection():
+            return ""
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
+        text = clipboard.wait_for_text()
+        return text.strip() if text else ""
+    def add_item(self, menu, label, callback, *args):
+        item = Gtk.MenuItem.new_with_label(label)
+        item.connect("activate", callback, *args)
+        menu.append(item)
+        return item
+    # File operations
+    def open_file(self, filename, cwd):
+        filename = resolve_path(filename, cwd)
+        run_emacs(filename)
+    def open_location(self, filename, line, column, cwd):
+        filename = resolve_path(filename, cwd)
+        if column is None:
+            run_emacs("+" + str(line), filename)
+            return
+        expression = """
+(progn
+  (find-file %s)
+  (goto-char (point-min))
+  (forward-line %d)
+  (move-to-column %d))
+""" % (lisp_string(filename), line - 1, column - 1)
+        eval_emacs(expression)
+    def on_open_file(self, _item, filename, cwd):
+        self.open_file(filename, cwd)
+    def on_open_location(self, _item, filename, line, column, cwd):
+        self.open_location(filename, line, column, cwd)
+    # Emacs navigation
+    def on_find_tag(self, _item, symbol, cwd):
+        eval_emacs("(progn %s (terminator-nav-find-tag %s %s))" % (
+            XREF_ELISP, lisp_string(symbol), lisp_string(cwd)))
+    def on_xref_definition(self, _item, symbol, cwd):
+        eval_emacs(xref_expression(symbol, cwd, "definitions"))
+    def on_xref_references(self, _item, symbol, cwd):
+        eval_emacs(xref_expression(symbol, cwd, "references"))
+    def on_imenu(self, _item, symbol, cwd):
+        # Jump straight to the selected symbol's imenu entry (shown buffer,
+        # then other project buffers); prompt with it pre-filled if not found.
+        eval_emacs(imenu_expression(symbol, cwd))
+    def on_git_log(self, _item, commit, cwd):
+        eval_emacs(git_log_expression(commit, cwd))
+    # Project search
+    def on_project_grep(self, _item, pattern, cwd):
+        """Search current Emacs project; fall back to rgrep."""
+        expression = """
+(let ((default-directory %s))
+  (require 'project)
+  (if (project-current nil)
+      (project-find-regexp %s)
+    (rgrep %s "*" default-directory)))
+""" % (lisp_string(cwd), lisp_string(pattern), lisp_string(pattern))
+        eval_emacs(expression)
+    # Clipboard
+    def on_copy(self, _item, text):
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text, -1)
+    # Terminator entry point
+    def callback(self, menuitems, menu, terminal):
+        self.terminal = terminal
+        selection = self.get_selection()
+        if not selection:
+            return
+        cwd = terminal_cwd(terminal)
+        submenu = Gtk.Menu()
+        parent = Gtk.MenuItem.new_with_label("Emacs")
+        parent.set_submenu(submenu)
+        # File navigation
+        if "\n" not in selection and "\r" not in selection:
+            filename, line, column = parse_file_location(selection)
+            filename = resolve_path(filename, cwd)
+            self.add_item(submenu, "Open as file", self.on_open_file, filename, cwd)
+            if line is not None:
+                self.add_item(submenu, "Open at line %d" % line, self.on_open_location, filename, line, None, cwd)
+                if column is not None:
+                    self.add_item(submenu, "Open at line %d, column %d" % (line, column), self.on_open_location, filename, line, column, cwd)
+            submenu.append(Gtk.SeparatorMenuItem())
+        # Git commit
+        if GIT_HASH_RE.match(selection):
+            self.add_item(submenu, "Git: show commit in log", self.on_git_log, selection, cwd)
+            submenu.append(Gtk.SeparatorMenuItem())
+        # Symbol navigation
+        symbol = selection.strip()
+        self.add_item(submenu, "Find tag", self.on_find_tag, symbol, cwd)
+        self.add_item(submenu, "Xref: find definition", self.on_xref_definition, symbol, cwd)
+        self.add_item(submenu, "Xref: find references", self.on_xref_references, symbol, cwd)
+        self.add_item(submenu, "Imenu: go to symbol", self.on_imenu, symbol, cwd)
+        submenu.append(Gtk.SeparatorMenuItem())
+        # Project-aware grep
+        self.add_item(submenu, "Search in Emacs project", self.on_project_grep, selection, cwd)
+        submenu.append(Gtk.SeparatorMenuItem())
+        # Copy
+        self.add_item(submenu, "Copy selection", self.on_copy, selection)
+        parent.show_all()
+        menuitems.append(parent)
+#+end_src
+
+And the =~/.config/terminator/config= should include:
+
+#+begin_example
+[global_config]
+  window_state = maximise
+  use_custom_url_handler = True
+  custom_url_handler = /home/YOUR-NAME/.config/terminator/plugins/emacs_nav.py
+  enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler,EmacsPathLineURLHandler, EmacsNavigationMenu
+#+end_example
 
 * Other plugins
 

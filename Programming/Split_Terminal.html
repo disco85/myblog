@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-11-05 Thu 20:03 -->
+<!-- 2026-11-10 Tue 18:21 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tiling Terminal and Emacs</title>
@@ -313,7 +313,11 @@ function toggleTheme() {
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
 <li><a href="#org4eee365">The goal</a></li>
-<li><a href="#orge8f7531">Tiling terminal</a></li>
+<li><a href="#orge8f7531">Tiling terminal</a>
+<ul>
+<li><a href="#org63c7780">Fully functional navigator</a></li>
+</ul>
+</li>
 <li><a href="#org4e464aa">Other plugins</a></li>
 </ul>
 </div>
@@ -355,7 +359,7 @@ keyboard strokes, etc, etc and custom plugins <i>allowing to control links recog
 Create in your <code>$HOME/.config</code> directory:
 </p>
 
-<pre class="example" id="org88cfb05">
+<pre class="example" id="org53e1522">
 .
 ├── config
 └── plugins/
@@ -398,10 +402,10 @@ And put to this <code>emacs_url_plugin.py</code> file this code:
 and add to the content of the <code>config</code> file this:
 </p>
 
-<pre class="example" id="orgacceb31">
+<pre class="example" id="org59d54ff">
 [global_config]
   use_custom_url_handler = True
-  custom_url_handler = /home/xyz/.config/terminator/plugins/emacs_url_handler.py
+  custom_url_handler = /home/YOUR-NAME/.config/terminator/plugins/emacs_url_plugin.py
   enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, EmacsPathLineURLHandler
 </pre>
 
@@ -427,13 +431,603 @@ with the mouse. It will call <code>emacsclient</code>. And Emacs running in the 
 will open the fil at the right line. Sure you need:
 </p>
 
-<pre class="example" id="org7f9b831">
+<pre class="example" id="org9bb1a77">
 (server-start)
 </pre>
 
 <p>
 in your <code>init.el</code> file in Emacs.
 </p>
+</div>
+<div id="outline-container-org63c7780" class="outline-3">
+<h3 id="org63c7780">Fully functional navigator</h3>
+<div class="outline-text-3" id="text-org63c7780">
+<p>
+My next attempt was to fix some problems and to implement (with AI) navigation using:
+</p>
+
+<ul class="org-ul">
+<li>jump to Git hash (branch...) in Emacs vc-dir - without to checkout it, just to put the point on it
+in the git log</li>
+<li>jump to the definition</li>
+<li>find a tag</li>
+<li>find usage of something</li>
+<li>open a file (optionally with a line or/and a column), directory</li>
+<li>etc...</li>
+</ul>
+
+<p>
+"Links" (including Git revisions) are "jumpable" with CTRL-mouse-click, other things - select it then
+open the popup menu and choose Emacs menu item...
+</p>
+
+<p>
+This is the full plugin code - just change if you want the paths to your <code>emacsclient</code> (btw, it can be
+set as an environment variable <code>EMACSCLIENT</code> as well) - this is <code>~/.config/terminator/plugins/emacs_nav.py</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/env python3
+</span><span class="org-doc">"""
+Terminator Emacs Navigation plugin.
+Features:
+  * Clickable file/path/line/column references.
+  * Right-click Emacs submenu for selected text.
+  * Tags, Xref, Imenu navigation.
+  * Project-aware regexp search, with rgrep fallback.
+  * Git commit hashes: show the commit in the vc root log (C-x v L).
+"""</span>
+<span class="org-keyword">import</span> os
+<span class="org-keyword">import</span> re
+<span class="org-keyword">import</span> shutil
+<span class="org-keyword">import</span> subprocess
+<span class="org-keyword">import</span> logging
+<span class="org-keyword">from</span> gi.repository <span class="org-keyword">import</span> Gtk, Gdk
+<span class="org-keyword">import</span> terminatorlib.plugin <span class="org-keyword">as</span> plugin
+<span class="org-variable-name">AVAILABLE</span> <span class="org-operator">=</span> [<span class="org-string">"EmacsPathLineURLHandler"</span>, <span class="org-string">"EmacsNavigationMenu"</span>]
+<span class="org-variable-name">LOG</span> <span class="org-operator">=</span> logging.getLogger(<span class="org-builtin">__name__</span>)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">find_emacsclient</span>():
+    <span class="org-doc">"""Locate emacsclient: $EMACSCLIENT, PATH, next to `emacs`, local builds."""</span>
+    <span class="org-variable-name">env</span> <span class="org-operator">=</span> os.environ.get(<span class="org-string">"EMACSCLIENT"</span>)
+    <span class="org-keyword">if</span> env <span class="org-keyword">and</span> os.access(env, os.X_OK):
+        <span class="org-keyword">return</span> env
+    <span class="org-variable-name">found</span> <span class="org-operator">=</span> shutil.which(<span class="org-string">"emacsclient"</span>)
+    <span class="org-keyword">if</span> found:
+        <span class="org-keyword">return</span> found
+    <span class="org-comment-delimiter"># </span><span class="org-comment">e.g. ~/.local/bin/emacs -&gt; ~/emacs30/bin/emacs-30.1 =&gt; ~/emacs30/bin/emacsclient
+</span>    <span class="org-variable-name">emacs</span> <span class="org-operator">=</span> shutil.which(<span class="org-string">"emacs"</span>)
+    <span class="org-keyword">if</span> emacs:
+        <span class="org-variable-name">candidate</span> <span class="org-operator">=</span> os.path.join(os.path.dirname(os.path.realpath(emacs)), <span class="org-string">"emacsclient"</span>)
+        <span class="org-keyword">if</span> os.access(candidate, os.X_OK):
+            <span class="org-keyword">return</span> candidate
+    <span class="org-comment-delimiter"># </span><span class="org-xxx-keyword">XXX</span><span class="org-comment"> better change them to your paths where emacslient binary can be:
+</span>    <span class="org-keyword">for</span> candidate <span class="org-keyword">in</span> (<span class="org-string">"~/emacs30/bin/emacsclient"</span>, <span class="org-string">"~/emacs29/bin/emacsclient"</span>,
+                      <span class="org-string">"/usr/local/bin/emacsclient"</span>, <span class="org-string">"/usr/bin/emacsclient"</span>):
+        <span class="org-variable-name">candidate</span> <span class="org-operator">=</span> os.path.expanduser(candidate)
+        <span class="org-keyword">if</span> os.access(candidate, os.X_OK):
+            <span class="org-keyword">return</span> candidate
+    <span class="org-keyword">return</span> <span class="org-string">"emacsclient"</span>
+
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Override by exporting EMACSCLIENT=/path/to/emacsclient before starting Terminator.
+</span><span class="org-variable-name">EMACSCLIENT</span> <span class="org-operator">=</span> find_emacsclient()
+<span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Common helpers
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-keyword">def</span> <span class="org-function-name">run_emacs</span>(<span class="org-operator">*</span>args):
+    <span class="org-doc">"""Launch emacsclient without a shell."""</span>
+    <span class="org-keyword">try</span>:
+        subprocess.Popen([EMACSCLIENT, <span class="org-string">"-n"</span>] <span class="org-operator">+</span> <span class="org-builtin">list</span>(args), close_fds<span class="org-operator">=</span><span class="org-constant">True</span>)
+    <span class="org-keyword">except</span> <span class="org-type">OSError</span>:
+        LOG.exception(<span class="org-string">"Cannot execute emacsclient: %s"</span>, EMACSCLIENT)
+<span class="org-keyword">def</span> <span class="org-function-name">lisp_string</span>(value):
+    <span class="org-doc">"""Convert Python string into a properly quoted Lisp string."""</span>
+    <span class="org-variable-name">value</span> <span class="org-operator">=</span> <span class="org-builtin">str</span>(value)
+    <span class="org-variable-name">value</span> <span class="org-operator">=</span> value.replace(<span class="org-string">"</span><span class="org-constant">\\</span><span class="org-string">"</span>, <span class="org-string">"</span><span class="org-constant">\\</span><span class="org-string">\\"</span>)
+    <span class="org-variable-name">value</span> <span class="org-operator">=</span> value.replace(<span class="org-string">'"'</span>, <span class="org-string">'</span><span class="org-constant">\\</span><span class="org-string">"'</span>)
+    <span class="org-variable-name">value</span> <span class="org-operator">=</span> value.replace(<span class="org-string">"</span><span class="org-constant">\n</span><span class="org-string">"</span>, <span class="org-string">"</span><span class="org-constant">\\</span><span class="org-string">n"</span>)
+    <span class="org-variable-name">value</span> <span class="org-operator">=</span> value.replace(<span class="org-string">"</span><span class="org-constant">\r</span><span class="org-string">"</span>, <span class="org-string">"</span><span class="org-constant">\\</span><span class="org-string">r"</span>)
+    <span class="org-keyword">return</span> <span class="org-string">'"'</span> <span class="org-operator">+</span> value <span class="org-operator">+</span> <span class="org-string">'"'</span>
+<span class="org-keyword">def</span> <span class="org-function-name">eval_emacs</span>(expression):
+    run_emacs(<span class="org-string">"--eval"</span>, expression)
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Elisp helpers sent along with every xref request.
+</span><span class="org-comment-delimiter">#</span><span class="org-comment">
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Why not just (xref-find-definitions "ID")?
+</span><span class="org-comment-delimiter">#  </span><span class="org-comment">* emacsclient --eval runs in an arbitrary buffer (whatever the server has
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">current), so the wrong xref backend / project is used.
+</span><span class="org-comment-delimiter">#  </span><span class="org-comment">* Eglot ignores the ID string (unless it sits in its completion cache) and
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">looks up the symbol AT POINT instead -- so a plain string finds nothing.
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">So: pick a buffer of the terminal's project as context, resolve the ID via
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">LSP workspace/symbol (exact name), falling back to the non-LSP backends
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">(dumb-jump, etags).  For references, jump to the definition and ask there.
+</span><span class="org-variable-name">XREF_ELISP</span> <span class="org-operator">=</span> r<span class="org-string">'''
+(progn
+  (require 'xref)
+  (require 'project)
+  (require 'seq)
+  (require 'cl-lib)
+  (require 'imenu)
+
+  (defun terminator-nav--project-buffers (dir)
+    "File buffers inside DIR's project (or DIR), most recent first."
+    (let* ((dir (file-name-as-directory (file-truename dir)))
+           (proj (let ((default-directory dir))
+                   (ignore-errors (project-current nil))))
+           (root (if proj
+                     (file-name-as-directory (file-truename (project-root proj)))
+                   dir)))
+      (seq-filter
+       (lambda (b)
+         (let ((f (buffer-file-name b)))
+           (and f (string-prefix-p root (file-truename f)))))
+       (buffer-list))))
+
+  (defun terminator-nav--context-buffer (dir)
+    "Most recent file buffer inside DIR's project; Eglot-managed preferred."
+    (let ((bufs (terminator-nav--project-buffers dir)))
+      (or (seq-find (lambda (b)
+                      (with-current-buffer b
+                        (and (fboundp 'eglot-managed-p) (eglot-managed-p))))
+                    bufs)
+          (car bufs))))
+
+  (defun terminator-nav--eglot-defs (id)
+    "Definitions of ID via LSP workspace/symbol, exact name match."
+    (when (and (fboundp 'eglot-managed-p) (eglot-managed-p)
+               (eglot-server-capable :workspaceSymbolProvider))
+      (delq nil
+            (mapcar
+             (lambda (s)
+               (let ((wss (get-text-property 0 'eglot--lsp-workspaceSymbol s)))
+                 (when (equal (plist-get wss :name) id)
+                   (let ((loc (plist-get wss :location)))
+                     (eglot--xref-make-match id (plist-get loc :uri)
+                                             (plist-get loc :range))))))
+             (ignore-errors (eglot--workspace-symbols id))))))
+
+  (defun terminator-nav--plain-backend ()
+    "First non-Eglot xref backend (dumb-jump, etags, ...) for this buffer."
+    (let ((xref-backend-functions
+           (remq 'eglot-xref-backend (default-value 'xref-backend-functions))))
+      (xref-find-backend)))
+
+  (defun terminator-nav--plain-defs (id)
+    (let ((backend (terminator-nav--plain-backend)))
+      (and backend (ignore-errors (xref-backend-definitions backend id)))))
+
+  (defun terminator-nav-xref (id dir kind)
+    "Show definitions or references (KIND) of ID, using DIR's project."
+    (let* ((ctx (or (terminator-nav--context-buffer dir)
+                    (with-current-buffer (get-buffer-create " *terminator-nav*")
+                      (setq default-directory (file-name-as-directory dir))
+                      (current-buffer))))
+           (lsp-defs (with-current-buffer ctx (terminator-nav--eglot-defs id)))
+           (defs (or lsp-defs
+                     (with-current-buffer ctx (terminator-nav--plain-defs id)))))
+      (ignore-errors (select-frame-set-input-focus (selected-frame)))
+      (when (window-minibuffer-p (selected-window))
+        (select-window (or (minibuffer-selected-window) (get-largest-window))))
+      (cond
+       ((eq kind 'definitions)
+        (if (null defs)
+            (message "Terminator: no definition found for %s" id)
+          (xref-push-marker-stack)
+          (xref--show-defs (lambda () defs) nil)))
+       (lsp-defs
+        ;; Eglot finds references of the symbol at point: go to the definition.
+        (let ((m (xref-location-marker (xref-item-location (car lsp-defs)))))
+          (with-current-buffer (marker-buffer m)
+            (unless (and (fboundp 'eglot-managed-p) (eglot-managed-p))
+              (ignore-errors (eglot--maybe-activate-editing-mode)))
+            (save-excursion
+              (goto-char m)
+              (when (re-search-forward
+                     (concat "\\_&lt;" (regexp-quote id) "\\_&gt;")
+                     (save-excursion (forward-line 5) (point)) t)
+                (goto-char (match-beginning 0)))
+              (xref-find-references id)))))
+       (t
+        (with-current-buffer ctx
+          (let ((xref-backend-functions
+                 (remq 'eglot-xref-backend
+                       (default-value 'xref-backend-functions))))
+            (xref-find-references id))))))))
+
+  (defun terminator-nav--imenu-find (id index)
+    "Imenu item in INDEX named ID (exact), else one containing ID as a word."
+    (let ((re (concat "\\_&lt;" (regexp-quote id) "\\_&gt;"))
+          exact fuzzy)
+      (cl-labels ((walk (alist)
+                    (dolist (elt alist)
+                      (cond ((imenu--subalist-p elt)
+                             ;; Eglot: a symbol with children (e.g. an object
+                             ;; or class) is a group; its position lives in
+                             ;; the `breadcrumb-region' text property.
+                             (let* ((name (car elt))
+                                    (reg (and (stringp name)
+                                              (get-text-property
+                                               0 'breadcrumb-region name)))
+                                    (item (and reg (cons name (car reg)))))
+                               (when item
+                                 (cond ((equal name id)
+                                        (unless exact (setq exact item)))
+                                       ((string-match-p re name)
+                                        (unless fuzzy (setq fuzzy item))))))
+                             (walk (cdr elt)))
+                            ((not (stringp (car-safe elt))))
+                            ((equal (car elt) id) (unless exact (setq exact elt)))
+                            ((string-match-p re (car elt))
+                             (unless fuzzy (setq fuzzy elt)))))))
+        (walk index))
+      (or exact fuzzy)))
+
+  (defun terminator-nav-imenu (id dir)
+    "Jump to imenu entry ID: shown buffer first, then DIR's project buffers.
+If not found, prompt with ID pre-filled."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (require 'imenu)
+    (let* ((shown (window-buffer (selected-window)))
+           (bufs (delete-dups
+                  (append (and (buffer-file-name shown) (list shown))
+                          (terminator-nav--project-buffers dir))))
+           (prompt-buf (car bufs))
+           found)
+      (while (and bufs (not found))
+        (let* ((buf (pop bufs))
+               (item (with-current-buffer buf
+                       (ignore-errors
+                         (terminator-nav--imenu-find
+                          id (imenu--make-index-alist t))))))
+          (when item (setq found (cons buf item)))))
+      (if found
+          (progn
+            (xref-push-marker-stack)
+            (switch-to-buffer (car found))
+            (imenu (cdr found)))
+        (if (not prompt-buf)
+            (message "Terminator: no imenu entry %s (no project file open)" id)
+          ;; Prompt in a real file buffer, not e.g. *Messages*.
+          (switch-to-buffer prompt-buf)
+          (let ((enable-recursive-minibuffers t))
+            (minibuffer-with-setup-hook (lambda () (insert id))
+              (call-interactively #'imenu)))))))
+
+  (defun terminator-nav-find-tag (id dir)
+    "Find ID using the nearest TAGS file at/above DIR; never prompt for one."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (require 'etags)
+    (let ((root (locate-dominating-file dir "TAGS")))
+      (if (not root)
+          (message "Terminator: no TAGS file in %s or above (create one: etags / ctags -e -R)"
+                   (abbreviate-file-name dir))
+        (let ((tags-file-name (expand-file-name "TAGS" root))
+              (tags-table-list nil)
+              (xref-backend-functions '(etags--xref-backend)))
+          (condition-case err
+              (xref-find-definitions id)
+            (error (message "Terminator: %s" (error-message-string err))))))))
+'''</span>
+
+
+<span class="org-comment-delimiter"># </span><span class="org-comment">Elisp for "show commit in vc log": open the root log (C-x v L) of the
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">terminal's repository and put point on the commit's line.  Does NOT check
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">anything out.
+</span><span class="org-comment-delimiter">#  </span><span class="org-comment">* The log is async: point is moved with `vc-run-delayed' once git is done.
+</span><span class="org-comment-delimiter">#  </span><span class="org-comment">* vc-git-show-log-entry only understands the long format ("commit HASH"),
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">the root log is the short one (abbreviated %h), so lines are matched via
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">`log-view-message-re' and a prefix test against the full hash.
+</span><span class="org-comment-delimiter">#  </span><span class="org-comment">* The limit (`vc-log-show-limit', 2000 by default) is raised so that old
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">commits are still in the log; a commit not reachable from HEAD (another
+</span><span class="org-comment-delimiter">#    </span><span class="org-comment">branch) gets a log starting at that commit.
+</span><span class="org-variable-name">GIT_ELISP</span> <span class="org-operator">=</span> r<span class="org-string">'''
+(progn
+  (require 'vc)
+  (require 'vc-git)
+  (require 'log-view)
+
+  (defun terminator-nav--git (dir &amp;rest args)
+    "Trimmed output of git ARGS in DIR, or nil if git fails."
+    (let ((default-directory (file-name-as-directory dir)))
+      (with-temp-buffer
+        (when (eq 0 (apply #'process-file "git" nil '(t nil) nil args))
+          (string-trim (buffer-string))))))
+
+  (defun terminator-nav--goto-commit (full)
+    "In a log-view buffer, move point to the entry of commit FULL."
+    (let ((pos (save-excursion
+                 (goto-char (point-min))
+                 (catch 'found
+                   (while (re-search-forward log-view-message-re nil t)
+                     (let ((rev (match-string-no-properties 1)))
+                       (when (and rev (&gt;= (length rev) 4)
+                                  (string-prefix-p rev full))
+                         (throw 'found (line-beginning-position)))))
+                   nil))))
+      (if (not pos)
+          (message "Terminator: commit %s is not in the log" (substring full 0 10))
+        (goto-char pos)
+        ;; vc's process sentinel restores point afterwards unless told so.
+        (setq vc-sentinel-movepoint pos)
+        (dolist (w (get-buffer-window-list (current-buffer) nil t))
+          (set-window-point w pos))
+        (let ((w (get-buffer-window (current-buffer) t)))
+          (when w (select-window w) (recenter)))
+        (when (fboundp 'pulse-momentary-highlight-one-line)
+          (pulse-momentary-highlight-one-line pos))
+        (message "Terminator: commit %s" (substring full 0 10)))))
+
+  (defun terminator-nav-git-log (hash dir)
+    "Show the vc root log of DIR's repository with point on commit HASH."
+    (ignore-errors (select-frame-set-input-focus (selected-frame)))
+    (when (window-minibuffer-p (selected-window))
+      (select-window (or (minibuffer-selected-window) (get-largest-window))))
+    (let* ((root (terminator-nav--git dir "rev-parse" "--show-toplevel"))
+           (full (and root (terminator-nav--git
+                            dir "rev-parse" "--verify" "--quiet"
+                            (concat hash "^{commit}")))))
+      (cond
+       ((not root) (message "Terminator: %s is not in a Git repository"
+                            (abbreviate-file-name dir)))
+       ((not full) (message "Terminator: %s is not a commit in %s"
+                            hash (abbreviate-file-name root)))
+       (t
+        (let* ((ancestor (terminator-nav--git
+                          root "merge-base" "--is-ancestor" full "HEAD"))
+               (newer (and ancestor
+                           (string-to-number
+                            (or (terminator-nav--git
+                                 root "rev-list" "--count" (concat full "..HEAD"))
+                                "0"))))
+               (limit (and (&gt; vc-log-show-limit 0)
+                           (max vc-log-show-limit (+ (or newer 0) 100)))))
+          ;; What `vc-print-root-log' (C-x v L) does, but with an explicit
+          ;; backend and root: it deduces them from the current buffer,
+          ;; which for emacsclient may be unrelated to the terminal's repo.
+          (let ((root (file-name-as-directory root)))
+            (let ((default-directory root))
+              (vc-print-log-internal 'Git (list root)
+                                     (unless ancestor full) (not ancestor)
+                                     limit))
+            (with-current-buffer "*vc-change-log*"
+              (setq default-directory root)
+              (setq vc-parent-buffer-name nil)))
+          (with-current-buffer "*vc-change-log*"
+            ;; apply-partially, not a lambda: --eval code may be evaluated
+            ;; with dynamic binding, so a lambda would not capture FULL.
+            (vc-exec-after (apply-partially #'terminator-nav--goto-commit
+                                            full)))))))))
+'''</span>
+
+<span class="org-variable-name">GIT_HASH_RE</span> <span class="org-operator">=</span> re.<span class="org-builtin">compile</span>(r<span class="org-string">"^[0-9a-fA-F]{7,64}$"</span>)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">is_git_commit</span>(text, cwd):
+    <span class="org-doc">"""True if TEXT looks like a hash and is a commit of CWD's repository."""</span>
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> GIT_HASH_RE.<span class="org-keyword">match</span>(text):
+        <span class="org-keyword">return</span> <span class="org-constant">False</span>
+    <span class="org-keyword">try</span>:
+        <span class="org-variable-name">result</span> <span class="org-operator">=</span> subprocess.run(
+            [<span class="org-string">"git"</span>, <span class="org-string">"-C"</span>, cwd, <span class="org-string">"rev-parse"</span>, <span class="org-string">"--verify"</span>, <span class="org-string">"--quiet"</span>, text <span class="org-operator">+</span> <span class="org-string">"^{commit}"</span>],
+            stdout<span class="org-operator">=</span>subprocess.DEVNULL, stderr<span class="org-operator">=</span>subprocess.DEVNULL, timeout<span class="org-operator">=</span>3)
+        <span class="org-keyword">return</span> result.returncode <span class="org-operator">==</span> 0
+    <span class="org-keyword">except</span> (<span class="org-type">OSError</span>, subprocess.SubprocessError):
+        <span class="org-keyword">return</span> <span class="org-constant">False</span>
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">git_log_expression</span>(commit, cwd):
+    <span class="org-keyword">return</span> <span class="org-string">"(progn %s (terminator-nav-git-log %s %s))"</span> <span class="org-operator">%</span> (
+        GIT_ELISP, lisp_string(commit), lisp_string(cwd))
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">xref_expression</span>(symbol, cwd, kind):
+    <span class="org-keyword">return</span> <span class="org-string">"(progn %s (terminator-nav-xref %s %s '%s))"</span> <span class="org-operator">%</span> (
+        XREF_ELISP, lisp_string(symbol), lisp_string(cwd), kind)
+
+
+<span class="org-keyword">def</span> <span class="org-function-name">imenu_expression</span>(symbol, cwd):
+    <span class="org-keyword">return</span> <span class="org-string">"(progn %s (terminator-nav-imenu %s %s))"</span> <span class="org-operator">%</span> (
+        XREF_ELISP, lisp_string(symbol), lisp_string(cwd))
+<span class="org-keyword">def</span> <span class="org-function-name">parse_file_location</span>(text):
+    <span class="org-doc">"""
+    Parse:
+        file
+        file:42
+        file:42:8
+    Returns (filename, line, column).
+    """</span>
+    <span class="org-variable-name">parts</span> <span class="org-operator">=</span> text.rsplit(<span class="org-string">":"</span>, 2)
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(parts) <span class="org-operator">==</span> 3 <span class="org-keyword">and</span> parts[1].isdigit() <span class="org-keyword">and</span> parts[2].isdigit():
+        <span class="org-keyword">return</span> parts[0], <span class="org-builtin">int</span>(parts[1]), <span class="org-builtin">int</span>(parts[2])
+    <span class="org-keyword">if</span> <span class="org-builtin">len</span>(parts) <span class="org-operator">&gt;=</span> 2 <span class="org-keyword">and</span> parts[<span class="org-operator">-</span>1].isdigit():
+        <span class="org-keyword">return</span> <span class="org-string">":"</span>.join(parts[:<span class="org-operator">-</span>1]), <span class="org-builtin">int</span>(parts[<span class="org-operator">-</span>1]), <span class="org-constant">None</span>
+    <span class="org-keyword">return</span> text, <span class="org-constant">None</span>, <span class="org-constant">None</span>
+<span class="org-keyword">def</span> <span class="org-function-name">terminal_cwd</span>(terminal):
+    <span class="org-keyword">try</span>:
+        <span class="org-variable-name">cwd</span> <span class="org-operator">=</span> terminal.get_cwd()
+        <span class="org-keyword">if</span> cwd <span class="org-keyword">and</span> os.path.isdir(cwd):
+            <span class="org-keyword">return</span> cwd
+    <span class="org-keyword">except</span> <span class="org-type">Exception</span>:
+        <span class="org-keyword">pass</span>
+    <span class="org-keyword">return</span> os.getcwd()
+<span class="org-keyword">def</span> <span class="org-function-name">focused_terminal_cwd</span>():
+    <span class="org-doc">"""CWD of the last focused terminal (URL callbacks are not given the terminal)."""</span>
+    <span class="org-keyword">try</span>:
+        <span class="org-keyword">from</span> terminatorlib.terminator <span class="org-keyword">import</span> Terminator
+        <span class="org-variable-name">term</span> <span class="org-operator">=</span> Terminator().last_focused_term
+        <span class="org-keyword">if</span> term <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            <span class="org-keyword">return</span> terminal_cwd(term)
+    <span class="org-keyword">except</span> <span class="org-type">Exception</span>:
+        <span class="org-keyword">pass</span>
+    <span class="org-keyword">return</span> os.getcwd()
+<span class="org-keyword">def</span> <span class="org-function-name">resolve_path</span>(filename, cwd):
+    <span class="org-variable-name">filename</span> <span class="org-operator">=</span> os.path.expanduser(filename)
+    <span class="org-keyword">if</span> <span class="org-keyword">not</span> os.path.isabs(filename):
+        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> os.path.join(cwd, filename)
+    <span class="org-keyword">return</span> os.path.abspath(filename)
+<span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">URL HANDLER
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-keyword">class</span> <span class="org-type">EmacsPathLineURLHandler</span>(plugin.URLHandler):
+    <span class="org-doc">"""Recognize paths and open them in Emacs."""</span>
+    <span class="org-variable-name">capabilities</span> <span class="org-operator">=</span> [<span class="org-string">"url_handler"</span>]
+    <span class="org-variable-name">handler_name</span> <span class="org-operator">=</span> <span class="org-string">"emacs_path_line"</span>
+    <span class="org-keyword">match</span> <span class="org-operator">=</span> (
+        r<span class="org-string">'(?&lt;![A-Za-z0-9_~./+-])'</span>
+        r<span class="org-string">'[A-Za-z0-9_~./+-]+'</span>
+        r<span class="org-string">'(?::[0-9]+(?::[0-9]+)?)?'</span>
+        r<span class="org-string">'(?![A-Za-z0-9_./+-]|:)'</span>
+    )
+    <span class="org-variable-name">nameopen</span> <span class="org-operator">=</span> <span class="org-string">"Open in Emacs"</span>
+    <span class="org-variable-name">namecopy</span> <span class="org-operator">=</span> <span class="org-string">"Copy Emacs URL"</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">callback</span>(<span class="org-keyword">self</span>, url):
+        <span class="org-variable-name">cwd</span> <span class="org-operator">=</span> focused_terminal_cwd()
+        <span class="org-variable-name">filename</span>, <span class="org-variable-name">line</span>, <span class="org-variable-name">column</span> <span class="org-operator">=</span> parse_file_location(url)
+        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> resolve_path(filename, cwd)
+        <span class="org-comment-delimiter"># </span><span class="org-comment">A Git hash (e.g. from `git log --oneline`): not a file, but a commit.
+</span>        <span class="org-keyword">if</span> line <span class="org-keyword">is</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> <span class="org-keyword">not</span> os.path.exists(filename) <span class="org-keyword">and</span> is_git_commit(url, cwd):
+            eval_emacs(git_log_expression(url, cwd))
+            <span class="org-keyword">return</span> <span class="org-string">"terminator://emacs-git-log"</span>
+        <span class="org-keyword">if</span> line <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span> <span class="org-keyword">and</span> column <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            <span class="org-variable-name">expression</span> <span class="org-operator">=</span> <span class="org-string">"""
+(progn
+  (find-file %s)
+  (goto-char (point-min))
+  (forward-line %d)
+  (move-to-column %d))
+"""</span> <span class="org-operator">%</span> (lisp_string(filename), line <span class="org-operator">-</span> 1, column <span class="org-operator">-</span> 1)
+            eval_emacs(expression)
+        <span class="org-keyword">elif</span> line <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+            run_emacs(<span class="org-string">"+"</span> <span class="org-operator">+</span> <span class="org-builtin">str</span>(line), filename)
+        <span class="org-keyword">else</span>:
+            run_emacs(filename)
+        <span class="org-keyword">return</span> <span class="org-string">"terminator://emacs-open"</span>
+<span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">CONTEXT MENU
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">------------------------------------------------------------
+</span><span class="org-keyword">class</span> <span class="org-type">EmacsNavigationMenu</span>(plugin.MenuItem):
+    <span class="org-variable-name">capabilities</span> <span class="org-operator">=</span> [<span class="org-string">"terminal_menu"</span>]
+    <span class="org-keyword">def</span> <span class="org-function-name">get_selection</span>(<span class="org-keyword">self</span>):
+        <span class="org-doc">"""Get selected text from GTK PRIMARY selection."""</span>
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> <span class="org-keyword">self</span>.terminal.vte.get_has_selection():
+            <span class="org-keyword">return</span> <span class="org-string">""</span>
+        <span class="org-variable-name">clipboard</span> <span class="org-operator">=</span> Gtk.Clipboard.get(Gdk.SELECTION_PRIMARY)
+        <span class="org-variable-name">text</span> <span class="org-operator">=</span> clipboard.wait_for_text()
+        <span class="org-keyword">return</span> text.strip() <span class="org-keyword">if</span> text <span class="org-keyword">else</span> <span class="org-string">""</span>
+    <span class="org-keyword">def</span> <span class="org-function-name">add_item</span>(<span class="org-keyword">self</span>, menu, label, callback, <span class="org-operator">*</span>args):
+        <span class="org-variable-name">item</span> <span class="org-operator">=</span> Gtk.MenuItem.new_with_label(label)
+        item.connect(<span class="org-string">"activate"</span>, callback, <span class="org-operator">*</span>args)
+        menu.append(item)
+        <span class="org-keyword">return</span> item
+    <span class="org-comment-delimiter"># </span><span class="org-comment">File operations
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">open_file</span>(<span class="org-keyword">self</span>, filename, cwd):
+        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> resolve_path(filename, cwd)
+        run_emacs(filename)
+    <span class="org-keyword">def</span> <span class="org-function-name">open_location</span>(<span class="org-keyword">self</span>, filename, line, column, cwd):
+        <span class="org-variable-name">filename</span> <span class="org-operator">=</span> resolve_path(filename, cwd)
+        <span class="org-keyword">if</span> column <span class="org-keyword">is</span> <span class="org-constant">None</span>:
+            run_emacs(<span class="org-string">"+"</span> <span class="org-operator">+</span> <span class="org-builtin">str</span>(line), filename)
+            <span class="org-keyword">return</span>
+        <span class="org-variable-name">expression</span> <span class="org-operator">=</span> <span class="org-string">"""
+(progn
+  (find-file %s)
+  (goto-char (point-min))
+  (forward-line %d)
+  (move-to-column %d))
+"""</span> <span class="org-operator">%</span> (lisp_string(filename), line <span class="org-operator">-</span> 1, column <span class="org-operator">-</span> 1)
+        eval_emacs(expression)
+    <span class="org-keyword">def</span> <span class="org-function-name">on_open_file</span>(<span class="org-keyword">self</span>, _item, filename, cwd):
+        <span class="org-keyword">self</span>.open_file(filename, cwd)
+    <span class="org-keyword">def</span> <span class="org-function-name">on_open_location</span>(<span class="org-keyword">self</span>, _item, filename, line, column, cwd):
+        <span class="org-keyword">self</span>.open_location(filename, line, column, cwd)
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Emacs navigation
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">on_find_tag</span>(<span class="org-keyword">self</span>, _item, symbol, cwd):
+        eval_emacs(<span class="org-string">"(progn %s (terminator-nav-find-tag %s %s))"</span> <span class="org-operator">%</span> (
+            XREF_ELISP, lisp_string(symbol), lisp_string(cwd)))
+    <span class="org-keyword">def</span> <span class="org-function-name">on_xref_definition</span>(<span class="org-keyword">self</span>, _item, symbol, cwd):
+        eval_emacs(xref_expression(symbol, cwd, <span class="org-string">"definitions"</span>))
+    <span class="org-keyword">def</span> <span class="org-function-name">on_xref_references</span>(<span class="org-keyword">self</span>, _item, symbol, cwd):
+        eval_emacs(xref_expression(symbol, cwd, <span class="org-string">"references"</span>))
+    <span class="org-keyword">def</span> <span class="org-function-name">on_imenu</span>(<span class="org-keyword">self</span>, _item, symbol, cwd):
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Jump straight to the selected symbol's imenu entry (shown buffer,
+</span>        <span class="org-comment-delimiter"># </span><span class="org-comment">then other project buffers); prompt with it pre-filled if not found.
+</span>        eval_emacs(imenu_expression(symbol, cwd))
+    <span class="org-keyword">def</span> <span class="org-function-name">on_git_log</span>(<span class="org-keyword">self</span>, _item, commit, cwd):
+        eval_emacs(git_log_expression(commit, cwd))
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Project search
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">on_project_grep</span>(<span class="org-keyword">self</span>, _item, pattern, cwd):
+        <span class="org-doc">"""Search current Emacs project; fall back to rgrep."""</span>
+        <span class="org-variable-name">expression</span> <span class="org-operator">=</span> <span class="org-string">"""
+(let ((default-directory %s))
+  (require 'project)
+  (if (project-current nil)
+      (project-find-regexp %s)
+    (rgrep %s "*" default-directory)))
+"""</span> <span class="org-operator">%</span> (lisp_string(cwd), lisp_string(pattern), lisp_string(pattern))
+        eval_emacs(expression)
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Clipboard
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">on_copy</span>(<span class="org-keyword">self</span>, _item, text):
+        <span class="org-variable-name">clipboard</span> <span class="org-operator">=</span> Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text, <span class="org-operator">-</span>1)
+    <span class="org-comment-delimiter"># </span><span class="org-comment">Terminator entry point
+</span>    <span class="org-keyword">def</span> <span class="org-function-name">callback</span>(<span class="org-keyword">self</span>, menuitems, menu, terminal):
+        <span class="org-keyword">self</span>.<span class="org-variable-name">terminal</span> <span class="org-operator">=</span> terminal
+        <span class="org-variable-name">selection</span> <span class="org-operator">=</span> <span class="org-keyword">self</span>.get_selection()
+        <span class="org-keyword">if</span> <span class="org-keyword">not</span> selection:
+            <span class="org-keyword">return</span>
+        <span class="org-variable-name">cwd</span> <span class="org-operator">=</span> terminal_cwd(terminal)
+        <span class="org-variable-name">submenu</span> <span class="org-operator">=</span> Gtk.Menu()
+        <span class="org-variable-name">parent</span> <span class="org-operator">=</span> Gtk.MenuItem.new_with_label(<span class="org-string">"Emacs"</span>)
+        parent.set_submenu(submenu)
+        <span class="org-comment-delimiter"># </span><span class="org-comment">File navigation
+</span>        <span class="org-keyword">if</span> <span class="org-string">"</span><span class="org-constant">\n</span><span class="org-string">"</span> <span class="org-keyword">not</span> <span class="org-keyword">in</span> selection <span class="org-keyword">and</span> <span class="org-string">"</span><span class="org-constant">\r</span><span class="org-string">"</span> <span class="org-keyword">not</span> <span class="org-keyword">in</span> selection:
+            <span class="org-variable-name">filename</span>, <span class="org-variable-name">line</span>, <span class="org-variable-name">column</span> <span class="org-operator">=</span> parse_file_location(selection)
+            <span class="org-variable-name">filename</span> <span class="org-operator">=</span> resolve_path(filename, cwd)
+            <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Open as file"</span>, <span class="org-keyword">self</span>.on_open_file, filename, cwd)
+            <span class="org-keyword">if</span> line <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Open at line %d"</span> <span class="org-operator">%</span> line, <span class="org-keyword">self</span>.on_open_location, filename, line, <span class="org-constant">None</span>, cwd)
+                <span class="org-keyword">if</span> column <span class="org-keyword">is</span> <span class="org-keyword">not</span> <span class="org-constant">None</span>:
+                    <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Open at line %d, column %d"</span> <span class="org-operator">%</span> (line, column), <span class="org-keyword">self</span>.on_open_location, filename, line, column, cwd)
+            submenu.append(Gtk.SeparatorMenuItem())
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Git commit
+</span>        <span class="org-keyword">if</span> GIT_HASH_RE.<span class="org-keyword">match</span>(selection):
+            <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Git: show commit in log"</span>, <span class="org-keyword">self</span>.on_git_log, selection, cwd)
+            submenu.append(Gtk.SeparatorMenuItem())
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Symbol navigation
+</span>        <span class="org-variable-name">symbol</span> <span class="org-operator">=</span> selection.strip()
+        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Find tag"</span>, <span class="org-keyword">self</span>.on_find_tag, symbol, cwd)
+        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Xref: find definition"</span>, <span class="org-keyword">self</span>.on_xref_definition, symbol, cwd)
+        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Xref: find references"</span>, <span class="org-keyword">self</span>.on_xref_references, symbol, cwd)
+        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Imenu: go to symbol"</span>, <span class="org-keyword">self</span>.on_imenu, symbol, cwd)
+        submenu.append(Gtk.SeparatorMenuItem())
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Project-aware grep
+</span>        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Search in Emacs project"</span>, <span class="org-keyword">self</span>.on_project_grep, selection, cwd)
+        submenu.append(Gtk.SeparatorMenuItem())
+        <span class="org-comment-delimiter"># </span><span class="org-comment">Copy
+</span>        <span class="org-keyword">self</span>.add_item(submenu, <span class="org-string">"Copy selection"</span>, <span class="org-keyword">self</span>.on_copy, selection)
+        parent.show_all()
+        menuitems.append(parent)
+</pre>
+</div>
+
+<p>
+And the <code>~/.config/terminator/config</code> should include:
+</p>
+
+<pre class="example" id="orga84a263">
+[global_config]
+  window_state = maximise
+  use_custom_url_handler = True
+  custom_url_handler = /home/YOUR-NAME/.config/terminator/plugins/emacs_nav.py
+  enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler,EmacsPathLineURLHandler, EmacsNavigationMenu
+</pre>
+</div>
 </div>
 </div>
 <div id="outline-container-org4e464aa" class="outline-2">
